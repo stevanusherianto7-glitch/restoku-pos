@@ -114,35 +114,60 @@ export default function CustomerView() {
   const [isOutletOpen, setIsOutletOpen] = useState(true);
   const [outletScheduleMsg, setOutletScheduleMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    const raw = localStorage.getItem("outlet_jam_operasional");
-    if (!raw) return;
-    try {
-      const schedule = JSON.parse(raw);
-      if (!Array.isArray(schedule)) return;
-      const daysMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-      const now = new Date();
-      const todayName = daysMap[now.getDay()];
-      const todaySchedule = schedule.find(d => d.day === todayName);
-      if (todaySchedule) {
-        if (!todaySchedule.isOpen) {
+  // Evaluasi apakah outlet buka berdasarkan jadwal
+  const evaluateSchedule = (schedule: any[]) => {
+    if (!Array.isArray(schedule)) return;
+    const daysMap = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const now = new Date();
+    const todayName = daysMap[now.getDay()];
+    const todaySchedule = schedule.find(d => d.day === todayName);
+    if (todaySchedule) {
+      if (!todaySchedule.isOpen) {
+        setIsOutletOpen(false);
+        setOutletScheduleMsg(`Restoran hari ini (${todayName}) TUTUP.`);
+      } else {
+        const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
+        if (currentTime < todaySchedule.openTime || currentTime > todaySchedule.closeTime) {
           setIsOutletOpen(false);
-          setOutletScheduleMsg(`Restoran hari ini (${todayName}) TUTUP.`);
+          setOutletScheduleMsg(`Restoran sedang TUTUP. Jam operasional hari ini: ${todaySchedule.openTime} - ${todaySchedule.closeTime} WIB.`);
         } else {
-          const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
-          if (currentTime < todaySchedule.openTime || currentTime > todaySchedule.closeTime) {
-            setIsOutletOpen(false);
-            setOutletScheduleMsg(`Restoran sedang TUTUP. Jam operasional hari ini: ${todaySchedule.openTime} - ${todaySchedule.closeTime} WIB.`);
-          } else {
-            setIsOutletOpen(true);
-            setOutletScheduleMsg(`Buka hari ini: ${todaySchedule.openTime} - ${todaySchedule.closeTime} WIB`);
-          }
+          setIsOutletOpen(true);
+          setOutletScheduleMsg(`Buka hari ini: ${todaySchedule.openTime} - ${todaySchedule.closeTime} WIB`);
         }
       }
-    } catch {}
+    }
+  };
+
+  useEffect(() => {
+    // Primary: fetch dari API publik (tidak butuh auth)
+    const outletSlug = window.location.pathname.split('/m/')[1] ?? '';
+    const apiUrl = `/api/outlet-operating-hours${outletSlug ? `?outlet=${encodeURIComponent(outletSlug)}` : ''}`;
+
+    fetch(apiUrl)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.operating_hours) {
+          // API mengembalikan format berbeda dari localStorage — konversi ke format lama
+          const schedule = Object.entries(data.operating_hours).map(([key, val]: [string, any]) => {
+            const dayNames: Record<string, string> = { mon: "Senin", tue: "Selasa", wed: "Rabu", thu: "Kamis", fri: "Jumat", sat: "Sabtu", sun: "Minggu" };
+            return { day: dayNames[key] ?? key, isOpen: !val.closed, openTime: val.open, closeTime: val.close };
+          });
+          evaluateSchedule(schedule);
+        } else {
+          // Fallback ke localStorage jika API tidak return operating_hours
+          const raw = localStorage.getItem("outlet_jam_operasional");
+          if (raw) { try { evaluateSchedule(JSON.parse(raw)); } catch {} }
+        }
+      })
+      .catch(() => {
+        // Fallback ke localStorage jika fetch gagal (offline, dll)
+        const raw = localStorage.getItem("outlet_jam_operasional");
+        if (raw) { try { evaluateSchedule(JSON.parse(raw)); } catch {} }
+      });
   }, []);
 
   // Dynamic CSS themes based on selected tenantLayout
+
   const theme = {
     premium: {
       outer: "min-h-screen w-full bg-gradient-to-b from-[#031510] via-[#052119] to-[#020b08] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 max-w-md mx-auto shadow-2xl relative border-x border-emerald-950/40",

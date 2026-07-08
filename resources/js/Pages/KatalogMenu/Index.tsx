@@ -1,7 +1,8 @@
 import { useState, type ChangeEvent } from "react";
 import { Head } from "@inertiajs/react";
+import { useSubscription } from "../../Hooks/useSubscription";
 import MainLayout from "../../Layouts/MainLayout";
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge, MOCK_PLAN, MOCK_OUTLET, planHasFeature, FEATURE_LOCKS } from "../../Components/Shared";
+import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from "../../Components/Shared";
 import { ChefHat, Search, Plus, Upload, Pencil, Trash2 } from "lucide-react";
 import { ProductImage } from "../../Components/ProductImage";
 

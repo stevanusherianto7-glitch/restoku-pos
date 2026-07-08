@@ -1,7 +1,8 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Head } from "@inertiajs/react";
+import { useSubscription } from "../../Hooks/useSubscription";
 import MainLayout from "../../Layouts/MainLayout";
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge, MOCK_PLAN, MOCK_OUTLET, planHasFeature, FEATURE_LOCKS } from "../../Components/Shared";
+import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from "../../Components/Shared";
 import { QrCode, Download, Printer, MapPin } from "lucide-react";
 import { ProductImage } from "../../Components/ProductImage";
 import { RoleGuard } from "../../Components/RoleGuard";
@@ -33,7 +34,7 @@ function QRCodeMejaInner() {
 
         <div className="space-y-4 sticky top-6">
           <Glass className="p-5 flex flex-col items-center">
-            <h2 className="text-base font-medium text-slate-200 mb-4">QR Code – Meja {selectedTable}</h2>
+            <h2 className="text-base font-medium text-slate-200 mb-4">QR Code � Meja {selectedTable}</h2>
             <div className="size-48 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-lg">
               <div className="size-40 grid grid-cols-8 gap-0.5">
                 {[...Array(64)].map((_, i) => (
@@ -58,7 +59,7 @@ function QRCodeMejaInner() {
             <ol className="space-y-1.5 text-xs text-slate-400 list-decimal list-inside">
               <li>Download QR dan cetak ukuran A5/A6</li>
               <li>Tempel di meja yang sesuai</li>
-              <li>Pelanggan scan → buka e-menu langsung</li>
+              <li>Pelanggan scan ? buka e-menu langsung</li>
               <li>Order masuk otomatis ke dapur</li>
             </ol>
           </Glass>

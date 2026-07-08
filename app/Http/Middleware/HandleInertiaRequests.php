@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use App\Services\FeatureRegistry;
+use App\Services\SettingsService;
 use App\Services\TenantContext;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -11,11 +13,13 @@ use Inertia\Middleware;
  * HandleInertiaRequests — share data ke SEMUA halaman Inertia.
  *
  * Data yang dishare di sini tersedia di React via usePage().props:
- *   - auth.user      → identitas user yang login
- *   - subscription   → plan, status, fitur, trial info (MENGGANTIKAN MOCK_PLAN)
- *   - feature_registry → feature_locks & plan_hierarchy dari FeatureRegistry
- *   - outlet         → outlet aktif user yang login
- *   - flash          → success/error message dari backend
+ *   - auth.user         → identitas user yang login
+ *   - subscription      → plan, status, fitur, trial info (MENGGANTIKAN MOCK_PLAN)
+ *   - feature_registry  → feature_locks & plan_hierarchy dari FeatureRegistry
+ *   - outlet            → outlet aktif user yang login
+ *   - outlet_settings   → tax config dari TenantSetting (MENGGANTIKAN localStorage POS)
+ *   - login_employees   → daftar karyawan dengan PIN hash (untuk StaffLogin PIN pad)
+ *   - flash             → success/error message dari backend
  *
  * Frontend tidak perlu MOCK_PLAN, PLAN_FEATURES, atau FEATURE_LOCKS hardcoded lagi.
  * Semua feature gate membaca dari props ini.
@@ -46,6 +50,18 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
+        // Tax config — dibaca dari TenantSetting, bukan localStorage
+        // Tersedia di React via usePage().props.outlet_settings
+        $taxConfig = null;
+        if ($ctx) {
+            try {
+                $settings  = app(SettingsService::class)->forTenant($ctx->id());
+                $taxConfig = $settings->toTaxShareableArray();
+            } catch (\Throwable) {
+                $taxConfig = null;
+            }
+        }
+
         return [
             ...parent::share($request),
 
@@ -62,13 +78,11 @@ class HandleInertiaRequests extends Middleware
             // ── Subscription & Feature Gate ───────────────────────────────────
             // Menggantikan MOCK_PLAN = "pro" dan PLAN_FEATURES hardcoded di Shared.tsx
             'subscription' => $ctx ? [
-                'plan'         => $ctx->plan(),
-                'status'       => $ctx->subscription()->status,
-                'is_trialing'  => $ctx->isTrialing(),
-                'days_left'    => $ctx->daysLeftInTrial(),
-                // Fitur yang dimiliki plan ini — frontend pakai ini untuk hasFeature()
+                'plan'          => $ctx->plan(),
+                'status'        => $ctx->subscription()->status,
+                'is_trialing'   => $ctx->isTrialing(),
+                'days_left'     => $ctx->daysLeftInTrial(),
                 'plan_features' => FeatureRegistry::allFeaturesForPlan($ctx->plan()),
-                // feature → min_plan mapping — untuk lock icons di sidebar
                 'feature_locks' => FeatureRegistry::FEATURE_LOCKS,
             ] : null,
 
@@ -77,6 +91,23 @@ class HandleInertiaRequests extends Middleware
                 'id'   => $user->outlet_id,
                 'name' => $user->outlet?->name,
             ] : null,
+
+            // ── Outlet Settings (Tax Config) ──────────────────────────────────
+            // Menggantikan localStorage.getItem("outlet_tax_rate") di POS/Index.tsx
+            // Format: { is_tax_active, tax_type, tax_rate, service_charge }
+            'outlet_settings' => $taxConfig,
+
+            // ── Login Employees ───────────────────────────────────────────────
+            // Tersedia di halaman /login untuk StaffLogin PIN verification.
+            // Hanya share pada halaman login — null di halaman lain (efisiensi).
+            // PIN yang di-share adalah hash (bcrypt), BUKAN plaintext.
+            'login_employees' => fn () => $request->routeIs('login')
+                ? User::whereNotNull('tenant_id')
+                    ->where('role', '!=', 'owner')
+                    ->select('id', 'name', 'role', 'pin')
+                    ->get()
+                    ->toArray()
+                : null,
 
             // ── Flash Messages ────────────────────────────────────────────────
             'flash' => [

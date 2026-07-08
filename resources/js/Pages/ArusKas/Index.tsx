@@ -1,7 +1,8 @@
-ï»¿import { useState } from "react";
+import { useState } from "react";
 import { Head } from "@inertiajs/react";
+import { useSubscription } from "../../Hooks/useSubscription";
 import MainLayout from "../../Layouts/MainLayout";
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge, MOCK_PLAN, MOCK_OUTLET, planHasFeature, FEATURE_LOCKS } from "../../Components/Shared";
+import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from "../../Components/Shared";
 import { DollarSign, Utensils, Package, Users, Search, Clock3, CheckCheck, Plus, SlidersHorizontal, ArrowDownToLine, Smartphone, QrCode, UserPlus, FileText, ChevronRight, Calculator, AlertTriangle, MessageSquare, TicketPercent, CheckCircle2, RefreshCcw, Download, DownloadCloud, Volume2, ArrowUpRight, ArrowDownLeft, Banknote } from "lucide-react";
 import { ProductImage } from "../../Components/ProductImage";
 import { RoleGuard } from "../../Components/RoleGuard";
@@ -106,10 +107,10 @@ function ArusKasInner() {
           {/* Print-only Header */}
           <div className="hidden print:block mb-8 border-b border-white/10 pb-4">
             <h1 className="text-2xl font-bold text-white">LAPORAN MUTASI ARUS KAS</h1>
-            <p className="text-slate-400 text-xs mt-1">Tanggal Mutasi: {selectedDate} â€¢ Cetak: {new Date().toLocaleDateString('id-ID')}</p>
+            <p className="text-slate-400 text-xs mt-1">Tanggal Mutasi: {selectedDate} • Cetak: {new Date().toLocaleDateString('id-ID')}</p>
           </div>
 
-          <h2 className="text-base font-medium text-slate-200 mb-4 print:hidden">Riwayat Transaksi Kas â€“ {selectedDate}</h2>
+          <h2 className="text-base font-medium text-slate-200 mb-4 print:hidden">Riwayat Transaksi Kas – {selectedDate}</h2>
           <h2 className="text-base font-bold text-white mb-4 hidden print:block">Riwayat Transaksi Mutasi Kas</h2>
           <div className="grid grid-cols-[80px_1fr_80px_1fr_1fr] border-b border-white/5 pb-3 text-[11px] font-medium uppercase tracking-wider text-slate-400">
             <span>Waktu</span><span>Keterangan</span><span>Jenis</span><span>Jumlah</span><span>Saldo</span>

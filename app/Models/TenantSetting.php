@@ -88,4 +88,19 @@ class TenantSetting extends Model
     {
         return $this->tax_type === 'ppn' ? $this->ppn_rate : $this->pbjt_rate;
     }
+
+    /**
+     * Data pajak yang aman untuk di-share ke frontend via Inertia shared props.
+     * Dipakai oleh HandleInertiaRequests untuk menggantikan localStorage POS.
+     */
+    public function toTaxShareableArray(): array
+    {
+        $isActive = $this->tax_type !== 'none';
+        return [
+            'is_tax_active'  => $isActive,
+            'tax_type'       => $this->tax_type ?? 'pbjt',
+            'tax_rate'       => $isActive ? (float)($this->active_tax_rate ?? 10) : 0,
+            'service_charge' => $isActive ? (float)($this->service_charge_rate ?? 0) : 0,
+        ];
+    }
 }

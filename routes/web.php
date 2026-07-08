@@ -28,6 +28,9 @@ Route::post('/api/orders',        [OrderController::class, 'submitOrder']);
 Route::get('/api/orders/{id}',    [OrderController::class, 'getOrderStatus']);
 Route::get('/api/reservations',   [OrderController::class, 'getReservations']);
 Route::post('/api/reservations',  [OrderController::class, 'submitReservation']);
+// Jam operasional outlet — publik untuk CustomerView (tidak butuh auth)
+Route::get('/api/outlet-operating-hours', [OrderController::class, 'getOutletOperatingHours']);
+
 
 /*
 |--------------------------------------------------------------------------

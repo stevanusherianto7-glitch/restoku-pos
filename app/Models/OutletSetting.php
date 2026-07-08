@@ -111,4 +111,16 @@ class OutletSetting extends Model
         $now   = now()->format('H:i');
         return $now >= $day['open'] && $now <= $day['close'];
     }
+
+    /**
+     * Data operating hours yang aman untuk di-share ke frontend (tamu/publik).
+     * Digunakan oleh endpoint GET /api/outlet-operating-hours
+     */
+    public function toPublicScheduleArray(): array
+    {
+        return [
+            'is_open_now'     => $this->isOpenNow(),
+            'operating_hours' => $this->operating_hours ?? self::defaultOperatingHours(),
+        ];
+    }
 }

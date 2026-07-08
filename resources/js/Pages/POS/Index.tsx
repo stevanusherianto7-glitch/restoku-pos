@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import MainLayout from "../../Layouts/MainLayout";
 import { useCart } from "../../Hooks/useCart";
 import { ProductImage } from "../../Components/ProductImage";
@@ -20,26 +20,40 @@ const MENU_CATALOG = [
   { id: 10, name: "Pisang Goreng Keju", price: 15000, category: "Pelengkap" },
 ] as const;
 
-// [H-1 FIX] Tax rate is now read dynamically from localStorage (set in Pengaturan Outlet).
-// Fallback: PBJT 10% if not configured.
-function getOutletTaxConfig(): { taxType: string; taxRate: number; serviceCharge: number; isTaxActive: boolean } {
-  try {
-    const isTaxActive = localStorage.getItem("outlet_tax_active") !== "false";
-    return {
-      taxType:       localStorage.getItem("outlet_tax_type")       ?? "pbjt",
-      taxRate:       isTaxActive ? (Number(localStorage.getItem("outlet_tax_rate"))       || 10) : 0,
-      serviceCharge: isTaxActive ? (Number(localStorage.getItem("outlet_service_charge")) || 0)  : 0,
-      isTaxActive,
-    };
-  } catch {
-    return { taxType: "pbjt", taxRate: 10, serviceCharge: 0, isTaxActive: true };
-  }
-}
-
 function POSInner() {
   const { screenMode } = useTenantSettings();
   const isNanoBanana = screenMode === "nano-banana";
   const cart = useCart();
+
+  // ── Tax Config dari Inertia Shared Props ──────────────────────────────────
+  // MIGRASI dari localStorage ke usePage().props.outlet_settings
+  // Fallback ke localStorage untuk backward-compat sementara komponen lain dimigrasikan
+  const { outlet_settings } = usePage<any>().props;
+  const taxConfig = (() => {
+    // Primary: baca dari Inertia shared props (di-supply oleh HandleInertiaRequests)
+    if (outlet_settings) {
+      return {
+        taxType:       outlet_settings.tax_type       ?? "pbjt",
+        taxRate:       outlet_settings.is_tax_active ? (outlet_settings.tax_rate ?? 10) : 0,
+        serviceCharge: outlet_settings.is_tax_active ? (outlet_settings.service_charge ?? 0) : 0,
+        isTaxActive:   outlet_settings.is_tax_active !== false,
+      };
+    }
+    // Fallback: localStorage (untuk sesi yang sudah ada sebelum migrasi)
+    try {
+      const isTaxActive = localStorage.getItem("outlet_tax_active") !== "false";
+      return {
+        taxType:       localStorage.getItem("outlet_tax_type")       ?? "pbjt",
+        taxRate:       isTaxActive ? (Number(localStorage.getItem("outlet_tax_rate"))       || 10) : 0,
+        serviceCharge: isTaxActive ? (Number(localStorage.getItem("outlet_service_charge")) || 0)  : 0,
+        isTaxActive,
+      };
+    } catch {
+      return { taxType: "pbjt", taxRate: 10, serviceCharge: 0, isTaxActive: true };
+    }
+  })();
+
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

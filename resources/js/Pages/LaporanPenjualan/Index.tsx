@@ -1,7 +1,8 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Head } from "@inertiajs/react";
+import { useSubscription } from "../../Hooks/useSubscription";
 import MainLayout from "../../Layouts/MainLayout";
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge, MOCK_PLAN, MOCK_OUTLET, planHasFeature, FEATURE_LOCKS, TAX_LABELS } from "../../Components/Shared";
+import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge, TAX_LABELS } from "../../Components/Shared";
 import { DollarSign, Utensils, Package, Users, Search, Clock3, CheckCheck, Plus, SlidersHorizontal, ArrowDownToLine, Smartphone, QrCode, UserPlus, FileText, ChevronRight, Calculator, AlertTriangle, MessageSquare, TicketPercent, CheckCircle2, RefreshCcw, Download, DownloadCloud, Volume2 } from "lucide-react";
 import { ProductImage } from "../../Components/ProductImage";
 import { RoleGuard } from "../../Components/RoleGuard";
@@ -91,7 +92,7 @@ function LaporanPenjualanInner() {
       {/* Print-only Header */}
       <div className="hidden print:block mb-8 border-b border-white/10 pb-4">
         <h1 className="text-2xl font-bold text-white">LAPORAN PENJUALAN OUTLET</h1>
-        <p className="text-slate-400 text-xs mt-1">Periode: {startDate} s/d {endDate} • Cetak: {new Date().toLocaleDateString('id-ID')}</p>
+        <p className="text-slate-400 text-xs mt-1">Periode: {startDate} s/d {endDate} � Cetak: {new Date().toLocaleDateString('id-ID')}</p>
       </div>
 
       <div className="space-y-5">

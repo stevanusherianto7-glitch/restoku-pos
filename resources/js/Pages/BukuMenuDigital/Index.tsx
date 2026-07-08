@@ -1,7 +1,8 @@
-﻿import { useState, ElementType } from "react";
+import { useState, ElementType } from "react";
 import { Head } from "@inertiajs/react";
+import { useSubscription } from "../../Hooks/useSubscription";
 import MainLayout from "../../Layouts/MainLayout";
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge, MOCK_PLAN, MOCK_OUTLET, planHasFeature, FEATURE_LOCKS } from "../../Components/Shared";
+import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from "../../Components/Shared";
 import { DollarSign, Utensils, Package, Users, Search, Clock3, CheckCheck, Plus, SlidersHorizontal, ArrowDownToLine, Smartphone, QrCode, UserPlus, FileText, ChevronRight, Calculator, AlertTriangle, MessageSquare, TicketPercent, CheckCircle2, RefreshCcw, Download, DownloadCloud, Volume2, Link2, Copy, LayoutTemplate, Palette, Image as ImageIcon, MessageCircle, Upload } from "lucide-react";
 import { ProductImage } from "../../Components/ProductImage";
 import { RoleGuard } from "../../Components/RoleGuard";

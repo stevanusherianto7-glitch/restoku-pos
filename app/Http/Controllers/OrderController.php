@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Outlet;
+use App\Models\OutletSetting;
 use App\Models\PrintJob;
 use App\Models\ReceiptConfig;
 use App\Models\Reservation;
@@ -446,6 +448,48 @@ class OrderController extends Controller
             'success' => true,
             'message' => 'Status reservasi berhasil diperbarui',
         ]);
+    }
+
+    // =========================================================================
+    // Public Guest — Jam Operasional Outlet
+    // =========================================================================
+
+    /**
+     * GET /api/outlet-operating-hours?outlet={slug|id}
+     *
+     * Endpoint publik untuk CustomerView — tidak butuh auth.
+     * Return: { is_open_now, operating_hours }
+     */
+    public function getOutletOperatingHours(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $outletParam = $request->query('outlet', '');
+
+        // Coba resolve outlet by slug (name), lalu by id
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
+            ->where('slug', $outletParam)
+            ->orWhere('id', is_numeric($outletParam) ? (int)$outletParam : 0)
+            ->first();
+
+        if (! $outlet) {
+            return response()->json([
+                'is_open_now'     => true,
+                'operating_hours' => OutletSetting::defaultOperatingHours(),
+                'note'            => 'outlet_not_found_using_defaults',
+            ]);
+        }
+
+        $setting = OutletSetting::withoutGlobalScope(TenantScope::class)
+            ->where('outlet_id', $outlet->id)
+            ->first();
+
+        if (! $setting) {
+            return response()->json([
+                'is_open_now'     => true,
+                'operating_hours' => OutletSetting::defaultOperatingHours(),
+            ]);
+        }
+
+        return response()->json($setting->toPublicScheduleArray());
     }
 
     // =========================================================================

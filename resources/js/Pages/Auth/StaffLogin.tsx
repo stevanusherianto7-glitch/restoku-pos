@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ChefHat, Delete, ArrowRight } from 'lucide-react';
 import { RestokuLogo, verifyPin, DEFAULT_EMPLOYEES } from '../../Components/Shared';
 
@@ -9,20 +9,23 @@ export default function StaffLogin() {
     const [error, setError] = useState(false);
     const tenantName = "Restoku";
 
-    // [H-3 FIX] Removed deprecated individual key reads (tenant_pin_kasir, etc.).
-    // Single source of truth: tenant_employees JSON array.
-    const [employeesList, setEmployeesList] = useState<any[]>([]);
+    // ── Daftar Karyawan dari Inertia Shared Props ──────────────────────────
+    // MIGRASI dari localStorage ke usePage().props.login_employees
+    // login_employees di-share oleh HandleInertiaRequests HANYA di halaman /login
+    const { login_employees } = usePage<{ login_employees?: any[] }>().props;
 
-    useEffect(() => {
-        const raw = localStorage.getItem("tenant_employees");
-        if (raw) {
-            try {
-                setEmployeesList(JSON.parse(raw));
-            } catch {
-                setEmployeesList([]);
-            }
+    // Fallback: localStorage untuk backward-compat jika props kosong (incognito/cache)
+    const [employeesList] = useState<any[]>(() => {
+        if (login_employees && login_employees.length > 0) {
+            return login_employees;
         }
-    }, []);
+        // Fallback ke localStorage jika props tidak tersedia
+        try {
+            const raw = localStorage.getItem("tenant_employees");
+            if (raw) return JSON.parse(raw);
+        } catch {}
+        return [];
+    });
 
     const handleNumberClick = (num: string) => {
         if (pin.length < 6 && !isLoading) {
@@ -75,6 +78,7 @@ export default function StaffLogin() {
             })();
         }
     }, [pin, employeesList]);
+
 
     return (
         <div className="min-h-screen w-full bg-[#030303] flex flex-col md:flex-row font-display selection:bg-white/20">
