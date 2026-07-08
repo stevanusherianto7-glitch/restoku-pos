@@ -3,7 +3,7 @@
 
 Gunakan atau salin (*copy-paste*) instruksi di bawah ini setiap kali Anda memulai sesi percakapan baru dengan AI Agent dalam mengembangkan fitur atau melakukan *refactoring* pada proyek **Restoku (6-Layer Enterprise Multi-Tenant SaaS)**.
 
-> **Status Terakhir:** Terverifikasi ✅ — E2E 50/50 routes HTTP OK | 39/39 Backend PHPUnit | 16/16 Vitest Frontend | 9/9 Playwright Browser | 2417 modules compiled clean.
+> **Status Terakhir:** Terverifikasi ✅ — E2E 51/51 routes HTTP OK | 39/39 Backend PHPUnit | 16/16 Vitest Frontend | 9/9 Playwright Browser | 2417 modules compiled clean.
 > Diperbarui: 8 Juli 2026
 
 ---
@@ -60,7 +60,7 @@ poin-poin berikut sebelum kita mulai bekerja:
 - Codebase dianggap SELESAI hanya jika semua perintah di atas menghasilkan ✅ PASS
 
 【STATUS E2E REFERENSI (Terakhir Diverifikasi — 8 Juli 2026)】
-- 50/50 routes: HTTP 200 ✅ (halaman Inertia)
+- 51/51 routes: HTTP 200 ✅ (halaman Inertia, termasuk /owner/google-reviews)
 - /api/* endpoints: HTTP 401 (protected, expected) ✅
 - /api/orders POST & /api/reservations: HTTP 422 (validasi, expected) ✅
 - 39/39 Backend PHPUnit tests ✅ (108 assertions)

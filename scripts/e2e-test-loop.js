@@ -106,11 +106,12 @@ const ROUTES = [
   { url: "/waiter-bar",           expectedStatus: 200, description: "Monitor Bar & Waiter",   critical: false },
 
   // Owner routes
-  { url: "/owner/employees",      expectedStatus: 200, description: "Data Karyawan (Owner)",   critical: false },
-  { url: "/owner/inventory/alerts",expectedStatus: 200, description: "Peringatan Stok (Owner)", critical: false },
-  { url: "/owner/settings",       expectedStatus: 200, description: "Pengaturan Owner",        critical: false },
-  { url: "/owner/dashboard",      expectedStatus: 200, description: "Analitik Owner (Dashboard)",critical: false },
-  { url: "/admin/employees",      expectedStatus: 200, description: "Data Karyawan (Admin)",   critical: false },
+  { url: "/owner/employees",       expectedStatus: 200, description: "Data Karyawan (Owner)",        critical: false },
+  { url: "/owner/inventory/alerts",expectedStatus: 200, description: "Peringatan Stok (Owner)",      critical: false },
+  { url: "/owner/google-reviews",  expectedStatus: 200, description: "Google Review & Complaint Hub", critical: false },
+  { url: "/owner/settings",        expectedStatus: 200, description: "Pengaturan Owner",              critical: false },
+  { url: "/owner/dashboard",       expectedStatus: 200, description: "Analitik Owner (Dashboard)",    critical: false },
+  { url: "/admin/employees",       expectedStatus: 200, description: "Data Karyawan (Admin)",         critical: false },
 
 
   // API receipt configuration & printing triggers

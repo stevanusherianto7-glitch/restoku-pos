@@ -83,9 +83,10 @@ const nav: NavGroup[] = [
     title: "Owner View", Icon: Smartphone,
     roles: ["owner"],
     items: [
-      { name:"Data Karyawan",    href:"/owner/employees",        phase:1, roles:["owner"] },
-      { name:"Peringatan Stok",  href:"/owner/inventory/alerts", phase:1, roles:["owner"] },
-      { name:"Pengaturan Owner", href:"/owner/settings",         phase:1, roles:["owner"] },
+      { name:"Data Karyawan",             href:"/owner/employees",         phase:1, roles:["owner"] },
+      { name:"Peringatan Stok",           href:"/owner/inventory/alerts",  phase:1, roles:["owner"] },
+      { name:"Google Review & Complaint", href:"/owner/google-reviews",    phase:1, roles:["owner"] },
+      { name:"Pengaturan Owner",          href:"/owner/settings",          phase:1, roles:["owner"] },
     ],
   },
 ];
