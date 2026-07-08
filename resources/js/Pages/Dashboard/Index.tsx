@@ -514,13 +514,13 @@ export default function Dashboard() {
               </div>
               <div>
                 <h3 className={`text-base font-bold flex items-center gap-2 ${isNanoBanana ? "text-amber-300" : "text-emerald-200"}`}>
-                  Mode Multi-Outlet {isNanoBanana && "(Cyber Gold Engine)"}
+                  {isGlobal ? "Dasbor Konsolidasi Multi-Outlet" : "Dasbor Analisis Cabang"}
                   {isGlobal && <span className="text-[10px] bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-mono">100 OUTLETS CONNECTED</span>}
                 </h3>
                 <p className={`text-xs ${isNanoBanana ? "text-amber-200/70" : "text-emerald-300/70"}`}>
                   {isGlobal 
-                    ? "Executive Command Center — Menampilkan konsolidasi makro, performa cabang, & radar keamanan global." 
-                    : `Menampilkan analisis mendalam dan metrik operasional untuk ${selectedOutlet}.`}
+                    ? "Pemantauan real-time performa penjualan, tingkat okupansi meja, dan kontrol operasional di seluruh cabang." 
+                    : `Laporan detail metrik operasional, transaksi harian, dan analisis produk terlaris untuk ${selectedOutlet}.`}
                 </p>
               </div>
             </div>
