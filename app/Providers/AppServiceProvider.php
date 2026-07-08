@@ -6,6 +6,7 @@ use App\Services\FeatureRegistry;
 use App\Services\SettingsService;
 use App\Services\TenantContext;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -34,5 +35,11 @@ class AppServiceProvider extends ServiceProvider
     {
         // Redirect middleware 'auth' ke halaman login staf.
         Authenticate::redirectUsing(fn () => '/login');
+
+        // Cegah cURL error 60 (SSL certificate verification) pada lingkungan pengembangan lokal (Windows PHP CLI)
+        if ($this->app->isLocal()) {
+            Http::globalOptions(['verify' => false]);
+        }
     }
 }
+
