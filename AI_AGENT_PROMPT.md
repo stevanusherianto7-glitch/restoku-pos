@@ -3,8 +3,8 @@
 
 Gunakan atau salin (*copy-paste*) instruksi di bawah ini setiap kali Anda memulai sesi percakapan baru dengan AI Agent dalam mengembangkan fitur atau melakukan *refactoring* pada proyek **Restoku (6-Layer Enterprise Multi-Tenant SaaS)**.
 
-> **Status Terakhir:** Terverifikasi ✅ — E2E 50/50 routes HTTP OK | 35/35 Backend Tests | 2415 modules compiled clean.
-> Diperbarui: Juli 2026
+> **Status Terakhir:** Terverifikasi ✅ — E2E 50/50 routes HTTP OK | 39/39 Backend PHPUnit | 16/16 Vitest Frontend | 9/9 Playwright Browser | 2417 modules compiled clean.
+> Diperbarui: 8 Juli 2026
 
 ---
 
@@ -37,23 +37,36 @@ poin-poin berikut sebelum kita mulai bekerja:
   hook `useSubscription()` dari Hooks/useSubscription.ts.
 - ❌ Menulis tipe TypeScript inline di komponen. Gunakan definisi di Types/.
 - ❌ Hardcode konstanta tarif langsung di komponen. Gunakan lib/constants.ts.
+- ❌ Akses props array dari Inertia TANPA null/Array.isArray check. Props bisa null
+  di halaman tertentu atau saat data DB belum ada (contoh: employee.pin = null).
 
 【KEWAJIBAN THEMING】
 - Semua komponen UI yang mendukung mode terang/gelap WAJIB membaca `isLight` dari
   `useTenantSettings()` (tersedia via Components/Shared). Jangan hardcode warna teks.
 
+【KEWAJIBAN NULL-SAFETY — WAJIB SAAT AKSES PROPS INERTIA】
+- Selalu gunakan Array.isArray(props) sebelum akses .length atau .map()
+- Selalu filter data yang masuk: arr.filter(e => e && typeof e.field === 'string')
+- Gunakan optional chaining: e.pin?.length, e.name ?? 'Unknown'
+- Contoh bug nyata yang pernah terjadi: login_employees dari DB mengandung pin: null
+  → crash TypeError: Cannot read properties of undefined (reading 'length')
+
 【KEWAJIBAN VERIFIKASI SETELAH KODING】
-- Setelah setiap perubahan kode: jalankan `npm run tdr` (35+ tests + build + lint)
+- Setelah setiap perubahan kode: jalankan `npm run tdr` (39+ tests + build + lint)
 - Setelah perubahan route/controller/middleware: jalankan `npm run tdr:e2e`
   (verifikasi 50 HTTP endpoint secara live)
-- Codebase dianggap SELESAI hanya jika kedua perintah di atas menghasilkan ✅ PASS
+- Untuk perubahan React komponen kritis: jalankan `npm run test:pw:chromium`
+  (Playwright browser test — mendeteksi React runtime error yg tidak terdeteksi HTTP check)
+- Codebase dianggap SELESAI hanya jika semua perintah di atas menghasilkan ✅ PASS
 
-【STATUS E2E REFERENSI (Terakhir Diverifikasi)】
+【STATUS E2E REFERENSI (Terakhir Diverifikasi — 8 Juli 2026)】
 - 50/50 routes: HTTP 200 ✅ (halaman Inertia)
 - /api/* endpoints: HTTP 401 (protected, expected) ✅
 - /api/orders POST & /api/reservations: HTTP 422 (validasi, expected) ✅
-- 35/35 Backend PHPUnit tests ✅
-- 2415 Vite modules compiled clean ✅
+- 39/39 Backend PHPUnit tests ✅ (108 assertions)
+- 16/16 Vitest Frontend tests ✅ (StaffLogin null-safety: A1–A8, B1–B5, C1–C2)
+- 9/9 Playwright Browser tests ✅ (Chromium: no React crash, PIN pad interaction)
+- 2417 Vite modules compiled clean ✅
 
 Setelah kamu mengonfirmasi pemahamanmu terhadap semua poin di atas, baru kita mulai
 mengerjakan tugasnya!
@@ -85,7 +98,9 @@ yang bisa membaca file secara langsung, cukup ketikkan:
 | **Konstanta** | Taruh di `lib/constants.ts`, formatter di `lib/formatters.ts` |
 | **Multi-tenancy** | Semua model WAJIB pakai `TenantScope` via `app/Models/Scopes/` |
 | **HTTP Gateway** | Middleware stack: `['auth', 'tenant', 'plan:<fitur>']` |
-| **Verifikasi akhir** | `npm run tdr` (wajib) + `npm run tdr:e2e` (wajib jika ada perubahan route) |
+| **Null-safety props** | `Array.isArray(arr) && arr.length > 0` sebelum `.map()` atau `.length` |
+| **Optional chaining** | `e.pin?.length`, `e.name ?? 'fallback'` untuk field yang bisa null di DB |
+| **Verifikasi akhir** | `npm run tdr` (wajib) + `npm run tdr:e2e` (wajib jika ada perubahan route) + `npm run test:pw:chromium` (wajib jika ada perubahan komponen React) |
 
 ### ❌ JANGAN PERNAH LAKUKAN INI
 
@@ -96,6 +111,37 @@ yang bisa membaca file secara langsung, cukup ketikkan:
 | `Cache::remember()` tanpa `instanceof` check | Bisa menghasilkan `__PHP_Incomplete_Class` |
 | Import dari `@/Components/Shared` (deprecated shim) | Gunakan `shared/` langsung atau via barrel |
 | Menulis tipe inline `interface MyType { ... }` di komponen | Duplikasi, gunakan `Types/` |
+| `arr.length` atau `arr.map()` tanpa null-check | Crash saat props dari Inertia bernilai null (terbukti di login page) |
+| `e.field.length` tanpa optional chaining | Crash saat record DB punya field null (terbukti: employee.pin = null) |
+| Mengandalkan HTTP 200 check sebagai bukti "React aman" | HTTP 200 = server OK, bukan render OK. Gunakan Playwright untuk itu |
+
+---
+
+## 🧪 Perintah Testing Lengkap
+
+```bash
+# 1. TDR standar — wajib setelah setiap perubahan kode
+npm run tdr
+
+# 2. TDR + E2E HTTP loop — wajib jika ada perubahan route/controller/middleware
+npm run tdr:e2e
+
+# 3. Playwright browser test — wajib jika ada perubahan komponen React
+npm run test:pw:chromium        # Chromium saja (cepat, ~10 detik)
+npm run test:pw                 # Semua browser: Chromium + Firefox + WebKit + Mobile
+
+# 4. Vitest unit test saja (cepat, ~3 detik)
+npm test
+
+# 5. Playwright interactive UI (debugging visual)
+npm run test:pw:ui
+
+# 6. Playwright headed mode (lihat browser terbuka)
+npm run test:pw:headed
+
+# 7. Playwright debug mode (step-by-step)
+npm run test:pw:debug
+```
 
 ---
 
@@ -108,9 +154,13 @@ restoku backend/
 ├── README.md                    ← Gambaran sistem, quick start, route table
 ├── BACKEND_DESIGN.md            ← Arsitektur backend aktual (models, services)
 ├── FRONTEND_ARCHITECTURE.md     ← Arsitektur frontend aktual (hooks, components)
+├── AI_AGENT_PROMPT.md           ← 📖 File ini — copy-paste ke AI Agent baru
+├── playwright.config.ts         ← Konfigurasi Playwright (Chromium/Firefox/WebKit)
 ├── scripts/
 │   ├── tdr.mjs                  ← npm run tdr (all-in-one: lint + test + build)
 │   └── e2e-test-loop.js         ← npm run tdr:e2e (50 route HTTP verification)
+├── e2e/
+│   └── staff-login.spec.ts      ← Playwright browser test (mendeteksi React runtime error)
 ├── app/
 │   ├── Models/Scopes/TenantScope.php   ← Global multi-tenant isolation
 │   └── Services/
@@ -120,6 +170,10 @@ restoku backend/
 └── resources/js/
     ├── Hooks/useSubscription.ts ← ✅ WAJIB untuk feature check di React
     ├── Components/Shared.tsx    ← useTenantSettings() tersedia di sini
+    ├── __tests__/
+    │   ├── setup.ts             ← Vitest jsdom setup
+    │   ├── dummy.test.tsx       ← Sanity check
+    │   └── StaffLogin.test.tsx  ← 16 unit tests: null-safety A1–A8, B1–B5, C1–C2
     └── lib/
         ├── constants.ts         ← PLAN_FEATURES, ORDER_STATUS, TAX_LABELS
         └── formatters.ts        ← formatRupiah(), formatDate()
@@ -127,7 +181,26 @@ restoku backend/
 
 ---
 
+## ⚠️ Pelajaran dari Bug Produksi (8 Juli 2026)
+
+> Bug ini **lolos TDR** karena layer Frontend hanya punya 1 dummy test (`1+1=2`).
+> HTTP E2E check `/login` → 200 OK **tidak berarti React berhasil dirender**.
+
+**Root cause:** `login_employees` dari DB mengandung record dengan `pin: null`
+(karyawan baru yang belum diset PIN). Kode langsung akses `e.pin.length` → crash.
+
+**Solusi yang diterapkan:**
+1. `Array.isArray()` check sebelum semua operasi array
+2. `filterValid()` — filter hanya karyawan dengan `typeof pin === 'string' && pin.length > 0`
+3. Optional chaining `e.pin?.length ?? 0` di render
+4. Guard `if (!emp.pin) continue` di loop verifikasi
+5. **16 Vitest unit tests** covering semua skenario null/undefined
+6. **9 Playwright browser tests** yang detect React crash secara real
+
+---
+
 <p align="center">
   <b>Restoku Engineering Standard</b><br>
-  Automated Quality Control • Zero Data Leakage • 50/50 E2E Verified
+  Automated Quality Control • Zero Data Leakage • 50/50 E2E Verified<br>
+  39 PHPUnit • 16 Vitest • 9 Playwright • 2417 Vite Modules Clean
 </p>

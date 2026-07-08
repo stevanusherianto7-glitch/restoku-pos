@@ -11,10 +11,16 @@
         "test:e2e": "node scripts/e2e-test-loop.js",
         "test:e2e:watch": "node scripts/e2e-test-loop.js --watch",
         "test:e2e:verbose": "node scripts/e2e-test-loop.js --verbose",
+        "test:pw": "playwright test",
+        "test:pw:ui": "playwright test --ui",
+        "test:pw:headed": "playwright test --headed",
+        "test:pw:chromium": "playwright test --project=chromium",
+        "test:pw:debug": "playwright test --debug",
         "tdr": "node scripts/tdr.mjs",
         "tdr:e2e": "node scripts/tdr.mjs --e2e"
     },
     "devDependencies": {
+        "@playwright/test": "^1.61.1",
         "@tailwindcss/vite": "4.1.12",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/jest-dom": "^6.9.1",
