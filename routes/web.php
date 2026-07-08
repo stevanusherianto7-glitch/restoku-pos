@@ -5,6 +5,7 @@ use App\Http\Controllers\GeminiAiController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OutletSettingsController;
 use App\Http\Controllers\OwnerDashboardController;
+use App\Http\Controllers\GoogleReviewController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -127,4 +128,13 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::post('/api/receipt-config',               [OrderController::class, 'updateReceiptConfig']);
     Route::put('/api/reservations/{id}/status',      [OrderController::class, 'updateReservationStatus']);
     Route::post('/api/ai/chat',                      [GeminiAiController::class, 'chat']);
+
+    // ── Google Review / Complaint Management ────────────────────────────────
+    Route::get('/owner/google-reviews',              [GoogleReviewController::class, 'viewPanel'])
+        ->name('owner.reviews');
+    Route::get('/api/google-reviews',                [GoogleReviewController::class, 'index']);
+    Route::post('/api/google-reviews/sync',          [GoogleReviewController::class, 'syncReviews']);
+    Route::post('/api/google-reviews/{id}/reply',    [GoogleReviewController::class, 'reply']);
+    Route::post('/api/google-reviews/{id}/generate-ai-reply', [GoogleReviewController::class, 'generateAiReply']);
+    Route::post('/api/google-reviews/settings',      [GoogleReviewController::class, 'saveSettings']);
 });
