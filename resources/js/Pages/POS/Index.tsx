@@ -408,7 +408,7 @@ function POSInner() {
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-5 flex-1 overflow-y-auto pr-2 pb-4">
+            <div className="grid grid-cols-4 gap-5 auto-rows-max content-start flex-1 overflow-y-auto pr-2 pb-4">
               {filteredMenu.map(product => {
                 const inCart = cart.items.find(i => i.id === product.id);
                 return (
