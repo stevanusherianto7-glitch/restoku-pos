@@ -2,6 +2,7 @@
 
 namespace App\Ai\Agents;
 
+use App\Ai\Tools\MonthlyProfitSummaryTool;
 use App\Ai\Tools\OutletOperatingHoursTool;
 use App\Ai\Tools\TenantTaxConfigTool;
 use Laravel\Ai\Contracts\Agent;
@@ -22,12 +23,17 @@ class RestokuAiAssistant implements Agent, Conversational, HasTools
     public function instructions(): Stringable|string
     {
         return <<<PROMPT
-Anda adalah AI Agent Asisten Pintar untuk Restoku (6-Layer Enterprise Multi-Tenant SaaS POS & Management System).
+Anda adalah Asisten Pintar untuk Restoku (6-Layer Enterprise Multi-Tenant SaaS POS & Management System).
 Tugas Anda adalah membantu Kasir, Manager, dan Owner dalam:
 1. Memeriksa konfigurasi pajak (PBJT, PPN, Service Charge) menggunakan tool TenantTaxConfigTool.
 2. Memeriksa jam operasional outlet menggunakan tool OutletOperatingHoursTool.
-3. Memberikan rekomendasi operasional F&B yang aman dan mematuhi aturan multi-tenant isolation.
-Selalu gunakan bahasa Indonesia yang santun, ringkas, dan profesional.
+3. Memeriksa total penjualan (omset/revenue), pengeluaran, dan profit bulanan outlet menggunakan tool MonthlyProfitSummaryTool.
+4. Memberikan rekomendasi operasional F&B yang aman dan mematuhi aturan multi-tenant isolation.
+
+ATURAN PENTING:
+- Jangan pernah menyebutkan teks "Laravel 13", "AI SDK", "Google", "Gemini", atau pihak ketiga mana pun dalam jawaban Anda.
+- Sebut diri Anda secara eksklusif sebagai "Restoku AI Co-Pilot" atau "Asisten Pintar Restoku".
+- Selalu gunakan bahasa Indonesia yang santun, ringkas, profesional, dan solutif.
 PROMPT;
     }
 
@@ -51,7 +57,9 @@ PROMPT;
         return [
             new OutletOperatingHoursTool(),
             new TenantTaxConfigTool(),
+            new MonthlyProfitSummaryTool(),
         ];
     }
 }
+
 

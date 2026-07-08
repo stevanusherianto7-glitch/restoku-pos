@@ -13,7 +13,7 @@ export default function GeminiCopilotWidget() {
     {
       id: "welcome-1",
       sender: "gemini",
-      text: "Halo! Saya **Gemini AI Co-Pilot** untuk Restoku (Laravel 13 AI SDK). Apa yang ingin Anda periksa mengenai jadwal operasional, pajak tenant, atau analisa operasional hari ini?",
+      text: "Halo! Saya **Restoku AI Co-Pilot**. Apa yang ingin Anda periksa mengenai jadwal operasional, pajak tenant, analisa penjualan, atau operasional hari ini?",
       timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
     },
   ]);
@@ -91,7 +91,7 @@ export default function GeminiCopilotWidget() {
         {
           id: "err-" + Date.now(),
           sender: "gemini",
-          text: `⚠️ **Error jaringan:** ${error.message || "Tidak dapat terhubung ke server Gemini."}`,
+          text: `⚠️ **Error jaringan:** ${error.message || "Tidak dapat terhubung ke server Asisten AI."}`,
           timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
@@ -113,10 +113,10 @@ export default function GeminiCopilotWidget() {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-semibold rounded-full shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 transform hover:-translate-y-1 group border border-indigo-400/30"
-          title="Buka Gemini AI Co-Pilot"
+          title="Buka Restoku AI Co-Pilot"
         >
           <span className="text-xl animate-pulse">✨</span>
-          <span className="text-sm tracking-wide">Gemini Co-Pilot</span>
+          <span className="text-sm tracking-wide">AI Co-Pilot</span>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping ml-1"></span>
         </button>
       </div>
@@ -132,12 +132,12 @@ export default function GeminiCopilotWidget() {
               </div>
               <div>
                 <h3 className="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
-                  Gemini AI Co-Pilot
+                  Restoku AI Co-Pilot
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 font-mono">
-                    v0.9 SDK
+                    Enterprise
                   </span>
                 </h3>
-                <p className="text-[11px] text-slate-300">Laravel 13 AI + Google Gemini</p>
+                <p className="text-[11px] text-slate-300">Asisten Pintar Operasional & Keuangan</p>
               </div>
             </div>
             <button
@@ -157,7 +157,7 @@ export default function GeminiCopilotWidget() {
               >
                 <div className="flex items-center gap-1.5 mb-1 px-1">
                   <span className="text-[10px] font-medium text-slate-400">
-                    {msg.sender === "user" ? "Anda (Manager)" : "✨ Gemini Co-Pilot"}
+                    {msg.sender === "user" ? "Anda (Manager)" : "✨ Restoku AI Co-Pilot"}
                   </span>
                   <span className="text-[10px] text-slate-500">• {msg.timestamp}</span>
                 </div>
@@ -176,7 +176,7 @@ export default function GeminiCopilotWidget() {
             {isLoading && (
               <div className="flex flex-col items-start animate-pulse">
                 <div className="flex items-center gap-1.5 mb-1 px-1">
-                  <span className="text-[10px] font-medium text-indigo-400">✨ Gemini Co-Pilot</span>
+                  <span className="text-[10px] font-medium text-indigo-400">✨ Restoku AI Co-Pilot</span>
                 </div>
                 <div className="bg-slate-800/90 border border-slate-700/60 px-4 py-3 rounded-2xl rounded-bl-none flex items-center gap-2">
                   <div className="flex space-x-1">
@@ -220,7 +220,7 @@ export default function GeminiCopilotWidget() {
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Tanyakan ke Gemini AI..."
+              placeholder="Tanyakan ke Asisten AI Restoku..."
               disabled={isLoading}
               className="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
             />
