@@ -1,6 +1,6 @@
 # RESTOKU OS - MODUL PENGATURAN OUTLET & SECURITY HARDENING
 
-Dokumen ini adalah rujukan teknis, arsitektural, dan spesifikasi keamanan untuk modul **Pengaturan Outlet** (`/pengaturan-outlet`), yang telah menggantikan rute lama `/pengaturan-toko`. Modul ini mengintegrasikan seluruh pengaturan operasional restoran dengan keamanan tingkat lanjut dan arsitektur *stateful synchronization*.
+Dokumen ini adalah rujukan teknis, arsitektural, dan spesifikasi keamanan untuk modul **Pengaturan Outlet** (`/pengaturan-outlet`). Modul ini mengintegrasikan seluruh pengaturan operasional restoran dengan keamanan tingkat lanjut dan arsitektur *stateful synchronization*.
 
 ---
 

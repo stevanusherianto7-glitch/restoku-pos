@@ -103,7 +103,6 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     // ── Pengaturan Outlet (DB-backed) ───────────────────────────────────────
     Route::get('/pengaturan-outlet', [OutletSettingsController::class, 'index']);
-    Route::redirect('/pengaturan-toko', '/pengaturan-outlet', 301);
 
     Route::prefix('api/outlet-settings')->group(function () {
         Route::put('/all',    [OutletSettingsController::class, 'updateAll']);
