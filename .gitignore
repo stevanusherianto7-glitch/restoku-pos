@@ -20,8 +20,23 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/app/private/*
+/storage/logs/*
 /vendor
 _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# OS & Editor artifacts
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Database file (SQLite — jangan push ke repo)
+/database/*.sqlite
+/database/*.sqlite-journal
