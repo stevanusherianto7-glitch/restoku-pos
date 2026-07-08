@@ -189,6 +189,78 @@ const ROUTES = [
     critical: false 
   },
 
+  // Public guest API — outlet operating hours (tidak butuh auth, return 200)
+  { url: "/api/outlet-operating-hours", expectedStatus: 200, description: "Jam Operasional Outlet (publik)", critical: false },
+
+  // Google Reviews API (protected)
+  { url: "/api/google-reviews",   expectedStatus: 401, description: "Get Google Reviews API",         critical: false },
+  {
+    url: "/api/google-reviews/sync",
+    expectedStatus: 401,
+    description: "Sync Google Reviews API",
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: {},
+    critical: false
+  },
+  {
+    url: "/api/google-reviews/settings",
+    expectedStatus: 401,
+    description: "Save Google Review Settings API",
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: { google_place_id: "ChIJ_test", api_key: "test_key" },
+    critical: false
+  },
+
+  // Outlet Settings API (protected)
+  { url: "/api/outlet-settings",  expectedStatus: 401, description: "List Karyawan API",             critical: false },
+
+  // Orders detail & status update (protected)
+  { url: "/api/orders/999",       expectedStatus: 422, description: "Get Order Status by ID (publik)", critical: false },
+  {
+    url: "/api/orders/999/status",
+    expectedStatus: 401,
+    description: "Update Order Status API",
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: { status: "selesai" },
+    critical: false
+  },
+
+  // Cashier queue delete (protected)
+  {
+    url: "/api/cashier-queue/999",
+    expectedStatus: 401,
+    description: "Clear Cashier Queue Item API",
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: {},
+    critical: false
+  },
+
+  // Reservation status update (protected)
+  {
+    url: "/api/reservations/999/status",
+    expectedStatus: 401,
+    description: "Update Reservation Status API",
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: { status: "confirmed" },
+    critical: false
+  },
+
+  // Gemini AI Chat (protected)
+  {
+    url: "/api/ai/chat",
+    expectedStatus: 401,
+    description: "Gemini AI Chat API",
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: { message: "Berikan rekomendasi menu hari ini" },
+    critical: false
+  },
+
   // 404 check
   { url: "/route-yang-tidak-ada-xyz-404", expectedStatus: 404, description: "404 Not Found (expected)", critical: false },
 ];

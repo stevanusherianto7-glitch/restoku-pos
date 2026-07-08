@@ -3,7 +3,7 @@
 
 Gunakan atau salin (*copy-paste*) instruksi di bawah ini setiap kali Anda memulai sesi percakapan baru dengan AI Agent dalam mengembangkan fitur atau melakukan *refactoring* pada proyek **Restoku (6-Layer Enterprise Multi-Tenant SaaS)**.
 
-> **Status Terakhir:** Terverifikasi ✅ — E2E 51/51 routes HTTP OK | 39/39 Backend PHPUnit | 16/16 Vitest Frontend | 36/36 Playwright (4 browsers) | 2417 modules compiled clean.
+> **Status Terakhir:** Terverifikasi ✅ — E2E 61/61 routes HTTP OK | 39/39 Backend PHPUnit | 16/16 Vitest Frontend | 36/36 Playwright (4 browsers) | 2417 modules compiled clean.
 > Diperbarui: 8 Juli 2026
 
 ---
@@ -60,12 +60,14 @@ poin-poin berikut sebelum kita mulai bekerja:
 - Codebase dianggap SELESAI hanya jika semua perintah di atas menghasilkan ✅ PASS
 
 【STATUS E2E REFERENSI (Terakhir Diverifikasi — 8 Juli 2026)】
-- 51/51 routes: HTTP 200 ✅ (halaman Inertia, termasuk /owner/google-reviews)
-- /api/* endpoints: HTTP 401 (protected, expected) ✅
-- /api/orders POST & /api/reservations: HTTP 422 (validasi, expected) ✅
+- 61/61 routes & API endpoints ✅ (39 halaman Inertia + 22 API endpoint)
+- Inertia pages: HTTP 200 ✅ (termasuk /owner/google-reviews)
+- Protected API /api/*: HTTP 401 (expected) ✅
+- Public API /api/orders POST & /api/reservations: HTTP 422 (validasi, expected) ✅
+- Public API /api/outlet-operating-hours: HTTP 200 ✅
 - 39/39 Backend PHPUnit tests ✅ (108 assertions)
 - 16/16 Vitest Frontend tests ✅ (StaffLogin null-safety: A1–A8, B1–B5, C1–C2)
-- 9/9 Playwright Browser tests ✅ (Chromium: no React crash, PIN pad interaction)
+- 36/36 Playwright Browser tests ✅ (Chromium + Firefox + WebKit + Mobile Chrome)
 - 2417 Vite modules compiled clean ✅
 
 Setelah kamu mengonfirmasi pemahamanmu terhadap semua poin di atas, baru kita mulai
