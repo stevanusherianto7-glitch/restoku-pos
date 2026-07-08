@@ -3,7 +3,7 @@
 
 Gunakan atau salin (*copy-paste*) instruksi di bawah ini setiap kali Anda memulai sesi percakapan baru dengan AI Agent dalam mengembangkan fitur atau melakukan *refactoring* pada proyek **Restoku (6-Layer Enterprise Multi-Tenant SaaS)**.
 
-> **Status Terakhir:** Terverifikasi ✅ — E2E 61/61 routes HTTP OK | 39/39 Backend PHPUnit | 16/16 Vitest Frontend | 36/36 Playwright (4 browsers) | 2417 modules compiled clean.
+> **Status Terakhir:** Terverifikasi ✅ — E2E 61/61 routes HTTP OK | 51/51 Backend PHPUnit | 38/38 Vitest Frontend | 104/104 Playwright (4 browsers) | 2417 modules compiled clean.
 > Diperbarui: 8 Juli 2026
 
 ---
@@ -65,9 +65,9 @@ poin-poin berikut sebelum kita mulai bekerja:
 - Protected API /api/*: HTTP 401 (expected) ✅
 - Public API /api/orders POST & /api/reservations: HTTP 422 (validasi, expected) ✅
 - Public API /api/outlet-operating-hours: HTTP 200 ✅
-- 39/39 Backend PHPUnit tests ✅ (108 assertions)
-- 16/16 Vitest Frontend tests ✅ (StaffLogin null-safety: A1–A8, B1–B5, C1–C2)
-- 36/36 Playwright Browser tests ✅ (Chromium + Firefox + WebKit + Mobile Chrome)
+- 51/51 Backend PHPUnit tests ✅ (124 assertions)
+- 38/38 Vitest Frontend tests ✅ (StaffLogin + GoogleReviews null-safety: A1–A4, B1–B4, C1–C4, D1–D6, E1–E4)
+- 104/104 Playwright Browser tests ✅ (Chromium + Firefox + WebKit + Mobile Chrome, covering login + 17 critical pages)
 - 2417 Vite modules compiled clean ✅
 
 Setelah kamu mengonfirmasi pemahamanmu terhadap semua poin di atas, baru kita mulai
@@ -203,6 +203,6 @@ restoku backend/
 
 <p align="center">
   <b>Restoku Engineering Standard</b><br>
-  Automated Quality Control • Zero Data Leakage • 50/50 E2E Verified<br>
-  39 PHPUnit • 16 Vitest • 9 Playwright • 2417 Vite Modules Clean
+  Automated Quality Control • Zero Data Leakage • 61/61 E2E Verified<br>
+  51 PHPUnit • 38 Vitest • 26 Playwright (104 runs) • 2417 Vite Modules Clean
 </p>
