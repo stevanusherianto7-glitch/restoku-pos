@@ -243,7 +243,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
         ))}
       </nav>
 
-      {/* AI Co-Pilot Widget in Bottom Sidebar */}
+      {/* Restoku Co-Pilot AI Widget in Bottom Sidebar */}
       <GeminiCopilotWidget placement="sidebar" isCollapsed={isCollapsed} />
 
       {/* Active Staff Profile Card */}

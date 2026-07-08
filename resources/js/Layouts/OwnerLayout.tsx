@@ -66,7 +66,7 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        {/* AI Co-Pilot Widget in Bottom Sidebar */}
+        {/* Restoku Co-Pilot AI Widget in Bottom Sidebar */}
         <GeminiCopilotWidget placement="sidebar" isCollapsed={false} />
 
         {/* Bottom user card */}
