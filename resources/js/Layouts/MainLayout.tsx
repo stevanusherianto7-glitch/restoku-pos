@@ -312,7 +312,7 @@ export default function MainLayout({
   return (
     <div className={`flex h-screen w-full overflow-hidden font-sans transition-all duration-500 ${isLight ? "light" : "dark"} ${rootBgClass}`}>
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-      <main className={`flex-1 ${noScroll ? "overflow-hidden p-4 md:p-5 flex flex-col" : "overflow-y-auto p-6 md:p-8"} relative`}>
+      <main className={`flex-1 ${noScroll ? "overflow-hidden p-4 md:p-5 flex flex-col min-h-0" : "overflow-y-auto p-6 md:p-8"} relative`}>
         {isNanoBanana ? (
           <>
             <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-amber-500/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
@@ -332,7 +332,7 @@ export default function MainLayout({
         ) : (
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.04),transparent_60%)] pointer-events-none" />
         )}
-        <div className="relative z-10">
+        <div className={`relative z-10 ${noScroll ? "flex-1 min-h-0 flex flex-col w-full h-full overflow-hidden" : ""}`}>
           {children}
         </div>
       </main>

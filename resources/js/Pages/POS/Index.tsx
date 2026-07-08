@@ -341,7 +341,7 @@ function POSInner() {
             🖨️ Bluetooth Printer: Auto-Print Struk Berhasil!
           </div>
         )}
-        <div className="grid grid-cols-[1fr_400px] gap-5 items-start flex-1 min-h-0 h-full overflow-hidden">
+        <div className="grid grid-cols-[1fr_400px] gap-5 items-stretch flex-1 min-h-0 h-full overflow-hidden">
           {/* ── Menu Grid ── */}
           <Glass className="p-4 flex flex-col h-full overflow-hidden min-h-0">
             {/* Served Orders Payment Queue */}

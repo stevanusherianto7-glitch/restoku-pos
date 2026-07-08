@@ -39,7 +39,7 @@ export function Screen({
   const isLight = screenMode === "terang";
 
   return (
-    <div className={`animate-in fade-in duration-500 max-w-[1280px] mx-auto w-full ${noScroll ? "h-full flex flex-col overflow-hidden" : ""}`}>
+    <div className={`animate-in fade-in duration-500 max-w-[1280px] mx-auto w-full ${noScroll ? "flex-1 min-h-0 flex flex-col h-full overflow-hidden" : ""}`}>
       {/* Page Header */}
       <div className={`${noScroll ? "mb-3 shrink-0" : "mb-8"} flex items-start justify-between gap-4`}>
         <div className="min-w-0">
@@ -64,7 +64,7 @@ export function Screen({
       </div>
 
       {/* Page Content */}
-      <div className={noPadding ? "" : noScroll ? "flex-1 min-h-0 flex flex-col overflow-hidden" : "space-y-6"}>
+      <div className={noPadding ? "" : noScroll ? "flex-1 min-h-0 flex flex-col h-full overflow-hidden" : "space-y-6"}>
         {children}
       </div>
     </div>
