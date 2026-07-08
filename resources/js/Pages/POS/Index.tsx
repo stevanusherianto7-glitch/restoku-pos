@@ -3,7 +3,7 @@ import { Head, usePage } from "@inertiajs/react";
 import MainLayout from "../../Layouts/MainLayout";
 import { useCart } from "../../Hooks/useCart";
 import { ProductImage } from "../../Components/ProductImage";
-import { Screen, Glass, Badge, formatRupiah, PAYMENT_METHODS, TAX_LABELS, useTenantSettings } from "../../Components/Shared";
+import { Screen, Glass, Badge, formatRupiah, PAYMENT_METHODS, TAX_LABELS, useTenantSettings, getOutletTaxConfig } from "../../Components/Shared";
 import { Search, Utensils, FileText, XCircle, Pencil, Percent, Sparkles } from "lucide-react";
 import { ReceiptPreview } from "../../Components/POS/ReceiptPreview";
 import { RoleGuard } from "../../Components/RoleGuard";
@@ -278,8 +278,10 @@ function POSInner() {
     cart.clearCart();
   };
 
-  // [H-1 FIX] Dynamic tax config from Pengaturan Outlet
-  const { taxType, taxRate, serviceCharge } = getOutletTaxConfig();
+  // [H-1 FIX] Dynamic tax config from Pengaturan Outlet (Inertia SSOT with fallback)
+  const taxType = taxConfig?.taxType ?? getOutletTaxConfig().taxType;
+  const taxRate = taxConfig?.taxRate ?? getOutletTaxConfig().taxRate;
+  const serviceCharge = taxConfig?.serviceCharge ?? getOutletTaxConfig().serviceCharge;
   const taxRateDecimal = taxRate / 100;
   const serviceChargeDecimal = serviceCharge / 100;
   const pbjt = Math.round(cart.subtotalAfterDiscount * taxRateDecimal);

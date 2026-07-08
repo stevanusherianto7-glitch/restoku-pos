@@ -311,3 +311,27 @@ export function RestokuLogo({ className = "size-5" }: { className?: string }) {
     </svg>
   );
 }
+
+export function getOutletTaxConfig() {
+  if (typeof window === "undefined") {
+    return { taxType: "pbjt", taxRate: 10, serviceCharge: 0, isTaxActive: true };
+  }
+  const saved = localStorage.getItem("outlet_tax_config");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      return {
+        taxType: parsed.taxType ?? "pbjt",
+        taxRate: parsed.isTaxActive ? (parsed.taxRate ?? 10) : 0,
+        serviceCharge: parsed.isTaxActive ? (parsed.serviceCharge ?? 0) : 0,
+        isTaxActive: parsed.isTaxActive !== false,
+      };
+    } catch (e) {}
+  }
+  return {
+    taxType: "pbjt",
+    taxRate: 10,
+    serviceCharge: 0,
+    isTaxActive: true,
+  };
+}
