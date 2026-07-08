@@ -31,41 +31,36 @@ class GoogleReviewController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        // Generate mock reviews if empty, to give a beautiful starting experience
-        $existingCount = GoogleReview::count();
-        if ($existingCount === 0) {
+        $placeId = session('google_place_id', 'ChIJrTLr-GzsaS4R350O6vCqzw4');
+
+        if ($placeId === 'ChIJmVwPLWHdaC4RzzPOd0s88Qk') {
+            // Hapus ulasan sebelumnya agar terupdate dengan ulasan asli Pawon Salam Resto
+            GoogleReview::truncate();
+
             $mockReviews = [
                 [
-                    'google_review_id' => 'rev_001',
-                    'reviewer_name' => 'Budi Sudarsono',
+                    'google_review_id' => 'pawon_001',
+                    'reviewer_name' => 'RJ Arje',
                     'reviewer_photo' => null,
-                    'rating' => 2,
-                    'comment' => 'Makanannya lumayan enak, tapi pelayanannya lambat sekali. Saya harus menunggu sate ayam sampai 30 menit keluar dari dapur. Mohon diperbaiki.',
+                    'rating' => 5,
+                    'comment' => 'Seusai jogging, cari warung tempat sarapan. Eh ada yang menawarkan menu Semarangan. Halaman parkir cukup banyak karena di kluster komersial. Layanan cukup ramah. Toilet bersih. Ruangan indoor ber-AC bersih dan tertata rapi. Pesan Nasi Soto...',
                     'reviewed_at' => now()->subDays(1),
                 ],
                 [
-                    'google_review_id' => 'rev_002',
-                    'reviewer_name' => 'Siti Rahmawati',
+                    'google_review_id' => 'pawon_002',
+                    'reviewer_name' => 'Mas M Ramdhani',
                     'reviewer_photo' => null,
-                    'rating' => 1,
-                    'comment' => 'Kasirnya kurang ramah dan salah menginput orderan saya. Saya pesan Ribeye Sambal Matah tapi dimasukkan Nasi Goreng.',
+                    'rating' => 5,
+                    'comment' => 'Tempatnya syahdu buat saya, dengan musik2 nuansa Jawa, dipadupadankan dengan makanan yang ajiibb rasanya, enak tenan! Nasi pindang kudusnya harus coba, kuahnya berempah manis tapi ada sensasi melinjo enak sih, asli! Dagingnya empuk, kaya...',
                     'reviewed_at' => now()->subDays(2),
                 ],
                 [
-                    'google_review_id' => 'rev_003',
-                    'reviewer_name' => 'Andi Wijaya',
-                    'reviewer_photo' => null,
-                    'rating' => 5,
-                    'comment' => 'Tempatnya bagus, bersih, dan makanannya juara. Sate ayam truffle rasanya premium sekali. Bakal jadi langganan tetap di sini.',
-                    'reviewed_at' => now()->subDays(3),
-                ],
-                [
-                    'google_review_id' => 'rev_004',
-                    'reviewer_name' => 'Lina Marlina',
+                    'google_review_id' => 'pawon_003',
+                    'reviewer_name' => 'Anisa Indah',
                     'reviewer_photo' => null,
                     'rating' => 3,
-                    'comment' => 'Rasa kopi susunya enak tapi mejanya agak kotor saat saya datang. Untungnya staf sigap membersihkan setelah saya komplain.',
-                    'reviewed_at' => now()->subDays(4),
+                    'comment' => 'Makanannya enak, soto semarang segar sekali. Tapi sayang kemarin pas jam makan siang rame banget, nunggunya agak lama karena antrean kasir menumpuk. Tolong ditingkatkan kecepatan layanannya ya.',
+                    'reviewed_at' => now()->subDays(3),
                 ],
             ];
 
@@ -80,6 +75,58 @@ class GoogleReviewController extends Controller
                     'comment' => $review['comment'],
                     'reviewed_at' => $review['reviewed_at'],
                 ]);
+            }
+        } else {
+            // Generate default mock reviews if empty
+            $existingCount = GoogleReview::count();
+            if ($existingCount === 0) {
+                $mockReviews = [
+                    [
+                        'google_review_id' => 'rev_001',
+                        'reviewer_name' => 'Budi Sudarsono',
+                        'reviewer_photo' => null,
+                        'rating' => 2,
+                        'comment' => 'Makanannya lumayan enak, tapi pelayanannya lambat sekali. Saya harus menunggu sate ayam sampai 30 menit keluar dari dapur. Mohon diperbaiki.',
+                        'reviewed_at' => now()->subDays(1),
+                    ],
+                    [
+                        'google_review_id' => 'rev_002',
+                        'reviewer_name' => 'Siti Rahmawati',
+                        'reviewer_photo' => null,
+                        'rating' => 1,
+                        'comment' => 'Kasirnya kurang ramah dan salah menginput orderan saya. Saya pesan Ribeye Sambal Matah tapi dimasukkan Nasi Goreng.',
+                        'reviewed_at' => now()->subDays(2),
+                    ],
+                    [
+                        'google_review_id' => 'rev_003',
+                        'reviewer_name' => 'Andi Wijaya',
+                        'reviewer_photo' => null,
+                        'rating' => 5,
+                        'comment' => 'Tempatnya bagus, bersih, dan makanannya juara. Sate ayam truffle rasanya premium sekali. Bakal jadi langganan tetap di sini.',
+                        'reviewed_at' => now()->subDays(3),
+                    ],
+                    [
+                        'google_review_id' => 'rev_004',
+                        'reviewer_name' => 'Lina Marlina',
+                        'reviewer_photo' => null,
+                        'rating' => 3,
+                        'comment' => 'Rasa kopi susunya enak tapi mejanya agak kotor saat saya datang. Untungnya staf sigap membersihkan setelah saya komplain.',
+                        'reviewed_at' => now()->subDays(4),
+                    ],
+                ];
+
+                foreach ($mockReviews as $review) {
+                    GoogleReview::create([
+                        'tenant_id' => $user->tenant_id,
+                        'outlet_id' => $user->outlet_id ?? 1,
+                        'google_review_id' => $review['google_review_id'],
+                        'reviewer_name' => $review['reviewer_name'],
+                        'reviewer_photo' => $review['reviewer_photo'],
+                        'rating' => $review['rating'],
+                        'comment' => $review['comment'],
+                        'reviewed_at' => $review['reviewed_at'],
+                    ]);
+                }
             }
         }
 
@@ -126,6 +173,13 @@ class GoogleReviewController extends Controller
             return response()->json([
                 'status' => 'success',
                 'reply' => "Halo Kak Siti, aduh mohon maaf sekali ya atas sikap kasir kami yang kurang ramah kemarin, dan sampai salah menginput pesanan Ribeye Sambal Matah jadi Nasi Goreng. Hal ini sudah kami tegur dan evaluasi langsung bersama tim frontliner agar pelayanan lebih teliti dan selalu senyum menyambut pelanggan. Kami sangat ingin mengirimkan complimentary voucher makan gratis sebagai permohonan maaf kami, boleh tolong kirim kontak Kak Siti ke DM kami? Ditunggu mampir kembali Kak.",
+            ]);
+        }
+
+        if ($review->reviewer_name === 'Anisa Indah') {
+            return response()->json([
+                'status' => 'success',
+                'reply' => "Halo Kak Anisa, terima kasih banyak sudah mampir sarapan di Pawon Salam Resto. Kami memohon maaf atas antrean kasir yang menumpuk saat makan siang kemarin. Masukan Kak Anisa langsung kami evaluasi dengan tim kasir agar bisa melayani lebih cepat di jam-jam sibuk. Kami tunggu kedatangan berikutnya untuk mencoba menu pindang kudus kami ya Kak. Sehat selalu!",
             ]);
         }
         
@@ -189,6 +243,8 @@ class GoogleReviewController extends Controller
             'google_place_id' => 'required|string|max:255',
             'api_key' => 'nullable|string|max:255',
         ]);
+
+        session(['google_place_id' => $request->input('google_place_id')]);
 
         return response()->json([
             'status' => 'success',
