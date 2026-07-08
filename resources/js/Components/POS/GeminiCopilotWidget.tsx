@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface Message {
   id: string;
@@ -157,17 +158,19 @@ export default function GeminiCopilotWidget({
         </div>
       )}
 
-      {/* Chat Drawer / Window */}
-      {isOpen && (
-        <div
-          className={`fixed ${
-            placement === "sidebar"
-              ? isCollapsed
-                ? "bottom-4 left-4 sm:left-[96px]"
-                : "bottom-4 left-4 sm:left-[272px]"
-              : "bottom-20 right-6"
-          } w-[380px] sm:w-[420px] h-[520px] bg-slate-900/95 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col z-50 text-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200`}
-        >
+      {/* Chat Drawer / Window rendered via React Portal so it is NEVER blocked by menus or main content */}
+      {isOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className={`fixed ${
+              placement === "sidebar"
+                ? isCollapsed
+                  ? "bottom-4 left-4 sm:left-[96px]"
+                  : "bottom-4 left-4 sm:left-[272px]"
+                : "bottom-20 right-6"
+            } w-[380px] sm:w-[420px] h-[520px] bg-slate-900/95 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col z-[9999] text-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200`}
+          >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3.5 bg-gradient-to-r from-indigo-900/80 via-purple-900/80 to-slate-900/90 border-b border-slate-700/60">
             <div className="flex items-center gap-2.5">
@@ -273,7 +276,8 @@ export default function GeminiCopilotWidget({
               Kirim
             </button>
           </form>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
