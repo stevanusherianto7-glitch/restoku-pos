@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\GeminiAiController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OutletSettingsController;
 use App\Http\Controllers\OwnerDashboardController;
@@ -125,4 +126,5 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/api/receipt-config',                [OrderController::class, 'getReceiptConfig']);
     Route::post('/api/receipt-config',               [OrderController::class, 'updateReceiptConfig']);
     Route::put('/api/reservations/{id}/status',      [OrderController::class, 'updateReservationStatus']);
+    Route::post('/api/ai/chat',                      [GeminiAiController::class, 'chat']);
 });

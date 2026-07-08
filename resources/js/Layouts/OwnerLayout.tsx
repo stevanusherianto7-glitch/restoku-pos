@@ -5,6 +5,7 @@ import {
   TrendingUp, LogOut, Bell, Store
 } from "lucide-react";
 import { PlanBadge, useTenantSettings } from "../Components/Shared";
+import GeminiCopilotWidget from "../Components/POS/GeminiCopilotWidget";
 import { useSubscription } from "../Hooks/useSubscription";
 import type { SharedProps } from "../Types";
 
@@ -99,6 +100,7 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.04),transparent_60%)] pointer-events-none" />
         )}
         <div className="relative z-10">{children}</div>
+        <GeminiCopilotWidget />
       </main>
     </div>
   );

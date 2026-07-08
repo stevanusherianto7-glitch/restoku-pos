@@ -5,6 +5,7 @@ import {
   Menu, ChevronDown, ChevronRight, Lock, ArrowLeft
 } from "lucide-react";
 import { useTenantSettings } from "../Components/Shared";
+import GeminiCopilotWidget from "../Components/POS/GeminiCopilotWidget";
 import { useSubscription } from "../Hooks/useSubscription";
 import type { SharedProps } from "../Types";
 
@@ -325,6 +326,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         <div className="relative z-10">
           {children}
         </div>
+        <GeminiCopilotWidget />
       </main>
     </div>
   );
