@@ -537,13 +537,13 @@ function POSInner() {
               ))}
             </div>
 
-            {/* Form Tambahan Menu Ad-Hoc (e.g. Kerupuk, Extra Sambal, etc.) */}
+            {/* Form Tambahan Item Manual / Menu Tambahan (cth. Kerupuk, Extra Sambal, dsb.) */}
             <div className="mt-3 p-3 bg-white/[0.02] border border-white/5 rounded-xl space-y-2 shrink-0">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">➕ Tambah Menu Ad-Hoc / Custom</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">➕ Tambah Item Manual / Tambahan</p>
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Nama menu (e.g. Kerupuk)"
+                  placeholder="Nama item (cth. Kerupuk, Extra Sambal)"
                   value={adHocName}
                   onChange={e => setAdHocName(e.target.value)}
                   className="flex-1 bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-blue-500/40"
