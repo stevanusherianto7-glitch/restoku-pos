@@ -116,9 +116,32 @@ class GoogleReviewController extends Controller
         
         try {
             $prompt = sprintf(
-                "Bertindaklah sebagai Asisten AI Co-Pilot Restoku. Tuliskan satu draf balasan tanggapan ulasan Google Review yang ramah, profesional, solutif, dan empatik untuk rating %d bintang dari pelanggan bernama %s berikut ini:\n\nReview: \"%s\"\n\nFormat jawaban langsung saja berupa teks balasan yang siap dikirim, tanpa salam pembuka formal tambahan seperti 'Halo Bapak/Ibu...', langsung ke isi tanggapan.",
+                "Bertindaklah sebagai Owner/Manager Restoran yang ramah, rendah hati, dan sangat peduli dengan masukan pelanggan. Tulis satu tanggapan ulasan Google Review yang sangat manusiawi, tidak kaku, relevan dengan isi komplain/ulasan, dan sama sekali TIDAK terlihat seperti ditulis oleh template AI.\n\n" .
+                "PANDUAN PENULISAN JAWABAN:\n" .
+                "1. Sapa pelanggan dengan nama panggilan akrab Indonesia yang wajar (contoh: 'Halo Kak %s', 'Hai Kak %s').\n" .
+                "2. Jika rating %d bintang (Ulasan Negatif/Komplain):\n" .
+                "   - Segera minta maaf dengan tulus secara spesifik atas keluhan mereka.\n" .
+                "   - JANGAN gunakan template klise seperti 'Kritik Anda adalah motivasi kami untuk lebih baik'.\n" .
+                "   - Tuliskan tindakan nyata yang akan kami lakukan (contoh: mengevaluasi tim kitchen, memeriksa kualitas bahan baku hari itu).\n" .
+                "   - Berikan nada bicara yang empatik, solutif, dan mengundang mereka menghubungi tim kami untuk kami berikan kompensasi (complimentary/refund).\n" .
+                "3. Jika rating >= 4 bintang (Ulasan Positif):\n" .
+                "   - Ucapkan terima kasih dengan hangat dan santai namun tetap sopan.\n" .
+                "   - Sebutkan item/menu yang mereka puji secara spesifik (jika ada).\n" .
+                "   - Sampaikan bahwa kami sangat menantikan kehadiran mereka kembali di outlet.\n" .
+                "4. Gaya Bahasa:\n" .
+                "   - Bahasa Indonesia kasual-profesional yang mengalir alami, seperti balasan WhatsApp dari manager restoran sungguhan.\n" .
+                "   - Hindari kata-kata kaku seperti 'Kami berkomitmen', 'Senantiasa', 'Berdedikasi tinggi', 'Terima kasih atas ulasan bintang %d Anda'.\n" .
+                "5. JANGAN menulis teks pembuka penjelasan seperti 'Berikut adalah balasan:', langsung tuliskan isi balasannya saja.\n\n" .
+                "ULASAN PELANGGAN:\n" .
+                "Nama: %s\n" .
+                "Rating: %d Bintang\n" .
+                "Komentar: \"%s\"",
+                $review->reviewer_name,
+                $review->reviewer_name,
+                $review->rating,
                 $review->rating,
                 $review->reviewer_name,
+                $review->rating,
                 $review->comment ?? '(Tanpa komentar tertulis)'
             );
 
