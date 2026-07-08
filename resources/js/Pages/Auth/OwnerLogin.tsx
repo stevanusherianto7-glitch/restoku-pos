@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChefHat, Mail, Lock, ArrowRight, Quote } from 'lucide-react';
+import { ChefHat, Mail, Lock, ArrowRight, Quote, Eye, EyeOff } from 'lucide-react';
 import { Input, Button, RestokuLogo } from '../../Components/Shared';
 
 export default function OwnerLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const tenantName = "Restoku";
 
     const handleLogin = (e: React.FormEvent) => {
@@ -63,13 +64,21 @@ export default function OwnerLogin() {
                             <div className="relative group">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                                 <Input 
-                                    type="password" 
+                                    type={showPassword ? "text" : "password"} 
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="pl-12 h-14 text-base bg-white/[0.02] border-white/5 focus:bg-white/[0.04] focus:border-blue-500/50 rounded-2xl transition-all shadow-inner"
+                                    className="pl-12 pr-12 h-14 text-base bg-white/[0.02] border-white/5 focus:bg-white/[0.04] focus:border-blue-500/50 rounded-2xl transition-all shadow-inner"
                                     required
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+                                    title={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                                >
+                                    {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                                </button>
                             </div>
                         </div>
 
