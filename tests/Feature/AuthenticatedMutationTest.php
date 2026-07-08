@@ -117,8 +117,8 @@ class AuthenticatedMutationTest extends TestCase
     public function test_authenticated_staff_can_update_order_status(): void
     {
         $response = $this->actingAs($this->staffA)
-            ->putJson("/api/orders/{$this->orderA->id}/status", [
-                'status' => Order::STATUS_SELESAI,
+            ->putJson("/api/orders/{$this->orderA->order_code}/status", [
+                'status' => 'Selesai',
             ]);
 
         $response->assertStatus(200)
@@ -126,14 +126,14 @@ class AuthenticatedMutationTest extends TestCase
 
         $this->assertDatabaseHas('orders', [
             'id'     => $this->orderA->id,
-            'status' => Order::STATUS_SELESAI,
+            'status' => Order::STATUS_SIAP_BAYAR,
         ]);
     }
 
     public function test_unauthenticated_cannot_update_order_status(): void
     {
-        $response = $this->putJson("/api/orders/{$this->orderA->id}/status", [
-            'status' => Order::STATUS_SELESAI,
+        $response = $this->putJson("/api/orders/{$this->orderA->order_code}/status", [
+            'status' => 'Selesai',
         ]);
         $response->assertStatus(401);
     }
@@ -141,8 +141,8 @@ class AuthenticatedMutationTest extends TestCase
     public function test_staff_b_cannot_update_order_from_tenant_a(): void
     {
         $response = $this->actingAs($this->staffB)
-            ->putJson("/api/orders/{$this->orderA->id}/status", [
-                'status' => Order::STATUS_SELESAI,
+            ->putJson("/api/orders/{$this->orderA->order_code}/status", [
+                'status' => 'Selesai',
             ]);
 
         // Harus 404 karena TenantScope menyembunyikan order milik tenant A
@@ -156,19 +156,20 @@ class AuthenticatedMutationTest extends TestCase
     public function test_authenticated_staff_can_update_reservation_status(): void
     {
         $reservation = Reservation::withoutGlobalScopes()->create([
-            'tenant_id' => $this->tenantA->id,
-            'outlet_id' => $this->outletA->id,
-            'name'      => 'Andi Setiawan',
-            'phone'     => '08123456789',
-            'date'      => now()->addDays(2)->toDateString(),
-            'time'      => '19:00',
-            'guests'    => 4,
-            'type'      => 'meja',
-            'status'    => 'pending',
+            'tenant_id'        => $this->tenantA->id,
+            'outlet_id'        => $this->outletA->id,
+            'reservation_code' => 'RSV-A-001',
+            'name'             => 'Andi Setiawan',
+            'phone'            => '08123456789',
+            'date'             => now()->addDays(2)->toDateString(),
+            'time'             => '19:00',
+            'guests'           => 4,
+            'type'             => 'meja',
+            'status'           => 'pending',
         ]);
 
         $response = $this->actingAs($this->staffA)
-            ->putJson("/api/reservations/{$reservation->id}/status", [
+            ->putJson("/api/reservations/{$reservation->reservation_code}/status", [
                 'status' => 'confirmed',
             ]);
 
@@ -183,18 +184,19 @@ class AuthenticatedMutationTest extends TestCase
     public function test_unauthenticated_cannot_update_reservation_status(): void
     {
         $reservation = Reservation::withoutGlobalScopes()->create([
-            'tenant_id' => $this->tenantA->id,
-            'outlet_id' => $this->outletA->id,
-            'name'      => 'Budi',
-            'phone'     => '08111',
-            'date'      => now()->addDay()->toDateString(),
-            'time'      => '18:00',
-            'guests'    => 2,
-            'type'      => 'meja',
-            'status'    => 'pending',
+            'tenant_id'        => $this->tenantA->id,
+            'outlet_id'        => $this->outletA->id,
+            'reservation_code' => 'RSV-A-002',
+            'name'             => 'Budi',
+            'phone'            => '08111',
+            'date'             => now()->addDay()->toDateString(),
+            'time'             => '18:00',
+            'guests'           => 2,
+            'type'             => 'meja',
+            'status'           => 'pending',
         ]);
 
-        $response = $this->putJson("/api/reservations/{$reservation->id}/status", [
+        $response = $this->putJson("/api/reservations/{$reservation->reservation_code}/status", [
             'status' => 'confirmed',
         ]);
         $response->assertStatus(401);
@@ -203,19 +205,20 @@ class AuthenticatedMutationTest extends TestCase
     public function test_staff_b_cannot_update_reservation_from_tenant_a(): void
     {
         $reservation = Reservation::withoutGlobalScopes()->create([
-            'tenant_id' => $this->tenantA->id,
-            'outlet_id' => $this->outletA->id,
-            'name'      => 'Citra',
-            'phone'     => '08222',
-            'date'      => now()->addDays(3)->toDateString(),
-            'time'      => '20:00',
-            'guests'    => 3,
-            'type'      => 'meja',
-            'status'    => 'pending',
+            'tenant_id'        => $this->tenantA->id,
+            'outlet_id'        => $this->outletA->id,
+            'reservation_code' => 'RSV-A-003',
+            'name'             => 'Citra',
+            'phone'            => '08222',
+            'date'             => now()->addDays(3)->toDateString(),
+            'time'             => '20:00',
+            'guests'           => 3,
+            'type'             => 'meja',
+            'status'           => 'pending',
         ]);
 
         $response = $this->actingAs($this->staffB)
-            ->putJson("/api/reservations/{$reservation->id}/status", [
+            ->putJson("/api/reservations/{$reservation->reservation_code}/status", [
                 'status' => 'confirmed',
             ]);
 
@@ -229,14 +232,14 @@ class AuthenticatedMutationTest extends TestCase
     public function test_owner_can_create_new_employee(): void
     {
         $response = $this->actingAs($this->ownerA)
-            ->postJson('/api/outlet-settings/karyawan', [
-                'name'  => 'Dewi Rahayu',
-                'role'  => 'waiter',
-                'pin'   => '456789',
-                'email' => 'dewi@alpha.com',
+            ->post('/api/outlet-settings/karyawan', [
+                'name'     => 'Dewi Rahayu',
+                'role'     => 'waiter',
+                'password' => '1234',
+                'email'    => 'dewi@alpha.com',
             ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(302);
 
         $this->assertDatabaseHas('users', [
             'name'      => 'Dewi Rahayu',
@@ -247,9 +250,10 @@ class AuthenticatedMutationTest extends TestCase
     public function test_unauthenticated_cannot_create_employee(): void
     {
         $response = $this->postJson('/api/outlet-settings/karyawan', [
-            'name' => 'Ghost User',
-            'role' => 'kasir',
-            'pin'  => '000000',
+            'name'     => 'Ghost User',
+            'role'     => 'kasir',
+            'password' => '1234',
+            'email'    => 'ghost@alpha.com',
         ]);
         $response->assertStatus(401);
     }

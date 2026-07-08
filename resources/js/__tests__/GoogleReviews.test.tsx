@@ -23,25 +23,25 @@ vi.mock('@inertiajs/react', () => ({
     usePage: vi.fn(() => ({ props: {} })),
 }));
 
-vi.mock('lucide-react', () => ({
-    Star:          () => <svg data-testid="icon-star" />,
-    RefreshCw:     () => <svg data-testid="icon-refresh" />,
-    Send:          () => <svg data-testid="icon-send" />,
-    CheckCircle2:  () => <svg data-testid="icon-check" />,
-    AlertTriangle: () => <svg data-testid="icon-alert" />,
-    Settings:      () => <svg data-testid="icon-settings" />,
-    Sparkles:      () => <svg data-testid="icon-sparkles" />,
-    AlertCircle:   () => <svg data-testid="icon-alert-circle" />,
-    X:             () => <svg data-testid="icon-x" />,
-    Check:         () => <svg data-testid="icon-check-mark" />,
-    MessageSquare: () => <svg data-testid="icon-message" />,
-}));
+vi.mock('lucide-react', () => {
+    const mockIcons = [
+        'Store', 'Package', 'Boxes', 'BriefcaseBusiness', 'BarChart3', 'Settings', 'Smartphone',
+        'Menu', 'ChevronDown', 'ChevronRight', 'Lock', 'ArrowLeft',
+        'Star', 'RefreshCw', 'Send', 'CheckCircle2', 'AlertTriangle', 'Sparkles', 'AlertCircle', 'X', 'Check', 'MessageSquare',
+        'Wifi'
+    ];
+    const mockExports: Record<string, any> = {};
+    mockIcons.forEach(iconName => {
+        mockExports[iconName] = (props: any) => <svg data-testid={`icon-${iconName.toLowerCase()}`} {...props} />;
+    });
+    return mockExports;
+});
 
-vi.mock('../../Layouts/MainLayout', () => ({
+vi.mock('../Layouts/MainLayout', () => ({
     default: ({ children }: { children: React.ReactNode }) => <div data-testid="main-layout">{children}</div>,
 }));
 
-vi.mock('../../Components/Shared', () => ({
+vi.mock('../Components/Shared', () => ({
     Screen:           ({ children }: { children: React.ReactNode }) => <div data-testid="screen">{children}</div>,
     Glass:            ({ children }: { children: React.ReactNode }) => <div data-testid="glass">{children}</div>,
     Badge:            ({ children }: { children: React.ReactNode }) => <span data-testid="badge">{children}</span>,
