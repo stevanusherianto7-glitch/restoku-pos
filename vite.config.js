@@ -38,4 +38,10 @@ export default defineConfig({
         },
     },
     assetsInclude: ['**/*.svg', '**/*.csv'],
+    test: {
+        environment: 'jsdom',
+        globals: true,
+        setupFiles: ['./resources/js/__tests__/setup.ts'],
+    },
 });
+
