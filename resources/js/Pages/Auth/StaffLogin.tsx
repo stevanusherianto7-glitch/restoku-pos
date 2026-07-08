@@ -16,13 +16,22 @@ export default function StaffLogin() {
 
     // Fallback: localStorage untuk backward-compat jika props kosong (incognito/cache)
     const [employeesList] = useState<any[]>(() => {
-        if (login_employees && login_employees.length > 0) {
-            return login_employees;
+        // Helper: filter karyawan yang memiliki pin valid (bukan null/undefined)
+        const filterValid = (arr: any[]) =>
+            Array.isArray(arr) ? arr.filter(e => e && typeof e.pin === 'string' && e.pin.length > 0) : [];
+
+        if (Array.isArray(login_employees) && login_employees.length > 0) {
+            const valid = filterValid(login_employees);
+            if (valid.length > 0) return valid;
         }
         // Fallback ke localStorage jika props tidak tersedia
         try {
             const raw = localStorage.getItem("tenant_employees");
-            if (raw) return JSON.parse(raw);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                const valid = filterValid(parsed);
+                if (valid.length > 0) return valid;
+            }
         } catch {}
         return [];
     });
@@ -46,12 +55,14 @@ export default function StaffLogin() {
     // Auto-login when PIN is 6 digits
     useEffect(() => {
         if (pin.length === 6) {
+            setIsLoading(true);
             const list = Array.isArray(employeesList) && employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES;
 
             // [C-2 FIX] Use async verifyPin() — supports both hashed (new) and plaintext (legacy) PINs
             (async () => {
                 let matched: any = null;
                 for (const emp of list) {
+                    if (!emp.pin) continue; // skip karyawan tanpa PIN
                     const ok = await verifyPin(pin, emp.pin);
                     if (ok) { matched = emp; break; }
                 }
@@ -131,7 +142,7 @@ export default function StaffLogin() {
                                         e.role === "kitchen" ? "text-red-400" :
                                         e.role === "waiter" ? "text-emerald-400" :
                                         "text-amber-400"
-                                    }`}>{e.role}</span> · {e.pin.length === 64 ? "******" : e.pin}
+                                    }`}>{e.role}</span> · {(e.pin?.length ?? 0) === 64 ? "******" : (e.pin ?? "—")}
                                 </span>
                             ))}
                         </div>
