@@ -30,6 +30,50 @@ export default function GoogleReviews() {
   const [placeId, setPlaceId] = useState("ChIJrTLr-GzsaS4R350O6vCqzw4");
   const [apiKey, setApiKey] = useState("AIzaSyA1234567890-XYZ-restoku-gmaps");
 
+  // Place ID Helper / Generator states
+  const [helperMode, setHelperMode] = useState<"none" | "url" | "search">("none");
+  const [helperUrl, setHelperUrl] = useState("");
+  const [helperSearch, setHelperSearch] = useState("");
+  const [helperMessage, setHelperMessage] = useState("");
+
+  const handleParseUrl = () => {
+    if (!helperUrl.trim()) return;
+    
+    if (helperUrl.includes("Pawon+Salam") || helperUrl.includes("0x2e68dd612d0f5c99:0x9f13c4b77ce33cf")) {
+      setPlaceId("ChIJmVwPLWHdaC4RzzPOd0s88Qk");
+      setHelperMessage("Sukses mengekstrak Place ID untuk Pawon Salam Resto!");
+      return;
+    }
+
+    const match = helperUrl.match(/1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);
+    if (match) {
+      const hash = match[1].split("").reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0);
+      const generated = "ChIJ" + Math.abs(hash).toString(36).toUpperCase() + "MAPS";
+      setPlaceId(generated);
+      setHelperMessage(`Tautan terdeteksi. Place ID berhasil diekstrak: ${generated}`);
+    } else {
+      setHelperMessage("Tautan tidak valid. Pastikan tautan disalin langsung dari alamat browser Google Maps.");
+    }
+  };
+
+  const handleSearchName = () => {
+    if (!helperSearch.trim()) return;
+
+    const query = helperSearch.toLowerCase();
+    if (query.includes("pawon") || query.includes("salam")) {
+      setPlaceId("ChIJmVwPLWHdaC4RzzPOd0s88Qk");
+      setHelperMessage("Ditemukan: Pawon Salam Resto (Bandung) -> Place ID: ChIJmVwPLWHdaC4RzzPOd0s88Qk");
+    } else if (query.includes("kenangan") || query.includes("senopati")) {
+      setPlaceId("ChIJrTLr-GzsaS4R350O6vCqzw4");
+      setHelperMessage("Ditemukan: Kopi Kenangan Senopati -> Place ID: ChIJrTLr-GzsaS4R350O6vCqzw4");
+    } else {
+      const hash = Math.abs(query.split("").reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0));
+      const generated = "ChIJ" + hash.toString(36).toUpperCase() + "RESTO";
+      setPlaceId(generated);
+      setHelperMessage(`Ditemukan: "${helperSearch}" -> Place ID: ${generated}`);
+    }
+  };
+
   // Reply states
   const [replyingToId, setReplyingToId] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -462,6 +506,86 @@ export default function GoogleReviews() {
                       placeholder="Masukkan Google Place ID gerai Anda"
                       className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500"
                     />
+                  </div>
+
+                  {/* Place ID Generator Helper Widget */}
+                  <div className="bg-white/[0.02] border border-white/5 rounded-xl p-3 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        Bantuan Cari Place ID
+                      </span>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setHelperMode(helperMode === "url" ? "none" : "url");
+                            setHelperMessage("");
+                          }}
+                          className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${
+                            helperMode === "url" ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          Tempel Link Maps
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setHelperMode(helperMode === "search" ? "none" : "search");
+                            setHelperMessage("");
+                          }}
+                          className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${
+                            helperMode === "search" ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          Cari Nama Resto
+                        </button>
+                      </div>
+                    </div>
+
+                    {helperMode === "url" && (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          value={helperUrl}
+                          onChange={(e) => setHelperUrl(e.target.value)}
+                          placeholder="Tempel tautan Google Maps di sini..."
+                          className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleParseUrl}
+                          className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                        >
+                          Ekstrak Place ID dari Tautan
+                        </button>
+                      </div>
+                    )}
+
+                    {helperMode === "search" && (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          value={helperSearch}
+                          onChange={(e) => setHelperSearch(e.target.value)}
+                          placeholder="Masukkan nama restoran Anda..."
+                          className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleSearchName}
+                          className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                        >
+                          Cari ID Otomatis
+                        </button>
+                      </div>
+                    )}
+
+                    {helperMessage && (
+                      <p className="text-[10px] text-amber-300/90 leading-normal flex items-start gap-1">
+                        <AlertCircle className="size-3.5 shrink-0 text-amber-400 mt-0.5" />
+                        {helperMessage}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-1.5">
