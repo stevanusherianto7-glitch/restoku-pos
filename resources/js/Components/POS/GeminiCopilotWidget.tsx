@@ -133,9 +133,6 @@ export default function GeminiCopilotWidget() {
               <div>
                 <h3 className="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
                   Restoku AI Co-Pilot
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 font-mono">
-                    Enterprise
-                  </span>
                 </h3>
                 <p className="text-[11px] text-slate-300">Asisten Pintar Operasional & Keuangan</p>
               </div>
