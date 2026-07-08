@@ -46,8 +46,7 @@ export default function StaffLogin() {
     // Auto-login when PIN is 6 digits
     useEffect(() => {
         if (pin.length === 6) {
-            setIsLoading(true);
-            const list = employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES;
+            const list = Array.isArray(employeesList) && employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES;
 
             // [C-2 FIX] Use async verifyPin() — supports both hashed (new) and plaintext (legacy) PINs
             (async () => {
@@ -125,7 +124,7 @@ export default function StaffLogin() {
                     <div className="text-center mb-10">
                         <h2 className="text-2xl font-bold text-white mb-2">Masukkan PIN</h2>
                         <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-1">
-                            {(employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES).map(e => (
+                            {(Array.isArray(employeesList) && employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES).map(e => (
                                 <span key={e.id}>
                                     <span className={`font-bold uppercase ${
                                         e.role === "kasir" ? "text-blue-400" :
