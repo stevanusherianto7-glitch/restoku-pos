@@ -66,6 +66,9 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
+        {/* AI Co-Pilot Widget in Bottom Sidebar */}
+        <GeminiCopilotWidget placement="sidebar" isCollapsed={false} />
+
         {/* Bottom user card */}
         <div className={`mt-4 rounded-xl border p-3 ${isNanoBanana ? "border-amber-500/30 bg-amber-500/[0.04] shadow-[0_0_20px_rgba(234,179,8,0.1)]" : "border-emerald-900/30 bg-emerald-900/10"}`}>
           <div className="flex items-center gap-3 mb-3">
@@ -100,7 +103,6 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.04),transparent_60%)] pointer-events-none" />
         )}
         <div className="relative z-10">{children}</div>
-        <GeminiCopilotWidget />
       </main>
     </div>
   );

@@ -243,6 +243,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
         ))}
       </nav>
 
+      {/* AI Co-Pilot Widget in Bottom Sidebar */}
+      <GeminiCopilotWidget placement="sidebar" isCollapsed={isCollapsed} />
+
       {/* Active Staff Profile Card */}
       {(() => {
         const rawName   = activeKaryawan?.name ?? "";
@@ -326,7 +329,6 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         <div className="relative z-10">
           {children}
         </div>
-        <GeminiCopilotWidget />
       </main>
     </div>
   );

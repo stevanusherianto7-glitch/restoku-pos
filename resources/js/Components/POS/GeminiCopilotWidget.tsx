@@ -7,7 +7,15 @@ interface Message {
   timestamp: string;
 }
 
-export default function GeminiCopilotWidget() {
+interface GeminiCopilotWidgetProps {
+  placement?: "sidebar" | "floating";
+  isCollapsed?: boolean;
+}
+
+export default function GeminiCopilotWidget({
+  placement = "sidebar",
+  isCollapsed = false,
+}: GeminiCopilotWidgetProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -108,22 +116,58 @@ export default function GeminiCopilotWidget() {
 
   return (
     <>
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-semibold rounded-full shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 transform hover:-translate-y-1 group border border-indigo-400/30"
-          title="Buka Restoku AI Co-Pilot"
-        >
-          <span className="text-xl animate-pulse">✨</span>
-          <span className="text-sm tracking-wide">AI Co-Pilot</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping ml-1"></span>
-        </button>
-      </div>
+      {/* Action Button: Sidebar or Floating */}
+      {placement === "sidebar" ? (
+        <div className="w-full pt-2">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className={`w-full flex items-center justify-between px-3 py-2.5 bg-gradient-to-r from-indigo-600/20 via-purple-600/20 to-indigo-600/20 hover:from-indigo-600 hover:to-purple-600 text-indigo-200 hover:text-white border border-indigo-500/40 rounded-xl transition-all duration-300 shadow-sm group ${
+              isCollapsed ? "justify-center px-2" : ""
+            }`}
+            title="Buka Restoku AI Co-Pilot"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-base sm:text-lg animate-pulse shrink-0">✨</span>
+              {!isCollapsed && (
+                <span className="text-xs font-semibold tracking-wide truncate">AI Co-Pilot</span>
+              )}
+            </div>
+            {!isCollapsed && (
+              <span className="flex items-center gap-1 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 group-hover:text-white">
+                  AI
+                </span>
+              </span>
+            )}
+          </button>
+        </div>
+      ) : (
+        /* Floating Action Button */
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-semibold rounded-full shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 transform hover:-translate-y-1 group border border-indigo-400/30"
+            title="Buka Restoku AI Co-Pilot"
+          >
+            <span className="text-xl animate-pulse">✨</span>
+            <span className="text-sm tracking-wide">AI Co-Pilot</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping ml-1"></span>
+          </button>
+        </div>
+      )}
 
       {/* Chat Drawer / Window */}
       {isOpen && (
-        <div className="fixed bottom-20 right-6 w-[400px] sm:w-[440px] h-[540px] bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col z-50 text-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
+        <div
+          className={`fixed ${
+            placement === "sidebar"
+              ? isCollapsed
+                ? "bottom-4 left-4 sm:left-[96px]"
+                : "bottom-4 left-4 sm:left-[272px]"
+              : "bottom-20 right-6"
+          } w-[380px] sm:w-[420px] h-[520px] bg-slate-900/95 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col z-50 text-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200`}
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3.5 bg-gradient-to-r from-indigo-900/80 via-purple-900/80 to-slate-900/90 border-b border-slate-700/60">
             <div className="flex items-center gap-2.5">
