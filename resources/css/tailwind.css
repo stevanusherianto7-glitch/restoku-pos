@@ -1,0 +1,19 @@
+@import 'tailwindcss' source(none);
+@source '../**/*.{js,ts,jsx,tsx}';
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans SC', sans-serif;
+  --font-display: 'Poppins', 'Inter', system-ui, sans-serif;
+  --font-mono: 'DejaVu Sans Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+
+  --text-receipt-sm: 9px;
+  --text-receipt-sm--line-height: 1.2;
+  --text-receipt: 11px;
+  --text-receipt--line-height: 1.3;
+  --text-receipt-lg: 14px;
+  --text-receipt-lg--line-height: 1.4;
+
+  --font-weight-receipt-bold: 700;
+}
+
+@import 'tw-animate-css';

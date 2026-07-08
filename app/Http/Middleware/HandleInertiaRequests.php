@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Services\FeatureRegistry;
+use App\Services\TenantContext;
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+
+/**
+ * HandleInertiaRequests — share data ke SEMUA halaman Inertia.
+ *
+ * Data yang dishare di sini tersedia di React via usePage().props:
+ *   - auth.user      → identitas user yang login
+ *   - subscription   → plan, status, fitur, trial info (MENGGANTIKAN MOCK_PLAN)
+ *   - feature_registry → feature_locks & plan_hierarchy dari FeatureRegistry
+ *   - outlet         → outlet aktif user yang login
+ *   - flash          → success/error message dari backend
+ *
+ * Frontend tidak perlu MOCK_PLAN, PLAN_FEATURES, atau FEATURE_LOCKS hardcoded lagi.
+ * Semua feature gate membaca dari props ini.
+ */
+class HandleInertiaRequests extends Middleware
+{
+    protected $rootView = 'app';
+
+    public function version(Request $request): ?string
+    {
+        return parent::version($request);
+    }
+
+    public function share(Request $request): array
+    {
+        $user = $request->user();
+        $ctx  = null;
+
+        // TenantContext hanya tersedia jika user sudah login dan EnsureTenantContext sudah berjalan
+        if ($user?->tenant_id) {
+            try {
+                $ctx = app(TenantContext::class);
+                if (! $ctx->isInitialized()) {
+                    $ctx->setFromUser($user);
+                }
+            } catch (\Throwable) {
+                $ctx = null;
+            }
+        }
+
+        return [
+            ...parent::share($request),
+
+            // ── Auth ──────────────────────────────────────────────────────────
+            'auth' => [
+                'user' => $user ? [
+                    'id'    => $user->id,
+                    'name'  => $user->name,
+                    'email' => $user->email,
+                    'role'  => $user->role,
+                ] : null,
+            ],
+
+            // ── Subscription & Feature Gate ───────────────────────────────────
+            // Menggantikan MOCK_PLAN = "pro" dan PLAN_FEATURES hardcoded di Shared.tsx
+            'subscription' => $ctx ? [
+                'plan'         => $ctx->plan(),
+                'status'       => $ctx->subscription()->status,
+                'is_trialing'  => $ctx->isTrialing(),
+                'days_left'    => $ctx->daysLeftInTrial(),
+                // Fitur yang dimiliki plan ini — frontend pakai ini untuk hasFeature()
+                'plan_features' => FeatureRegistry::allFeaturesForPlan($ctx->plan()),
+                // feature → min_plan mapping — untuk lock icons di sidebar
+                'feature_locks' => FeatureRegistry::FEATURE_LOCKS,
+            ] : null,
+
+            // ── Outlet ────────────────────────────────────────────────────────
+            'outlet' => $user ? [
+                'id'   => $user->outlet_id,
+                'name' => $user->outlet?->name,
+            ] : null,
+
+            // ── Flash Messages ────────────────────────────────────────────────
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error'   => fn () => $request->session()->get('error'),
+            ],
+        ];
+    }
+}
