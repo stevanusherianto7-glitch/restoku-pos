@@ -16,6 +16,8 @@ interface ScreenProps {
   actions?: ReactNode;
   /** If true, removes the default padding — useful for full-bleed pages. */
   noPadding?: boolean;
+  /** If true, locks outer height to 100% and prevents vertical scrolling of the wrapper (`overflow-hidden`). Ideal for fixed desk views like POS. */
+  noScroll?: boolean;
 }
 
 /**
@@ -29,6 +31,7 @@ export function Screen({
   action,
   actions,
   noPadding = false,
+  noScroll = false,
 }: ScreenProps) {
   const { screenMode } = useTenantSettings();
   const { outlet } = usePage<SharedProps>().props;
@@ -36,9 +39,9 @@ export function Screen({
   const isLight = screenMode === "terang";
 
   return (
-    <div className="animate-in fade-in duration-500 max-w-[1280px] mx-auto w-full">
+    <div className={`animate-in fade-in duration-500 max-w-[1280px] mx-auto w-full ${noScroll ? "h-full flex flex-col overflow-hidden" : ""}`}>
       {/* Page Header */}
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div className={`${noScroll ? "mb-3 shrink-0" : "mb-8"} flex items-start justify-between gap-4`}>
         <div className="min-w-0">
           <h1 className={`text-2xl font-extrabold tracking-tight truncate ${isLight ? "text-slate-900" : "text-slate-100"}`}>{title}</h1>
           <p className={`text-sm mt-1 ${isLight ? "text-slate-600" : "text-slate-500"}`}>
@@ -61,7 +64,7 @@ export function Screen({
       </div>
 
       {/* Page Content */}
-      <div className={noPadding ? "" : "space-y-6"}>
+      <div className={noPadding ? "" : noScroll ? "flex-1 min-h-0 flex flex-col overflow-hidden" : "space-y-6"}>
         {children}
       </div>
     </div>

@@ -287,7 +287,13 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
   );
 }
 
-export default function MainLayout({ children }: { children: ReactNode }) {
+export default function MainLayout({
+  children,
+  noScroll = false,
+}: {
+  children: ReactNode;
+  noScroll?: boolean;
+}) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { screenMode } = useTenantSettings();
 
@@ -306,7 +312,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   return (
     <div className={`flex h-screen w-full overflow-hidden font-sans transition-all duration-500 ${isLight ? "light" : "dark"} ${rootBgClass}`}>
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 relative">
+      <main className={`flex-1 ${noScroll ? "overflow-hidden p-4 md:p-5 flex flex-col" : "overflow-y-auto p-6 md:p-8"} relative`}>
         {isNanoBanana ? (
           <>
             <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-amber-500/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />

@@ -332,18 +332,18 @@ function POSInner() {
   };
 
   return (
-    <MainLayout>
+    <MainLayout noScroll>
       <Head title="Kasir (POS)" />
-      <Screen title="Kasir (POS)">
+      <Screen title="Kasir (POS)" noScroll>
         {isPrintingBt && (
           <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl bg-emerald-500 text-slate-950 font-bold px-5 py-4 shadow-2xl animate-bounce border border-emerald-400">
             <span className="size-2 bg-slate-950 rounded-full animate-ping" />
             🖨️ Bluetooth Printer: Auto-Print Struk Berhasil!
           </div>
         )}
-        <div className="grid grid-cols-[1fr_400px] gap-6 items-start">
+        <div className="grid grid-cols-[1fr_400px] gap-5 items-start flex-1 min-h-0 h-full overflow-hidden">
           {/* ── Menu Grid ── */}
-          <Glass className="p-5 flex flex-col h-[calc(100vh-160px)]">
+          <Glass className="p-4 flex flex-col h-full overflow-hidden min-h-0">
             {/* Served Orders Payment Queue */}
             {servedQueue.length > 0 && (
               <div className="mb-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4">
@@ -449,7 +449,7 @@ function POSInner() {
           </Glass>
 
           {/* ── Cart Panel ── */}
-          <Glass className="p-5 flex flex-col h-[calc(100vh-160px)]">
+          <Glass className="p-4 flex flex-col h-full overflow-hidden min-h-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-bold text-slate-200 truncate">
                 {activeOrderId ? `Pesanan: ${orderTableName}` : "Transaksi Baru"}
