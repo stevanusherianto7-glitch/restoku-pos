@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OrderArchive;
 use App\Services\OrderArchiveService;
 use App\Services\OwnerDashboardService;
+use App\Services\RedisHealthService;
 use App\Services\SalesRollupService;
 use App\Services\TenantContext;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ class OwnerDashboardController extends Controller
         private TenantContext $ctx,
         private SalesRollupService $rollupService,
         private OrderArchiveService $archiveService,
+        private RedisHealthService $redisHealth,
     ) {}
 
     public function index(Request $request)
@@ -75,5 +77,14 @@ class OwnerDashboardController extends Controller
         return response()->json(
             $query->orderByDesc('created_at')->paginate($perPage)
         );
+    }
+
+    /**
+     * Fase Audit-Followup — Health Redis (Pilar 5 #3).
+     * Return status koneksi + memory/clients pressure untuk monitoring owner.
+     */
+    public function redisHealth(Request $request)
+    {
+        return response()->json($this->redisHealth->check());
     }
 }

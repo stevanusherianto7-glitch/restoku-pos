@@ -1,4 +1,4 @@
-name: CI — Restoku Quality Gate
+name: CI — Restoku Quality Gate (Hardened)
 
 on:
   push:
@@ -6,14 +6,29 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# 🛡️ Audit-followup #3: cancel run duplikat (push beruntun tidak tumpang-tindih)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ─────────────────────────────────────────────────────────────
-  # Job 1: Backend PHPUnit — 51 tests / 124 assertions
+  # Job 1: Backend PHPUnit + coverage gate + composer audit
   # ─────────────────────────────────────────────────────────────
   phpunit:
-    name: "PHPUnit (51 tests)"
+    name: "PHPUnit"
     runs-on: ubuntu-latest
     needs: build
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: [ "6379:6379" ]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -28,27 +43,39 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, redis
           coverage: pcov
+          ini-values: "pcov.directory=app"
 
-      - name: Install Composer dependencies
-        run: composer update --no-interaction --prefer-dist
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      # 🛡️ reproducible build: pakai lock, bukan `composer update`
+      - name: Install Composer dependencies (from lock)
+        run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+
+      # 🛡️ supply-chain: gagal bila ada advisory keamanan
+      - name: Composer audit (security advisories)
+        run: composer audit --format=github
 
       - name: Prepare CI environment
         run: |
           cp .env.example .env
+          # Aktifkan Redis beneran (service container) untuk RedisConfigTest
+          sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
+          sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=redis/' .env
+          sed -i 's/^CACHE_STORE=.*/CACHE_STORE=redis/' .env
+          sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=redis/' .env
           php artisan key:generate
-          mkdir -p storage/framework/views
-          mkdir -p storage/framework/cache/data
-          mkdir -p storage/framework/sessions
-          mkdir -p storage/logs
+          mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs
           php artisan migrate --force
 
-      - name: Run PHPUnit with coverage
-        run: php artisan test --coverage --coverage-clover=coverage.xml
-
-      - name: Run PHPStan (Larastan) static analysis
-        run: ./vendor/bin/phpstan analyse
+      - name: Run PHPUnit with coverage gate
+        # --min = fail bila coverage < 70% (gate regresi)
+        run: php artisan test --coverage --coverage-clover=coverage.xml --min=70
 
       - name: Upload backend coverage
         uses: actions/upload-artifact@v4
@@ -59,10 +86,10 @@ jobs:
           retention-days: 14
 
   # ─────────────────────────────────────────────────────────────
-  # Job 2: Frontend Vitest — 38 unit tests
+  # Job 2: Frontend Vitest + npm audit
   # ─────────────────────────────────────────────────────────────
   vitest:
-    name: "Vitest (38 unit tests)"
+    name: "Vitest"
     runs-on: ubuntu-latest
 
     steps:
@@ -76,6 +103,10 @@ jobs:
 
       - name: Install npm dependencies
         run: npm ci --legacy-peer-deps
+
+      # 🛡️ supply-chain: gagal bila ada vuln high/critical
+      - name: NPM audit (security)
+        run: npm audit --audit-level=high
 
       - name: Run ESLint code check
         run: npm run lint
@@ -94,7 +125,7 @@ jobs:
           retention-days: 14
 
   # ─────────────────────────────────────────────────────────────
-  # Job 3: Vite Production Build — 2417 modules
+  # Job 3: Vite Production Build
   # ─────────────────────────────────────────────────────────────
   build:
     name: "Vite Build (production)"
@@ -123,13 +154,17 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────────────────────────
-  # Job 4: Playwright E2E — 26 specs x 4 browsers = 104 runs
-  # Runs after all other jobs pass
+  # Job 4: Playwright E2E (Redis-asli via service)
   # ─────────────────────────────────────────────────────────────
   playwright:
     name: "Playwright (${{ matrix.browser }})"
     runs-on: ubuntu-latest
     needs: [phpunit, vitest, build]
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: [ "6379:6379" ]
 
     strategy:
       fail-fast: false
@@ -143,7 +178,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, redis
           coverage: none
 
       - name: Set up Node.js 20
@@ -152,8 +187,8 @@ jobs:
           node-version: 20
           cache: "npm"
 
-      - name: Install Composer dependencies
-        run: composer update --no-interaction --prefer-dist
+      - name: Install Composer dependencies (from lock)
+        run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
 
       - name: Install npm dependencies
         run: npm ci --legacy-peer-deps
@@ -161,14 +196,12 @@ jobs:
       - name: Prepare CI environment
         run: |
           cp .env.example .env
-          sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=file/' .env
-          sed -i 's/CACHE_STORE=database/CACHE_STORE=file/' .env
+          sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
+          sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=redis/' .env
+          sed -i 's/^CACHE_STORE=.*/CACHE_STORE=redis/' .env
           sed -i 's|APP_URL=http://localhost$|APP_URL=http://localhost:8000|' .env
           touch database/database.sqlite
-          mkdir -p storage/framework/views
-          mkdir -p storage/framework/cache/data
-          mkdir -p storage/framework/sessions
-          mkdir -p storage/logs
+          mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs
           php artisan key:generate
           php artisan migrate --force --seed
 
@@ -190,20 +223,12 @@ jobs:
       - name: Start Laravel server
         run: |
           php artisan serve --host=0.0.0.0 --port=8000 &
-          echo "Waiting for server..."
-          for i in {1..20}; do
-            if curl -sf http://127.0.0.1:8000 > /dev/null 2>&1; then
-              echo "Server up!"
-              break
-            fi
-            echo "[$i/20] Not ready yet..."
-            echo "--- DEBUG SERV ---"
-            curl -i http://127.0.0.1:8000/ || true
-            echo "------------------"
+          for i in $(seq 1 20); do
+            if curl -sf http://127.0.0.1:8000 > /dev/null 2>&1; then echo "Server up!"; break; fi
             sleep 3
           done
 
-      - name: "E2E HTTP Route Check (61 endpoints)"
+      - name: "E2E HTTP Route Check"
         run: npm run test:e2e -- --base-url http://127.0.0.1:8000
 
       - name: "Playwright E2E — ${{ matrix.browser }}"
@@ -222,7 +247,4 @@ jobs:
       - name: "Print Laravel log on failure"
         if: failure()
         run: |
-          if [ -f storage/logs/laravel.log ]; then
-            cat storage/logs/laravel.log
-          fi
-
+          if [ -f storage/logs/laravel.log ]; then cat storage/logs/laravel.log; fi

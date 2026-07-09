@@ -63,6 +63,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/api/owner/sales-summary', [OwnerDashboardController::class, 'salesSummary'])->name('owner.sales-summary');
     // Fase 4 — Baca orders yang sudah diarsip (cold storage, read-only compliance)
     Route::get('/api/owner/archived-orders', [OwnerDashboardController::class, 'archivedOrders'])->name('owner.archived-orders');
+    // Fase Audit-Followup — Health Redis untuk owner/monitoring
+    Route::get('/api/owner/redis-health', [OwnerDashboardController::class, 'redisHealth'])->name('owner.redis-health');
     Route::get('/owner/settings',     fn () => Inertia::render('Owner/Settings'))->name('owner.settings');
     Route::get('/owner/employees',    fn () => Inertia::render('Owner/Employees'))->name('owner.employees');
     Route::get('/owner/inventory/alerts', fn () => Inertia::render('Owner/InventoryAlerts'))->name('owner.inventory.alerts');
