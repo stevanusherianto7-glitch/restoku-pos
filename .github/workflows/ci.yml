@@ -30,13 +30,7 @@ jobs:
       - name: Prepare CI environment
         run: |
           cp .env.example .env
-          sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=file/' .env
-          sed -i 's/CACHE_STORE=database/CACHE_STORE=file/' .env
-          sed -i 's|APP_URL=http://localhost$|APP_URL=http://localhost:8000|' .env
-          touch database/database.sqlite
           php artisan key:generate
-          php artisan migrate --force --seed
-          php artisan storage:link --quiet || true
 
       - name: Run PHPUnit (php artisan test)
         run: php artisan test --stop-on-failure
