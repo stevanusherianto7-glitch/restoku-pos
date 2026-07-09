@@ -78,7 +78,7 @@ jobs:
         run: php artisan test --coverage --coverage-clover=coverage.xml --min=70
 
       - name: Upload backend coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: backend-coverage
@@ -117,7 +117,7 @@ jobs:
           LARAVEL_BYPASS_ENV_CHECK: 1
 
       - name: Upload frontend coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: frontend-coverage
@@ -147,7 +147,7 @@ jobs:
         run: npm run build
 
       - name: Upload Vite build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vite-build
           path: public/build/
@@ -237,7 +237,7 @@ jobs:
           CI: true
 
       - name: "Upload Playwright report — ${{ matrix.browser }}"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: "playwright-report-${{ matrix.browser }}"
