@@ -4,7 +4,7 @@
 Gunakan atau salin (*copy-paste*) instruksi di bawah ini setiap kali Anda memulai sesi percakapan baru dengan AI Agent dalam mengembangkan fitur atau melakukan *refactoring* pada proyek **Restoku (6-Layer Enterprise Multi-Tenant SaaS)**.
 
 > **Status Terakhir:** Terverifikasi ✅ — E2E 61/61 routes HTTP OK | 51/51 Backend PHPUnit | 38/38 Vitest Frontend | 104/104 Playwright (4 browsers) | 2417 modules compiled clean.
-> Diperbarui: 8 Juli 2026
+> Diperbarui: 9 Juli 2026
 
 ---
 
