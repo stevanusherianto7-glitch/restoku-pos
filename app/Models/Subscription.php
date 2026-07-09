@@ -19,18 +19,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *   - period_end=null berarti perpetual, tidak ada auto-expiry
  *   - Ketika billing siap: php artisan subscription:enforce --grace-days=30
  *
- * @property int    $id
- * @property int    $tenant_id
- * @property string $plan       'basic'|'pro'|'enterprise'
- * @property string $status     'trialing'|'active'|'past_due'|'cancelled'|'expired'
+ * @property int $id
+ * @property int $tenant_id
+ * @property string $plan 'basic'|'pro'|'enterprise'
+ * @property string $status 'trialing'|'active'|'past_due'|'cancelled'|'expired'
  * @property ?Carbon $trial_ends_at
  * @property ?Carbon $current_period_start
  * @property ?Carbon $current_period_end
  * @property ?Carbon $cancelled_at
- * @property ?array  $metadata
+ * @property ?array $metadata
  */
 class Subscription extends Model
 {
+    /** Plan yang didukung (harus sinkron dengan config/subscription.php). */
+    public const PLANS = ['basic', 'pro', 'enterprise'];
+
     protected $fillable = [
         'tenant_id',
         'plan',
@@ -43,11 +46,11 @@ class Subscription extends Model
     ];
 
     protected $casts = [
-        'trial_ends_at'        => 'datetime',
+        'trial_ends_at' => 'datetime',
         'current_period_start' => 'datetime',
-        'current_period_end'   => 'datetime',
-        'cancelled_at'         => 'datetime',
-        'metadata'             => 'array',
+        'current_period_end' => 'datetime',
+        'cancelled_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     // ─── Relations ────────────────────────────────────────────────────────────
@@ -55,6 +58,14 @@ class Subscription extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    // ─── Plan helpers ──────────────────────────────────────────────────────
+
+    /** True jika $plan adalah salah satu plan valid (basic/pro/enterprise). */
+    public static function isValidPlan(?string $plan): bool
+    {
+        return in_array($plan, self::PLANS, true);
     }
 
     // ─── Status helpers ───────────────────────────────────────────────────────
@@ -88,8 +99,13 @@ class Subscription extends Model
 
     public function isExpired(): bool
     {
-        if ($this->status === 'expired') return true;
-        if ($this->current_period_end === null) return false;
+        if ($this->status === 'expired') {
+            return true;
+        }
+        if ($this->current_period_end === null) {
+            return false;
+        }
+
         return $this->current_period_end->isPast() && $this->status !== 'trialing';
     }
 
@@ -98,7 +114,10 @@ class Subscription extends Model
      */
     public function daysLeftInTrial(): int
     {
-        if (! $this->isTrialing()) return 0;
+        if (! $this->isTrialing()) {
+            return 0;
+        }
+
         return max(0, (int) now()->diffInDays($this->trial_ends_at, false));
     }
 
@@ -107,7 +126,10 @@ class Subscription extends Model
      */
     public function daysLeftInPeriod(): ?int
     {
-        if ($this->current_period_end === null) return null;
+        if ($this->current_period_end === null) {
+            return null;
+        }
+
         return max(0, (int) now()->diffInDays($this->current_period_end, false));
     }
 
@@ -118,7 +140,7 @@ class Subscription extends Model
         return $query->whereIn('status', ['active', 'trialing', 'past_due'])
             ->where(function ($q) {
                 $q->whereNull('current_period_end')
-                  ->orWhere('current_period_end', '>', now());
+                    ->orWhere('current_period_end', '>', now());
             });
     }
 
@@ -126,11 +148,11 @@ class Subscription extends Model
     {
         return $query->where(function ($q) {
             $q->where('status', 'expired')
-              ->orWhere(function ($q2) {
-                  $q2->whereNotNull('current_period_end')
-                     ->where('current_period_end', '<=', now())
-                     ->whereNotIn('status', ['trialing', 'cancelled']);
-              });
+                ->orWhere(function ($q2) {
+                    $q2->whereNotNull('current_period_end')
+                        ->where('current_period_end', '<=', now())
+                        ->whereNotIn('status', ['trialing', 'cancelled']);
+                });
         });
     }
 

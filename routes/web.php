@@ -17,6 +17,16 @@ use Inertia\Inertia;
 */
 Route::get('/', fn () => Inertia::render('LandingPage/Index'));
 
+// ── Subscription checkout (publik, tanpa login) ─────────────────────────────
+// Simulasi trial 14 hari (PRD non-goal: no payment gateway bawaan).
+use App\Http\Controllers\SubscriptionController;
+
+Route::get('/subscribe/{plan}',  [SubscriptionController::class, 'show'])
+    ->name('subscribe.show');
+Route::post('/subscribe/{plan}', [SubscriptionController::class, 'store'])
+    ->name('subscribe.store')
+    ->middleware('throttle:10,1');
+
 Route::get('/login',       fn () => Inertia::render('Auth/StaffLogin'))->name('login');
 Route::get('/owner/login', fn () => Inertia::render('Auth/OwnerLogin'))->name('owner.login');
 Route::post('/login',       [AuthenticatedSessionController::class, 'storeStaff'])->middleware('throttle:10,1');

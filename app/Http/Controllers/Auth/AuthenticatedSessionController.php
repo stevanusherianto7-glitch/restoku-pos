@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -104,6 +105,21 @@ class AuthenticatedSessionController extends Controller
             throw ValidationException::withMessages([
                 'email' => 'Akun ini belum terhubung ke tenant manapun.',
             ]);
+        }
+
+        // Apply paket yang dipilih dari landing page (flow: klik plan → login owner).
+        if ($plan = $request->session()->pull('intended_plan')) {
+            if (in_array($plan, Subscription::PLANS, true)) {
+                Subscription::updateOrCreate(
+                    ['tenant_id' => $user->tenant_id],
+                    [
+                        'plan' => $plan,
+                        'status' => 'trialing',
+                        'trial_ends_at' => now()->addDays(config('subscription.trial_days')),
+                        'current_period_end' => null,
+                    ]
+                );
+            }
         }
 
         return redirect()->intended($redirectTo);
