@@ -47,6 +47,9 @@ jobs:
       - name: Run PHPUnit (php artisan test)
         run: php artisan test --stop-on-failure
 
+      - name: Run PHPStan (Larastan) static analysis
+        run: ./vendor/bin/phpstan analyse
+
   # ─────────────────────────────────────────────────────────────
   # Job 2: Frontend Vitest — 38 unit tests
   # ─────────────────────────────────────────────────────────────
@@ -65,6 +68,9 @@ jobs:
 
       - name: Install npm dependencies
         run: npm ci --legacy-peer-deps
+
+      - name: Run ESLint code check
+        run: npm run lint
 
       - name: Run Vitest (npm test)
         run: npm test

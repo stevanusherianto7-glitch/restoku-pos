@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+
+    paths:
+        - app/
+
+    # Level 5 is a good balance for Laravel projects (range is 0-9)
+    level: 5
+
+    ignoreErrors:
+        # Ignore common dynamic property calls
+        - '#Access to an undefined property App\\Models\\User::.*#'
+        - '#Access to an undefined property App\\Models\\Tenant::.*#'
+        - '#Access to an undefined property App\\Models\\Outlet::.*#'
+
+    excludePaths:
+        # Add any paths to exclude if needed
