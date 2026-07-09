@@ -1,4 +1,4 @@
-﻿name: CI — Restoku Quality Gate
+name: CI — Restoku Quality Gate
 
 on:
   push:
@@ -36,6 +36,7 @@ jobs:
           touch database/database.sqlite
           php artisan key:generate
           php artisan migrate --force --seed
+          php artisan storage:link --quiet || true
 
       - name: Run PHPUnit (php artisan test)
         run: php artisan test --stop-on-failure
@@ -61,6 +62,8 @@ jobs:
 
       - name: Run Vitest (npm test)
         run: npm test
+        env:
+          LARAVEL_BYPASS_ENV_CHECK: 1
 
   # ─────────────────────────────────────────────────────────────
   # Job 3: Vite Production Build — 2417 modules
