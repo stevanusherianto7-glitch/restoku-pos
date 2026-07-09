@@ -1,0 +1,15 @@
+# CODEOWNERS — Restoku POS
+# Setiap PR ke main wajib diapprove owner (review gate, free di private repo).
+# Ref: https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+*       @stevanusherianto7-glitch
+
+# Keamanan & CI — butuh perhatian ekstra
+.github/        @stevanusherianto7-glitch
+app/Services/   @stevanusherianto7-glitch
+app/Http/Controllers/GeminiAiController.php   @stevanusherianto7-glitch
+
+# Infra / deploy
+config/         @stevanusherianto7-glitch
+routes/         @stevanusherianto7-glitch
+DEPLOY_RUNBOOK.md   @stevanusherianto7-glitch
