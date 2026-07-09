@@ -44,6 +44,11 @@ export default defineConfig({
         setupFiles: ['./resources/js/__tests__/setup.ts'],
         include: ['resources/js/__tests__/**/*.{test,spec}.{ts,tsx}'],
         exclude: ['e2e/**', 'node_modules/**'],
+        coverage: {
+            reporter: ['text', 'clover', 'json'],
+            reportsDirectory: 'coverage',
+            include: ['resources/js/**/*.{ts,tsx}'],
+        },
     },
 });
 

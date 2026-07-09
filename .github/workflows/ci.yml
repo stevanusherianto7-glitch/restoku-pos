@@ -37,9 +37,8 @@ jobs:
       - name: Trufflehog — second-layer scan (entropy + regex)
         uses: trufflesecurity/trufflehog@main
         with:
+          # Filesystem scan (bukan diff) → tidak error saat BASE==HEAD di push event
           path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
           extra_args: --only-verified --json
 
   # ─────────────────────────────────────────────────────────────
