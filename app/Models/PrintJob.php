@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\UsesTenantConnection;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class PrintJob extends Model
 {
     use HasFactory;
+    use UsesTenantConnection;
 
     protected $guarded = ['id'];
 
@@ -41,6 +43,6 @@ class PrintJob extends Model
             ->where('tenant_id', $tenantId)
             ->count();
 
-        return 'PRJ-' . str_pad((string) ($count + 1), 4, '0', STR_PAD_LEFT);
+        return 'PRJ-'.str_pad((string) ($count + 1), 4, '0', STR_PAD_LEFT);
     }
 }

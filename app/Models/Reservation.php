@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\UsesTenantConnection;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,11 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 class Reservation extends Model
 {
     use HasFactory;
+    use UsesTenantConnection;
 
     protected $guarded = ['id'];
 
     protected $casts = [
-        'date'   => 'date',
+        'date' => 'date',
         'guests' => 'integer',
     ];
 
@@ -48,6 +50,6 @@ class Reservation extends Model
             ->where('tenant_id', $tenantId)
             ->count();
 
-        return 'RSV-' . str_pad((string) ($count + 1), 3, '0', STR_PAD_LEFT);
+        return 'RSV-'.str_pad((string) ($count + 1), 3, '0', STR_PAD_LEFT);
     }
 }

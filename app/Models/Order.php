@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\UsesTenantConnection;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,16 +10,22 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
+    use UsesTenantConnection;
 
     protected $guarded = ['id'];
 
     // Status yang dipakai KDS / kasir. Disimpan sebagai konstanta supaya
     // konsisten dipakai di controller, bukan string bebas seperti sebelumnya.
     public const STATUS_ANTRIAN_MASUK = 'antrian_masuk';
+
     public const STATUS_SEDANG_DIMASAK = 'sedang_dimasak';
+
     public const STATUS_SIAP_SAJIKAN = 'siap_sajikan';
+
     public const STATUS_SIAP_BAYAR = 'siap_bayar';
+
     public const STATUS_SELESAI = 'selesai';
+
     public const STATUS_DIBATALKAN = 'dibatalkan';
 
     protected $casts = [
@@ -79,6 +86,6 @@ class Order extends Model
             ->whereDate('created_at', now()->toDateString())
             ->count();
 
-        return 'ORD-' . now()->format('md') . '-' . str_pad((string) ($todayCount + 1), 2, '0', STR_PAD_LEFT);
+        return 'ORD-'.now()->format('md').'-'.str_pad((string) ($todayCount + 1), 2, '0', STR_PAD_LEFT);
     }
 }

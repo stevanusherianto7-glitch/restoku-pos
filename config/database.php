@@ -114,7 +114,57 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        // ── Fase 2: Schema-per-tenant (Postgres) ───────────────────────────────
+        // Shared DB untuk tenants + pemeta outlet slug->schema.
+        'sys' => [
+            'driver'   => env('DB_CONNECTION_SYS', 'pgsql'),
+            'url'      => env('DB_URL_SYS'),
+            'host'     => env('DB_HOST_SYS', env('DB_HOST', '127.0.0.1')),
+            'port'     => env('DB_PORT_SYS', env('DB_PORT', '5432')),
+            'database' => env('DB_DATABASE_SYS', 'restoku_sys'),
+            'username' => env('DB_USERNAME_SYS', env('DB_USERNAME', 'forge')),
+            'password' => env('DB_PASSWORD_SYS', env('DB_PASSWORD', '')),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+            'search_path' => 'public',
+            'sslmode'  => env('DB_SSLMODE', 'prefer'),
+        ],
+
+        // Template koneksi tenant (di-clone jadi tenant_{id} saat runtime).
+        'tenant_template' => [
+            'driver'   => env('DB_CONNECTION', 'pgsql'),
+            'url'      => env('DB_URL'),
+            'host'     => env('DB_HOST', '127.0.0.1'),
+            'port'     => env('DB_PORT', '5432'),
+            'username' => env('DB_USERNAME', 'forge'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode'  => env('DB_SSLMODE', 'prefer'),
+            // database diisi dinamis (MySQL) / search_path diisi dinamis (Postgres)
+        ],
+
+        // Read replica untuk beban baca tinggi (CustomerView / public menu).
+        'tenant_read' => [
+            'driver'   => env('DB_CONNECTION_READ', 'pgsql'),
+            'url'      => env('DB_URL_READ'),
+            'host'     => env('DB_HOST_READ', env('DB_HOST', '127.0.0.1')),
+            'port'     => env('DB_PORT_READ', env('DB_PORT', '5432')),
+            'username' => env('DB_USERNAME_READ', env('DB_USERNAME', 'forge')),
+            'password' => env('DB_PASSWORD_READ', env('DB_PASSWORD', '')),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+            'search_path' => 'public',
+            'sslmode'  => env('DB_SSLMODE', 'prefer'),
+        ],
+
     ],
+
+    // Fase 2: aktifkan schema-per-tenant (false di sqlite/test → fallback shared).
+    'sharding_enabled' => env('DB_SHARDING_ENABLED', true),
+
 
     /*
     |--------------------------------------------------------------------------
