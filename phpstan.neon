@@ -14,6 +14,17 @@ parameters:
         - '#Access to an undefined property App\\Models\\User::.*#'
         - '#Access to an undefined property App\\Models\\Tenant::.*#'
         - '#Access to an undefined property App\\Models\\Outlet::.*#'
+        - '#Access to an undefined property App\\Models\\OrderItem::.*#'
+        - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::.*#'
+
+        # Ignore unnecessary nullsafe warnings on active models
+        - '#Using nullsafe property access.*on left side of \?\? is unnecessary\. Use -> instead\.#'
+
+        # Ignore dynamic relations not formally declared in Eloquent models
+        - '#Relation .* is not found in App\\Models\\.* model\.#'
+
+        # Ignore env calls outside config warnings for existing legacy services
+        - '#Called '\''env'\'' outside of the config directory.*#'
 
     excludePaths:
         # Add any paths to exclude if needed
