@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Outlet;
 use App\Models\Models\Scopes\TenantScope;
+use App\Models\Outlet;
+use App\Models\OutletSetting;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\SettingsService;
 use App\Services\TenantContext;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,10 +32,11 @@ use Inertia\Response;
 class OutletSettingsController extends Controller
 {
     private const ALLOWED_ROLES = ['cashier', 'admin', 'kitchen', 'waiter', 'manager'];
-    private const DAYS          = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+    private const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
     public function __construct(
-        private TenantContext  $ctx,
+        private TenantContext $ctx,
         private SettingsService $settings,
     ) {}
 
@@ -44,8 +47,8 @@ class OutletSettingsController extends Controller
     public function index(): Response
     {
         $tenantId = $this->ctx->id();
-        $user     = Auth::user();
-        $tenant   = $this->ctx->tenant();
+        $user = Auth::user();
+        $tenant = $this->ctx->tenant();
 
         // TenantScope aktif — outlet sudah otomatis difilter per tenant
         // Tidak perlu withoutGlobalScope lagi
@@ -53,7 +56,7 @@ class OutletSettingsController extends Controller
             "CASE WHEN id = {$user->outlet_id} THEN 0 ELSE 1 END"
         ))->first();
 
-        $outlets   = Outlet::select('id', 'name', 'is_active')->get();
+        $outlets = Outlet::select('id', 'name', 'is_active')->get();
         $outletSettings = $outlet ? $this->settings->forOutlet($outlet->id) : null;
         $tenantSettings = $this->settings->forTenant($tenantId);
 
@@ -61,46 +64,46 @@ class OutletSettingsController extends Controller
             ->select('id', 'name', 'email', 'role', 'outlet_id')
             ->get()
             ->map(fn ($u) => [
-                'id'        => $u->id,
-                'name'      => $u->name,
-                'email'     => $u->email,
-                'role'      => $u->role,
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'role' => $u->role,
                 'outlet_id' => $u->outlet_id,
             ]);
 
         return Inertia::render('PengaturanOutlet/Index', [
             'tenant' => [
-                'id'                  => $tenant->id,
-                'name'                => $tenant->name,
-                'brand_name'          => $tenant->brand_name,
-                'email'               => $tenant->email,
-                'phone'               => $tenant->phone,
-                'npwp'                => $tenant->npwp,
-                'nib'                 => $tenant->nib,
-                'address'             => $tenant->address,
+                'id' => $tenant->id,
+                'name' => $tenant->name,
+                'brand_name' => $tenant->brand_name,
+                'email' => $tenant->email,
+                'phone' => $tenant->phone,
+                'npwp' => $tenant->npwp,
+                'nib' => $tenant->nib,
+                'address' => $tenant->address,
                 // Pajak dari tenant_settings (dengan COALESCE fallback ke tenants)
-                'tax_type'            => $tenantSettings->tax_type,
-                'pbjt_rate'           => (float) $tenantSettings->pbjt_rate,
-                'ppn_rate'            => (float) $tenantSettings->ppn_rate,
+                'tax_type' => $tenantSettings->tax_type,
+                'pbjt_rate' => (float) $tenantSettings->pbjt_rate,
+                'ppn_rate' => (float) $tenantSettings->ppn_rate,
                 'service_charge_rate' => (float) $tenantSettings->service_charge_rate,
             ],
             'outlet' => $outlet ? [
-                'id'               => $outlet->id,
-                'name'             => $outlet->name,
-                'address'          => $outlet->address,
-                'phone'            => $outlet->phone,
-                'latitude'         => $outlet->latitude ? (float) $outlet->latitude : null,
-                'longitude'        => $outlet->longitude ? (float) $outlet->longitude : null,
+                'id' => $outlet->id,
+                'name' => $outlet->name,
+                'address' => $outlet->address,
+                'phone' => $outlet->phone,
+                'latitude' => $outlet->latitude ? (float) $outlet->latitude : null,
+                'longitude' => $outlet->longitude ? (float) $outlet->longitude : null,
                 'geo_radius_meters' => $outlet->geo_radius_meters ?? 50,
-                'is_active'        => (bool) ($outlet->is_active ?? true),
+                'is_active' => (bool) ($outlet->is_active ?? true),
                 // Jam operasional dari outlet_settings (bukan outlets.operating_hours lagi)
-                'operating_hours'  => $outletSettings?->operating_hours
-                    ?? \App\Models\OutletSetting::defaultOperatingHours(),
-                'logo_path'        => $outlet->logo_path ?? null,
+                'operating_hours' => $outletSettings?->operating_hours
+                    ?? OutletSetting::defaultOperatingHours(),
+                'logo_path' => $outlet->logo_path ?? null,
             ] : null,
-            'outlets'   => $outlets,
+            'outlets' => $outlets,
             'employees' => $employees,
-            'roles'     => self::ALLOWED_ROLES,
+            'roles' => self::ALLOWED_ROLES,
         ]);
     }
 
@@ -113,14 +116,14 @@ class OutletSettingsController extends Controller
         $tenantId = $this->ctx->id();
 
         $validated = $request->validate([
-            'name'       => 'required|string|max:150',
+            'name' => 'required|string|max:150',
             'brand_name' => 'required|string|max:100',
-            'email'      => ['required', 'email', 'max:150',
+            'email' => ['required', 'email', 'max:150',
                 Rule::unique('tenants', 'email')->ignore($tenantId)],
-            'phone'      => 'nullable|string|max:20',
-            'npwp'       => 'nullable|string|max:30',
-            'nib'        => 'nullable|string|max:30',
-            'address'    => 'nullable|string|max:500',
+            'phone' => 'nullable|string|max:20',
+            'npwp' => 'nullable|string|max:30',
+            'nib' => 'nullable|string|max:30',
+            'address' => 'nullable|string|max:500',
         ]);
 
         // Update identitas di tenants (name, brand_name, email, dll.)
@@ -136,16 +139,16 @@ class OutletSettingsController extends Controller
     public function updateLokasi(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'outlet_id'         => 'required|integer',
-            'latitude'          => 'nullable|numeric|between:-90,90',
-            'longitude'         => 'nullable|numeric|between:-180,180',
+            'outlet_id' => 'required|integer',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'geo_radius_meters' => 'required|integer|min:10|max:5000',
         ]);
 
         // findOutletForTenant() memastikan outlet milik tenant ini
         $this->findOutletForTenant($validated['outlet_id'])->update([
-            'latitude'          => $validated['latitude'],
-            'longitude'         => $validated['longitude'],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
             'geo_radius_meters' => $validated['geo_radius_meters'],
         ]);
 
@@ -159,9 +162,9 @@ class OutletSettingsController extends Controller
     public function updatePajak(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'tax_type'            => 'required|in:pbjt,ppn',
-            'pbjt_rate'           => 'required|numeric|min:0|max:10',
-            'ppn_rate'            => 'required|numeric|min:0|max:12',
+            'tax_type' => 'required|in:pbjt,ppn',
+            'pbjt_rate' => 'required|numeric|min:0|max:10',
+            'ppn_rate' => 'required|numeric|min:0|max:12',
             'service_charge_rate' => 'required|numeric|min:0|max:10',
         ]);
 
@@ -170,9 +173,9 @@ class OutletSettingsController extends Controller
 
         // Backward-compat: sync ke kolom tenants lama juga (hingga migration drop-columns)
         Tenant::where('id', $this->ctx->id())->update([
-            'tax_type'            => $validated['tax_type'],
-            'pbjt_rate'           => $validated['pbjt_rate'],
-            'ppn_rate'            => $validated['ppn_rate'],
+            'tax_type' => $validated['tax_type'],
+            'pbjt_rate' => $validated['pbjt_rate'],
+            'ppn_rate' => $validated['ppn_rate'],
             'service_charge_rate' => $validated['service_charge_rate'],
         ]);
 
@@ -186,16 +189,16 @@ class OutletSettingsController extends Controller
     public function updateJam(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'outlet_id'       => 'required|integer',
+            'outlet_id' => 'required|integer',
             'operating_hours' => 'required|array',
         ]);
 
         $hours = [];
         foreach (self::DAYS as $day) {
-            $dayData    = $validated['operating_hours'][$day] ?? [];
+            $dayData = $validated['operating_hours'][$day] ?? [];
             $hours[$day] = [
-                'open'   => preg_match('/^\d{2}:\d{2}$/', $dayData['open'] ?? '') ? $dayData['open'] : '08:00',
-                'close'  => preg_match('/^\d{2}:\d{2}$/', $dayData['close'] ?? '') ? $dayData['close'] : '22:00',
+                'open' => preg_match('/^\d{2}:\d{2}$/', $dayData['open'] ?? '') ? $dayData['open'] : '08:00',
+                'close' => preg_match('/^\d{2}:\d{2}$/', $dayData['close'] ?? '') ? $dayData['close'] : '22:00',
                 'closed' => (bool) ($dayData['closed'] ?? false),
             ];
         }
@@ -222,13 +225,13 @@ class OutletSettingsController extends Controller
         // 1. Profil Tenant
         if ($request->has('profil')) {
             $validatedProfil = $request->validate([
-                'profil.name'       => 'required|string|max:150',
+                'profil.name' => 'required|string|max:150',
                 'profil.brand_name' => 'required|string|max:100',
-                'profil.email'      => ['required', 'email', 'max:150', Rule::unique('tenants', 'email')->ignore($tenantId)],
-                'profil.phone'      => 'nullable|string|max:20',
-                'profil.npwp'       => 'nullable|string|max:30',
-                'profil.nib'        => 'nullable|string|max:30',
-                'profil.address'    => 'nullable|string|max:500',
+                'profil.email' => ['required', 'email', 'max:150', Rule::unique('tenants', 'email')->ignore($tenantId)],
+                'profil.phone' => 'nullable|string|max:20',
+                'profil.npwp' => 'nullable|string|max:30',
+                'profil.nib' => 'nullable|string|max:30',
+                'profil.address' => 'nullable|string|max:500',
             ])['profil'];
             Tenant::where('id', $tenantId)->update($validatedProfil);
         }
@@ -237,23 +240,29 @@ class OutletSettingsController extends Controller
         $outletId = $request->input('lokasi.outlet_id') ?? $request->input('outlet_id') ?? Auth::user()?->outlet_id;
         if ($outletId && $request->has('lokasi')) {
             $validatedLokasi = $request->validate([
-                'lokasi.outlet_id'         => 'required|integer',
-                'lokasi.name'              => 'nullable|string|max:150',
-                'lokasi.address'           => 'nullable|string|max:500',
-                'lokasi.phone'             => 'nullable|string|max:20',
-                'lokasi.latitude'          => 'nullable|numeric|between:-90,90',
-                'lokasi.longitude'         => 'nullable|numeric|between:-180,180',
+                'lokasi.outlet_id' => 'required|integer',
+                'lokasi.name' => 'nullable|string|max:150',
+                'lokasi.address' => 'nullable|string|max:500',
+                'lokasi.phone' => 'nullable|string|max:20',
+                'lokasi.latitude' => 'nullable|numeric|between:-90,90',
+                'lokasi.longitude' => 'nullable|numeric|between:-180,180',
                 'lokasi.geo_radius_meters' => 'required|integer|min:10|max:5000',
             ])['lokasi'];
-            
+
             $outletData = [
-                'latitude'          => $validatedLokasi['latitude'] ?? null,
-                'longitude'         => $validatedLokasi['longitude'] ?? null,
+                'latitude' => $validatedLokasi['latitude'] ?? null,
+                'longitude' => $validatedLokasi['longitude'] ?? null,
                 'geo_radius_meters' => $validatedLokasi['geo_radius_meters'],
             ];
-            if (!empty($validatedLokasi['name'])) $outletData['name'] = $validatedLokasi['name'];
-            if (isset($validatedLokasi['address'])) $outletData['address'] = $validatedLokasi['address'];
-            if (isset($validatedLokasi['phone'])) $outletData['phone'] = $validatedLokasi['phone'];
+            if (! empty($validatedLokasi['name'])) {
+                $outletData['name'] = $validatedLokasi['name'];
+            }
+            if (isset($validatedLokasi['address'])) {
+                $outletData['address'] = $validatedLokasi['address'];
+            }
+            if (isset($validatedLokasi['phone'])) {
+                $outletData['phone'] = $validatedLokasi['phone'];
+            }
 
             $this->findOutletForTenant($validatedLokasi['outlet_id'])->update($outletData);
         }
@@ -261,9 +270,9 @@ class OutletSettingsController extends Controller
         // 3. Pajak
         if ($request->has('pajak')) {
             $validatedPajak = $request->validate([
-                'pajak.tax_type'            => 'required|in:pbjt,ppn',
-                'pajak.pbjt_rate'           => 'required|numeric|min:0|max:10',
-                'pajak.ppn_rate'            => 'required|numeric|min:0|max:12',
+                'pajak.tax_type' => 'required|in:pbjt,ppn',
+                'pajak.pbjt_rate' => 'required|numeric|min:0|max:10',
+                'pajak.ppn_rate' => 'required|numeric|min:0|max:12',
                 'pajak.service_charge_rate' => 'required|numeric|min:0|max:10',
             ])['pajak'];
 
@@ -281,8 +290,8 @@ class OutletSettingsController extends Controller
             foreach (self::DAYS as $day) {
                 $dayData = $validatedJam['operating_hours'][$day] ?? [];
                 $hours[$day] = [
-                    'open'   => preg_match('/^\d{2}:\d{2}$/', $dayData['open'] ?? '') ? $dayData['open'] : '08:00',
-                    'close'  => preg_match('/^\d{2}:\d{2}$/', $dayData['close'] ?? '') ? $dayData['close'] : '22:00',
+                    'open' => preg_match('/^\d{2}:\d{2}$/', $dayData['open'] ?? '') ? $dayData['open'] : '08:00',
+                    'close' => preg_match('/^\d{2}:\d{2}$/', $dayData['close'] ?? '') ? $dayData['close'] : '22:00',
                     'closed' => (bool) ($dayData['closed'] ?? false),
                 ];
             }
@@ -299,7 +308,7 @@ class OutletSettingsController extends Controller
     // Karyawan CRUD
     // =========================================================================
 
-    public function listKaryawan(): \Illuminate\Http\JsonResponse
+    public function listKaryawan(): JsonResponse
     {
         $employees = User::where('role', '!=', 'owner')
             ->select('id', 'name', 'email', 'role', 'outlet_id')
@@ -313,10 +322,10 @@ class OutletSettingsController extends Controller
         $tenantId = $this->ctx->id();
 
         $validated = $request->validate([
-            'name'      => 'required|string|max:100',
-            'email'     => 'required|email|unique:users,email',
-            'password'  => 'required|string|min:4|max:20',
-            'role'      => ['required', Rule::in(self::ALLOWED_ROLES)],
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:4|max:20',
+            'role' => ['required', Rule::in(self::ALLOWED_ROLES)],
             'outlet_id' => ['nullable', 'integer',
                 Rule::exists('outlets', 'id')->where('tenant_id', $tenantId)],
         ]);
@@ -326,10 +335,10 @@ class OutletSettingsController extends Controller
         User::create([
             'tenant_id' => $tenantId,
             'outlet_id' => $validated['outlet_id'] ?? null,
-            'name'      => $validated['name'],
-            'email'     => $validated['email'],
-            'password'  => Hash::make($validated['password']),
-            'role'      => $validated['role'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
         ]);
 
         return back()->with('success', "Karyawan {$validated['name']} berhasil ditambahkan.");
@@ -341,18 +350,18 @@ class OutletSettingsController extends Controller
         $employee = $this->findEmployeeForTenant($id);
 
         $validated = $request->validate([
-            'name'      => 'required|string|max:100',
-            'email'     => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
-            'password'  => 'nullable|string|min:4|max:20',
-            'role'      => ['required', Rule::in(self::ALLOWED_ROLES)],
+            'name' => 'required|string|max:100',
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
+            'password' => 'nullable|string|min:4|max:20',
+            'role' => ['required', Rule::in(self::ALLOWED_ROLES)],
             'outlet_id' => ['nullable', 'integer',
                 Rule::exists('outlets', 'id')->where('tenant_id', $tenantId)],
         ]);
 
         $data = [
-            'name'      => $validated['name'],
-            'email'     => $validated['email'],
-            'role'      => $validated['role'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'],
             'outlet_id' => $validated['outlet_id'] ?? null,
         ];
         if (! empty($validated['password'])) {
@@ -395,6 +404,45 @@ class OutletSettingsController extends Controller
                 ->where('tenant_id', $this->ctx->id())
                 ->firstOrFail()
         );
+    }
+
+    /**
+     * Fase 1 — Bulk-create N outlet (owner input, max 500, idempoten).
+     * Nama outlet dari request (array atau textarea 1/baris). Slug auto-generated
+     * via mutator setNameAttribute. Idempoten: skip nama yang sudah ada.
+     */
+    public function bulkCreateOutlets(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'names' => 'required|string',
+            'count' => 'nullable|integer|min:1|max:500',
+        ]);
+
+        $names = collect(explode("\n", $validated['names']))
+            ->map(fn ($n) => trim($n))
+            ->filter(fn ($n) => $n !== '')
+            ->slice(0, (int) ($validated['count'] ?? 500))
+            ->unique();
+
+        $existing = Outlet::where('tenant_id', $this->ctx->id())
+            ->whereIn('name', $names->all())
+            ->pluck('name')
+            ->all();
+
+        $created = 0;
+        foreach ($names as $name) {
+            if (in_array($name, $existing, true)) {
+                continue; // idempoten: jangan duplikat
+            }
+            Outlet::create([
+                'tenant_id' => $this->ctx->id(),
+                'name' => $name,
+                'is_active' => true,
+            ]);
+            $created++;
+        }
+
+        return back()->with('success', "{$created} outlet baru ditambahkan.");
     }
 
     /**

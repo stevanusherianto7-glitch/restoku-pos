@@ -14,20 +14,11 @@ class MenuCategory extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'sort_order' => 'integer',
     ];
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::addGlobalScope(new TenantScope);
-    }
-
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
-    public function menuItems()
-    {
-        return $this->hasMany(MenuItem::class);
     }
 }

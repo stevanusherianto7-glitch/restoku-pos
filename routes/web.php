@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\GeminiAiController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OutletSettingsController;
 use App\Http\Controllers\OwnerDashboardController;
@@ -23,7 +24,10 @@ Route::post('/owner/login', [AuthenticatedSessionController::class, 'storeOwner'
 
 // Guest-facing digital menu & order (QR code meja)
 Route::get('/order',         fn () => Inertia::render('BukuMenuDigital/CustomerView'));
-Route::get('/m/senopati',    fn () => Inertia::render('BukuMenuDigital/CustomerView'));
+// Fase 1: URL buku menu tamu pakai slug outlet dinamis (bukan hardcode 'senopati')
+Route::get('/m/{slug}',       fn (string $slug) => Inertia::render('BukuMenuDigital/CustomerView', ['slug' => $slug]));
+// API buku menu publik (read-only, by slug outlet) — untuk CustomerView
+Route::get('/api/menu/{slug}', [OrderController::class, 'getPublicMenu']);
 
 // Guest order endpoints (BUG-006 FIX: tenant diidentifikasi via outlet_id, bukan req body)
 // C2 (Security Audit): throttle wajib — endpoint publik CSRF-exempt rentan spam/DoS.
@@ -115,6 +119,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::post('/karyawan',        [OutletSettingsController::class, 'createKaryawan']);
         Route::put('/karyawan/{id}',    [OutletSettingsController::class, 'updateKaryawan']);
         Route::delete('/karyawan/{id}', [OutletSettingsController::class, 'deleteKaryawan']);
+        Route::post('/bulk-outlets',    [OutletSettingsController::class, 'bulkCreateOutlets'])->middleware('throttle:30,1');
     });
 
     // ── Order / KDS API ─────────────────────────────────────────────────────
@@ -129,7 +134,12 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::put('/api/reservations/{id}/status',      [OrderController::class, 'updateReservationStatus']);
     Route::post('/api/ai/chat',                      [GeminiAiController::class, 'chat'])->middleware('throttle:20,1');
 
-    // ── Google Review / Complaint Management ────────────────────────────────
+    // ── Menu Management (Fase 1) ──────────────────────────────────────────────
+    Route::get('/katalog-menu',                 [MenuController::class, 'index']);
+    Route::post('/api/menu',                    [MenuController::class, 'store'])->middleware('throttle:30,1');
+    Route::put('/api/menu/{id}',                [MenuController::class, 'update'])->middleware('throttle:30,1');
+    Route::delete('/api/menu/{id}',             [MenuController::class, 'destroy'])->middleware('throttle:30,1');
+
     Route::get('/owner/google-reviews',              [GoogleReviewController::class, 'viewPanel'])
         ->name('owner.reviews');
     Route::get('/api/google-reviews',                [GoogleReviewController::class, 'index']);

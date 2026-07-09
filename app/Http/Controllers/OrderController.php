@@ -12,13 +12,45 @@ use App\Models\ReceiptConfig;
 use App\Models\Reservation;
 use App\Models\Scopes\TenantScope;
 use App\Services\TenantContext;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
     public function __construct(private TenantContext $ctx) {}
+
+    /**
+     * Fase 1 — Buku menu publik untuk tamu (read-only, by outlet slug).
+     * Cache per-outlet di Redis (F1.5); fallback ke DB bila cache miss.
+     * Tidak butuh auth; tenant di-resolusi dari slug outlet.
+     */
+    public function getPublicMenu(Request $request, string $slug)
+    {
+        $outlet = Outlet::where('slug', $slug)->first();
+        if (! $outlet) {
+            return response()->json(['error' => 'Outlet tidak ditemukan.'], 404);
+        }
+
+        $cacheKey = "menu:tenant:{$outlet->tenant_id}:outlet:".($outlet->id ?? 'global');
+        $menu = Cache::remember(
+            $cacheKey,
+            now()->addMinutes(10),
+            fn () => MenuItem::withoutGlobalScope(TenantScope::class)
+                ->where('tenant_id', $outlet->tenant_id)
+                ->forGuestMenu($outlet->id)
+                ->with('category:id,name')
+                ->get(['id', 'name', 'description', 'price', 'image_path', 'is_popular', 'menu_category_id'])
+                ->toArray()
+        );
+
+        return response()->json([
+            'outlet' => ['id' => $outlet->id, 'name' => $outlet->name, 'slug' => $outlet->slug],
+            'menu' => $menu,
+        ]);
+    }
 
     // Label tampilan KDS <-> nilai status di DB. Disatukan di sini supaya
     // frontend & backend konsisten (sebelumnya string ini tersebar bebas).
@@ -52,12 +84,12 @@ class OrderController extends Controller
             }
 
             $grouped[$label][] = [
-                'id'     => $order->order_code,
-                'table'  => $order->table_number,
+                'id' => $order->order_code,
+                'table' => $order->table_number,
                 'status' => $label,
-                'tone'   => $this->toneForStatus($order->status),
-                'time'   => max(1, (int) $order->created_at->diffInMinutes(now())),
-                'items'  => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}" . ($item->notes ? " ({$item->notes})" : ''))->all(),
+                'tone' => $this->toneForStatus($order->status),
+                'time' => max(1, (int) $order->created_at->diffInMinutes(now())),
+                'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}".($item->notes ? " ({$item->notes})" : ''))->all(),
             ];
         }
 
@@ -82,16 +114,16 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'outlet_id' => 'required|integer|exists:outlets,id',
-            'table'     => 'required|string|max:50',
-            'items'     => 'required|array|min:1',
+            'table' => 'required|string|max:50',
+            'items' => 'required|array|min:1',
             'items.*.menu_item_id' => 'required|integer',
-            'items.*.quantity'     => 'required|integer|min:1|max:99',
-            'items.*.notes'        => 'nullable|string|max:255',
+            'items.*.quantity' => 'required|integer|min:1|max:99',
+            'items.*.notes' => 'nullable|string|max:255',
         ]);
 
         // BUG-006 FIX: Ambil tenant_id dari outlet, bukan dari request
         // Ini memastikan client tidak bisa memilih tenant sembarangan
-        $outlet = \App\Models\Outlet::withoutGlobalScope(TenantScope::class)
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->select('id', 'tenant_id')
             ->findOrFail($validated['outlet_id']);
 
@@ -116,30 +148,30 @@ class OrderController extends Controller
 
         $order = DB::transaction(function () use ($validated, $tenantId, $menuItems, $outlet) {
             $order = Order::withoutGlobalScope(TenantScope::class)->create([
-                'tenant_id'    => $tenantId,
-                'outlet_id'    => $outlet->id,
-                'order_code'   => Order::generateOrderCode($tenantId),
-                'table_number' => str_starts_with($validated['table'], 'Meja') ? $validated['table'] : 'Meja ' . $validated['table'],
-                'source'       => 'guest_qr',
-                'status'       => Order::STATUS_ANTRIAN_MASUK,
+                'tenant_id' => $tenantId,
+                'outlet_id' => $outlet->id,
+                'order_code' => Order::generateOrderCode($tenantId),
+                'table_number' => str_starts_with($validated['table'], 'Meja') ? $validated['table'] : 'Meja '.$validated['table'],
+                'source' => 'guest_qr',
+                'status' => Order::STATUS_ANTRIAN_MASUK,
             ]);
 
             $subtotal = 0;
 
             foreach ($validated['items'] as $row) {
-                $menuItem     = $menuItems[$row['menu_item_id']];
+                $menuItem = $menuItems[$row['menu_item_id']];
                 $lineSubtotal = $menuItem->price * $row['quantity'];
-                $subtotal    += $lineSubtotal;
+                $subtotal += $lineSubtotal;
 
                 OrderItem::withoutGlobalScope(TenantScope::class)->create([
-                    'tenant_id'    => $tenantId,
-                    'order_id'     => $order->id,
+                    'tenant_id' => $tenantId,
+                    'order_id' => $order->id,
                     'menu_item_id' => $menuItem->id,
-                    'item_name'    => $menuItem->name,
-                    'quantity'     => $row['quantity'],
-                    'unit_price'   => $menuItem->price,
-                    'subtotal'     => $lineSubtotal,
-                    'notes'        => $row['notes'] ?? null,
+                    'item_name' => $menuItem->name,
+                    'quantity' => $row['quantity'],
+                    'unit_price' => $menuItem->price,
+                    'subtotal' => $lineSubtotal,
+                    'notes' => $row['notes'] ?? null,
                 ]);
             }
 
@@ -150,12 +182,12 @@ class OrderController extends Controller
 
         return response()->json([
             'success' => true,
-            'order'   => [
-                'id'     => $order->order_code,
-                'table'  => $order->table_number,
+            'order' => [
+                'id' => $order->order_code,
+                'table' => $order->table_number,
                 'status' => self::KDS_STATUS_LABELS[$order->status],
-                'items'  => $order->items->pluck('item_name'),
-                'total'  => (float) $order->total,
+                'items' => $order->items->pluck('item_name'),
+                'total' => (float) $order->total,
             ],
         ]);
     }
@@ -168,7 +200,7 @@ class OrderController extends Controller
     {
         $request->validate(['outlet_id' => 'required|integer|exists:outlets,id']);
 
-        $outlet = \App\Models\Outlet::withoutGlobalScope(TenantScope::class)
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->select('id', 'tenant_id')
             ->findOrFail($request->input('outlet_id'));
 
@@ -183,8 +215,8 @@ class OrderController extends Controller
 
         return response()->json([
             'success' => true,
-            'status'  => self::KDS_STATUS_LABELS[$order->status] ?? $order->status,
-            'tone'    => $this->toneForStatus($order->status),
+            'status' => self::KDS_STATUS_LABELS[$order->status] ?? $order->status,
+            'tone' => $this->toneForStatus($order->status),
         ]);
     }
 
@@ -223,17 +255,17 @@ class OrderController extends Controller
             ->with('items')
             ->get()
             ->map(fn ($order) => [
-                'id'     => $order->order_code,
-                'table'  => $order->table_number,
+                'id' => $order->order_code,
+                'table' => $order->table_number,
                 'status' => 'Siap Bayar',
-                'tone'   => 'emerald',
-                'time'   => max(1, (int) $order->created_at->diffInMinutes(now())),
-                'items'  => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}")->all(),
+                'tone' => 'emerald',
+                'time' => max(1, (int) $order->created_at->diffInMinutes(now())),
+                'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}")->all(),
             ]);
 
         return response()->json([
             'success' => true,
-            'queue'   => $queue->values(),
+            'queue' => $queue->values(),
         ]);
     }
 
@@ -246,9 +278,9 @@ class OrderController extends Controller
         $this->authorize('update', $order);
 
         $order->update([
-            'status'         => Order::STATUS_SELESAI,
+            'status' => Order::STATUS_SELESAI,
             'payment_status' => 'paid',
-            'paid_at'        => now(),
+            'paid_at' => now(),
         ]);
 
         return response()->json(['success' => true]);
@@ -267,13 +299,13 @@ class OrderController extends Controller
             ->take(50)
             ->get()
             ->map(fn ($j) => [
-                'id'         => $j->job_code,
-                'type'       => $j->type,
-                'orderId'    => $j->order_ref ?? '-',
-                'target'     => $j->target,
-                'status'     => $j->status,
-                'time'       => $j->created_at->diffForHumans(),
-                'error'      => $j->error,
+                'id' => $j->job_code,
+                'type' => $j->type,
+                'orderId' => $j->order_ref ?? '-',
+                'target' => $j->target,
+                'status' => $j->status,
+                'time' => $j->created_at->diffForHumans(),
+                'error' => $j->error,
                 'retryCount' => $j->retry_count,
             ]);
 
@@ -287,20 +319,20 @@ class OrderController extends Controller
     {
         $request->validate([
             'orderId' => 'nullable|string|max:50',
-            'table'   => 'required|string|max:50',
-            'total'   => 'required|numeric|min:0',
+            'table' => 'required|string|max:50',
+            'total' => 'required|numeric|min:0',
         ]);
 
         $tenantId = $this->ctx->id();
-        $orderId  = $request->input('orderId') ?? 'TRX-' . date('ymd') . '-' . rand(1000, 9999);
+        $orderId = $request->input('orderId') ?? 'TRX-'.date('ymd').'-'.rand(1000, 9999);
 
         PrintJob::create([
             'tenant_id' => $tenantId,
-            'job_code'  => PrintJob::generateCode($tenantId),
-            'type'      => 'Struk Kasir (BT)',
+            'job_code' => PrintJob::generateCode($tenantId),
+            'type' => 'Struk Kasir (BT)',
             'order_ref' => $orderId,
-            'target'    => 'Kasir Depan (Bluetooth)',
-            'status'    => 'printing',
+            'target' => 'Kasir Depan (Bluetooth)',
+            'status' => 'printing',
         ]);
 
         return response()->json([
@@ -329,17 +361,17 @@ class OrderController extends Controller
     public function updateReceiptConfig(Request $request)
     {
         $validated = $request->validate([
-            'header'              => 'sometimes|string|max:255',
-            'footer'              => 'sometimes|string|max:1000',
-            'show_npwp'           => 'sometimes|boolean',
-            'show_nib'            => 'sometimes|boolean',
+            'header' => 'sometimes|string|max:255',
+            'footer' => 'sometimes|string|max:1000',
+            'show_npwp' => 'sometimes|boolean',
+            'show_nib' => 'sometimes|boolean',
             'show_service_charge' => 'sometimes|boolean',
-            'show_pbjt'           => 'sometimes|boolean',
-            'paper_width'         => 'sometimes|in:58mm,80mm',
-            'font_type'           => 'sometimes|in:font-a,font-b',
-            'print_density'       => 'sometimes|in:light,normal,dark',
-            'auto_write_cashier'  => 'sometimes|boolean',
-            'void_policy'         => 'sometimes|in:audit_full,audit_minimal,no_audit',
+            'show_pbjt' => 'sometimes|boolean',
+            'paper_width' => 'sometimes|in:58mm,80mm',
+            'font_type' => 'sometimes|in:font-a,font-b',
+            'print_density' => 'sometimes|in:light,normal,dark',
+            'auto_write_cashier' => 'sometimes|boolean',
+            'void_policy' => 'sometimes|in:audit_full,audit_minimal,no_audit',
         ]);
 
         $config = ReceiptConfig::forTenant($this->ctx->id());
@@ -348,7 +380,7 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Format struk berhasil diperbarui.',
-            'config'  => $config->fresh()->toArray(),
+            'config' => $config->fresh()->toArray(),
         ]);
     }
 
@@ -364,7 +396,7 @@ class OrderController extends Controller
         // Endpoint publik — butuh outlet_id untuk identifikasi tenant (BUG-006 pattern)
         $request->validate(['outlet_id' => 'required|integer|exists:outlets,id']);
 
-        $outlet = \App\Models\Outlet::withoutGlobalScope(TenantScope::class)
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->select('id', 'tenant_id')
             ->findOrFail($request->input('outlet_id'));
 
@@ -385,38 +417,38 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'outlet_id' => 'required|integer|exists:outlets,id',
-            'name'      => 'required|string|max:100',
-            'phone'     => 'required|string|max:20',
-            'date'      => 'required|date|after_or_equal:today',
-            'time'      => 'required|date_format:H:i',
-            'guests'    => 'required|integer|min:1|max:100',
-            'type'      => 'required|string|max:50',
-            'notes'     => 'nullable|string|max:500',
+            'name' => 'required|string|max:100',
+            'phone' => 'required|string|max:20',
+            'date' => 'required|date|after_or_equal:today',
+            'time' => 'required|date_format:H:i',
+            'guests' => 'required|integer|min:1|max:100',
+            'type' => 'required|string|max:50',
+            'notes' => 'nullable|string|max:500',
         ]);
 
-        $outlet = \App\Models\Outlet::withoutGlobalScope(TenantScope::class)
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->select('id', 'tenant_id')
             ->findOrFail($validated['outlet_id']);
 
         $tenantId = $outlet->tenant_id;
 
         $reservation = Reservation::withoutGlobalScope(TenantScope::class)->create([
-            'tenant_id'          => $tenantId,
-            'outlet_id'          => $outlet->id,
-            'reservation_code'   => Reservation::generateCode($tenantId),
-            'name'               => $validated['name'],
-            'phone'              => $validated['phone'],
-            'date'               => $validated['date'],
-            'time'               => $validated['time'],
-            'guests'             => $validated['guests'],
-            'type'               => $validated['type'],
-            'notes'              => $validated['notes'] ?? null,
-            'status'             => 'pending',
+            'tenant_id' => $tenantId,
+            'outlet_id' => $outlet->id,
+            'reservation_code' => Reservation::generateCode($tenantId),
+            'name' => $validated['name'],
+            'phone' => $validated['phone'],
+            'date' => $validated['date'],
+            'time' => $validated['time'],
+            'guests' => $validated['guests'],
+            'type' => $validated['type'],
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'pending',
         ]);
 
         return response()->json([
-            'success'     => true,
-            'message'     => 'Reservasi berhasil dibuat',
+            'success' => true,
+            'message' => 'Reservasi berhasil dibuat',
             'reservation' => $reservation,
         ]);
     }
@@ -430,7 +462,7 @@ class OrderController extends Controller
     {
         // BUG-007 FIX: Validasi nilai status yang diizinkan
         $request->validate([
-            'status' => ['required', 'string', 'in:' . implode(',', self::RESERVATION_STATUSES)],
+            'status' => ['required', 'string', 'in:'.implode(',', self::RESERVATION_STATUSES)],
         ]);
 
         // Ambil dengan TenantScope aktif — secara otomatis memfilter ke tenant yang login
@@ -460,21 +492,21 @@ class OrderController extends Controller
      * Endpoint publik untuk CustomerView — tidak butuh auth.
      * Return: { is_open_now, operating_hours }
      */
-    public function getOutletOperatingHours(Request $request): \Illuminate\Http\JsonResponse
+    public function getOutletOperatingHours(Request $request): JsonResponse
     {
         $outletParam = $request->query('outlet', '');
 
         // Coba resolve outlet by slug (name), lalu by id
         $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->where('slug', $outletParam)
-            ->orWhere('id', is_numeric($outletParam) ? (int)$outletParam : 0)
+            ->orWhere('id', is_numeric($outletParam) ? (int) $outletParam : 0)
             ->first();
 
         if (! $outlet) {
             return response()->json([
-                'is_open_now'     => true,
+                'is_open_now' => true,
                 'operating_hours' => OutletSetting::defaultOperatingHours(),
-                'note'            => 'outlet_not_found_using_defaults',
+                'note' => 'outlet_not_found_using_defaults',
             ]);
         }
 
@@ -484,7 +516,7 @@ class OrderController extends Controller
 
         if (! $setting) {
             return response()->json([
-                'is_open_now'     => true,
+                'is_open_now' => true,
                 'operating_hours' => OutletSetting::defaultOperatingHours(),
             ]);
         }

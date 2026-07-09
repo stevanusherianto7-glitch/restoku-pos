@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // Cloudinary (foto menu) — format resmi: cloudinary://key:secret@cloud
+    // README/PRD: wajib untuk skala 500k outlet (CDN offload + transform on-the-fly).
+    'cloudinary' => [
+        'url' => env('CLOUDINARY_URL'),
+    ],
+
 ];
