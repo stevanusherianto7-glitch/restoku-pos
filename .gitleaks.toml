@@ -1,0 +1,32 @@
+# Gitleaks config — Restoku (audit CI follow-up: secret scanning)
+# Ref: https://github.com/gitleaks/gitleaks#configuration
+title = "Restoku Gitleaks"
+
+# Fail bila ada secret, exit code 1.
+[rules]
+  # Supress generic high-entropy di file yang memang placeholder (contoh .env.example).
+  # Kita pakai global [allowlist] di bawah, bukan disable rule.
+
+# Allowlist global: jangan scan file/pat path ini.
+[allowlist]
+  # .env.example adalah template kosong (APP_KEY=, CLOUDINARY_URL=) — bukan secret.
+  paths = [
+    '''.env.example''',
+    '''\.gitleaks\.toml''',
+    '''AUDIT_RESTOKU_V2\.md''',
+    '''DEPLOY_RUNBOOK\.md''',
+    '''PRD\.md''',
+    '''tests/''',
+    '''database/seeders/''',
+    '''node_modules/''',
+    '''vendor/''',
+    '''public/build/''',
+  ]
+  # Stopword: baris yang mengandung kata ini di-allow (contoh dokumentasi).
+  regexes = [
+    '''CLOUDINARY_URL=\s*$''',     # hanya key kosong di .env.example (tapi sdh di-path-allow)
+    '''APP_KEY=\s*$''',
+    '''GEMINI_API_KEY=\s*$''',
+  ]
+  # Commit hash yang memang berisi secret tapi sudah di-rotate (isi bila ada).
+  # commits = [ "0000000000000000000000000000000000000000" ]
