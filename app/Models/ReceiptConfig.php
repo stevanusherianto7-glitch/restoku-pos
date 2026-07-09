@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\UsesTenantConnection;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,14 +10,15 @@ use Illuminate\Database\Eloquent\Model;
 class ReceiptConfig extends Model
 {
     use HasFactory;
+    use UsesTenantConnection;
 
     protected $guarded = ['id'];
 
     protected $casts = [
-        'show_npwp'          => 'boolean',
-        'show_nib'           => 'boolean',
-        'show_service_charge'=> 'boolean',
-        'show_pbjt'          => 'boolean',
+        'show_npwp' => 'boolean',
+        'show_nib' => 'boolean',
+        'show_service_charge' => 'boolean',
+        'show_pbjt' => 'boolean',
         'auto_write_cashier' => 'boolean',
     ];
 
@@ -39,17 +41,17 @@ class ReceiptConfig extends Model
             ->firstOrCreate(
                 ['tenant_id' => $tenantId],
                 [
-                    'header'             => 'RESTOKU',
-                    'footer'             => "Terima kasih atas kunjungan Anda!\nSampai jumpa kembali.",
-                    'show_npwp'          => false,
-                    'show_nib'           => false,
-                    'show_service_charge'=> false,
-                    'show_pbjt'          => true,
-                    'paper_width'        => '80mm',
-                    'font_type'          => 'font-a',
-                    'print_density'      => 'normal',
+                    'header' => 'RESTOKU',
+                    'footer' => "Terima kasih atas kunjungan Anda!\nSampai jumpa kembali.",
+                    'show_npwp' => false,
+                    'show_nib' => false,
+                    'show_service_charge' => false,
+                    'show_pbjt' => true,
+                    'paper_width' => '80mm',
+                    'font_type' => 'font-a',
+                    'print_density' => 'normal',
                     'auto_write_cashier' => true,
-                    'void_policy'        => 'audit_full',
+                    'void_policy' => 'audit_full',
                 ]
             );
     }

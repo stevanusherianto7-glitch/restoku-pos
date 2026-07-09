@@ -12,6 +12,7 @@ use App\Models\ReceiptConfig;
 use App\Models\Reservation;
 use App\Models\Scopes\TenantScope;
 use App\Services\TenantContext;
+use App\Services\TenantReadConnection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,10 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function __construct(private TenantContext $ctx) {}
+    public function __construct(
+        private TenantContext $ctx,
+        private TenantReadConnection $readConn
+    ) {}
 
     /**
      * Fase 1 — Buku menu publik untuk tamu (read-only, by outlet slug).
@@ -34,16 +38,20 @@ class OrderController extends Controller
             return response()->json(['error' => 'Outlet tidak ditemukan.'], 404);
         }
 
+        // Inisialisasi TenantContext dari outlet (endpoint publik tamu, tanpa auth).
+        // Perlu agar TenantReadConnection bisa arahkan ke schema/replica tenant ini.
+        $this->ctx->setTenantId($outlet->tenant_id);
+
         $cacheKey = "menu:tenant:{$outlet->tenant_id}:outlet:".($outlet->id ?? 'global');
         $menu = Cache::remember(
             $cacheKey,
             now()->addMinutes(10),
-            fn () => MenuItem::withoutGlobalScope(TenantScope::class)
+            fn () => $this->readConn->read(fn () => MenuItem::withoutGlobalScope(TenantScope::class)
                 ->where('tenant_id', $outlet->tenant_id)
                 ->forGuestMenu($outlet->id)
                 ->with('category:id,name')
                 ->get(['id', 'name', 'description', 'price', 'image_path', 'is_popular', 'menu_category_id'])
-                ->toArray()
+                ->toArray())
         );
 
         return response()->json([
