@@ -39,6 +39,26 @@ class Order extends Model
     ];
 
     /**
+     * #3 — Wrapper query order yang menjamin isolasi tenant+outlet.
+     * Ganti pemakaian Order::where('tenant_id', ...)->where('outlet_id', ...)
+     * manual yang rawan lupa/typo. Semua akses order per-outlet lewat sini.
+     */
+    public static function forOutlet(Outlet $outlet)
+    {
+        return static::query()
+            ->where('tenant_id', $outlet->tenant_id)
+            ->where('outlet_id', $outlet->id);
+    }
+
+    /**
+     * #3 — Wrapper query order per-tenant (tanpa outlet spesifik).
+     */
+    public static function byTenant(int $tenantId)
+    {
+        return static::query()->where('tenant_id', $tenantId);
+    }
+
+    /**
      * Fase 4 — Scope untuk orders yang layak diarsip (>N bulan, sudah selesai/batal).
      */
     public function scopeArchivable($query, int $months = 6)

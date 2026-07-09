@@ -14,14 +14,14 @@ class OwnerDashboardService
      */
     public function getAggregateMetrics(int $tenantId, string $dateRange = 'today')
     {
-        $ordersQuery = Order::where('tenant_id', $tenantId)
+        $ordersQuery = Order::byTenant($tenantId)
             ->where('status', Order::STATUS_SELESAI);
 
         if ($dateRange === 'today') {
             $ordersQuery->whereDate('created_at', now()->toDateString());
         } elseif ($dateRange === 'month') {
             $ordersQuery->whereMonth('created_at', now()->month)
-                        ->whereYear('created_at', now()->year);
+                ->whereYear('created_at', now()->year);
         }
 
         $totalRevenue = (float) $ordersQuery->sum('total');
@@ -42,17 +42,17 @@ class OwnerDashboardService
     public function getOutletLeaderboard(int $tenantId, string $dateRange = 'today')
     {
         $outlets = Outlet::where('tenant_id', $tenantId)->get();
-        
+
         $leaderboard = [];
         foreach ($outlets as $outlet) {
-            $outletOrders = Order::where('outlet_id', $outlet->id)
+            $outletOrders = Order::forOutlet($outlet)
                 ->where('status', Order::STATUS_SELESAI);
 
             if ($dateRange === 'today') {
                 $outletOrders->whereDate('created_at', now()->toDateString());
             } elseif ($dateRange === 'month') {
                 $outletOrders->whereMonth('created_at', now()->month)
-                             ->whereYear('created_at', now()->year);
+                    ->whereYear('created_at', now()->year);
             }
 
             $revenue = (float) $outletOrders->sum('total');
@@ -67,7 +67,8 @@ class OwnerDashboardService
             ];
         }
 
-        usort($leaderboard, fn($a, $b) => $b['revenue'] <=> $a['revenue']);
+        usort($leaderboard, fn ($a, $b) => $b['revenue'] <=> $a['revenue']);
+
         return $leaderboard;
     }
 
@@ -83,7 +84,7 @@ class OwnerDashboardService
                     $q->whereDate('created_at', now()->toDateString());
                 } elseif ($dateRange === 'month') {
                     $q->whereMonth('created_at', now()->month)
-                      ->whereYear('created_at', now()->year);
+                        ->whereYear('created_at', now()->year);
                 }
             });
 
@@ -92,13 +93,13 @@ class OwnerDashboardService
             ->orderByDesc('total_revenue')
             ->get();
 
-        $topPerformers = $aggregated->take(5)->map(fn($item) => [
+        $topPerformers = $aggregated->take(5)->map(fn ($item) => [
             'name' => $item->item_name,
             'qty_sold' => (int) $item->total_qty,
             'revenue' => (float) $item->total_revenue,
         ])->values()->all();
 
-        $slowMovers = $aggregated->sortBy('total_qty')->take(5)->map(fn($item) => [
+        $slowMovers = $aggregated->sortBy('total_qty')->take(5)->map(fn ($item) => [
             'name' => $item->item_name,
             'qty_sold' => (int) $item->total_qty,
             'revenue' => (float) $item->total_revenue,
@@ -115,12 +116,12 @@ class OwnerDashboardService
      */
     public function getFinancialReport(int $tenantId, string $dateRange = 'month')
     {
-        $ordersQuery = Order::where('tenant_id', $tenantId)
+        $ordersQuery = Order::byTenant($tenantId)
             ->where('status', Order::STATUS_SELESAI);
 
         if ($dateRange === 'month') {
             $ordersQuery->whereMonth('created_at', now()->month)
-                        ->whereYear('created_at', now()->year);
+                ->whereYear('created_at', now()->year);
         }
 
         $grossProfit = (float) $ordersQuery->sum('total');

@@ -46,7 +46,8 @@ class MonthlyProfitSummaryTool implements Tool
             }
         }
 
-        $query = Order::where('payment_status', 'paid')
+        $query = Order::byTenant($tenantId)
+            ->where('payment_status', 'paid')
             ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
 
         if ($outletId > 0) {

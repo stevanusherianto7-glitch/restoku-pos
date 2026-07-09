@@ -238,7 +238,9 @@ class OrderController extends Controller
             'status' => 'required|string|in:Antrian Masuk,Sedang Dimasak,Siap Sajikan,Selesai',
         ]);
 
-        $order = Order::where('order_code', $id)->firstOrFail();
+        $order = Order::byTenant(auth()->user()->tenant_id)
+            ->where('order_code', $id)
+            ->firstOrFail();
         $this->authorize('update', $order);
 
         $statusInput = $request->input('status');
@@ -282,7 +284,9 @@ class OrderController extends Controller
      */
     public function clearCashierQueueItem($id)
     {
-        $order = Order::where('order_code', $id)->firstOrFail();
+        $order = Order::byTenant(auth()->user()->tenant_id)
+            ->where('order_code', $id)
+            ->firstOrFail();
         $this->authorize('update', $order);
 
         $order->update([
