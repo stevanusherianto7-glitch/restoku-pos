@@ -29,7 +29,7 @@ jobs:
         with:
           php-version: "8.4"
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath
-          coverage: none
+          coverage: pcov
 
       - name: Install Composer dependencies
         run: composer update --no-interaction --prefer-dist
@@ -44,11 +44,19 @@ jobs:
           mkdir -p storage/logs
           php artisan migrate --force
 
-      - name: Run PHPUnit (php artisan test)
-        run: php artisan test --stop-on-failure
+      - name: Run PHPUnit with coverage
+        run: php artisan test --coverage --coverage-clover=coverage.xml
 
       - name: Run PHPStan (Larastan) static analysis
         run: ./vendor/bin/phpstan analyse
+
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: coverage.xml
+          retention-days: 14
 
   # ─────────────────────────────────────────────────────────────
   # Job 2: Frontend Vitest — 38 unit tests
@@ -72,10 +80,18 @@ jobs:
       - name: Run ESLint code check
         run: npm run lint
 
-      - name: Run Vitest (npm test)
-        run: npm test
+      - name: Run Vitest with coverage
+        run: npm run test:coverage
         env:
           LARAVEL_BYPASS_ENV_CHECK: 1
+
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: coverage/
+          retention-days: 14
 
   # ─────────────────────────────────────────────────────────────
   # Job 3: Vite Production Build — 2417 modules
