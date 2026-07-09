@@ -119,7 +119,8 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
   const [open, setOpen] = useState(["Utama"]);
   const { tenantName, renderLogo, screenMode } = useTenantSettings();
   const { isLocked: checkLocked, featureLocks } = useSubscription();
-  const { outlet } = usePage<SharedProps>().props;
+  const { outlet, auth } = usePage<SharedProps>().props;
+  const user = auth?.user;
   const outletName = outlet?.name ?? "Senopati";
 
   const isLight = screenMode === "terang";
@@ -163,7 +164,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
     return () => clearInterval(interval);
   }, []);
 
-  const activeRole = (activeKaryawan?.role ?? "kasir") as Role;
+  const activeRole = (user?.role === 'owner' ? 'owner' : (activeKaryawan?.role ?? user?.role ?? 'kasir')) as Role;
 
   // Filter: render only what the active role is authorised to see
   const visibleNav = nav
@@ -249,7 +250,8 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
 
       {/* Active Staff Profile Card */}
       {(() => {
-        const rawName   = activeKaryawan?.name ?? "";
+        const isOwnerSession = user?.role === 'owner';
+        const rawName   = isOwnerSession ? (user?.name ?? "Owner") : (activeKaryawan?.name ?? "");
         const roleLabel = ROLE_LABEL[activeRole] ?? "Kasir";
         // Detect stale session where name was set to the role string itself
         const nameIsRole = rawName.toLowerCase() === activeRole
