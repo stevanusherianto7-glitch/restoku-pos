@@ -38,6 +38,15 @@ class Order extends Model
         'cancelled_at' => 'datetime',
     ];
 
+    /**
+     * Fase 4 — Scope untuk orders yang layak diarsip (>N bulan, sudah selesai/batal).
+     */
+    public function scopeArchivable($query, int $months = 6)
+    {
+        return $query->where('created_at', '<', now()->subMonths($months))
+            ->whereIn('status', [self::STATUS_SELESAI, self::STATUS_DIBATALKAN]);
+    }
+
     protected static function booted()
     {
         static::addGlobalScope(new TenantScope);

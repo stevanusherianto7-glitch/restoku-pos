@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderArchive;
+use App\Services\OrderArchiveService;
 use App\Services\OwnerDashboardService;
 use App\Services\SalesRollupService;
 use App\Services\TenantContext;
@@ -14,6 +16,7 @@ class OwnerDashboardController extends Controller
         private OwnerDashboardService $dashboardService,
         private TenantContext $ctx,
         private SalesRollupService $rollupService,
+        private OrderArchiveService $archiveService,
     ) {}
 
     public function index(Request $request)
@@ -52,6 +55,25 @@ class OwnerDashboardController extends Controller
 
         return response()->json(
             $this->rollupService->dashboardSummary($tenantId, $outletId, $days)
+        );
+    }
+
+    /**
+     * Fase 4 — Daftar orders yang sudah diarsip (cold storage, read-only).
+     * Query: ?per_page=50&outlet_id=5
+     */
+    public function archivedOrders(Request $request)
+    {
+        $tenantId = $this->ctx->id();
+        $perPage = min((int) $request->input('per_page', 50), 200);
+
+        $query = OrderArchive::where('tenant_id', $tenantId);
+        if ($request->filled('outlet_id')) {
+            $query->where('outlet_id', (int) $request->input('outlet_id'));
+        }
+
+        return response()->json(
+            $query->orderByDesc('created_at')->paginate($perPage)
         );
     }
 }
