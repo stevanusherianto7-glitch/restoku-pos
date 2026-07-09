@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Concerns\UsesTenantConnection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Fase 3 — Rollup penjualan harian per outlet.
+ * Dashboard owner baca ini, bukan scan tabel orders.
+ */
+class SalesDailyRollup extends Model
+{
+    use HasFactory;
+    use UsesTenantConnection;
+
+    protected $guarded = ['id'];
+
+    protected $casts = [
+        'date' => 'date',
+        'gross_revenue' => 'decimal:2',
+        'net_revenue' => 'decimal:2',
+        'avg_order_value' => 'decimal:2',
+    ];
+}

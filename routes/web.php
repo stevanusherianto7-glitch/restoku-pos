@@ -59,6 +59,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/dashboard',          fn () => Inertia::render('Dashboard/Index'))->name('dashboard');
     Route::get('/laporan-keuangan',   fn () => Inertia::render('Dashboard/Reports'))->name('reports');
     Route::get('/owner/dashboard',    [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
+    // Fase 3 — API dashboard pakai rollup (bukan scan orders). Query param ?days=30&outlet_id=
+    Route::get('/api/owner/sales-summary', [OwnerDashboardController::class, 'salesSummary'])->name('owner.sales-summary');
     Route::get('/owner/settings',     fn () => Inertia::render('Owner/Settings'))->name('owner.settings');
     Route::get('/owner/employees',    fn () => Inertia::render('Owner/Employees'))->name('owner.employees');
     Route::get('/owner/inventory/alerts', fn () => Inertia::render('Owner/InventoryAlerts'))->name('owner.inventory.alerts');
