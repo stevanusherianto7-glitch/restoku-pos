@@ -7,6 +7,7 @@ on:
     branches: [ "main" ]
   schedule:
     - cron: '0 0 * * 0' # Every Sunday at 00:00 UTC
+  workflow_dispatch: # manual trigger dari tab Actions (setelah enable code scanning)
 
 jobs:
   analyze:
