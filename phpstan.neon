@@ -9,6 +9,8 @@ parameters:
     # Level 5 is a good balance for Laravel projects (range is 0-9)
     level: 5
 
+    reportUnmatchedIgnoredErrors: false
+
     ignoreErrors:
         # Ignore common dynamic property calls
         - "#Access to an undefined property App\\\\Models\\\\User::.*#"
