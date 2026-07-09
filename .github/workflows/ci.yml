@@ -13,9 +13,16 @@ jobs:
   phpunit:
     name: "PHPUnit (51 tests)"
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download Vite build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vite-build
+          path: public/build/
 
       - name: Set up PHP 8.4
         uses: shivammathur/setup-php@v2
