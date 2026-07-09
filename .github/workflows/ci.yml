@@ -82,9 +82,10 @@ jobs:
           path: ~/.composer/cache
           key: composer-${{ hashFiles('composer.lock') }}
 
-      # 🛡️ reproducible build: pakai lock, bukan `composer update`
+      # 🛡️ reproducible build: pakai lock, bukan `composer update`.
+      # TANPA --no-dev: test butuh dev-deps (phpunit, laravel/phpunit, collision).
       - name: Install Composer dependencies (from lock)
-        run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       # 🛡️ supply-chain: gagal bila ada advisory keamanan
       - name: Composer audit (security advisories)
@@ -217,9 +218,10 @@ jobs:
         with:
           node-version: 20
           cache: "npm"
-
+      # 🛡️ reproducible build: pakai lock, bukan `composer update`.
+      # TANPA --no-dev: test butuh dev-deps (phpunit, laravel/phpunit, collision).
       - name: Install Composer dependencies (from lock)
-        run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Install npm dependencies
         run: npm ci --legacy-peer-deps
