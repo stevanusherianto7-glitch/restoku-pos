@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\EnsureTenantContext;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RequiresPlan;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,18 +16,22 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
+            HandleInertiaRequests::class,
         ]);
         $middleware->validateCsrfTokens(except: [
-            'api/*',
+            'api/orders',
+            'api/orders/*',
+            'api/reservations',
+            'api/reservations/*',
+            'api/outlet-operating-hours',
         ]);
 
         // Alias supaya bisa dipakai singkat di routes:
         //   ->middleware(['auth', 'tenant'])        — pastikan user login & punya tenant
         //   ->middleware('plan:kds')                — pastikan plan cukup untuk fitur
         $middleware->alias([
-            'tenant' => \App\Http\Middleware\EnsureTenantContext::class,
-            'plan'   => \App\Http\Middleware\RequiresPlan::class,
+            'tenant' => EnsureTenantContext::class,
+            'plan' => RequiresPlan::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

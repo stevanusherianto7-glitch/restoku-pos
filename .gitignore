@@ -40,3 +40,8 @@ Thumbs.db
 # Database file (SQLite — jangan push ke repo)
 /database/*.sqlite
 /database/*.sqlite-journal
+
+# Test artifacts (Playwright / coverage)
+/playwright-report/
+/tests/Browser/console/
+coverage/

@@ -35,10 +35,11 @@ class GeminiAiController extends Controller
                 'reply' => (string) $response,
             ]);
         } catch (\Exception $e) {
-            Log::error('[Gemini AI] Error: ' . $e->getMessage());
+            Log::error('[Gemini AI] Error: '.$e->getMessage());
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'Maaf, Gemini AI sedang sibuk atau mengalami kendala koneksi. Error: ' . $e->getMessage(),
+                'message' => 'Maaf, Gemini AI sedang sibuk atau mengalami kendala koneksi.',
             ], 500);
         }
     }

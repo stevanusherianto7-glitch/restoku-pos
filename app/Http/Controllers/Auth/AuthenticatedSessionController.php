@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -26,19 +28,21 @@ class AuthenticatedSessionController extends Controller
     {
         if ($request->has('pin')) {
             $pin = $request->input('pin');
-            $users = \App\Models\User::where('role', '!=', 'owner')->get();
+            // SECURITY (C-1): never trust a raw role param to bypass PIN verification.
+            // Only match by hashed PIN; plaintext fallback removed. Load is scoped by
+            // role (owner excluded) — tenant scoping happens post-login via TenantContext.
+            $users = User::where('role', '!=', 'owner')
+                ->whereNotNull('password')
+                ->get();
             $matchedUser = null;
             foreach ($users as $u) {
-                if (\Illuminate\Support\Facades\Hash::check($pin, $u->password) || $u->password === $pin) {
+                if (Hash::check($pin, $u->password)) {
                     $matchedUser = $u;
                     break;
                 }
             }
-            if (! $matchedUser && $request->has('role')) {
-                $matchedUser = \App\Models\User::where('role', $request->input('role'))->first();
-            }
             if ($matchedUser) {
-                \Illuminate\Support\Facades\Auth::login($matchedUser, $request->boolean('remember', true));
+                Auth::login($matchedUser, $request->boolean('remember', true));
                 $request->session()->regenerate();
 
                 if ($matchedUser->role === 'kitchen') {
@@ -46,6 +50,7 @@ class AuthenticatedSessionController extends Controller
                 } elseif ($matchedUser->role === 'waiter') {
                     return redirect()->intended('/waiter-bar');
                 }
+
                 return redirect()->intended('/pos');
             }
             throw ValidationException::withMessages([

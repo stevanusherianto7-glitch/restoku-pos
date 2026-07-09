@@ -3,6 +3,8 @@
 namespace App\Ai\Tools;
 
 use App\Models\Order;
+use App\Models\Outlet;
+use App\Services\TenantContext;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Tools\Request;
@@ -10,6 +12,8 @@ use Stringable;
 
 class MonthlyProfitSummaryTool implements Tool
 {
+    public function __construct(private ?TenantContext $ctx = null) {}
+
     /**
      * Get the description of the tool's purpose.
      */
@@ -23,12 +27,27 @@ class MonthlyProfitSummaryTool implements Tool
      */
     public function handle(Request $request): Stringable|string
     {
+        // SECURITY (C-4): tenant comes from authenticated context, never the LLM request.
+        if (! $this->ctx || ! $this->ctx->isInitialized()) {
+            abort(403, 'Tenant context tidak tersedia.');
+        }
+        $tenantId = $this->ctx->id();
         $outletId = $request->integer('outlet_id');
-        $startOfMonth = now()->startOfMonth();
-        $endOfMonth = now()->endOfMonth();
+
+        // If an outlet is requested, ensure it belongs to the current tenant (lateral isolation).
+        if ($outletId > 0) {
+            $outlet = Outlet::where('tenant_id', $tenantId)
+                ->where('id', $outletId)
+                ->first();
+            if (! $outlet) {
+                return json_encode([
+                    'error' => 'Outlet tidak ditemukan untuk tenant ini.',
+                ]);
+            }
+        }
 
         $query = Order::where('payment_status', 'paid')
-            ->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
 
         if ($outletId > 0) {
             $query->where('outlet_id', $outletId);
@@ -36,7 +55,7 @@ class MonthlyProfitSummaryTool implements Tool
 
         $totalOrders = $query->count();
         $totalRevenue = (float) $query->sum('total');
-        
+
         // Estimasi COGS & biaya operasional (45% dari revenue) atau biaya rill jika ada
         $estimatedExpenses = $totalRevenue * 0.45;
         $netProfit = $totalRevenue - $estimatedExpenses;
@@ -45,11 +64,11 @@ class MonthlyProfitSummaryTool implements Tool
         return json_encode([
             'periode_bulan' => now()->translatedFormat('F Y'),
             'total_transaksi_berhasil' => $totalOrders,
-            'total_penjualan_revenue' => "Rp " . number_format($totalRevenue, 0, ',', '.'),
-            'estimasi_biaya_dan_cogs' => "Rp " . number_format($estimatedExpenses, 0, ',', '.'),
-            'keuntungan_berdih_net_profit' => "Rp " . number_format($netProfit, 0, ',', '.'),
+            'total_penjualan_revenue' => 'Rp '.number_format($totalRevenue, 0, ',', '.'),
+            'estimasi_biaya_dan_cogs' => 'Rp '.number_format($estimatedExpenses, 0, ',', '.'),
+            'keuntungan_berdih_net_profit' => 'Rp '.number_format($netProfit, 0, ',', '.'),
             'status_keuangan' => $isProfitable ? 'PROFIT (MENGUNTUNGKAN)' : 'RUGI / DEFISIT',
-            'is_profit' => $isProfitable
+            'is_profit' => $isProfitable,
         ]);
     }
 

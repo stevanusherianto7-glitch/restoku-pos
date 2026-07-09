@@ -18,8 +18,8 @@ Route::get('/', fn () => Inertia::render('LandingPage/Index'));
 
 Route::get('/login',       fn () => Inertia::render('Auth/StaffLogin'))->name('login');
 Route::get('/owner/login', fn () => Inertia::render('Auth/OwnerLogin'))->name('owner.login');
-Route::post('/login',       [AuthenticatedSessionController::class, 'storeStaff']);
-Route::post('/owner/login', [AuthenticatedSessionController::class, 'storeOwner']);
+Route::post('/login',       [AuthenticatedSessionController::class, 'storeStaff'])->middleware('throttle:10,1');
+Route::post('/owner/login', [AuthenticatedSessionController::class, 'storeOwner'])->middleware('throttle:10,1');
 
 // Guest-facing digital menu & order (QR code meja)
 Route::get('/order',         fn () => Inertia::render('BukuMenuDigital/CustomerView'));
@@ -104,7 +104,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // ── Pengaturan Outlet (DB-backed) ───────────────────────────────────────
     Route::get('/pengaturan-outlet', [OutletSettingsController::class, 'index']);
 
-    Route::prefix('api/outlet-settings')->group(function () {
+    Route::prefix('api/outlet-settings')->middleware('throttle:60,1')->group(function () {
         Route::put('/all',    [OutletSettingsController::class, 'updateAll']);
         Route::put('/profil', [OutletSettingsController::class, 'updateProfil']);
         Route::put('/lokasi', [OutletSettingsController::class, 'updateLokasi']);
@@ -126,7 +126,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/api/receipt-config',                [OrderController::class, 'getReceiptConfig']);
     Route::post('/api/receipt-config',               [OrderController::class, 'updateReceiptConfig']);
     Route::put('/api/reservations/{id}/status',      [OrderController::class, 'updateReservationStatus']);
-    Route::post('/api/ai/chat',                      [GeminiAiController::class, 'chat']);
+    Route::post('/api/ai/chat',                      [GeminiAiController::class, 'chat'])->middleware('throttle:20,1');
 
     // ── Google Review / Complaint Management ────────────────────────────────
     Route::get('/owner/google-reviews',              [GoogleReviewController::class, 'viewPanel'])

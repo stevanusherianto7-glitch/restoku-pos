@@ -34,13 +34,20 @@ class TenantScope implements Scope
     {
         // Baca dari container — diisi oleh EnsureTenantContext atau artisan command
         if (! app()->bound('tenant.id')) {
-            return; // scope tidak aktif — seeding, console, atau test tanpa setup
+            // SECURITY (H-3): in production, a missing tenant binding on a
+            // tenant-scoped model is a misconfiguration that would silently
+            // return CROSS-TENANT data. Fail closed instead of returning everything.
+            if (app()->environment('production')) {
+                abort(500, 'TenantContext belum diinisialisasi (misconfig).');
+            }
+
+            return; // local/testing/console/seeding: scope tidak aktif (Plan B)
         }
 
         $tenantId = app('tenant.id');
 
         if ($tenantId) {
-            $builder->where($model->getTable() . '.tenant_id', $tenantId);
+            $builder->where($model->getTable().'.tenant_id', $tenantId);
         }
     }
 

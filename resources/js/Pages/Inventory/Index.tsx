@@ -1,7 +1,7 @@
 import { Head } from "@inertiajs/react";
 import { useSubscription } from "../../Hooks/useSubscription";
 import MainLayout from "../../Layouts/MainLayout";
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from "../../Components/Shared";
+import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge, MOCK_PLAN, MOCK_OUTLET, planHasFeature, FEATURE_LOCKS } from "../../Components/Shared";
 import { DollarSign, Utensils, Package, Users, Search, Clock3, CheckCheck, Plus, SlidersHorizontal, ArrowDownToLine, Smartphone, QrCode, UserPlus, FileText, ChevronRight, Calculator, AlertTriangle, MessageSquare, TicketPercent, CheckCircle2, RefreshCcw, Download, DownloadCloud, Volume2 } from "lucide-react";
 import { ProductImage } from "../../Components/ProductImage";
 import { RoleGuard } from "../../Components/RoleGuard";
@@ -48,7 +48,7 @@ function InventoryInner() {
               <div className="grid grid-cols-[1.4fr_1fr_1.2fr_.7fr_1fr_1fr_.5fr] items-center border-b border-white/5 py-4 text-sm" key={r.name}>
                 <span className="font-medium text-slate-200">{r.name}</span>
                 <span className="text-slate-400">{r.cat}</span>
-                <span>{r.low ? <Badge tone="red">Rendah · {r.stock}</Badge> : <Badge tone="emerald">OK · {r.stock}</Badge>}</span>
+                <span>{r.low ? <Badge tone="red">Rendah ï¿½ {r.stock}</Badge> : <Badge tone="emerald">OK ï¿½ {r.stock}</Badge>}</span>
                 <span className="font-mono text-slate-400">{r.unit}</span>
                 <span className="font-mono text-slate-300">{formatRupiah(r.cost)}</span>
                 <span className="text-slate-400">{r.updated}</span>
