@@ -163,16 +163,16 @@ jobs:
 
       - name: Start Laravel server
         run: |
-          php artisan serve --port=8000 &
+          php artisan serve --host=0.0.0.0 --port=8000 &
           echo "Waiting for server..."
           for i in {1..20}; do
-            curl -sf http://localhost:8000 > /dev/null 2>&1 && echo "Server up!" && break
+            curl -sf http://127.0.0.1:8000 > /dev/null 2>&1 && echo "Server up!" && break
             echo "[$i/20] Not ready yet..."
             sleep 2
           done
 
       - name: "E2E HTTP Route Check (61 endpoints)"
-        run: npm run test:e2e
+        run: npm run test:e2e -- --base-url http://127.0.0.1:8000
 
       - name: "Playwright E2E — ${{ matrix.browser }}"
         run: npx playwright test --project="${{ matrix.browser }}"
