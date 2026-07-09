@@ -26,10 +26,11 @@ Route::get('/order',         fn () => Inertia::render('BukuMenuDigital/CustomerV
 Route::get('/m/senopati',    fn () => Inertia::render('BukuMenuDigital/CustomerView'));
 
 // Guest order endpoints (BUG-006 FIX: tenant diidentifikasi via outlet_id, bukan req body)
-Route::post('/api/orders',        [OrderController::class, 'submitOrder']);
+// C2 (Security Audit): throttle wajib — endpoint publik CSRF-exempt rentan spam/DoS.
+Route::post('/api/orders',        [OrderController::class, 'submitOrder'])->middleware('throttle:30,1');
 Route::get('/api/orders/{id}',    [OrderController::class, 'getOrderStatus']);
 Route::get('/api/reservations',   [OrderController::class, 'getReservations']);
-Route::post('/api/reservations',  [OrderController::class, 'submitReservation']);
+Route::post('/api/reservations',  [OrderController::class, 'submitReservation'])->middleware('throttle:30,1');
 // Jam operasional outlet — publik untuk CustomerView (tidak butuh auth)
 Route::get('/api/outlet-operating-hours', [OrderController::class, 'getOutletOperatingHours']);
 

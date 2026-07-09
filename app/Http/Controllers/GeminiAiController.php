@@ -23,8 +23,8 @@ class GeminiAiController extends Controller
                 "[Konteks Pengguna: %s (Role: %s), Outlet ID: %s, Tenant ID: %s]\nPertanyaan: %s",
                 $user ? $user->name : 'Manager',
                 $user ? $user->role : 'manager',
-                $user ? ($user->outlet_id ?? 1) : 1,
-                $user ? ($user->tenant_id ?? 1) : 1,
+                $user ? ($user->outlet_id ?? 'null') : 'null',
+                $user ? ($user->tenant_id ?? 'null') : 'null',
                 $message
             );
 
