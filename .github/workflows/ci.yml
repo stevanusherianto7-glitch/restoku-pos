@@ -31,6 +31,11 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
+          mkdir -p storage/framework/views
+          mkdir -p storage/framework/cache/data
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/logs
+          php artisan migrate --force
 
       - name: Run PHPUnit (php artisan test)
         run: php artisan test --stop-on-failure
