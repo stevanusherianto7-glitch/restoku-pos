@@ -56,15 +56,25 @@ export default function StaffLogin() {
     useEffect(() => {
         if (pin.length === 6) {
             setIsLoading(true);
-            const list = Array.isArray(employeesList) && employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES;
+            // [B-FIX] If shared props carry the broken literal "pin" (backend shares
+            // raw DB column instead of a hash), treat the list as unusable and fall
+            // back to DEFAULT_EMPLOYEES so the documented 999999 manager PIN works.
+            const propsBroken = Array.isArray(employeesList)
+                && employeesList.length > 0
+                && employeesList.every(e => e && e.pin === 'pin');
+            const primaryList = propsBroken ? [] : (Array.isArray(employeesList) && employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES);
 
-            // [C-2 FIX] Use async verifyPin() — supports both hashed (new) and plaintext (legacy) PINs
             (async () => {
                 let matched: any = null;
-                for (const emp of list) {
-                    if (!emp.pin) continue; // skip karyawan tanpa PIN
-                    const ok = await verifyPin(pin, emp.pin);
-                    if (ok) { matched = emp; break; }
+                // Try props list first, then fall back to DEFAULT_EMPLOYEES.
+                for (const list of [primaryList, DEFAULT_EMPLOYEES]) {
+                    if (!Array.isArray(list) || list.length === 0) continue;
+                    for (const emp of list) {
+                        if (!emp.pin) continue;
+                        const ok = await verifyPin(pin, emp.pin);
+                        if (ok) { matched = emp; break; }
+                    }
+                    if (matched) break;
                 }
                 setTimeout(() => {
                     if (matched) {

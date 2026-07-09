@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ChefHat, Mail, Lock, ArrowRight, Quote, Eye, EyeOff } from 'lucide-react';
 import { Input, Button, RestokuLogo } from '../../Components/Shared';
 
@@ -9,14 +9,17 @@ export default function OwnerLogin() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const tenantName = "Restoku";
+    const { errors } = usePage().props;
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-        // Simulate network delay
-        setTimeout(() => {
-            router.visit('/dashboard');
-        }, 1000);
+        router.post('/owner/login', {
+            email,
+            password,
+        }, {
+            onStart: () => setIsLoading(true),
+            onFinish: () => setIsLoading(false),
+        });
     };
 
     return (
@@ -39,6 +42,12 @@ export default function OwnerLogin() {
                     <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-10">
                         Akses dasbor analitik dan pantau performa seluruh cabang restoran Anda secara real-time.
                     </p>
+
+                    {errors && errors.email && (
+                        <div className="p-4 mb-6 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium">
+                            {errors.email}
+                        </div>
+                    )}
 
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">
