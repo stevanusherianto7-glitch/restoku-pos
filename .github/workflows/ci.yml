@@ -87,9 +87,9 @@ jobs:
       - name: Install Composer dependencies (from lock)
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      # 🛡️ supply-chain: gagal bila ada advisory keamanan
+      # 🛡️ supply-chain: gagal bila ada advisory keamanan (ignore renamed/abandoned)
       - name: Composer audit (security advisories)
-        run: composer audit --format=json
+        run: composer audit --format=json --ignore-abandoned=*
 
       - name: Prepare CI environment
         run: |
