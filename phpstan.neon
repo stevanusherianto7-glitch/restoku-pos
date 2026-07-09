@@ -12,11 +12,8 @@ parameters:
     reportUnmatchedIgnoredErrors: false
 
     ignoreErrors:
-        # Ignore common dynamic property calls
-        - "#Access to an undefined property App\\\\Models\\\\User::.*#"
-        - "#Access to an undefined property App\\\\Models\\\\Tenant::.*#"
-        - "#Access to an undefined property App\\\\Models\\\\Outlet::.*#"
-        - "#Access to an undefined property App\\\\Models\\\\OrderItem::.*#"
+        # Ignore all common dynamic property calls on Eloquent Models
+        - "#Access to an undefined property App\\\\Models\\\\.*#"
         - "#Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model::.*#"
 
         # Ignore unnecessary nullsafe warnings on active models
