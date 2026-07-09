@@ -3,18 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Ai\Agents\RestokuAiAssistant;
+use App\Services\PromptSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class GeminiAiController extends Controller
 {
+    public function __construct(
+        private PromptSanitizer $sanitizer,
+    ) {}
+
     public function chat(Request $request)
     {
         $request->validate([
             'message' => 'required|string|max:1000',
         ]);
 
-        $message = $request->input('message');
+        $raw = $request->input('message');
+
+        // 🛡️ Audit-followup: sanitasi prompt-injection SEBELUM dikirim ke LLM.
+        if ($this->sanitizer->looksInjected($raw)) {
+            Log::warning('[Gemini AI] Possible prompt-injection blocked', [
+                'tenant_id' => auth()->id() ? auth()->user()->tenant_id : null,
+                'user_id' => auth()->id(),
+                'snippet' => mb_substr($raw, 0, 200),
+            ]);
+        }
+        $message = $this->sanitizer->sanitize($raw);
+
         $user = auth()->user();
 
         try {

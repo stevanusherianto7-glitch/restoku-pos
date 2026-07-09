@@ -14,3 +14,6 @@ Schedule::command('sales:rollup')->dailyAt('01:00');
 
 // Fase 4 — Arsip orders >6 bulan ke cold storage, tiap tanggal 1 pukul 02:00.
 Schedule::command('orders:archive')->monthlyOn(1, '02:00');
+
+// Fase Audit-Followup — Redis alerting tiap 5 menit (Pilar 5 #3).
+Schedule::command('redis:health --notify')->everyFiveMinutes();
