@@ -166,9 +166,15 @@ jobs:
           php artisan serve --host=0.0.0.0 --port=8000 &
           echo "Waiting for server..."
           for i in {1..20}; do
-            curl -sf http://127.0.0.1:8000 > /dev/null 2>&1 && echo "Server up!" && break
+            if curl -sf http://127.0.0.1:8000 > /dev/null 2>&1; then
+              echo "Server up!"
+              break
+            fi
             echo "[$i/20] Not ready yet..."
-            sleep 2
+            echo "--- DEBUG SERV ---"
+            curl -i http://127.0.0.1:8000/ || true
+            echo "------------------"
+            sleep 3
           done
 
       - name: "E2E HTTP Route Check (61 endpoints)"
