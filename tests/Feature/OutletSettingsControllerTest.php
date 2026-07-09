@@ -12,9 +12,12 @@ class OutletSettingsControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User   $owner;
-    private User   $staff;
+    private User $owner;
+
+    private User $staff;
+
     private Tenant $tenant;
+
     private Outlet $outlet;
 
     protected function setUp(): void
@@ -22,39 +25,40 @@ class OutletSettingsControllerTest extends TestCase
         parent::setUp();
 
         $this->tenant = Tenant::create([
-            'name'                => 'Resto Test',
-            'brand_name'          => 'Resto Test',
-            'email'               => 'test@resto.com',
-            'phone'               => '0812345',
-            'tax_type'            => 'pbjt',
-            'pbjt_rate'           => 10.00,
+            'name' => 'Resto Test',
+            'brand_name' => 'Resto Test',
+            'email' => 'test@resto.com',
+            'phone' => '0812345',
+            'tax_type' => 'pbjt',
+            'pbjt_rate' => 10.00,
             'service_charge_rate' => 0.00,
         ]);
 
         $this->outlet = Outlet::withoutGlobalScopes()->create([
-            'tenant_id'         => $this->tenant->id,
-            'name'              => 'Outlet Utama',
-            'address'           => 'Jl. Test No. 1',
-            'latitude'          => -6.20,
-            'longitude'         => 106.82,
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Outlet Utama',
+            'slug' => 'outlet-test-1',
+            'address' => 'Jl. Test No. 1',
+            'latitude' => -6.20,
+            'longitude' => 106.82,
             'geo_radius_meters' => 50,
         ]);
 
         $this->owner = User::create([
             'tenant_id' => $this->tenant->id,
-            'name'      => 'Owner',
-            'email'     => 'owner@test.com',
-            'password'  => bcrypt('password'),
-            'role'      => 'owner',
+            'name' => 'Owner',
+            'email' => 'owner@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'owner',
         ]);
 
         $this->staff = User::create([
             'tenant_id' => $this->tenant->id,
             'outlet_id' => $this->outlet->id,
-            'name'      => 'Kasir',
-            'email'     => 'kasir@test.com',
-            'password'  => bcrypt('password'),
-            'role'      => 'cashier',
+            'name' => 'Kasir',
+            'email' => 'kasir@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'cashier',
         ]);
     }
 
@@ -71,13 +75,12 @@ class OutletSettingsControllerTest extends TestCase
         $response->assertStatus(200);
 
         // Inertia component name
-        $response->assertInertia(fn ($page) =>
-            $page->component('PengaturanOutlet/Index')
-                 ->has('tenant')
-                 ->has('outlet')
-                 ->has('employees')
-                 ->where('tenant.name', 'Resto Test')
-                 ->where('tenant.tax_type', 'pbjt')
+        $response->assertInertia(fn ($page) => $page->component('PengaturanOutlet/Index')
+            ->has('tenant')
+            ->has('outlet')
+            ->has('employees')
+            ->where('tenant.name', 'Resto Test')
+            ->where('tenant.tax_type', 'pbjt')
         );
     }
 
@@ -86,19 +89,19 @@ class OutletSettingsControllerTest extends TestCase
     public function test_update_profil_saves_to_database(): void
     {
         $response = $this->actingAs($this->owner)->put('/api/outlet-settings/profil', [
-            'name'       => 'Resto Baru',
+            'name' => 'Resto Baru',
             'brand_name' => 'RB',
-            'email'      => 'baru@resto.com',
-            'phone'      => '08100',
-            'npwp'       => '01.234.567.0',
-            'nib'        => '987654321',
-            'address'    => 'Jl. Baru No. 99',
+            'email' => 'baru@resto.com',
+            'phone' => '08100',
+            'npwp' => '01.234.567.0',
+            'nib' => '987654321',
+            'address' => 'Jl. Baru No. 99',
         ]);
 
         $response->assertRedirect();
 
         $this->assertDatabaseHas('tenants', [
-            'id'   => $this->tenant->id,
+            'id' => $this->tenant->id,
             'name' => 'Resto Baru',
             'npwp' => '01.234.567.0',
         ]);
@@ -116,7 +119,7 @@ class OutletSettingsControllerTest extends TestCase
         $response = $this->actingAs($this->owner)
             ->putJson('/api/outlet-settings/profil', ['name' => '']);
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['name', 'brand_name', 'email']);
+            ->assertJsonValidationErrors(['name', 'brand_name', 'email']);
     }
 
     // ─── PUT /api/outlet-settings/lokasi ──────────────────────────────────────
@@ -124,15 +127,15 @@ class OutletSettingsControllerTest extends TestCase
     public function test_update_lokasi_saves_to_outlet(): void
     {
         $response = $this->actingAs($this->owner)->put('/api/outlet-settings/lokasi', [
-            'outlet_id'         => $this->outlet->id,
-            'latitude'          => -6.250,
-            'longitude'         => 106.825,
+            'outlet_id' => $this->outlet->id,
+            'latitude' => -6.250,
+            'longitude' => 106.825,
             'geo_radius_meters' => 100,
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('outlets', [
-            'id'                => $this->outlet->id,
+            'id' => $this->outlet->id,
             'geo_radius_meters' => 100,
         ]);
     }
@@ -146,7 +149,7 @@ class OutletSettingsControllerTest extends TestCase
 
         // Owner dari tenant kita coba update outlet milik tenant lain
         $response = $this->actingAs($this->owner)->put('/api/outlet-settings/lokasi', [
-            'outlet_id'         => $otherOutlet->id,
+            'outlet_id' => $otherOutlet->id,
             'geo_radius_meters' => 50,
         ]);
 
@@ -158,15 +161,15 @@ class OutletSettingsControllerTest extends TestCase
     public function test_update_pajak_saves_to_tenant(): void
     {
         $response = $this->actingAs($this->owner)->put('/api/outlet-settings/pajak', [
-            'tax_type'            => 'ppn',
-            'pbjt_rate'           => 10.00,
-            'ppn_rate'            => 11.00,
+            'tax_type' => 'ppn',
+            'pbjt_rate' => 10.00,
+            'ppn_rate' => 11.00,
             'service_charge_rate' => 5.00,
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('tenants', [
-            'id'       => $this->tenant->id,
+            'id' => $this->tenant->id,
             'tax_type' => 'ppn',
         ]);
     }
@@ -175,25 +178,25 @@ class OutletSettingsControllerTest extends TestCase
     {
         $response = $this->actingAs($this->owner)
             ->putJson('/api/outlet-settings/pajak', [
-                'tax_type'            => 'vat',
-                'pbjt_rate'           => 10,
-                'ppn_rate'            => 11,
+                'tax_type' => 'vat',
+                'pbjt_rate' => 10,
+                'ppn_rate' => 11,
                 'service_charge_rate' => 0,
             ]);
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['tax_type']);
+            ->assertJsonValidationErrors(['tax_type']);
     }
 
     // ─── PUT /api/outlet-settings/jam ─────────────────────────────────────────
 
     public function test_update_jam_saves_operating_hours(): void
     {
-        $hours = array_fill_keys(['mon','tue','wed','thu','fri','sat','sun'],
+        $hours = array_fill_keys(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
             ['open' => '09:00', 'close' => '21:00', 'closed' => false]);
         $hours['sun']['closed'] = true;
 
         $response = $this->actingAs($this->owner)->put('/api/outlet-settings/jam', [
-            'outlet_id'       => $this->outlet->id,
+            'outlet_id' => $this->outlet->id,
             'operating_hours' => $hours,
         ]);
 
@@ -208,17 +211,17 @@ class OutletSettingsControllerTest extends TestCase
     public function test_create_karyawan_saves_to_users(): void
     {
         $response = $this->actingAs($this->owner)->post('/api/outlet-settings/karyawan', [
-            'name'      => 'Staf Baru',
-            'email'     => 'stafbaru@test.com',
-            'password'  => '1234',
-            'role'      => 'kitchen',
+            'name' => 'Staf Baru',
+            'email' => 'stafbaru@test.com',
+            'password' => '1234',
+            'role' => 'kitchen',
             'outlet_id' => $this->outlet->id,
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('users', [
-            'email'     => 'stafbaru@test.com',
-            'role'      => 'kitchen',
+            'email' => 'stafbaru@test.com',
+            'role' => 'kitchen',
             'tenant_id' => $this->tenant->id,
         ]);
     }
@@ -227,13 +230,13 @@ class OutletSettingsControllerTest extends TestCase
     {
         $response = $this->actingAs($this->owner)
             ->postJson('/api/outlet-settings/karyawan', [
-                'name'     => 'Hacker',
-                'email'    => 'hacker@test.com',
+                'name' => 'Hacker',
+                'email' => 'hacker@test.com',
                 'password' => '1234',
-                'role'     => 'owner',
+                'role' => 'owner',
             ]);
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['role']);
+            ->assertJsonValidationErrors(['role']);
     }
 
     public function test_delete_karyawan_removes_from_db(): void
@@ -266,45 +269,45 @@ class OutletSettingsControllerTest extends TestCase
     {
         $response = $this->actingAs($this->owner)
             ->putJson("/api/outlet-settings/karyawan/{$this->staff->id}", [
-                'name'  => $this->staff->name,
+                'name' => $this->staff->name,
                 'email' => $this->staff->email,
-                'role'  => 'owner',
+                'role' => 'owner',
             ]);
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['role']);
+            ->assertJsonValidationErrors(['role']);
     }
 
     // ─── PUT /api/outlet-settings/all (Atomic Update) ─────────────────────────
 
     public function test_update_all_saves_profil_lokasi_pajak_and_jam(): void
     {
-        $hours = array_fill_keys(['mon','tue','wed','thu','fri','sat','sun'],
+        $hours = array_fill_keys(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
             ['open' => '08:30', 'close' => '22:30', 'closed' => false]);
         $hours['sun']['closed'] = true;
 
         $response = $this->actingAs($this->owner)->put('/api/outlet-settings/all', [
             'profil' => [
-                'name'       => 'Resto All Updated',
+                'name' => 'Resto All Updated',
                 'brand_name' => 'RAU',
-                'email'      => 'all@resto.com',
-                'phone'      => '08199999',
-                'npwp'       => '02.345.678.0',
-                'nib'        => '1122334455',
-                'address'    => 'Jl. All Updated No. 1',
+                'email' => 'all@resto.com',
+                'phone' => '08199999',
+                'npwp' => '02.345.678.0',
+                'nib' => '1122334455',
+                'address' => 'Jl. All Updated No. 1',
             ],
             'lokasi' => [
-                'outlet_id'         => $this->outlet->id,
-                'name'              => 'Outlet Cabang Baru',
-                'address'           => 'Jl. All Updated No. 1',
-                'phone'             => '08199999',
-                'latitude'          => -6.30,
-                'longitude'         => 106.90,
+                'outlet_id' => $this->outlet->id,
+                'name' => 'Outlet Cabang Baru',
+                'address' => 'Jl. All Updated No. 1',
+                'phone' => '08199999',
+                'latitude' => -6.30,
+                'longitude' => 106.90,
                 'geo_radius_meters' => 150,
             ],
             'pajak' => [
-                'tax_type'            => 'ppn',
-                'pbjt_rate'           => 10.0,
-                'ppn_rate'            => 11.0,
+                'tax_type' => 'ppn',
+                'pbjt_rate' => 10.0,
+                'ppn_rate' => 11.0,
                 'service_charge_rate' => 5.0,
             ],
             'jam' => [
@@ -316,14 +319,14 @@ class OutletSettingsControllerTest extends TestCase
 
         // Assert tenant updated
         $this->assertDatabaseHas('tenants', [
-            'id'       => $this->tenant->id,
-            'name'     => 'Resto All Updated',
+            'id' => $this->tenant->id,
+            'name' => 'Resto All Updated',
             'tax_type' => 'ppn',
         ]);
 
         // Assert outlet updated
         $this->assertDatabaseHas('outlets', [
-            'id'                => $this->outlet->id,
+            'id' => $this->outlet->id,
             'geo_radius_meters' => 150,
         ]);
 
@@ -340,7 +343,7 @@ class OutletSettingsControllerTest extends TestCase
 
         $response = $this->actingAs($this->owner)->put('/api/outlet-settings/all', [
             'lokasi' => [
-                'outlet_id'         => $otherOutlet->id,
+                'outlet_id' => $otherOutlet->id,
                 'geo_radius_meters' => 50,
             ],
         ]);

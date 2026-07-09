@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Outlet;
 use App\Models\User;
 use App\Services\FeatureRegistry;
 use App\Services\SettingsService;
@@ -36,7 +37,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-        $ctx  = null;
+        $ctx = null;
 
         // TenantContext hanya tersedia jika user sudah login dan EnsureTenantContext sudah berjalan
         if ($user?->tenant_id) {
@@ -55,7 +56,7 @@ class HandleInertiaRequests extends Middleware
         $taxConfig = null;
         if ($ctx) {
             try {
-                $settings  = app(SettingsService::class)->forTenant($ctx->id());
+                $settings = app(SettingsService::class)->forTenant($ctx->id());
                 $taxConfig = $settings->toTaxShareableArray();
             } catch (\Throwable) {
                 $taxConfig = null;
@@ -68,29 +69,37 @@ class HandleInertiaRequests extends Middleware
             // ── Auth ──────────────────────────────────────────────────────────
             'auth' => [
                 'user' => $user ? [
-                    'id'    => $user->id,
-                    'name'  => $user->name,
+                    'id' => $user->id,
+                    'name' => $user->name,
                     'email' => $user->email,
-                    'role'  => $user->role,
+                    'role' => $user->role,
                 ] : null,
             ],
 
             // ── Subscription & Feature Gate ───────────────────────────────────
             // Menggantikan MOCK_PLAN = "pro" dan PLAN_FEATURES hardcoded di Shared.tsx
             'subscription' => $ctx ? [
-                'plan'          => $ctx->plan(),
-                'status'        => $ctx->subscription()->status,
-                'is_trialing'   => $ctx->isTrialing(),
-                'days_left'     => $ctx->daysLeftInTrial(),
+                'plan' => $ctx->plan(),
+                'status' => $ctx->subscription()->status,
+                'is_trialing' => $ctx->isTrialing(),
+                'days_left' => $ctx->daysLeftInTrial(),
                 'plan_features' => FeatureRegistry::allFeaturesForPlan($ctx->plan()),
                 'feature_locks' => FeatureRegistry::FEATURE_LOCKS,
             ] : null,
 
             // ── Outlet ────────────────────────────────────────────────────────
             'outlet' => $user ? [
-                'id'   => $user->outlet_id,
+                'id' => $user->outlet_id,
                 'name' => $user->outlet?->name,
             ] : null,
+
+            // ── Outlets (untuk QR generator) ──────────────────────────────────
+            // Daftar outlet milik tenant (TenantScope aktif → hanya outlet tenant ini).
+            // Field slug wajib untuk build URL buku menu tamu /m/{slug}?t={meja}.
+            'outlets' => $ctx ? Outlet::select('id', 'name', 'slug', 'is_active')
+                ->orderBy('name')
+                ->get()
+                ->toArray() : [],
 
             // ── Outlet Settings (Tax Config) ──────────────────────────────────
             // Menggantikan localStorage.getItem("outlet_tax_rate") di POS/Index.tsx
@@ -112,7 +121,7 @@ class HandleInertiaRequests extends Middleware
             // ── Flash Messages ────────────────────────────────────────────────
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
-                'error'   => fn () => $request->session()->get('error'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ];
     }

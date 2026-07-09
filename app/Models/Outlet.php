@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 class Outlet extends Model
 {
@@ -16,12 +17,12 @@ class Outlet extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'settings'         => 'json',
-        'operating_hours'  => 'json',   // kolom lama — dipertahankan untuk fallback
-        'latitude'         => 'decimal:8',
-        'longitude'        => 'decimal:8',
+        'settings' => 'json',
+        'operating_hours' => 'json',   // kolom lama — dipertahankan untuk fallback
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
         'geo_radius_meters' => 'integer',
-        'is_active'        => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -51,6 +52,17 @@ class Outlet extends Model
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Auto-slug saat nama diisi & slug kosong (memudahkan auto-outlet-default).
+     */
+    public function setNameAttribute($value): void
+    {
+        $this->attributes['name'] = $value;
+        if (empty($this->attributes['slug'])) {
+            $this->attributes['slug'] = Str::slug($value) ?: 'outlet';
+        }
+    }
 
     /**
      * Resolve OutletSetting dengan fallback ke defaults.

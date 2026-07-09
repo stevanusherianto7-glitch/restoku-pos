@@ -14,14 +14,31 @@ class Tenant extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'settings'                => 'json',
+        'settings' => 'json',
         'onboarding_completed_at' => 'datetime',
         // Kolom lama dipertahankan cast-nya sebagai fallback COALESCE
         // hingga migration drop-columns dijalankan setelah verifikasi.
-        'pbjt_rate'           => 'decimal:2',
-        'ppn_rate'            => 'decimal:2',
+        'pbjt_rate' => 'decimal:2',
+        'ppn_rate' => 'decimal:2',
         'service_charge_rate' => 'decimal:2',
     ];
+
+    protected static function booted(): void
+    {
+        // Fase 0: tenant tanpa outlet = dead-end (QR/menu tamu 404).
+        // Jaminan: tiap tenant yang dibuat otomatis punya 1 outlet default
+        // ("Outlet Utama") sehingga URL /m/{slug} SELALU punya target.
+        // Dijalankan setelah parent tersimpan (butuh $this->id).
+        static::created(function (Tenant $tenant) {
+            if ($tenant->outlets()->doesntExist()) {
+                $tenant->outlets()->create([
+                    'name' => $tenant->brand_name ?: ($tenant->name ?: 'Outlet Utama'),
+                    'is_active' => true,
+                ]);
+                // setNameAttribute mengisi slug otomatis (lihat Outlet model).
+            }
+        });
+    }
 
     // ─── Relations ────────────────────────────────────────────────────────────
 
