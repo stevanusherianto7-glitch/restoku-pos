@@ -12,9 +12,14 @@ concurrency:
   cancel-in-progress: true
 
 # ─────────────────────────────────────────────────────────────
-# Job 0: Secret Scanning (gitleaks + trufflehog) — fail-fast
-#   Jalan di PR & push; blokir bila ada credential bocor.
+# Job "secrets" (Secret Scan) didefinisikan di dalam `jobs:` di bawah.
 # ─────────────────────────────────────────────────────────────
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Job 0: Secret Scanning (gitleaks + trufflehog) — fail-fast
+  #   Jalan di PR & push; blokir bila ada credential bocor.
+  # ─────────────────────────────────────────────────────────────
   secrets:
     name: "Secret Scan"
     runs-on: ubuntu-latest
@@ -37,7 +42,6 @@ concurrency:
           head: HEAD
           extra_args: --only-verified --json
 
-jobs:
   # ─────────────────────────────────────────────────────────────
   # Job 1: Backend PHPUnit + coverage gate + composer audit
   # ─────────────────────────────────────────────────────────────
