@@ -143,6 +143,10 @@ jobs:
           sed -i 's/CACHE_STORE=database/CACHE_STORE=file/' .env
           sed -i 's|APP_URL=http://localhost$|APP_URL=http://localhost:8000|' .env
           touch database/database.sqlite
+          mkdir -p storage/framework/views
+          mkdir -p storage/framework/cache/data
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/logs
           php artisan key:generate
           php artisan migrate --force --seed
 
@@ -192,3 +196,11 @@ jobs:
           name: "playwright-report-${{ matrix.browser }}"
           path: playwright-report/
           retention-days: 14
+
+      - name: "Print Laravel log on failure"
+        if: failure()
+        run: |
+          if [ -f storage/logs/laravel.log ]; then
+            cat storage/logs/laravel.log
+          fi
+
