@@ -565,8 +565,8 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                 </section>
 
                 {/* CTA */}
-                <section className="w-full bg-[#FF5B35] py-20 px-6">
-                    <div className="max-w-4xl mx-auto text-center">
+                <section className="w-full bg-[#FF5B35] py-20 px-6 relative overflow-hidden">
+                    <div className="max-w-4xl mx-auto text-center relative z-10">
                         <h2
                             className="text-3xl md:text-4xl font-black text-white mb-4"
                             style={{ fontFamily: '"Playfair Display", serif' }}
@@ -583,6 +583,17 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                             Coba Gratis Sekarang ↗
                         </button>
                     </div>
+
+                    {/* Foreground: multi-outlet route map */}
+                    <img
+                        src="/images/landing/cta_map_pins.png"
+                        alt="Peta rute banyak cabang Restoku"
+                        className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-0 w-full max-w-5xl h-auto opacity-95 select-none z-20"
+                        aria-hidden="true"
+                        onError={(e: any) => {
+                            e.currentTarget.style.display = 'none';
+                        }}
+                    />
                 </section>
             </main>
 
