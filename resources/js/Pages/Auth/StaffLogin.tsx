@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ChefHat, Delete, ArrowRight } from 'lucide-react';
-import { RestokuLogo, verifyPin, DEFAULT_EMPLOYEES } from '../../Components/Shared';
+import { RestokuLogo, RestokuWordmark, verifyPin, DEFAULT_EMPLOYEES } from '../../Components/Shared';
 
 export default function StaffLogin() {
     const [pin, setPin] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(false);
-    const tenantName = "Restoku";
+    const tenantName = 'Restoku';
 
     // ── Daftar Karyawan dari Inertia Shared Props ──────────────────────────
     // MIGRASI dari localStorage ke usePage().props.login_employees
@@ -18,7 +18,7 @@ export default function StaffLogin() {
     const [employeesList] = useState<any[]>(() => {
         // Helper: filter karyawan yang memiliki pin valid (bukan null/undefined)
         const filterValid = (arr: any[]) =>
-            Array.isArray(arr) ? arr.filter(e => e && typeof e.pin === 'string' && e.pin.length > 0) : [];
+            Array.isArray(arr) ? arr.filter((e) => e && typeof e.pin === 'string' && e.pin.length > 0) : [];
 
         if (Array.isArray(login_employees) && login_employees.length > 0) {
             const valid = filterValid(login_employees);
@@ -26,7 +26,7 @@ export default function StaffLogin() {
         }
         // Fallback ke localStorage jika props tidak tersedia
         try {
-            const raw = localStorage.getItem("tenant_employees");
+            const raw = localStorage.getItem('tenant_employees');
             if (raw) {
                 const parsed = JSON.parse(raw);
                 const valid = filterValid(parsed);
@@ -38,14 +38,14 @@ export default function StaffLogin() {
 
     const handleNumberClick = (num: string) => {
         if (pin.length < 6 && !isLoading) {
-            setPin(prev => prev + num);
+            setPin((prev) => prev + num);
             setError(false);
         }
     };
 
     const handleDelete = () => {
         if (pin.length > 0 && !isLoading) {
-            setPin(prev => prev.slice(0, -1));
+            setPin((prev) => prev.slice(0, -1));
             setError(false);
         }
     };
@@ -59,10 +59,15 @@ export default function StaffLogin() {
             // [B-FIX] If shared props carry the broken literal "pin" (backend shares
             // raw DB column instead of a hash), treat the list as unusable and fall
             // back to DEFAULT_EMPLOYEES so the documented 999999 manager PIN works.
-            const propsBroken = Array.isArray(employeesList)
-                && employeesList.length > 0
-                && employeesList.every(e => e && e.pin === 'pin');
-            const primaryList = propsBroken ? [] : (Array.isArray(employeesList) && employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES);
+            const propsBroken =
+                Array.isArray(employeesList) &&
+                employeesList.length > 0 &&
+                employeesList.every((e) => e && e.pin === 'pin');
+            const primaryList = propsBroken
+                ? []
+                : Array.isArray(employeesList) && employeesList.length > 0
+                  ? employeesList
+                  : DEFAULT_EMPLOYEES;
 
             (async () => {
                 let matched: any = null;
@@ -72,22 +77,28 @@ export default function StaffLogin() {
                     for (const emp of list) {
                         if (!emp.pin) continue;
                         const ok = await verifyPin(pin, emp.pin);
-                        if (ok) { matched = emp; break; }
+                        if (ok) {
+                            matched = emp;
+                            break;
+                        }
                     }
                     if (matched) break;
                 }
                 setTimeout(() => {
                     if (matched) {
-                        localStorage.setItem("activeKaryawan", JSON.stringify({ 
-                            id: matched.id, 
-                            name: matched.name, 
-                            role: matched.role,
-                            token: `${matched.id}_${matched.role}_auth_ok`
-                        }));
+                        localStorage.setItem(
+                            'activeKaryawan',
+                            JSON.stringify({
+                                id: matched.id,
+                                name: matched.name,
+                                role: matched.role,
+                                token: `${matched.id}_${matched.role}_auth_ok`,
+                            }),
+                        );
                         router.post('/login', {
                             pin: pin,
                             role: matched.role,
-                            name: matched.name
+                            name: matched.name,
                         });
                     } else {
                         setError(true);
@@ -99,25 +110,22 @@ export default function StaffLogin() {
         }
     }, [pin, employeesList]);
 
-
     return (
         <div className="min-h-screen w-full bg-[#030303] flex flex-col md:flex-row font-display selection:bg-white/20">
             <Head title={`Staff Login - ${tenantName}`} />
-            
+
             {/* Left side - Branding (Hidden on mobile) */}
             <div className="hidden md:flex flex-1 flex-col justify-between p-12 bg-white/[0.02] border-r border-white/5 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(59,130,246,0.1)_0%,transparent_50%)]" />
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-12">
-                        <div className="grid size-12 place-items-center rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
-                            <RestokuLogo className="size-8" />
-                        </div>
+                        <RestokuWordmark className="h-9 w-auto brightness-110" />
                         <div>
                             <div className="text-xl font-bold text-white tracking-tight">{tenantName} OS</div>
                             <div className="text-xs text-slate-500 uppercase tracking-wider">Cabang Senopati</div>
                         </div>
                     </div>
-                    
+
                     <h1 className="text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
                         Masuk ke <br />
                         Sistem Operasional.
@@ -128,7 +136,9 @@ export default function StaffLogin() {
                 </div>
 
                 <div className="relative z-10 text-sm text-slate-500">
-                    <p>&copy; {new Date().getFullYear()} {tenantName}. Mode Kasir Aktif.</p>
+                    <p>
+                        &copy; {new Date().getFullYear()} {tenantName}. Mode Kasir Aktif.
+                    </p>
                 </div>
             </div>
 
@@ -136,23 +146,32 @@ export default function StaffLogin() {
             <div className="flex-1 flex flex-col justify-center items-center p-6 relative">
                 <div className="w-full max-w-sm">
                     <div className="md:hidden flex items-center justify-center gap-2 mb-10">
-                        <div className="grid size-10 place-items-center rounded-xl bg-white/5 border border-white/10 overflow-hidden">
-                            <RestokuLogo className="size-6" />
-                        </div>
+                        <RestokuWordmark className="h-7 w-auto" />
                         <span className="text-xl font-bold text-white">{tenantName}</span>
                     </div>
 
                     <div className="text-center mb-10">
                         <h2 className="text-2xl font-bold text-white mb-2">Masukkan PIN</h2>
                         <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-1">
-                            {(Array.isArray(employeesList) && employeesList.length > 0 ? employeesList : DEFAULT_EMPLOYEES).map(e => (
+                            {(Array.isArray(employeesList) && employeesList.length > 0
+                                ? employeesList
+                                : DEFAULT_EMPLOYEES
+                            ).map((e) => (
                                 <span key={e.id}>
-                                    <span className={`font-bold uppercase ${
-                                        e.role === "kasir" ? "text-blue-400" :
-                                        e.role === "kitchen" ? "text-red-400" :
-                                        e.role === "waiter" ? "text-emerald-400" :
-                                        "text-amber-400"
-                                    }`}>{e.role}</span> · {(e.pin?.length ?? 0) === 64 ? "******" : (e.pin ?? "—")}
+                                    <span
+                                        className={`font-bold uppercase ${
+                                            e.role === 'kasir'
+                                                ? 'text-blue-400'
+                                                : e.role === 'kitchen'
+                                                  ? 'text-red-400'
+                                                  : e.role === 'waiter'
+                                                    ? 'text-emerald-400'
+                                                    : 'text-amber-400'
+                                        }`}
+                                    >
+                                        {e.role}
+                                    </span>{' '}
+                                    · {(e.pin?.length ?? 0) === 64 ? '******' : (e.pin ?? '—')}
                                 </span>
                             ))}
                         </div>
@@ -161,14 +180,14 @@ export default function StaffLogin() {
                     {/* PIN Display */}
                     <div className="flex justify-center gap-4 mb-12">
                         {[0, 1, 2, 3, 4, 5].map((index) => (
-                            <div 
+                            <div
                                 key={index}
                                 className={`size-4 md:size-5 rounded-full transition-all duration-300 ${
-                                    error 
-                                        ? "bg-red-500" 
-                                        : index < pin.length 
-                                            ? "bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.5)] scale-110" 
-                                            : "bg-white/10"
+                                    error
+                                        ? 'bg-red-500'
+                                        : index < pin.length
+                                          ? 'bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.5)] scale-110'
+                                          : 'bg-white/10'
                                 }`}
                             />
                         ))}
@@ -212,7 +231,10 @@ export default function StaffLogin() {
                     </div>
 
                     <div className="mt-12 text-center">
-                        <Link href="/" className="text-sm font-medium text-slate-500 hover:text-white transition-colors">
+                        <Link
+                            href="/"
+                            className="text-sm font-medium text-slate-500 hover:text-white transition-colors"
+                        >
                             Batal & Kembali
                         </Link>
                     </div>
