@@ -96,6 +96,13 @@ return [
             'driver' => 'gemini',
             'key' => env('GEMINI_API_KEY'),
             'url' => env('GEMINI_URL', 'https://generativelanguage.googleapis.com/v1beta/'),
+            // Pin model teks ke yang tersedia di free tier. Default SDK
+            // (gemini-3.5-flash) sering overload 503 di akun tanpa billing.
+            'models' => [
+                'text' => [
+                    'default' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+                ],
+            ],
         ],
 
         'groq' => [
