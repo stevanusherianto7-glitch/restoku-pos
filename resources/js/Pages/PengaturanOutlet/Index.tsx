@@ -57,14 +57,17 @@ function PengaturanOutletInner() {
     const [nameInput, setNameInput] = useState(tenantName);
     const [logoInput, setLogoInput] = useState(tenantLogo);
     const [imageInput, setImageInput] = useState<string | null>(tenantImage);
-    const [ownerInput, setOwnerInput] = useState(staffOwner);
+    const authUser = (usePage<any>().props as any)?.auth?.user;
+    const [ownerInput, setOwnerInput] = useState(
+        staffOwner && staffOwner !== 'LALU GUSTI' ? staffOwner : (authUser?.name ?? ''),
+    );
 
     // CRUD States for Staff List
     const [employeesList, setEmployeesList] = useState<any[]>(dbEmployees || employees);
     const [newEmpName, setNewEmpName] = useState('');
     const [newEmpEmail, setNewEmpEmail] = useState('');
     const [newEmpPassword, setNewEmpPassword] = useState('');
-    const [newEmpRole, setNewEmpRole] = useState<'cashier' | 'kitchen' | 'waiter' | 'admin'>('waiter');
+    const [newEmpRole, setNewEmpRole] = useState<'' | 'cashier' | 'kitchen' | 'waiter' | 'admin'>('');
     const [editingId, setEditingId] = useState<string | number | null>(null);
     const [editName, setEditName] = useState('');
     const [editEmail, setEditEmail] = useState('');
@@ -387,6 +390,10 @@ function PengaturanOutletInner() {
     const handleAddEmployee = () => {
         if (!newEmpName.trim() || !newEmpEmail.trim() || !newEmpPassword.trim()) {
             alert('Nama, Email, dan Password wajib diisi.');
+            return;
+        }
+        if (!newEmpRole) {
+            alert('Pilih Role karyawan.');
             return;
         }
         router.post(
@@ -832,18 +839,23 @@ function PengaturanOutletInner() {
                                                     onChange={(e) => setNewEmpName(e.target.value)}
                                                     className={`sm:col-span-1 ${inputClass}`}
                                                     placeholder="Nama Lengkap"
+                                                    autoComplete="off"
                                                 />
                                                 <input
                                                     value={newEmpEmail}
                                                     onChange={(e) => setNewEmpEmail(e.target.value)}
                                                     className={`sm:col-span-1 ${inputClass}`}
                                                     placeholder="Email Login"
+                                                    autoComplete="off"
                                                 />
                                                 <select
                                                     value={newEmpRole}
                                                     onChange={(e) => setNewEmpRole(e.target.value as any)}
                                                     className={inputClass}
                                                 >
+                                                    <option value="" disabled>
+                                                        Pilih Role
+                                                    </option>
                                                     <option value="cashier">KASIR (CASHIER)</option>
                                                     <option value="kitchen">KITCHEN</option>
                                                     <option value="waiter">WAITER</option>

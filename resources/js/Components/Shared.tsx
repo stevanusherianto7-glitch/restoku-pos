@@ -312,6 +312,9 @@ export function useTenantSettings() {
 
 export function TenantBrandLockup({ collapsed = false }: { collapsed?: boolean }) {
     const { tenantName, tenantLogo, tenantImage, renderLogo } = useTenantSettings();
+    const pageProps = (usePage<any>().props as any) || {};
+    const dbOutletName = pageProps?.outlet?.name;
+    const displayName = (tenantName && tenantName !== 'Restoku' ? tenantName : dbOutletName) || '';
     const hasBrand = Boolean(tenantImage || (tenantLogo && tenantLogo !== 'ChefHat'));
     return (
         <div className={`flex items-center gap-3 ${collapsed ? 'flex-col justify-center' : ''}`}>
@@ -332,9 +335,9 @@ export function TenantBrandLockup({ collapsed = false }: { collapsed?: boolean }
             {!collapsed && (
                 <div className="min-w-0">
                     <div
-                        className={`font-semibold tracking-tight truncate ${tenantName ? 'text-slate-100' : 'text-slate-500 text-xs uppercase tracking-wider'}`}
+                        className={`font-semibold tracking-tight truncate ${displayName ? 'text-slate-100' : 'text-slate-500 text-xs uppercase tracking-wider'}`}
                     >
-                        {tenantName || 'nama Outlet Tenant'}
+                        {displayName || 'nama Outlet Tenant'}
                     </div>
                     <RestokuWordmark className="h-[18px] w-auto mt-0.5 brightness-110" />
                 </div>
