@@ -11,6 +11,13 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# 🛡️ gitleaks-action breaking change: GITHUB_TOKEN wajib utk scan PR.
+# Tanpa ini, Secret Scan FAIL (bukan karena secret bocor, tapi config).
+permissions:
+  contents: read          # checkout
+  security-events: write  # gitleaks upload SARIF / scan PR
+  pull-requests: read     # akses diff PR untuk gitleaks
+
 # ─────────────────────────────────────────────────────────────
 # Job "secrets" (Secret Scan) didefinisikan di dalam `jobs:` di bawah.
 # ─────────────────────────────────────────────────────────────
@@ -31,6 +38,7 @@ jobs:
       - name: Gitleaks — detect secrets
         uses: gitleaks/gitleaks-action@v2
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
 
