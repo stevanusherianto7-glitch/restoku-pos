@@ -73,10 +73,11 @@ export default function OwnerLogin() {
                             <div className="flex justify-between items-center ml-1">
                                 <label className="text-sm font-medium text-slate-300">Password</label>
                                 <a
-                                    href="#"
+                                    href="/oauth/google"
                                     className="text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium"
+                                    title="Lupa password? Masuk dengan Google — Google yang verifikasi identitas Anda."
                                 >
-                                    Lupa?
+                                    Lupa? Pakai Google
                                 </a>
                             </div>
                             <div className="relative group">
@@ -151,6 +152,10 @@ export default function OwnerLogin() {
                             </svg>
                             Masuk dengan Google
                         </a>
+                        <p className="mt-3 text-center text-xs text-slate-500 leading-relaxed">
+                            Lupa password? Gunakan tombol di atas — Google yang verifikasi identitas Anda, tanpa perlu
+                            reset via email.
+                        </p>
                     </div>
 
                     <div className="mt-12 pt-8 border-t border-white/5 text-center">
