@@ -334,13 +334,13 @@ export function TenantBrandLockup({ collapsed = false }: { collapsed?: boolean }
                 )}
             </div>
             {!collapsed && (
-                <div className="min-w-0">
+                <div className="min-w-0 max-w-[150px]">
                     <div
-                        className={`font-semibold tracking-tight truncate ${displayName ? 'text-slate-100' : 'text-slate-500 text-xs uppercase tracking-wider'}`}
+                        className={`font-semibold tracking-tight truncate text-xs ${displayName ? 'text-slate-100' : 'text-slate-500 uppercase tracking-wider'}`}
                     >
                         {displayName || 'nama Outlet Tenant'}
                     </div>
-                    <RestokuWordmark className="h-[18px] w-auto mt-0.5 brightness-110" />
+                    <RestokuWordmark className="h-[14px] w-auto mt-0.5 brightness-110" />
                 </div>
             )}
             {collapsed && <RestokuWordmark className="h-3.5 w-auto brightness-110" />}
