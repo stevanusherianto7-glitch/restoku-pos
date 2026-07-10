@@ -16,7 +16,7 @@ use Tests\TestCase;
  *
  * Cover:
  *  - callback dgn email owner existing → login sukses (password lama tetap valid).
- *  - callback dgn email baru → auto-register tenant+outlet+owner.
+ *  - callback dgn email Google asing → redirect ke /subscribe/basic (no auto-create).
  *  - callback email null / tak terverifikasi → 403.
  *  - email sama tapi role staff → 403 (jangan izinkan OAuth ke akun staff).
  *  - tidak ada cross-tenant: login langsung ke tenant milik user.
@@ -65,23 +65,19 @@ class OAuthControllerTest extends TestCase
         $this->assertTrue(Auth::user()->password !== '');
     }
 
-    public function test_new_google_email_auto_registers_owner(): void
+    public function test_unknown_google_email_redirects_to_signup(): void
     {
+        // Email Google asing (bukan owner terdaftar) → jangan auto-create
+        // tenant (cegah fragmentasi bila owner punya >1 Gmail / salah ketik).
         $this->mockGoogleUser('newowner@gmail.com');
 
         $this->get('/oauth/google/callback')
-            ->assertRedirect('/owner/dashboard');
+            ->assertRedirect('/subscribe/basic');
 
-        $this->assertDatabaseHas('users', [
-            'email' => 'newowner@gmail.com',
-            'role' => 'owner',
-            'google_id' => 'google-123',
-        ]);
-        // Tenant + outlet default otomatis terbuat.
-        $tenant = Tenant::where('email', 'newowner@gmail.com')->first();
-        $this->assertNotNull($tenant);
-        $this->assertCount(1, $tenant->outlets);
-        $this->assertTrue(Auth::check());
+        // Tidak ada user/tenant baru yang spawn.
+        $this->assertFalse(Auth::check());
+        $this->assertDatabaseMissing('users', ['email' => 'newowner@gmail.com']);
+        $this->assertDatabaseMissing('tenants', ['email' => 'newowner@gmail.com']);
     }
 
     public function test_unverified_google_email_is_rejected(): void
