@@ -77,6 +77,7 @@ export function FeatureLock({ requiredPlan, children }: { requiredPlan: Plan; ch
 }
 
 import { useState, useEffect } from 'react';
+import { usePage } from '@inertiajs/react';
 import * as LucideIcons from 'lucide-react';
 
 export interface StaffMember {
