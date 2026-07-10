@@ -57,6 +57,7 @@ class OrderController extends Controller
                 ->forGuestMenu($outlet->id)
                 ->with('category:id,name')
                 ->get(['id', 'name', 'description', 'price', 'image_path', 'is_popular', 'menu_category_id'])
+                ->append('photo_url')
                 ->toArray())
         );
 

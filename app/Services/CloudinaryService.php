@@ -8,24 +8,30 @@ use RuntimeException;
 /**
  * CloudinaryService — upload foto menu ke Cloudinary (CDN offload).
  *
- * Keputusan Architect (Fase 1):
- *  - TIDAK pakai SDK penuh; cukup signed upload via HTTP facade (Laravel bawaan).
+ * Keputusan Architect (Fase 1, diserap dari Cloudinary Skills):
+ *  - Server-side SIGNED upload via HTTP facade (secret TIDAK pernah ke client).
  *  - Path logical per-tenant: restoku/{tenant_id}/menu/{hash} -> isolasi multi-tenant.
- *  - Return secure URL (https), bukan path storage lokal (cegah kebocoran internal).
- *  - Di testing/tanpa config -> fallback ke placeholder URL (jangan throw).
+ *  - Transform on-the-fly: incoming f_auto,q_auto + eager thumbnail grid (c_fill,w_500,h_500).
+ *  - Return associative ['url' => secure_url, 'public_id' => ...] supaya bisa di-destroy.
+ *  - Tanpa CLOUDINARY_URL (local/testing) -> fallback null (jangan throw), frontend placeholder.
  */
 class CloudinaryService
 {
     /**
      * Upload file (base64 data URL atau path temp) ke Cloudinary.
-     * Mengembalikan secure URL, atau null bila config tidak tersedia.
      *
-     * @param  string  $fileData  Path file temp ATAU data URL base64
+     * @param  string  $fileData  Path file temp ATAU data URL base64 (harus image)
      * @param  int  $tenantId  Untuk namespacing folder (isolasi)
      * @param  string  $folder  Sub-folder (default 'menu')
+     * @return array|null ['url' => secure_url, 'public_id' => string] atau null bila tanpa config
      */
-    public function uploadMenuPhoto(string $fileData, int $tenantId, string $folder = 'menu'): ?string
+    public function uploadMenuPhoto(string $fileData, int $tenantId, string $folder = 'menu'): ?array
     {
+        // Sanity: hanya terima image (data URL harus diawali data:image).
+        if (! $this->isImage($fileData)) {
+            throw new RuntimeException('File bukan gambar valid (harus data:image atau path gambar).');
+        }
+
         $config = $this->parseConfig();
         if (! $config) {
             // Tanpa config (local/testing): kembalikan null -> frontend placeholder.
@@ -38,6 +44,10 @@ class CloudinaryService
         $params = [
             'timestamp' => time(),
             'folder' => "restoku/{$tenantId}/{$folder}",
+            'transformation' => 'f_auto,q_auto',
+            'eager' => 'c_fill,w_500,h_500,f_auto,q_auto',
+            'eager_async' => true,
+            'return_delete_token' => true,
         ];
         $params['signature'] = $this->sign($params, $config['secret']);
         $params['api_key'] = $config['key'];
@@ -56,7 +66,63 @@ class CloudinaryService
 
         $body = $response->json();
 
-        return $body['secure_url'] ?? null;
+        if (empty($body['secure_url']) || empty($body['public_id'])) {
+            return null;
+        }
+
+        return [
+            'url' => $body['secure_url'],
+            'public_id' => $body['public_id'],
+        ];
+    }
+
+    /**
+     * Hapus asset dari Cloudinary berdasarkan public_id (saat ganti/hapus foto menu).
+     *
+     * @return bool true = berhasil dihapus / di-skip (tanpa config), false = gagal API
+     */
+    public function deleteMenuPhoto(string $publicId): bool
+    {
+        $config = $this->parseConfig();
+        if (! $config) {
+            // Tanpa config: tidak ada asset di Cloudinary -> anggap sukses (no-op).
+            return true;
+        }
+
+        $destroyUrl = "https://api.cloudinary.com/v1_1/{$config['cloud']}/image/destroy";
+
+        $params = [
+            'timestamp' => time(),
+            'public_id' => $publicId,
+        ];
+        $params['signature'] = $this->sign($params, $config['secret']);
+        $params['api_key'] = $config['key'];
+
+        $response = Http::asForm()->post($destroyUrl, $params);
+        if (! $response->successful()) {
+            return false;
+        }
+
+        $body = $response->json();
+
+        // result: "ok" (deleted) atau "not found" (sudah hilang) -> dua-duanya aman.
+        return in_array($body['result'] ?? null, ['ok', 'not found'], true);
+    }
+
+    /**
+     * Cek apakah input berupa gambar valid.
+     */
+    private function isImage(string $fileData): bool
+    {
+        if (preg_match('/^data:image\//', $fileData)) {
+            return true;
+        }
+        if (preg_match('/^data:/', $fileData)) {
+            return false; // data URL tapi bukan image
+        }
+
+        // Path file: cek ekstensi umum (best-effort, bukan validasi mime penuh).
+        return (bool) preg_match('/\.(jpe?g|png|webp|gif|avif|bmp)$/i', $fileData);
     }
 
     /**
@@ -86,6 +152,13 @@ class CloudinaryService
         ksort($sorted);
         $raw = '';
         foreach ($sorted as $k => $v) {
+            // boolean true -> "1", false -> di-skip (Cloudinary convention)
+            if (is_bool($v)) {
+                if (! $v) {
+                    continue;
+                }
+                $v = '1';
+            }
             $raw .= "$k=".($v ?? '').'&';
         }
         $raw = rtrim($raw, '&');

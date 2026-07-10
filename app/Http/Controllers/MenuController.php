@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Models\Outlet;
 use App\Models\Scopes\TenantScope;
@@ -37,10 +38,15 @@ class MenuController extends Controller
             ->get(['id', 'outlet_id', 'menu_category_id', 'name', 'description', 'price', 'image_path', 'is_available', 'is_popular', 'sort_order']);
 
         $outlets = Outlet::select('id', 'name')->get();
+        $categories = MenuCategory::where('tenant_id', $this->ctx->id())
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
         return Inertia::render('KatalogMenu/Index', [
             'menuItems' => $items,
             'outlets' => $outlets,
+            'categories' => $categories,
         ]);
     }
 
@@ -65,10 +71,15 @@ class MenuController extends Controller
         ]);
 
         $photoUrl = null;
+        $photoPublicId = null;
         if (! empty($validated['photo'])) {
-            $photoUrl = $this->cloudinary->uploadMenuPhoto(
+            $uploaded = $this->cloudinary->uploadMenuPhoto(
                 $validated['photo'], $this->ctx->id()
             );
+            if ($uploaded) {
+                $photoUrl = $uploaded['url'];
+                $photoPublicId = $uploaded['public_id'];
+            }
         }
 
         MenuItem::create([
@@ -79,6 +90,7 @@ class MenuController extends Controller
             'description' => $validated['description'] ?? null,
             'price' => $validated['price'],
             'image_path' => $photoUrl,
+            'image_public_id' => $photoPublicId,
             'is_popular' => $validated['is_popular'] ?? false,
             'is_available' => $validated['is_available'] ?? true,
             'sort_order' => $validated['sort_order'] ?? 0,
@@ -112,12 +124,18 @@ class MenuController extends Controller
         $oldOutletId = $item->outlet_id; // capture SEBELUM update (bisa jadi null)
 
         $photoUrl = $item->image_path;
+        $photoPublicId = $item->image_public_id;
         if (! empty($validated['photo']) && $validated['photo'] !== $item->image_path) {
             $uploaded = $this->cloudinary->uploadMenuPhoto(
                 $validated['photo'], $this->ctx->id()
             );
             if ($uploaded) {
-                $photoUrl = $uploaded;
+                // Hapus foto lama di Cloudinary (cegah orphan) bila ada.
+                if ($item->image_public_id) {
+                    $this->cloudinary->deleteMenuPhoto($item->image_public_id);
+                }
+                $photoUrl = $uploaded['url'];
+                $photoPublicId = $uploaded['public_id'];
             }
         }
 
@@ -128,6 +146,7 @@ class MenuController extends Controller
             'description' => $validated['description'] ?? null,
             'price' => $validated['price'],
             'image_path' => $photoUrl,
+            'image_public_id' => $photoPublicId,
             'is_popular' => $validated['is_popular'] ?? false,
             'is_available' => $validated['is_available'] ?? true,
             'sort_order' => $validated['sort_order'] ?? 0,
@@ -142,6 +161,12 @@ class MenuController extends Controller
     {
         $item = MenuItem::findOrFail($id);
         $outletId = $item->outlet_id;
+
+        // Hapus foto di Cloudinary (cegah orphan) bila ada.
+        if ($item->image_public_id) {
+            $this->cloudinary->deleteMenuPhoto($item->image_public_id);
+        }
+
         $item->delete();
 
         $this->invalidateMenuCache($outletId);

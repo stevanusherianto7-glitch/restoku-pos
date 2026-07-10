@@ -43,4 +43,11 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/oauth/google/callback'),
     ],
 
+    // Cloudinary (upload foto menu — CDN offload).
+    // Format resmi: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+    // Secret TIDAK pernah ke client; upload signed dari backend Laravel.
+    'cloudinary' => [
+        'url' => env('CLOUDINARY_URL'),
+    ],
+
 ];
