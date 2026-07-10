@@ -35,10 +35,12 @@ return [
         ],
     ],
 
-    // Cloudinary (foto menu) — format resmi: cloudinary://key:secret@cloud
-    // README/PRD: wajib untuk skala 500k outlet (CDN offload + transform on-the-fly).
-    'cloudinary' => [
-        'url' => env('CLOUDINARY_URL'),
+    // Google OAuth (Masuk dengan Google — login/register owner).
+    // Credential dari Google Cloud Console: OAuth 2.0 Client ID (type Web application).
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', '/oauth/google/callback'),
     ],
 
 ];

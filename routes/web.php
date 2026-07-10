@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\GeminiAiController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
@@ -31,6 +32,11 @@ Route::get('/login',       fn () => Inertia::render('Auth/StaffLogin'))->name('l
 Route::get('/owner/login', fn () => Inertia::render('Auth/OwnerLogin'))->name('owner.login');
 Route::post('/login',       [AuthenticatedSessionController::class, 'storeStaff'])->middleware('throttle:10,1');
 Route::post('/owner/login', [AuthenticatedSessionController::class, 'storeOwner'])->middleware('throttle:10,1');
+
+// ── OAuth "Masuk dengan Google" (khusus owner) ─────────────────────────
+// Redirect ke Google lalu callback otomatis login/register owner.
+Route::get('/oauth/google', [OAuthController::class, 'redirect'])->name('oauth.google');
+Route::get('/oauth/google/callback', [OAuthController::class, 'callback'])->middleware('throttle:10,1')->name('oauth.google.callback');
 
 // Guest-facing digital menu & order (QR code meja)
 Route::get('/order',         fn () => Inertia::render('BukuMenuDigital/CustomerView'));
