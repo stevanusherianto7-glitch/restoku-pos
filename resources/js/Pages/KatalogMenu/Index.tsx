@@ -135,76 +135,78 @@ export default function KatalogMenu() {
                             ))}
                         </div>
 
-                        <div className="flex-1 overflow-y-auto pr-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 pb-10">
-                            {filtered.map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden flex flex-col group hover:border-white/20 transition-all hover:bg-white/[0.04]"
-                                >
-                                    <div className="aspect-square bg-slate-800/50 relative flex items-center justify-center border-b border-white/5 group/img overflow-hidden">
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                                        <ProductImage
-                                            src={item.image || null}
-                                            alt={item.name}
-                                            variant="full"
-                                            className="group-hover/img:scale-105 transition-transform duration-300 absolute inset-0 !rounded-none"
-                                        />
-                                        {item.image && (
-                                            <div className="absolute top-2 left-2 bg-emerald-500/20 backdrop-blur-md px-2 py-0.5 rounded text-[9px] font-bold text-emerald-400 border border-emerald-500/30 z-20">
-                                                WEBP
-                                            </div>
-                                        )}
-                                        <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md px-2 py-1 rounded text-[10px] font-medium text-slate-300 border border-white/10 z-20">
-                                            {item.category}
-                                        </div>
-                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center z-30 backdrop-blur-sm">
-                                            <input
-                                                type="file"
-                                                id={`file-upload-${item.id}`}
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={(e) => handleFileChange(item.id, e)}
+                        <div className="flex-1 overflow-y-auto pr-2">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 pb-6">
+                                {filtered.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden flex flex-col group hover:border-white/20 transition-all hover:bg-white/[0.04]"
+                                    >
+                                        <div className="aspect-square bg-slate-800/50 relative flex items-center justify-center border-b border-white/5 group/img overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                                            <ProductImage
+                                                src={item.image || null}
+                                                alt={item.name}
+                                                variant="full"
+                                                className="group-hover/img:scale-105 transition-transform duration-300 absolute inset-0 !rounded-none"
                                             />
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    document.getElementById(`file-upload-${item.id}`)?.click()
-                                                }
-                                                className="flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-lg border border-white/20 transition-all transform translate-y-2 group-hover/img:translate-y-0"
-                                            >
-                                                <Upload className="size-3" /> Upload Foto
-                                            </button>
+                                            {item.image && (
+                                                <div className="absolute top-2 left-2 bg-emerald-500/20 backdrop-blur-md px-2 py-0.5 rounded text-[9px] font-bold text-emerald-400 border border-emerald-500/30 z-20">
+                                                    WEBP
+                                                </div>
+                                            )}
+                                            <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md px-2 py-1 rounded text-[10px] font-medium text-slate-300 border border-white/10 z-20">
+                                                {item.category}
+                                            </div>
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center z-30 backdrop-blur-sm">
+                                                <input
+                                                    type="file"
+                                                    id={`file-upload-${item.id}`}
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => handleFileChange(item.id, e)}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        document.getElementById(`file-upload-${item.id}`)?.click()
+                                                    }
+                                                    className="flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-lg border border-white/20 transition-all transform translate-y-2 group-hover/img:translate-y-0"
+                                                >
+                                                    <Upload className="size-3" /> Upload Foto
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="p-4 flex-1 flex flex-col justify-between">
+                                            <div>
+                                                <h3 className="text-sm font-semibold text-slate-200 mb-1 leading-tight">
+                                                    {item.name}
+                                                </h3>
+                                                <p className="text-xs font-mono font-medium text-emerald-400">
+                                                    {formatRupiah(item.price)}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/5 opacity-80 group-hover:opacity-100 transition-opacity">
+                                                <button className="flex-1 flex justify-center items-center gap-1.5 py-1.5 rounded-lg bg-white/5 hover:bg-blue-500/20 hover:text-blue-400 text-slate-300 text-xs font-medium transition-colors border border-transparent hover:border-blue-500/30">
+                                                    <Pencil className="size-3" /> Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(item.id)}
+                                                    className="flex-1 flex justify-center items-center gap-1.5 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-slate-300 text-xs font-medium transition-colors border border-transparent hover:border-red-500/30"
+                                                >
+                                                    <Trash2 className="size-3" /> Hapus
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="p-4 flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-semibold text-slate-200 mb-1 leading-tight">
-                                                {item.name}
-                                            </h3>
-                                            <p className="text-xs font-mono font-medium text-emerald-400">
-                                                {formatRupiah(item.price)}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/5 opacity-80 group-hover:opacity-100 transition-opacity">
-                                            <button className="flex-1 flex justify-center items-center gap-1.5 py-1.5 rounded-lg bg-white/5 hover:bg-blue-500/20 hover:text-blue-400 text-slate-300 text-xs font-medium transition-colors border border-transparent hover:border-blue-500/30">
-                                                <Pencil className="size-3" /> Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(item.id)}
-                                                className="flex-1 flex justify-center items-center gap-1.5 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-slate-300 text-xs font-medium transition-colors border border-transparent hover:border-red-500/30"
-                                            >
-                                                <Trash2 className="size-3" /> Hapus
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                             <div
                                 onClick={handleAdd}
-                                className="bg-white/[0.01] border border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center min-h-[220px] cursor-pointer hover:bg-white/[0.03] hover:border-white/20 transition-all text-slate-500 hover:text-white group"
+                                className="mt-6 w-full flex items-center justify-center gap-2 py-4 rounded-2xl border border-dashed border-white/10 bg-white/[0.01] cursor-pointer hover:bg-white/[0.03] hover:border-white/20 transition-all text-slate-500 hover:text-white group"
                             >
-                                <div className="size-12 rounded-full bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                    <Plus className="size-6" />
+                                <div className="size-10 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Plus className="size-5" />
                                 </div>
                                 <span className="text-sm font-medium">Tambah Menu Baru</span>
                             </div>
