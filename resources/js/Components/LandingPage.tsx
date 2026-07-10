@@ -308,24 +308,24 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                     <div className="w-full overflow-hidden relative select-none">
                         <div className="flex w-max animate-marquee gap-12 px-6">
                             {[
-                                'WAROENG STEAK',
-                                'Kopi Kenangan',
-                                'SOLARIA',
-                                'HokBen',
-                                'BAKMI GM',
-                                'Richeese Factory',
-                                'WAROENG STEAK',
-                                'Kopi Kenangan',
-                                'SOLARIA',
-                                'HokBen',
-                                'BAKMI GM',
-                                'Richeese Factory',
+                                { name: 'WAROENG STEAK', color: 'text-[#E4002B]' },
+                                { name: 'Kopi Kenangan', color: 'text-[#6F4E37]' },
+                                { name: 'SOLARIA', color: 'text-[#F2B705]' },
+                                { name: 'HokBen', color: 'text-[#E23744]' },
+                                { name: 'BAKMI GM', color: 'text-[#C8102E]' },
+                                { name: 'Richeese Factory', color: 'text-[#D7263D]' },
+                                { name: 'WAROENG STEAK', color: 'text-[#E4002B]' },
+                                { name: 'Kopi Kenangan', color: 'text-[#6F4E37]' },
+                                { name: 'SOLARIA', color: 'text-[#F2B705]' },
+                                { name: 'HokBen', color: 'text-[#E23744]' },
+                                { name: 'BAKMI GM', color: 'text-[#C8102E]' },
+                                { name: 'Richeese Factory', color: 'text-[#D7263D]' },
                             ].map((brand, i) => (
                                 <span
                                     key={i}
-                                    className="text-[#FAF5EE]/30 font-black text-lg tracking-wide whitespace-nowrap"
+                                    className={`${brand.color} font-black text-lg tracking-wide whitespace-nowrap drop-shadow-sm`}
                                 >
-                                    {brand}
+                                    {brand.name}
                                 </span>
                             ))}
                         </div>
@@ -566,34 +566,38 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
 
                 {/* CTA */}
                 <section className="w-full bg-[#FF5B35] py-20 px-6 relative overflow-hidden">
-                    <div className="max-w-4xl mx-auto text-center relative z-10">
-                        <h2
-                            className="text-3xl md:text-4xl font-black text-white mb-4"
-                            style={{ fontFamily: '"Playfair Display", serif' }}
-                        >
-                            Siap bikin bisnis kuliner kamu tumbuh pesat?
-                        </h2>
-                        <p className="text-white/90 mb-8 font-medium">
-                            Mulai gratis 14 hari. Tanpa kartu kredit. Upgrade kapan saja.
-                        </p>
-                        <button
-                            onClick={onEnter}
-                            className="px-8 py-4 bg-white text-[#FF5B35] hover:bg-[#FAF5EE] rounded-xl font-extrabold text-base shadow-lg transition-all hover:-translate-y-0.5"
-                        >
-                            Coba Gratis Sekarang ↗
-                        </button>
-                    </div>
+                    <div className="max-w-7xl mx-auto grid lg:grid-cols-[460px_1fr] gap-8 items-center">
+                        {/* Left: multi-outlet route map */}
+                        <div className="order-2 lg:order-1 flex justify-center lg:justify-start lg:-ml-10">
+                            <img
+                                src="/images/landing/cta_map_pins.png"
+                                alt="Peta rute banyak cabang Restoku"
+                                className="w-full max-w-[520px] h-auto select-none drop-shadow-xl"
+                                onError={(e: any) => {
+                                    e.currentTarget.style.display = 'none';
+                                }}
+                            />
+                        </div>
 
-                    {/* Foreground: multi-outlet route map */}
-                    <img
-                        src="/images/landing/cta_map_pins.png"
-                        alt="Peta rute banyak cabang Restoku"
-                        className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-0 w-full max-w-5xl h-auto opacity-95 select-none z-20"
-                        aria-hidden="true"
-                        onError={(e: any) => {
-                            e.currentTarget.style.display = 'none';
-                        }}
-                    />
+                        {/* Right: copy */}
+                        <div className="order-1 lg:order-2 text-center lg:text-left">
+                            <h2
+                                className="text-3xl md:text-4xl lg:text-4xl font-black text-white mb-4 whitespace-nowrap"
+                                style={{ fontFamily: '"Playfair Display", serif' }}
+                            >
+                                Siap bikin bisnis kuliner kamu tumbuh pesat?
+                            </h2>
+                            <p className="text-white/90 mb-8 font-medium">
+                                Mulai gratis 14 hari. Tanpa kartu kredit. Upgrade kapan saja.
+                            </p>
+                            <button
+                                onClick={onEnter}
+                                className="px-8 py-4 bg-white text-[#FF5B35] hover:bg-[#FAF5EE] rounded-xl font-extrabold text-base shadow-lg transition-all hover:-translate-y-0.5"
+                            >
+                                Coba Gratis Sekarang ↗
+                            </button>
+                        </div>
+                    </div>
                 </section>
             </main>
 
