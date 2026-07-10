@@ -474,7 +474,7 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
 
                         <div className="grid md:grid-cols-3 gap-8 items-stretch">
                             {/* Basic */}
-                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow text-center">
+                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] ring-1 ring-black/5 flex flex-col justify-between shadow-lg shadow-black/5 hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1 transition-all duration-300 text-center">
                                 <div>
                                     <h3 className="text-lg font-extrabold text-[#2B2523] mb-2">Basic</h3>
                                     <div className="text-3xl font-black text-[#2B2523] mb-6">
@@ -502,9 +502,9 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                             </div>
 
                             {/* Pro (Highlighted) */}
-                            <div className="bg-[#FF5B35] text-white rounded-3xl p-8 border border-[#FF5B35] flex flex-col justify-between shadow-xl shadow-[#FF5B35]/15 relative transform md:-translate-y-4 text-center">
+                            <div className="bg-[#FF5B35] text-white rounded-3xl p-8 border border-[#FF5B35] ring-2 ring-white/40 flex flex-col justify-between shadow-2xl shadow-[#FF5B35]/35 relative transform md:-translate-y-6 md:scale-105 text-center">
                                 <div className="absolute -top-3.5 inset-x-0 flex justify-center">
-                                    <span className="bg-[#1F1A17] text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest border border-white/10">
+                                    <span className="bg-[#1F1A17] text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest border border-white/10 shadow-lg">
                                         Paling Laris
                                     </span>
                                 </div>
@@ -528,14 +528,14 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                                 </div>
                                 <button
                                     onClick={onEnterOwner}
-                                    className="w-full py-4 rounded-xl bg-white text-[#FF5B35] hover:bg-[#FAF5EE] font-extrabold transition-all text-sm mt-8 shadow-md"
+                                    className="w-full py-4 rounded-xl bg-white text-[#FF5B35] hover:bg-[#FAF5EE] font-extrabold transition-all text-sm mt-8 shadow-lg shadow-black/10"
                                 >
                                     Coba Pro Gratis
                                 </button>
                             </div>
 
                             {/* Enterprise */}
-                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow text-center">
+                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] ring-1 ring-black/5 flex flex-col justify-between shadow-lg shadow-black/5 hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1 transition-all duration-300 text-center">
                                 <div>
                                     <h3 className="text-lg font-extrabold text-[#2B2523] mb-2">Enterprise</h3>
                                     <div className="text-3xl font-black text-[#2B2523] mb-6">
