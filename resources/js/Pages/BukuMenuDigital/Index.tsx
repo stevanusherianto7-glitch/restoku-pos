@@ -1,5 +1,5 @@
-import { useState, ElementType } from 'react';
-import { Head } from '@inertiajs/react';
+import { useState, useMemo, ElementType } from 'react';
+import { Head, usePage } from '@inertiajs/react';
 import { useSubscription } from '../../Hooks/useSubscription';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from '../../Components/Shared';
@@ -35,11 +35,51 @@ import {
     Image as ImageIcon,
     MessageCircle,
     Upload,
+    Printer,
 } from 'lucide-react';
 import { ProductImage } from '../../Components/ProductImage';
 import { RoleGuard } from '../../Components/RoleGuard';
+import { QRCodeSVG } from 'qrcode.react';
+import { buildMenuUrl } from '../../lib/menuUrl';
+
+type Outlet = { id: number; name: string; slug: string; is_active: boolean };
 
 function BukuMenuDigitalInner() {
+    const { props } = usePage();
+    const outlets = (props.outlets as Outlet[]) ?? [];
+    const activeOutletId = (props.outlet as Outlet | undefined)?.id;
+    const [selectedOutletId, setSelectedOutletId] = useState<number>(activeOutletId ?? outlets[0]?.id ?? 0);
+    // Label meja bebas owner (A1, 01, Meja 7, ...), 1 per baris.
+    const [tableInput, setTableInput] = useState<string>('A1\nA2\nB1\nB2\nC1');
+    const [copied, setCopied] = useState(false);
+
+    const selectedOutlet = outlets.find((o) => o.id === selectedOutletId) ?? outlets[0];
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const menuUrl = selectedOutlet ? buildMenuUrl(baseUrl, selectedOutlet.slug) : '';
+
+    const tables = useMemo(
+        () =>
+            tableInput
+                .split('\n')
+                .map((s) => s.trim())
+                .filter(Boolean)
+                .slice(0, 200),
+        [tableInput],
+    );
+
+    const tableUrl = (label: string) => (selectedOutlet ? buildMenuUrl(baseUrl, selectedOutlet.slug, label) : '');
+
+    const copyMenuLink = async () => {
+        if (!menuUrl) return;
+        try {
+            await navigator.clipboard.writeText(menuUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        } catch {
+            /* clipboard tidak tersedia */
+        }
+    };
+
     return (
         <MainLayout>
             <Head title="Buku Menu Digital (e-Menu)" />
@@ -52,17 +92,29 @@ function BukuMenuDigitalInner() {
                             </h2>
                             <div className="flex items-center gap-3">
                                 <div className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 flex items-center justify-between">
-                                    <span className="text-sm text-slate-300">https://restoku.id/m/senopati</span>
+                                    <span className="text-sm text-slate-300 break-all">
+                                        {menuUrl || 'https://restoku.id/m/...'}
+                                    </span>
                                     <button
-                                        className="text-slate-400 hover:text-white transition-colors"
+                                        onClick={copyMenuLink}
+                                        className="text-slate-400 hover:text-white transition-colors shrink-0 ml-2"
                                         title="Salin Tautan"
                                     >
-                                        <Copy className="size-4" />
+                                        {copied ? (
+                                            <CheckCircle2 className="size-4 text-emerald-400" />
+                                        ) : (
+                                            <Copy className="size-4" />
+                                        )}
                                     </button>
                                 </div>
-                                <button className="rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-2.5 text-sm font-medium hover:bg-emerald-500/20 transition-colors">
+                                <a
+                                    href={menuUrl || '#'}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-2.5 text-sm font-medium hover:bg-emerald-500/20 transition-colors"
+                                >
                                     Buka Preview
-                                </button>
+                                </a>
                             </div>
                             <div className="mt-5 grid grid-cols-2 gap-4">
                                 <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex items-center gap-4">
@@ -71,9 +123,9 @@ function BukuMenuDigitalInner() {
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-slate-200">QR Code Meja</p>
-                                        <button className="text-xs text-blue-400 hover:text-blue-300 mt-0.5">
-                                            Unduh Semua QR
-                                        </button>
+                                        <p className="text-xs text-slate-400 mt-0.5">
+                                            {tables.length} meja siap dicetak
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex items-center gap-4">
@@ -87,6 +139,68 @@ function BukuMenuDigitalInner() {
                                 </div>
                             </div>
                         </Glass>
+
+                        {/* QR Code Generator */}
+                        <Glass className="p-5">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-base font-medium text-slate-200 flex items-center gap-2">
+                                    <QrCode className="size-4 text-blue-400" /> Generator QR Code Meja
+                                </h2>
+                                <button
+                                    onClick={() => window.print()}
+                                    className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-medium text-slate-200 transition-colors flex items-center gap-2"
+                                >
+                                    <Printer className="size-3.5" /> Cetak Semua
+                                </button>
+                            </div>
+
+                            {outlets.length === 0 ? (
+                                <p className="text-sm text-amber-300">
+                                    Belum ada outlet. Tambah outlet di Pengaturan Outlet terlebih dahulu.
+                                </p>
+                            ) : (
+                                <>
+                                    <div className="mb-4 max-w-xs">
+                                        <label className="text-xs text-slate-400">Outlet</label>
+                                        <select
+                                            value={selectedOutletId}
+                                            onChange={(e) => setSelectedOutletId(Number(e.target.value))}
+                                            className="w-full mt-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200"
+                                        >
+                                            {outlets.map((o) => (
+                                                <option key={o.id} value={o.id}>
+                                                    {o.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <label className="text-xs text-slate-400">
+                                        Label meja (1 per baris, bebas: A1, 01, Meja 7)
+                                    </label>
+                                    <textarea
+                                        value={tableInput}
+                                        onChange={(e) => setTableInput(e.target.value)}
+                                        rows={5}
+                                        className="w-full mt-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 font-mono"
+                                        placeholder={'A1\nA2\nB1'}
+                                    />
+                                    <div className="mt-4 grid grid-cols-3 gap-3">
+                                        {tables.map((t) => (
+                                            <div
+                                                key={t}
+                                                className="rounded-xl border border-white/5 bg-white/[0.02] p-3 flex flex-col items-center"
+                                            >
+                                                <div className="size-24 bg-white rounded-lg p-1.5">
+                                                    <QRCodeSVG value={tableUrl(t)} size={84} level="M" />
+                                                </div>
+                                                <p className="text-xs font-semibold text-slate-300 mt-2">{t}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </Glass>
+
                         <Glass className="p-5">
                             <h2 className="text-base font-medium text-slate-200 mb-5 flex items-center gap-2">
                                 <Palette className="size-4 text-blue-400" /> Kustomisasi Tampilan
