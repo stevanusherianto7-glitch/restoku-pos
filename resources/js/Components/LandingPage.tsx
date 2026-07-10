@@ -190,10 +190,7 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
             {/* ─── Header ─── */}
             <header className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-12 py-4 bg-[#FAF5EE] border-b border-[#F2EAE0]">
                 <div className="flex items-center gap-3">
-                    <div className="grid size-10 place-items-center rounded-xl bg-[#FF5B35] text-white">
-                        <BowlIcon className="size-6" />
-                    </div>
-                    <span className="text-xl font-bold tracking-tight text-[#2B2523]">Restoku</span>
+                    <img src="/images/restoku_logo.png" alt="Restoku" className="h-7 w-auto select-none" />
                 </div>
                 <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#2B2523]/70">
                     <a href="#features" className="hover:text-[#FF5B35] transition-colors">
@@ -607,10 +604,11 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                 <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
                     <div className="md:col-span-2">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="grid size-10 place-items-center rounded-xl bg-[#FF5B35] text-white">
-                                <BowlIcon className="size-6" />
-                            </div>
-                            <span className="text-xl font-bold text-white">Restoku</span>
+                            <img
+                                src="/images/restoku_logo.png"
+                                alt="Restoku"
+                                className="h-7 w-auto select-none brightness-110"
+                            />
                         </div>
                         <p className="text-sm max-w-sm leading-relaxed">
                             Sistem manajemen restoran all-in-one untuk pemilik kuliner di Indonesia yang mau ekspansi
