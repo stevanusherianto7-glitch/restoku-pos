@@ -306,27 +306,28 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                     </div>
 
                     <div className="w-full overflow-hidden relative select-none">
-                        <div className="flex w-max animate-marquee gap-12 px-6">
+                        <div className="flex w-max animate-marquee items-center gap-12 px-6">
                             {[
-                                { name: 'WAROENG STEAK', color: 'text-[#E4002B]' },
-                                { name: 'Kopi Kenangan', color: 'text-[#6F4E37]' },
-                                { name: 'SOLARIA', color: 'text-[#F2B705]' },
-                                { name: 'HokBen', color: 'text-[#E23744]' },
-                                { name: 'BAKMI GM', color: 'text-[#C8102E]' },
-                                { name: 'Richeese Factory', color: 'text-[#D7263D]' },
-                                { name: 'WAROENG STEAK', color: 'text-[#E4002B]' },
-                                { name: 'Kopi Kenangan', color: 'text-[#6F4E37]' },
-                                { name: 'SOLARIA', color: 'text-[#F2B705]' },
-                                { name: 'HokBen', color: 'text-[#E23744]' },
-                                { name: 'BAKMI GM', color: 'text-[#C8102E]' },
-                                { name: 'Richeese Factory', color: 'text-[#D7263D]' },
+                                { src: '/images/landing/brands/waroeng.png', alt: 'Waroeng Steak' },
+                                { src: '/images/landing/brands/kopi_kenangan.png', alt: 'Kopi Kenangan' },
+                                { src: '/images/landing/brands/solaria.png', alt: 'Solaria' },
+                                { src: '/images/landing/brands/hokben.png', alt: 'HokBen' },
+                                { src: '/images/landing/brands/bakmi_gm.png', alt: 'Bakmi GM' },
+                                { src: '/images/landing/brands/richeese.png', alt: 'Richeese Factory' },
+                                { src: '/images/landing/brands/waroeng.png', alt: 'Waroeng Steak' },
+                                { src: '/images/landing/brands/kopi_kenangan.png', alt: 'Kopi Kenangan' },
+                                { src: '/images/landing/brands/solaria.png', alt: 'Solaria' },
+                                { src: '/images/landing/brands/hokben.png', alt: 'HokBen' },
+                                { src: '/images/landing/brands/bakmi_gm.png', alt: 'Bakmi GM' },
+                                { src: '/images/landing/brands/richeese.png', alt: 'Richeese Factory' },
                             ].map((brand, i) => (
-                                <span
+                                <img
                                     key={i}
-                                    className={`${brand.color} font-black text-lg tracking-wide whitespace-nowrap drop-shadow-sm`}
-                                >
-                                    {brand.name}
-                                </span>
+                                    src={brand.src}
+                                    alt={brand.alt}
+                                    className="h-[60px] w-auto object-contain opacity-90 brightness-110 saturate-110"
+                                    loading="lazy"
+                                />
                             ))}
                         </div>
                     </div>
