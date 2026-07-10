@@ -208,15 +208,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
         <aside
             className={`flex h-full shrink-0 flex-col p-4 transition-all duration-500 relative ${asideBg} ${isCollapsed ? 'w-[80px]' : 'w-64'}`}
         >
-            {/* Brand & Toggle */}
-            <div className={`mb-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between gap-2'}`}>
+            {/* Brand */}
+            <div className={`mb-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-start gap-2'}`}>
                 <TenantBrandLockup collapsed={isCollapsed} />
-                <button
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    className={`rounded-lg border border-white/10 bg-white/5 p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-all shrink-0 shadow-sm ${isCollapsed ? 'hidden' : ''}`}
-                >
-                    <Menu className="size-4" />
-                </button>
             </div>
 
             {/* Role-filtered nav */}
@@ -361,6 +355,16 @@ export default function MainLayout({ children, noScroll = false }: { children: R
             <main
                 className={`flex-1 ${noScroll ? 'overflow-hidden p-4 md:p-5 flex flex-col min-h-0' : 'overflow-y-auto p-6 md:p-8'} relative`}
             >
+                {/* Floating burger toggle — hanya saat sidebar collapsed */}
+                {isCollapsed && (
+                    <button
+                        onClick={() => setIsCollapsed(false)}
+                        className="absolute top-3 left-3 z-30 rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all shadow-sm"
+                        title="Buka sidebar"
+                    >
+                        <Menu className="size-4" />
+                    </button>
+                )}
                 {isNanoBanana ? (
                     <>
                         <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-amber-500/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
