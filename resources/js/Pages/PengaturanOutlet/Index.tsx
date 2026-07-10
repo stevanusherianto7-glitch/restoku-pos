@@ -334,14 +334,14 @@ function PengaturanOutletInner() {
         }
     };
 
-    const handleScreenModeChange = (mode: 'terang' | 'gelap' | 'glassmorphic' | 'nano-banana') => {
+    const handleScreenModeChange = (mode: 'terang' | 'gelap' | 'glassmorphic' | 'nano-banana' | 'krem') => {
         setScreenMode(mode);
         localStorage.setItem('outlet_screen_mode', mode);
         document.documentElement.setAttribute('data-screen-mode', mode);
         if (mode === 'nano-banana') {
             document.documentElement.classList.add('nano-banana', 'dark');
             document.documentElement.classList.remove('light');
-        } else if (mode === 'terang') {
+        } else if (mode === 'terang' || mode === 'krem') {
             document.documentElement.classList.add('light');
             document.documentElement.classList.remove('dark', 'nano-banana');
         } else {
@@ -1003,6 +1003,13 @@ function PengaturanOutletInner() {
                                                 desc: 'Transparan & Futuristik',
                                                 theme: 'bg-white/10 backdrop-blur-md border-white/20 text-white',
                                                 preview: 'from-emerald-900/40 via-slate-900/60 to-purple-900/40',
+                                            },
+                                            {
+                                                id: 'krem',
+                                                name: 'Krem Hangat',
+                                                desc: 'Warm & Cozy',
+                                                theme: 'bg-[#ffe6c0] border-amber-300 text-amber-900',
+                                                preview: 'from-[#fff3e0] via-[#ffe6c0] to-[#ffd99f]',
                                             },
                                         ].map((opt) => (
                                             <button

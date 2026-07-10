@@ -130,7 +130,9 @@ export function useTenantSettings() {
     const [tenantLogo, setTenantLogo] = useState('ChefHat');
     const [tenantImage, setTenantImage] = useState<string | null>(null);
     const [tenantLayout, setTenantLayout] = useState<'premium-dark' | 'minimalist-light' | 'warm-cozy'>('premium-dark');
-    const [screenMode, setScreenMode] = useState<'terang' | 'gelap' | 'glassmorphic' | 'nano-banana'>('nano-banana');
+    const [screenMode, setScreenMode] = useState<'terang' | 'gelap' | 'glassmorphic' | 'nano-banana' | 'krem'>(
+        'nano-banana',
+    );
     const [staffOwner, setStaffOwner] = useState('LALU GUSTI');
     const [employees, setEmployees] = useState<StaffMember[]>(DEFAULT_EMPLOYEES);
 
@@ -162,14 +164,15 @@ export function useTenantSettings() {
             savedScreenMode === 'terang' ||
             savedScreenMode === 'gelap' ||
             savedScreenMode === 'glassmorphic' ||
-            savedScreenMode === 'nano-banana'
+            savedScreenMode === 'nano-banana' ||
+            savedScreenMode === 'krem'
         ) {
             setScreenMode(savedScreenMode as any);
             document.documentElement.setAttribute('data-screen-mode', savedScreenMode);
             if (savedScreenMode === 'nano-banana') {
                 document.documentElement.classList.add('nano-banana', 'dark');
                 document.documentElement.classList.remove('light');
-            } else if (savedScreenMode === 'terang') {
+            } else if (savedScreenMode === 'terang' || savedScreenMode === 'krem') {
                 document.documentElement.classList.add('light');
                 document.documentElement.classList.remove('dark', 'nano-banana');
             } else {

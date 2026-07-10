@@ -336,16 +336,19 @@ export default function MainLayout({ children, noScroll = false }: { children: R
     const { screenMode } = useTenantSettings();
 
     const isLight = screenMode === 'terang';
+    const isKrem = screenMode === 'krem';
     const isGlass = screenMode === 'glassmorphic';
     const isNanoBanana = screenMode === 'nano-banana';
 
     const rootBgClass = isLight
         ? 'bg-slate-50 text-slate-900 selection:bg-blue-500/20'
-        : isNanoBanana
-          ? 'bg-[#030712] text-slate-100 selection:bg-amber-500/30'
-          : isGlass
-            ? 'bg-gradient-to-br from-[#020617] via-[#0b1329] to-[#030712] text-slate-100 selection:bg-cyan-500/30'
-            : 'bg-[#030303] text-slate-200 selection:bg-white/20';
+        : isKrem
+          ? 'bg-[linear-gradient(90deg,#fff3e0_0%,#ffe6c0_50%,#ffd99f_100%)] text-slate-900 selection:bg-amber-500/20'
+          : isNanoBanana
+            ? 'bg-[#030712] text-slate-100 selection:bg-amber-500/30'
+            : isGlass
+              ? 'bg-gradient-to-br from-[#020617] via-[#0b1329] to-[#030712] text-slate-100 selection:bg-cyan-500/30'
+              : 'bg-[#030303] text-slate-200 selection:bg-white/20';
 
     return (
         <div

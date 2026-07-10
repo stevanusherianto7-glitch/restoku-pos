@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
 import { ShieldAlert } from 'lucide-react';
 
@@ -12,9 +13,17 @@ import { ShieldAlert } from 'lucide-react';
  *   - status: "loading" | "allowed" | "denied"
  */
 export function useRoleGuard(allowedRoles: string[]): 'loading' | 'allowed' | 'denied' {
+    const { auth } = (usePage<any>().props as any) ?? {};
     const [status, setStatus] = useState<'loading' | 'allowed' | 'denied'>('loading');
 
     useEffect(() => {
+        // Owner session (login via owner, bukan staff PIN) → izinkan bila 'owner' di-allow.
+        // Ini menangani kasus di mana localStorage.activeKaryawan kosong untuk owner.
+        if (auth?.user?.role === 'owner' && allowedRoles.includes('owner')) {
+            setStatus('allowed');
+            return;
+        }
+
         try {
             const raw = localStorage.getItem('activeKaryawan');
             if (!raw) {
@@ -62,7 +71,7 @@ export function useRoleGuard(allowedRoles: string[]): 'loading' | 'allowed' | 'd
         } catch {
             setStatus('denied');
         }
-    }, []);
+    }, [auth?.user?.role, allowedRoles]);
 
     return status;
 }
