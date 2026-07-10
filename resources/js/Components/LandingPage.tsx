@@ -389,7 +389,7 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                                 return (
                                     <div
                                         key={i}
-                                        className="rounded-3xl text-[#2B2523] hover:shadow-md transition-all duration-300 flex flex-col"
+                                        className="rounded-3xl text-[#2B2523] hover:shadow-md transition-all duration-300 flex flex-col items-center text-center"
                                     >
                                         <Illustration />
                                         <h3 className="text-xl font-bold mb-4 mt-6">{feat.title}</h3>
@@ -473,23 +473,20 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
 
                         <div className="grid md:grid-cols-3 gap-8 items-stretch">
                             {/* Basic */}
-                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow text-center">
                                 <div>
                                     <h3 className="text-lg font-extrabold text-[#2B2523] mb-2">Basic</h3>
                                     <div className="text-3xl font-black text-[#2B2523] mb-6">
                                         Rp 149rb<span className="text-sm font-normal text-[#2B2523]/60">/bln</span>
                                     </div>
-                                    <ul className="space-y-4 mb-8">
+                                    <ul className="space-y-3 mb-8 text-center">
                                         {[
                                             '1 Outlet',
                                             'Kasir & Order Tamu',
                                             'Buku Menu Digital (QR)',
                                             'Laporan Penjualan',
                                         ].map((f, i) => (
-                                            <li
-                                                key={i}
-                                                className="flex items-center gap-2 text-sm text-[#2B2523]/80 font-semibold"
-                                            >
+                                            <li key={i} className="text-center text-sm text-[#2B2523]/80 font-semibold">
                                                 <CheckIcon className="size-4 text-[#FF5B35] shrink-0" /> {f}
                                             </li>
                                         ))}
@@ -504,7 +501,7 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                             </div>
 
                             {/* Pro (Highlighted) */}
-                            <div className="bg-[#FF5B35] text-white rounded-3xl p-8 border border-[#FF5B35] flex flex-col justify-between shadow-xl shadow-[#FF5B35]/15 relative transform md:-translate-y-4">
+                            <div className="bg-[#FF5B35] text-white rounded-3xl p-8 border border-[#FF5B35] flex flex-col justify-between shadow-xl shadow-[#FF5B35]/15 relative transform md:-translate-y-4 text-center">
                                 <div className="absolute -top-3.5 inset-x-0 flex justify-center">
                                     <span className="bg-[#1F1A17] text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest border border-white/10">
                                         Paling Laris
@@ -515,17 +512,14 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                                     <div className="text-4xl font-black mb-6">
                                         Rp 399rb<span className="text-sm font-normal text-white/80">/bln</span>
                                     </div>
-                                    <ul className="space-y-4 mb-8">
+                                    <ul className="space-y-3 mb-8 text-center">
                                         {[
                                             'Hingga 3 Outlet',
                                             'Laporan Stok & Keuangan',
                                             'Kelola Karyawan & Shift',
                                             'Reservasi & Antrean',
                                         ].map((f, i) => (
-                                            <li
-                                                key={i}
-                                                className="flex items-center gap-2 text-sm text-white/95 font-semibold"
-                                            >
+                                            <li key={i} className="text-center text-sm text-white/95 font-semibold">
                                                 <CheckIcon className="size-4 text-white fill-white/10 shrink-0" /> {f}
                                             </li>
                                         ))}
@@ -540,23 +534,20 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                             </div>
 
                             {/* Enterprise */}
-                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
+                            <div className="bg-white rounded-3xl p-8 border border-[#F2EAE0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow text-center">
                                 <div>
                                     <h3 className="text-lg font-extrabold text-[#2B2523] mb-2">Enterprise</h3>
                                     <div className="text-3xl font-black text-[#2B2523] mb-6">
                                         Rp 999rb<span className="text-sm font-normal text-[#2B2523]/60">/bln</span>
                                     </div>
-                                    <ul className="space-y-4 mb-8">
+                                    <ul className="space-y-3 mb-8 text-center">
                                         {[
                                             'Multi-Outlet Unlimited',
                                             'Pengaturan Outlet Lanjutan',
                                             'Reservasi & Google Review',
                                             'Support Prioritas 24/7',
                                         ].map((f, i) => (
-                                            <li
-                                                key={i}
-                                                className="flex items-center gap-2 text-sm text-[#2B2523]/80 font-semibold"
-                                            >
+                                            <li key={i} className="text-center text-sm text-[#2B2523]/80 font-semibold">
                                                 <CheckIcon className="size-4 text-[#FF5B35] shrink-0" /> {f}
                                             </li>
                                         ))}
