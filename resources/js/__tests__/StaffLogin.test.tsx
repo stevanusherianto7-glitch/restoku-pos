@@ -18,8 +18,7 @@ import '@testing-library/jest-dom';
 // Mock @inertiajs/react — usePage dan Head
 vi.mock('@inertiajs/react', () => ({
     Head: ({ title }: { title: string }) => <title>{title}</title>,
-    Link: ({ href, children }: { href: string; children: React.ReactNode }) =>
-        <a href={href}>{children}</a>,
+    Link: ({ href, children }: { href: string; children: React.ReactNode }) => <a href={href}>{children}</a>,
     router: { post: vi.fn() },
     usePage: vi.fn(),
 }));
@@ -36,9 +35,9 @@ vi.mock('../../Components/Shared', () => ({
     RestokuLogo: () => <svg data-testid="restoku-logo" />,
     verifyPin: vi.fn(async () => false),
     DEFAULT_EMPLOYEES: [
-        { id: '1', name: 'BUDI HARTONO',  role: 'kasir',   pin: '123456' },
-        { id: '2', name: 'DEDI CAHYONO',  role: 'kitchen', pin: '111111' },
-        { id: '3', name: 'SARI PERTIWI',  role: 'waiter',  pin: '654321' },
+        { id: '1', name: 'BUDI HARTONO', role: 'kasir', pin: '123456' },
+        { id: '2', name: 'DEDI CAHYONO', role: 'kitchen', pin: '111111' },
+        { id: '3', name: 'SARI PERTIWI', role: 'waiter', pin: '654321' },
         { id: '4', name: 'AGUS SETIAWAN', role: 'manager', pin: '999999' },
     ],
 }));
@@ -59,9 +58,15 @@ const localStorageMock = (() => {
     let store: Record<string, string> = {};
     return {
         getItem: (key: string) => store[key] ?? null,
-        setItem: (key: string, value: string) => { store[key] = value; },
-        removeItem: (key: string) => { delete store[key]; },
-        clear: () => { store = {}; },
+        setItem: (key: string, value: string) => {
+            store[key] = value;
+        },
+        removeItem: (key: string) => {
+            delete store[key];
+        },
+        clear: () => {
+            store = {};
+        },
     };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
@@ -102,16 +107,12 @@ describe('StaffLogin — null-safety & rendering', () => {
     });
 
     it('A5 — tidak crash ketika login_employees mengandung record dengan pin: undefined', () => {
-        setupUsePage([
-            { id: '12', name: 'NO PIN USER', role: 'waiter', pin: undefined },
-        ]);
+        setupUsePage([{ id: '12', name: 'NO PIN USER', role: 'waiter', pin: undefined }]);
         expect(() => render(<StaffLogin />)).not.toThrow();
     });
 
     it('A6 — tidak crash ketika login_employees mengandung record dengan pin: "" (string kosong)', () => {
-        setupUsePage([
-            { id: '13', name: 'EMPTY PIN USER', role: 'kasir', pin: '' },
-        ]);
+        setupUsePage([{ id: '13', name: 'EMPTY PIN USER', role: 'kasir', pin: '' }]);
         expect(() => render(<StaffLogin />)).not.toThrow();
     });
 
@@ -122,7 +123,7 @@ describe('StaffLogin — null-safety & rendering', () => {
 
     it('A8 — tidak crash ketika semua record di login_employees memiliki pin: null', () => {
         setupUsePage([
-            { id: '1', name: 'A', role: 'kasir',   pin: null },
+            { id: '1', name: 'A', role: 'kasir', pin: null },
             { id: '2', name: 'B', role: 'kitchen', pin: null },
         ]);
         expect(() => render(<StaffLogin />)).not.toThrow();
@@ -133,9 +134,7 @@ describe('StaffLogin — null-safety & rendering', () => {
     // ────────────────────────────────────────────────────────────────────────
 
     it('B1 — merender "Masukkan PIN" ketika data karyawan valid', () => {
-        setupUsePage([
-            { id: '1', name: 'BUDI', role: 'kasir', pin: '123456' },
-        ]);
+        setupUsePage([{ id: '1', name: 'BUDI', role: 'kasir', pin: '123456' }]);
         render(<StaffLogin />);
         expect(screen.getByText('Masukkan PIN')).toBeInTheDocument();
     });
@@ -155,18 +154,14 @@ describe('StaffLogin — null-safety & rendering', () => {
         // bcrypt hash adalah 60 karakter, SHA256 adalah 64 karakter
         // Komponen cek pin.length === 64 — test menggunakan SHA256-style hash
         const sha256Hash = 'a'.repeat(64); // 64 karakter = terdeteksi sebagai hash
-        setupUsePage([
-            { id: '1', name: 'BUDI', role: 'kasir', pin: sha256Hash },
-        ]);
+        setupUsePage([{ id: '1', name: 'BUDI', role: 'kasir', pin: sha256Hash }]);
         const { container } = render(<StaffLogin />);
         // PIN hash (64 char) ditampilkan sebagai bintang — cek di textContent keseluruhan
         expect(container.textContent).toContain('******');
     });
 
     it('B4 — menampilkan PIN plaintext apa adanya', () => {
-        setupUsePage([
-            { id: '1', name: 'BUDI', role: 'kasir', pin: '123456' },
-        ]);
+        setupUsePage([{ id: '1', name: 'BUDI', role: 'kasir', pin: '123456' }]);
         render(<StaffLogin />);
         // PIN plaintext harus muncul di halaman
         expect(screen.getByText(/123456/)).toBeInTheDocument();
@@ -186,8 +181,8 @@ describe('StaffLogin — null-safety & rendering', () => {
 
     it('C1 — memfilter karyawan dengan pin null, hanya render yang valid', () => {
         setupUsePage([
-            { id: '1', name: 'INVALID', role: 'kasir',   pin: null },
-            { id: '2', name: 'VALID',   role: 'kitchen', pin: '111111' },
+            { id: '1', name: 'INVALID', role: 'kasir', pin: null },
+            { id: '2', name: 'VALID', role: 'kitchen', pin: '111111' },
         ]);
         // Tidak boleh crash — ini yang paling penting
         expect(() => render(<StaffLogin />)).not.toThrow();
@@ -197,7 +192,7 @@ describe('StaffLogin — null-safety & rendering', () => {
 
     it('C2 — semua null-pin → fallback ke DEFAULT_EMPLOYEES', () => {
         setupUsePage([
-            { id: '1', name: 'A', role: 'kasir',   pin: null },
+            { id: '1', name: 'A', role: 'kasir', pin: null },
             { id: '2', name: 'B', role: 'kitchen', pin: null },
         ]);
         // Tidak boleh crash — fallback ke DEFAULT_EMPLOYEES
