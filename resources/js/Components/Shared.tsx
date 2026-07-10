@@ -310,6 +310,40 @@ export function useTenantSettings() {
     };
 }
 
+export function TenantBrandLockup({ collapsed = false }: { collapsed?: boolean }) {
+    const { tenantName, tenantLogo, tenantImage, renderLogo } = useTenantSettings();
+    const hasBrand = Boolean(tenantImage || (tenantLogo && tenantLogo !== 'ChefHat'));
+    return (
+        <div className={`flex items-center gap-3 ${collapsed ? 'flex-col justify-center' : ''}`}>
+            {/* Logo tenant (atau placeholder kosong) */}
+            <div
+                className={`grid place-items-center rounded-xl overflow-hidden bg-white/5 border border-white/10 ${collapsed ? 'size-10' : 'size-11'}`}
+            >
+                {hasBrand ? (
+                    renderLogo('size-6 text-slate-200')
+                ) : (
+                    <span className="text-[8px] leading-tight text-center uppercase tracking-wide text-slate-500 px-1">
+                        Logo
+                        <br />
+                        Tenant
+                    </span>
+                )}
+            </div>
+            {!collapsed && (
+                <div className="min-w-0">
+                    <div
+                        className={`font-semibold tracking-tight truncate ${tenantName ? 'text-slate-100' : 'text-slate-500 text-xs uppercase tracking-wider'}`}
+                    >
+                        {tenantName || 'nama Outlet Tenant'}
+                    </div>
+                    <RestokuWordmark className="h-[18px] w-auto mt-0.5 brightness-110" />
+                </div>
+            )}
+            {collapsed && <RestokuWordmark className="h-3.5 w-auto brightness-110" />}
+        </div>
+    );
+}
+
 export function RestokuLogo({ className = 'size-5' }: { className?: string }) {
     return (
         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
