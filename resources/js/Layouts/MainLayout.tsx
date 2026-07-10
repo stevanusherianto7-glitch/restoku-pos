@@ -209,11 +209,11 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
             className={`flex h-full shrink-0 flex-col p-4 transition-all duration-500 relative ${asideBg} ${isCollapsed ? 'w-[80px]' : 'w-64'}`}
         >
             {/* Brand & Toggle */}
-            <div className={`mb-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between gap-2 px-1'}`}>
+            <div className={`mb-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between gap-2'}`}>
                 <TenantBrandLockup collapsed={isCollapsed} />
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className={`rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all shrink-0 shadow-sm ${isCollapsed ? 'hidden' : ''}`}
+                    className={`rounded-lg border border-white/10 bg-white/5 p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-all shrink-0 shadow-sm ${isCollapsed ? 'hidden' : ''}`}
                 >
                     <Menu className="size-4" />
                 </button>
