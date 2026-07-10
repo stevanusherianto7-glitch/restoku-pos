@@ -90,5 +90,8 @@ class DatabaseSeeder extends Seeder
 
         // 5. Seed Subscriptions & Settings
         $this->call(SubscriptionSeeder::class);
+
+        // 6. Seed contoh menu + kategori (e-Menu tidak kosong)
+        $this->call(MenuSeeder::class);
     }
 }

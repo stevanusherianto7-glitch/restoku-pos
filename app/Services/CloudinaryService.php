@@ -54,9 +54,11 @@ class CloudinaryService
 
         // Tentukan field 'file'
         if (preg_match('/^data:/', $fileData)) {
-            $params['file'] = $fileData;               // data URL
+            $params['file'] = $fileData;               // data URL (upload dari frontend)
+        } elseif (preg_match('#^https?://#', $fileData)) {
+            $params['file'] = $fileData;               // remote URL (Cloudinary fetch upload)
         } else {
-            $params['file'] = fopen($fileData, 'r');   // path temp
+            $params['file'] = fopen($fileData, 'r');   // path lokal temp
         }
 
         $response = Http::asMultipart()->post($uploadUrl, $params);
