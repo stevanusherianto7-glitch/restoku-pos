@@ -85,6 +85,13 @@ return [
         'deepseek' => [
             'driver' => 'deepseek',
             'key' => env('DEEPSEEK_API_KEY'),
+            'url' => env('DEEPSEEK_URL', 'https://api.deepseek.com/v1'),
+            // Free tier no-card: pin ke deepseek-chat. Override via DEEPSEEK_MODEL.
+            'models' => [
+                'text' => [
+                    'default' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
+                ],
+            ],
         ],
 
         'eleven' => [
@@ -108,6 +115,13 @@ return [
         'groq' => [
             'driver' => 'groq',
             'key' => env('GROQ_API_KEY'),
+            'url' => env('GROQ_URL', 'https://api.groq.com/openai/v1'),
+            // Free tier no-card: pin ke model gratis. Override via GROQ_MODEL.
+            'models' => [
+                'text' => [
+                    'default' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+                ],
+            ],
         ],
 
         'jina' => [
