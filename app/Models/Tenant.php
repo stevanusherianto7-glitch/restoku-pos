@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\OutletSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,11 +32,13 @@ class Tenant extends Model
         // Dijalankan setelah parent tersimpan (butuh $this->id).
         static::created(function (Tenant $tenant) {
             if ($tenant->outlets()->doesntExist()) {
+                $name = $tenant->brand_name ?: ($tenant->name ?: 'Outlet Utama');
                 $tenant->outlets()->create([
-                    'name' => $tenant->brand_name ?: ($tenant->name ?: 'Outlet Utama'),
+                    'name' => $name,
+                    'slug' => OutletSlug::unique($name, $tenant->id),
                     'is_active' => true,
                 ]);
-                // setNameAttribute mengisi slug otomatis (lihat Outlet model).
+                // Slug diisi eksplisit (global-unique) — lihat OutletSlug service.
             }
         });
     }

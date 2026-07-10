@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restoku — Playful Rounded (Full)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@800;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  :root { --cabe:#FF5A36; --cabe-d:#d83e1f; --mustard:#FFB020; --char:#2B1E16; --cream:#FFF6EC; --paper:#fff; --mut:#8A7463; --line:#F0E2D2; }
+  body { font-family:'Nunito',system-ui,sans-serif; background:var(--cream); color:var(--char); -webkit-font-smoothing:antialiased; line-height:1.55; }
+  .wrap { max-width:1180px; margin:0 auto; padding:0 24px; }
+  section { scroll-margin-top:80px; }
+  h2 { font-family:'Playfair Display',serif; font-weight:900; font-size:clamp(30px,4vw,46px); line-height:1.1; }
+  .sub { color:var(--mut); font-size:18px; max-width:560px; margin:14px auto 0; font-weight:600; }
+  .banner { background:var(--mustard); color:var(--char); font-size:13px; text-align:center; padding:9px; font-weight:700; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:18px 0; position:sticky; top:0; background:rgba(255,246,236,.92); backdrop-filter:blur(8px); z-index:50; }
+  .logo { display:flex; align-items:center; gap:11px; font-weight:900; font-size:22px; }
+  .logo .mark { width:40px; height:40px; border-radius:14px; background:var(--cabe); color:#fff; display:grid; place-items:center; font-weight:900; font-size:21px; transform:rotate(-4deg); }
+  nav { display:flex; gap:28px; }
+  nav a { color:var(--char); text-decoration:none; font-weight:700; font-size:15px; opacity:.78; }
+  nav a:hover { opacity:1; color:var(--cabe); }
+  .nav-btns { display:flex; gap:10px; }
+  .btn { font-family:inherit; font-weight:800; font-size:14px; padding:12px 20px; border-radius:16px; cursor:pointer; border:0; transition:.12s; text-decoration:none; display:inline-block; text-align:center; }
+  .btn:active { transform:translateY(1px) scale(.99); }
+  .btn-ghost { background:#fff; color:var(--char); box-shadow:0 4px 0 var(--line); }
+  .btn-cabe { background:var(--cabe); color:#fff; box-shadow:0 5px 0 var(--cabe-d); }
+  .btn-cabe:hover { background:#ff6c4c; }
+  .hero { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; padding:54px 0 78px; }
+  .pill { display:inline-flex; gap:8px; background:var(--mustard); color:var(--char); font-weight:800; font-size:13px; padding:8px 15px; border-radius:999px; }
+  h1 { font-family:'Playfair Display',serif; font-weight:900; font-size:clamp(46px,6.2vw,78px); line-height:1.03; letter-spacing:-1px; margin:22px 0 18px; }
+  h1 .accent { color:var(--cabe); }
+  .lead { font-size:18px; color:var(--mut); max-width:470px; font-weight:600; }
+  .cta { display:flex; gap:14px; margin:30px 0 18px; flex-wrap:wrap; }
+  .cta .btn { font-size:16px; padding:16px 26px; }
+  .trust { font-size:13px; color:var(--mut); font-weight:700; }
+  .trust b { color:var(--char); }
+  .phone { width:310px; margin:0 auto; border-radius:42px; background:var(--char); padding:15px; box-shadow:0 26px 50px -18px rgba(43,30,22,.5); }
+  .screen { background:#fff; border-radius:30px; overflow:hidden; }
+  .scr-head { background:var(--cabe); color:#fff; padding:20px 16px 16px; border-radius:0 0 22px 22px; }
+  .scr-head .nm { font-weight:900; font-size:18px; }
+  .scr-head .sb { font-size:12px; opacity:.92; font-weight:600; }
+  .menu { padding:14px; }
+  .mrow { display:flex; align-items:center; gap:12px; padding:10px; border-radius:16px; background:var(--cream); margin-bottom:9px; }
+  .thumb { width:46px; height:46px; border-radius:13px; background:linear-gradient(135deg,#ffd089,#ff7d52); flex:none; display:grid; place-items:center; font-size:23px; }
+  .mrow .n { font-weight:800; font-size:14px; }
+  .mrow .p { font-size:13px; color:var(--cabe); font-weight:800; }
+  .qr { margin:6px 14px 16px; background:#fff; border:2px dashed #f0c9a0; border-radius:18px; padding:16px; text-align:center; }
+  .qr .box { width:96px; height:96px; margin:0 auto 8px; background:repeating-conic-gradient(var(--char) 0 25%,#fff 0 50%) 0/16px 16px; border-radius:10px; }
+  .qr small { color:var(--mut); font-size:12px; font-weight:700; }
+  .scr-foot { background:var(--char); color:#fff; text-align:center; font-size:12px; padding:11px; font-weight:700; border-radius:22px 22px 0 0; }
+  .stats { background:var(--char); color:#fff; }
+  .stats .wrap { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; padding:34px 24px; text-align:center; }
+  .stats .n { font-family:'Playfair Display',serif; font-weight:900; font-size:34px; color:var(--mustard); }
+  .stats .l { font-size:13px; opacity:.8; margin-top:4px; font-weight:600; }
+  .band { padding:80px 0; }
+  .band.alt { background:#fff; }
+  .center { text-align:center; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:46px; }
+  .card { background:var(--cream); border-radius:24px; padding:28px; box-shadow:0 5px 0 var(--line); transition:.15s; }
+  .band.alt .card { background:var(--cream); }
+  .card:hover { transform:translateY(-4px); box-shadow:0 10px 0 var(--line); }
+  .card.hot, .band.alt .card.hot { background:var(--cabe); color:#fff; box-shadow:0 5px 0 var(--cabe-d); }
+  .ic { width:54px; height:54px; border-radius:16px; background:#fff; color:var(--cabe); display:grid; place-items:center; font-size:26px; margin-bottom:16px; box-shadow:0 3px 0 var(--line); }
+  .card.hot .ic { background:rgba(255,255,255,.2); color:#fff; box-shadow:none; }
+  .card h3 { font-size:19px; font-weight:800; margin-bottom:8px; }
+  .card p { color:var(--mut); font-size:15px; font-weight:600; }
+  .card.hot p { color:#ffe6dc; }
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:26px; margin-top:46px; }
+  .step .no { width:50px; height:50px; border-radius:18px; background:var(--cabe); color:#fff; display:grid; place-items:center; font-weight:900; font-size:20px; margin-bottom:16px; transform:rotate(-4deg); box-shadow:0 4px 0 var(--cabe-d); }
+  .step h3 { font-size:19px; font-weight:800; margin-bottom:8px; }
+  .step p { color:var(--mut); font-size:15px; font-weight:600; }
+  .prices { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:46px; align-items:stretch; }
+  .price { background:#fff; border-radius:26px; padding:32px 28px; display:flex; flex-direction:column; box-shadow:0 5px 0 var(--line); }
+  .band.alt .price { background:var(--cream); }
+  .price.pop, .band.alt .price.pop { box-shadow:0 6px 0 var(--cabe-d); background:var(--cabe); color:#fff; position:relative; }
+  .price.pop .desc,.price.pop .amt span { color:#ffe6dc; }
+  .price.pop .amt { color:#fff; }
+  .price .tag { position:absolute; top:-13px; left:50%; transform:translateX(-50%); background:var(--mustard); color:var(--char); font-size:12px; font-weight:800; padding:5px 14px; border-radius:999px; }
+  .price .name { font-weight:800; font-size:20px; }
+  .price .amt { font-family:'Playfair Display',serif; font-weight:900; font-size:40px; margin:10px 0 2px; }
+  .price .amt span { font-family:'Nunito'; font-size:15px; font-weight:700; color:var(--mut); }
+  .price .desc { color:var(--mut); font-size:14px; margin-bottom:18px; font-weight:600; }
+  .price ul { list-style:none; margin:0 0 24px; display:flex; flex-direction:column; gap:10px; }
+  .price li { font-size:14px; display:flex; gap:9px; align-items:flex-start; font-weight:600; }
+  .price li svg { flex:none; margin-top:2px; }
+  .price.pop li svg path { stroke:#fff; }
+  .price .btn { margin-top:auto; width:100%; padding:14px; }
+  .price.pop .btn-cabe { background:#fff; color:var(--cabe); box-shadow:0 5px 0 #ffd9cc; }
+  .cta-band { padding:80px 0; }
+  .cta-box { background:var(--cabe); color:#fff; border-radius:36px; padding:56px; display:flex; align-items:center; justify-content:space-between; gap:30px; flex-wrap:wrap; box-shadow:0 8px 0 var(--cabe-d); }
+  .cta-box h2 { color:#fff; }
+  .cta-box p { margin-top:10px; font-weight:600; opacity:.95; }
+  .cta-box .btn { background:#fff; color:var(--cabe); box-shadow:0 5px 0 #ffd9cc; }
+  footer { background:var(--char); color:#c9b6a6; padding:60px 0 30px; }
+  .fgrid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:30px; }
+  footer .logo { color:#fff; margin-bottom:14px; }
+  footer h4 { color:#fff; font-size:14px; margin-bottom:14px; }
+  footer a { color:#c9b6a6; text-decoration:none; display:block; font-size:14px; margin-bottom:9px; font-weight:600; }
+  footer a:hover { color:var(--mustard); }
+  .copy { border-top:1px solid #4a382c; margin-top:40px; padding-top:24px; font-size:13px; text-align:center; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(160%); background:var(--char); color:#fff; padding:13px 22px; border-radius:16px; font-weight:800; font-size:14px; transition:transform .35s cubic-bezier(.2,.9,.3,1); z-index:99; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  @media (max-width:880px){ .hero,.grid3,.steps,.prices,.fgrid{ grid-template-columns:1fr; } .hero{text-align:center;} .cta{justify-content:center;} nav{display:none;} .lead,.sub{margin-left:auto;margin-right:auto;} .stats .wrap{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+  <div class="banner">🔥 Baru! Buku Menu Digital + QR Code — tamu pesan langsung dari HP, tanpa scan aplikasi.</div>
+  <header><div class="wrap" style="display:flex;align-items:center;justify-content:space-between;width:100%">
+    <div class="logo"><span class="mark">R</span> Restoku</div>
+    <nav><a href="#fitur">Fitur</a><a href="#cara">Cara Kerja</a><a href="#harga">Harga</a><a href="#testi">Testimoni</a></nav>
+    <div class="nav-btns"><button class="btn btn-ghost" onclick="toast('Login Owner')">Login Owner</button><button class="btn btn-cabe" onclick="toast('Login Staf')">Login Staf</button></div>
+  </div></header>
+
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <span class="pill">🌶 Sistem restoran untuk resto lokal</span>
+        <h1>Dapur jalan,<br>kasir tenang,<br><span class="accent">tamu puas.</span></h1>
+        <p class="lead">Restoku bantu kamu kelola pesanan, dapur, dan laporan dari satu tempat, plus buku menu digital yang tamu bisa buka pakai QR di meja.</p>
+        <div class="cta"><button class="btn btn-cabe" onclick="toast('Masuk sebagai Staf / Kasir')">Masuk sebagai Staf / Kasir</button><button class="btn btn-ghost" onclick="toast('Lihat Analitik Owner')">Lihat Analitik Owner</button></div>
+        <p class="trust">⭐ <b>Dipercaya 2.000+ resto & warung</b> di Indonesia</p>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="scr-head"><div class="nm">Warung Senopati</div><div class="sb">Pindai & pesan dari meja kamu</div></div>
+        <div class="menu">
+          <div class="mrow"><div class="thumb">🍗</div><div><div class="n">Ayam Bakar Kecap</div><div class="p">Rp 28.000</div></div></div>
+          <div class="mrow"><div class="thumb">🧋</div><div><div class="n">Es Teh Manis</div><div class="p">Rp 8.000</div></div></div>
+          <div class="mrow"><div class="thumb">🌶</div><div><div class="n">Sambal Terasi</div><div class="p">Rp 5.000</div></div></div>
+        </div>
+        <div class="qr"><div class="box"></div><small>Pindai untuk buku menu lengkap</small></div>
+        <div class="scr-foot">Restoku — Pesan tanpa antre</div>
+      </div></div>
+    </section>
+  </div>
+
+  <div class="stats"><div class="wrap">
+    <div><div class="n">2.000+</div><div class="l">Resto & warung</div></div>
+    <div><div class="n">12,4 jt</div><div class="l">Pesanan / bulan</div></div>
+    <div><div class="n">98%</div><div class="l">Uptime dapur</div></div>
+    <div><div class="n">&lt;3 dtk</div><div class="l">Order ke KDS</div></div>
+  </div></div>
+
+  <section id="fitur" class="band alt"><div class="wrap center">
+    <h2>Operasional yang nggak bikin kepala panas</h2>
+    <p class="sub">Dari kasir sampai laporan malam — satu sistem yang paham cara kerja resto lokal.</p>
+    <div class="grid3" style="text-align:left">
+      <div class="card"><div class="ic">🧾</div><h3>Kasir Cepat</h3><p>Transaksi ngebut, split bill, dan QRIS langsung dari satu layar.</p></div>
+      <div class="card"><div class="ic">🍳</div><h3>Dapur (KDS)</h3><p>Order masuk otomatis ke layar dapur — tanpa teriak-teriak.</p></div>
+      <div class="card"><div class="ic">📱</div><h3>Buku Menu Digital</h3><p>Tamu pindai QR, lihat foto menu, pesan sendiri. Tanpa install app.</p></div>
+      <div class="card hot"><div class="ic">📊</div><h3>Laporan Malam Otomatis</h3><p>Tutup warung, laporan langsung masuk HP owner. Beres.</p></div>
+      <div class="card"><div class="ic">👥</div><h3>Kelola Karyawan</h3><p>Atur peran kasir/dapur/owner plus rekap gaji dalam satu tempat.</p></div>
+      <div class="card"><div class="ic">🏪</div><h3>Multi-Outlet</h3><p>Pantau banyak cabang dari satu dashboard, real-time.</p></div>
+    </div>
+  </div></section>
+
+  <section id="cara" class="band"><div class="wrap center">
+    <h2>Tiga langkah, warung langsung online</h2>
+    <div class="steps" style="text-align:left">
+      <div class="step"><div class="no">1</div><h3>Pasang & login</h3><p>Buka Restoku di tablet kasir. Login staf, langsung bisa terima order.</p></div>
+      <div class="step"><div class="no">2</div><h3>Taruh QR di meja</h3><p>Cetak QR menu sekali. Tamu pindai, lihat foto, pesan sendiri tanpa panggil pelayan.</p></div>
+      <div class="step"><div class="no">3</div><h3>Lihat laporan</h3><p>Tutup warung, laporan otomatis masuk. Besok pagi sudah tahu menu apa yang laris.</p></div>
+    </div>
+  </div></section>
+
+  <section id="harga" class="band alt"><div class="wrap center">
+    <h2>Harga jujur, sesuai skala warung</h2>
+    <p class="sub">Mulai gratis 14 hari. Tanpa kartu kredit. Upgrade kapan saja.</p>
+    <div class="prices" style="text-align:left">
+      <div class="price">
+        <div class="name">Basic</div>
+        <div class="amt">Rp 149rb<span>/bln</span></div>
+        <div class="desc">Untuk warung baru mulai digital.</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> 1 outlet</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Kasir + KDS</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Buku Menu Digital + QR</li>
+        </ul>
+        <a class="btn btn-ghost" href="/subscribe/basic">Mulai Basic</a>
+      </div>
+      <div class="price pop">
+        <span class="tag">PALING LARIS</span>
+        <div class="name">Pro</div>
+        <div class="amt">Rp 399rb<span>/bln</span></div>
+        <div class="desc">Untuk resto yang lagi tumbuh.</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Semua fitur Basic</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Hingga 5 outlet</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Laporan analitik + kelola karyawan</li>
+        </ul>
+        <a class="btn btn-cabe" href="/subscribe/pro">Coba Pro Gratis</a>
+      </div>
+      <div class="price">
+        <div class="name">Enterprise</div>
+        <div class="amt">Rp 999rb<span>/bln</span></div>
+        <div class="desc">Untuk jaringan multi-cabang.</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Semua fitur Pro</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Outlet tak terbatas</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#FF5A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Support prioritas + SLA</li>
+        </ul>
+        <a class="btn btn-ghost" href="/subscribe/enterprise">Hubungi Sales</a>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="cta-band"><div class="wrap"><div class="cta-box">
+    <div><h2>Siap bikin warung jalan tanpa ribet?</h2><p>Mulai gratis 14 hari. Tanpa kartu kredit.</p></div>
+    <a class="btn" href="/subscribe/pro" style="font-size:16px;padding:16px 30px">Coba Restoku Sekarang</a>
+  </div></div></section>
+
+  <footer><div class="wrap">
+    <div class="fgrid">
+      <div><div class="logo"><span class="mark">R</span> Restoku</div><p style="max-width:300px;font-size:14px;font-weight:600">Sistem restoran all-in-one untuk resto & warung lokal di Indonesia — dari kasir sampai laporan malam.</p></div>
+      <div><h4>Produk</h4><a href="#fitur">Fitur</a><a href="#harga">Harga</a><a href="#">Buku Menu Digital</a><a href="#">Integrasi</a></div>
+      <div><h4>Perusahaan</h4><a href="#">Tentang</a><a href="#">Karir</a><a href="#">Blog</a><a href="#">Kontak</a></div>
+      <div><h4>Bantuan</h4><a href="#">0812-3456-7890</a><a href="#">hello@restoku.com</a><a href="#">Sen–Jum 09–18</a></div>
+    </div>
+    <div class="copy">© 2026 Restoku. Dibuat untuk resto lokal Indonesia.</div>
+  </div></footer>
+
+  <div class="toast" id="toast"></div>
+  <script>function toast(m){const t=document.getElementById('toast');t.textContent=m+' ✓';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600);}
+  document.querySelectorAll('a[href^="/subscribe"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();toast('→ '+a.getAttribute('href'));}));</script>
+</body>
+</html>

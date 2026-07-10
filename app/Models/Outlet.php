@@ -4,12 +4,12 @@ namespace App\Models;
 
 use App\Models\Concerns\UsesTenantConnection;
 use App\Models\Scopes\TenantScope;
+use App\Services\OutletSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Str;
 
 class Outlet extends Model
 {
@@ -62,7 +62,9 @@ class Outlet extends Model
     {
         $this->attributes['name'] = $value;
         if (empty($this->attributes['slug'])) {
-            $this->attributes['slug'] = Str::slug($value) ?: 'outlet';
+            // Slug global-unique (route /m/{slug} bersifat publik global).
+            // tenant_id mungkin belum terikat saat ini → fallback random aman.
+            $this->attributes['slug'] = OutletSlug::unique($value, $this->tenant_id ?? null);
         }
     }
 

@@ -33,6 +33,12 @@ interface MenuItem {
     photo_url?: string;
     description?: string;
     isPopular?: boolean;
+    rating?: number;
+    cookTime?: string;
+    servings?: string;
+    steps?: string[];
+    combo?: string;
+    reviews?: { name: string; text: string; rating: number }[];
 }
 
 // Fallback saat API belum load / outlet belum punya menu (graceful, bukan crash).
@@ -108,6 +114,7 @@ export default function CustomerView() {
     const [searchQuery, setSearchQuery] = useState('');
     const [cart, setCart] = useState<Record<number, number>>({});
     const [isWaOptIn, setIsWaOptIn] = useState(true);
+    const [detailItem, setDetailItem] = useState<MenuItem | null>(null);
     const [orderSuccess, setOrderSuccess] = useState(false);
     const [activeTab, setActiveTab] = useState<'menu' | 'cart' | 'reservasi' | 'galeri'>('menu');
 
@@ -638,7 +645,8 @@ export default function CustomerView() {
                             filteredItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="flex gap-4 bg-white/[0.03] p-4 rounded-3xl shadow-sm border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden"
+                                    onClick={() => setDetailItem(item)}
+                                    className="flex gap-4 bg-white/[0.03] p-4 rounded-3xl shadow-sm border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden cursor-pointer"
                                 >
                                     <div className="relative size-20 rounded-2xl overflow-hidden shrink-0 bg-slate-900 border border-white/5">
                                         <ProductImage
@@ -1244,6 +1252,156 @@ export default function CustomerView() {
                     </div>
                 </div>
             )}
+
+            {detailItem && (
+                <MenuDetailSheet
+                    item={detailItem}
+                    outletName={tenantName || 'Outlet'}
+                    onClose={() => setDetailItem(null)}
+                    onAdd={addToCart}
+                />
+            )}
+        </div>
+    );
+}
+
+function MenuDetailSheet({
+    item,
+    outletName,
+    onClose,
+    onAdd,
+}: {
+    item: MenuItem;
+    outletName: string;
+    onClose: () => void;
+    onAdd: (id: number) => void;
+}) {
+    const [tab, setTab] = useState<'desc' | 'combo' | 'reviews'>('desc');
+    const accent = 'text-[#FF5B35]';
+    const accentBg = 'bg-[#FF5B35]';
+    const steps = item.steps ?? [
+        'Bahan segar diproses higienis sesuai standar outlet.',
+        'Diolah dengan resep rahasia outlet untuk cita rasa terbaik.',
+        'Disajikan hangat/segar langsung ke meja Anda.',
+    ];
+    const reviews = item.reviews ?? [];
+
+    return (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={onClose}>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <div
+                className="relative w-full max-w-md mx-auto bg-[#1c1917] rounded-t-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Hero */}
+                <div className="relative h-56 shrink-0 bg-black">
+                    <ProductImage
+                        src={item.image}
+                        alt={item.name}
+                        variant="large"
+                        className="w-full h-full object-cover"
+                    />
+                    <button
+                        onClick={onClose}
+                        className="absolute top-3 right-3 size-9 rounded-full bg-black/50 text-white grid place-items-center backdrop-blur"
+                    >
+                        ✕
+                    </button>
+                    {item.isPopular && (
+                        <span className="absolute top-3 left-3 bg-white/90 text-[#7C4A2D] font-black text-[10px] uppercase tracking-wider px-2 py-1 rounded-full">
+                            🔥 Favorit
+                        </span>
+                    )}
+                    <div
+                        className={`absolute bottom-3 right-3 ${accentBg} text-white font-extrabold text-sm px-3 py-1.5 rounded-full shadow-lg`}
+                    >
+                        {formatRupiah(item.price)}
+                    </div>
+                </div>
+
+                {/* Body */}
+                <div className="flex-1 overflow-y-auto px-5 py-4">
+                    <h2 className="text-2xl font-extrabold text-white tracking-tight">{item.name}</h2>
+                    <p className="text-xs font-semibold text-[#D97706] mt-0.5">{outletName}</p>
+
+                    <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
+                        <span className="text-[#F59E0B]">
+                            {'★'.repeat(Math.round(item.rating ?? 4.9))}{' '}
+                            <span className="text-slate-300 font-bold">{(item.rating ?? 4.9).toFixed(1)}</span>
+                        </span>
+                        {item.cookTime && <span>⏱ {item.cookTime}</span>}
+                        {item.servings && <span>🍽 {item.servings}</span>}
+                    </div>
+
+                    <p className="text-sm text-slate-300 leading-relaxed mt-3">
+                        {item.description || 'Hidangan lezat diolah higienis dengan resep rahasia outlet.'}
+                    </p>
+
+                    {/* Tabs */}
+                    <div className="flex gap-6 mt-5 border-b border-white/10">
+                        {(['desc', 'combo', 'reviews'] as const).map((t) => (
+                            <button
+                                key={t}
+                                onClick={() => setTab(t)}
+                                className={`pb-2 text-sm font-bold transition-colors ${tab === t ? accent + ' border-b-2 border-[#FF5B35]' : 'text-slate-500'}`}
+                            >
+                                {t === 'desc' ? 'Deskripsi' : t === 'combo' ? 'Combo' : 'Ulasan'}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="py-4 space-y-3">
+                        {tab === 'desc' && (
+                            <div className="space-y-3">
+                                {steps.map((s, i) => (
+                                    <div key={i} className="flex gap-3">
+                                        <div
+                                            className={`shrink-0 size-6 rounded-full ${accentBg} text-white font-extrabold text-xs grid place-items-center`}
+                                        >
+                                            {i + 1}
+                                        </div>
+                                        <p className="text-sm text-slate-300 leading-snug pt-0.5">{s}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {tab === 'combo' && (
+                            <p className="text-sm text-slate-400">
+                                {item.combo ?? 'Belum ada paket combo untuk menu ini.'}
+                            </p>
+                        )}
+                        {tab === 'reviews' &&
+                            (reviews.length > 0 ? (
+                                <div className="space-y-3">
+                                    {reviews.map((r, i) => (
+                                        <div key={i} className="border border-white/10 rounded-xl p-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-bold text-white">{r.name}</span>
+                                                <span className="text-[#F59E0B] text-xs">{'★'.repeat(r.rating)}</span>
+                                            </div>
+                                            <p className="text-xs text-slate-400 mt-1">{r.text}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-400">Belum ada ulasan untuk menu ini.</p>
+                            ))}
+                    </div>
+                </div>
+
+                {/* CTA */}
+                <div className="shrink-0 p-4 bg-[#1c1917] border-t border-white/10">
+                    <button
+                        onClick={() => {
+                            onAdd(item.id);
+                            onClose();
+                        }}
+                        className={`w-full ${accentBg} text-white rounded-2xl py-3.5 text-sm font-extrabold shadow-lg shadow-[#FF5B35]/30`}
+                    >
+                        Tambah ke Pesanan · {formatRupiah(item.price)}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

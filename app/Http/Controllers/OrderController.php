@@ -33,7 +33,13 @@ class OrderController extends Controller
      */
     public function getPublicMenu(Request $request, string $slug)
     {
-        $outlet = Outlet::where('slug', $slug)->first();
+        // Lookup global (route /m/{slug} bersifat publik, tanpa tenant context).
+        // Tanpa withoutGlobalScope, TenantScope fail-closed abort(500) di production
+        // karena tenant.id tidak terikat pada request guest. Slug sudah global-unique
+        // (migrasi 2026_07_10) sehingga first() unambiguous & bebas collision lintas tenant.
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
+            ->where('slug', $slug)
+            ->first();
         if (! $outlet) {
             return response()->json(['error' => 'Outlet tidak ditemukan.'], 404);
         }
@@ -508,10 +514,12 @@ class OrderController extends Controller
     {
         $outletParam = $request->query('outlet', '');
 
-        // Coba resolve outlet by slug (name), lalu by id
+        // Resolve outlet by slug (global-unique → unambiguous, bebas collision lintas tenant).
+        // orWhere('id') DIHAPUS: membolehkan tamu passing id outlet orang lain untuk
+        // mengambil jam operasional tenant lain (info-leak). Slug sudah cukup sebagai
+        // identifier publik tunggal untuk endpoint guest.
         $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->where('slug', $outletParam)
-            ->orWhere('id', is_numeric($outletParam) ? (int) $outletParam : 0)
             ->first();
 
         if (! $outlet) {
