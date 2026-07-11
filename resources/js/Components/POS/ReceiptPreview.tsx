@@ -42,7 +42,7 @@ export function ReceiptPreview({ isOpen, onClose, orderData }: ReceiptPreviewPro
             <Glass className="p-0 w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">
                 <div className="bg-slate-900/50 p-4 border-b border-white/10 flex justify-between items-center shrink-0">
                     <h3 className="text-sm font-medium text-white flex items-center gap-2">
-                        <FileText className="size-4 text-blue-400" /> Preview Struk
+                        <FileText className="size-4 text-[var(--color-primary)]" /> Preview Struk
                     </h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-white">
                         <XCircle className="size-5" />
@@ -179,7 +179,7 @@ export function ReceiptPreview({ isOpen, onClose, orderData }: ReceiptPreviewPro
                     <Button className="flex-1 bg-emerald-600 hover:bg-emerald-500 border-none text-white">
                         <Share2 className="size-4 mr-2" /> WA
                     </Button>
-                    <Button className="flex-1 bg-blue-600 hover:bg-blue-500 border-none text-white">
+                    <Button className="flex-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/100 border-none text-white">
                         <Printer className="size-4 mr-2" /> Cetak
                     </Button>
                 </div>

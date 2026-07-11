@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeftIcon } from '../Components/icons';
 import { RestokuWordmark } from '../Components/Shared';
 
 interface AuthLayoutProps {
@@ -64,7 +64,7 @@ export default function AuthLayout({
                             href="/"
                             className="flex items-center gap-2 text-sm text-slate-500 hover:text-white transition-colors group"
                         >
-                            <ArrowLeft className="size-4 group-hover:-translate-x-0.5 transition-transform" />
+                            <ArrowLeftIcon className="size-4 group-hover:-translate-x-0.5 transition-transform" />
                             Kembali ke website
                         </Link>
                     </div>

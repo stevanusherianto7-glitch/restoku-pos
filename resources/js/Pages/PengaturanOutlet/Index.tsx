@@ -555,18 +555,18 @@ function PengaturanOutletInner() {
     const h2Class = `mb-5 text-base font-bold flex items-center gap-2 ${isLight ? 'text-slate-900' : 'text-slate-200'}`;
     const h3Class = `text-xs font-bold tracking-wider uppercase ${isLight ? 'text-slate-900' : 'text-slate-300'}`;
     const labelClass = `text-xs font-semibold ${isLight ? 'text-slate-700' : 'text-slate-400'}`;
-    const inputClass = `w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors ${isLight ? 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-600 shadow-xs' : 'border-white/10 bg-white/5 text-slate-200 focus:border-emerald-500/30'}`;
+    const inputClass = `w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors ${isLight ? 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary)] shadow-sm' : 'border-white/10 bg-white/5 text-slate-200 focus:border-emerald-500/30'}`;
     const descClass = `text-xs leading-relaxed ${isLight ? 'text-slate-600' : 'text-slate-400'}`;
-    const selectClass = `w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors ${isLight ? 'bg-white border-slate-300 text-slate-900 focus:border-blue-600 shadow-xs' : 'border-white/10 bg-white/5 text-slate-200 focus:border-emerald-500/30'}`;
-    const cardRowClass = `flex items-center justify-between gap-3 border p-3 rounded-xl transition-colors ${isLight ? 'bg-slate-50 border-slate-200 text-slate-900 hover:bg-slate-100 shadow-xs' : 'bg-white/[0.01] border-white/5 hover:bg-white/[0.02]'}`;
+    const selectClass = `w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors ${isLight ? 'bg-white border-slate-300 text-slate-900 focus:border-[var(--color-primary)] shadow-sm' : 'border-white/10 bg-white/5 text-slate-200 focus:border-emerald-500/30'}`;
+    const cardRowClass = `flex items-center justify-between gap-3 border p-3 rounded-xl transition-colors ${isLight ? 'bg-slate-50 border-slate-200 text-slate-900 hover:bg-slate-100 shadow-sm' : 'bg-white/[0.01] border-white/5 hover:bg-white/[0.02]'}`;
     const optionBtnClass = (active: boolean) =>
         `flex flex-col text-left rounded-xl border p-3 transition-all relative overflow-hidden group ${
             active
                 ? isLight
-                    ? 'border-blue-600 bg-blue-50/80 ring-1 ring-blue-600/40 shadow-sm'
+                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10/80 ring-1 ring-[var(--color-primary)]/40 shadow-sm'
                     : 'border-amber-500 bg-amber-500/[0.05] ring-1 ring-amber-500/40 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
                 : isLight
-                  ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-xs'
+                  ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800 shadow-sm'
                   : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.05]'
         }`;
 
@@ -683,7 +683,7 @@ function PengaturanOutletInner() {
                                                         key={name}
                                                         type="button"
                                                         onClick={() => setLogoInput(name)}
-                                                        className={`flex flex-col items-center gap-1.5 rounded-xl border p-2 text-center transition-all ${logoInput === name ? (isLight ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-xs' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400') : isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100' : 'bg-white/[0.02] border-white/5 text-slate-400 hover:bg-white/5 hover:text-slate-300'}`}
+                                                        className={`flex flex-col items-center gap-1.5 rounded-xl border p-2 text-center transition-all ${logoInput === name ? (isLight ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] shadow-sm' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400') : isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100' : 'bg-white/[0.02] border-white/5 text-slate-400 hover:bg-white/5 hover:text-slate-300'}`}
                                                     >
                                                         <Icon className="size-5" />
                                                         <span className="text-[9px] font-medium leading-none">
@@ -749,7 +749,7 @@ function PengaturanOutletInner() {
                                                             <div
                                                                 className={`text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md border shrink-0 w-20 text-center ${
                                                                     emp.role === 'cashier' || emp.role === 'kasir'
-                                                                        ? 'bg-blue-500/10 border-blue-500/20 text-blue-500'
+                                                                        ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]/20 text-[var(--color-primary)]'
                                                                         : emp.role === 'kitchen'
                                                                           ? 'bg-red-500/10 border-red-500/20 text-red-500'
                                                                           : emp.role === 'waiter'
@@ -1030,7 +1030,7 @@ function PengaturanOutletInner() {
 
                                                 {screenMode === opt.id && (
                                                     <div
-                                                        className={`absolute top-1 right-1 size-2 rounded-full ${isLight ? 'bg-blue-600' : 'bg-amber-400'} animate-pulse`}
+                                                        className={`absolute top-1 right-1 size-2 rounded-full ${isLight ? 'bg-[var(--color-primary)]' : 'bg-amber-400'} animate-pulse`}
                                                     />
                                                 )}
                                             </button>
@@ -1100,7 +1100,7 @@ function PengaturanOutletInner() {
 
                                                 {tenantLayout === opt.id && (
                                                     <div
-                                                        className={`absolute top-1 right-1 size-2 rounded-full ${isLight ? 'bg-blue-600' : 'bg-emerald-500'}`}
+                                                        className={`absolute top-1 right-1 size-2 rounded-full ${isLight ? 'bg-[var(--color-primary)]' : 'bg-emerald-500'}`}
                                                     />
                                                 )}
                                             </button>
@@ -1173,12 +1173,12 @@ function PengaturanOutletInner() {
                                                     );
                                                 }
                                             }}
-                                            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors border ${isLight ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 shadow-xs' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20'}`}
+                                            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors border ${isLight ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20'}`}
                                         >
                                             <LocateFixed className="size-4" /> Deteksi Otomatis
                                         </button>
                                         <button
-                                            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isLight ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-white text-slate-900'}`}
+                                            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isLight ? 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white shadow-sm' : 'bg-slate-100 hover:bg-white text-slate-900'}`}
                                         >
                                             Simpan Lokasi
                                         </button>
@@ -1191,7 +1191,7 @@ function PengaturanOutletInner() {
                         <div id="pajak" className="space-y-5">
                             <Glass className="p-6">
                                 <h2 className={h2Class}>
-                                    <Percent className="size-4 text-blue-500" /> Konfigurasi Pajak & Biaya
+                                    <Percent className="size-4 text-[var(--color-primary)]" /> Konfigurasi Pajak & Biaya
                                 </h2>
 
                                 {/* Referensi Regulasi Pemerintah */}
@@ -1226,7 +1226,13 @@ function PengaturanOutletInner() {
                                         yang dipungut Pemerintah Daerah dengan tarif maksimal{' '}
                                         <strong className={isLight ? 'text-slate-950' : 'text-white'}>10%</strong>. PBJT
                                         dikecualikan dari PPN (UU HPP) untuk mencegah pajak ganda.{' '}
-                                        <strong className={isLight ? 'text-blue-700 font-bold' : 'text-blue-300'}>
+                                        <strong
+                                            className={
+                                                isLight
+                                                    ? 'text-[var(--color-primary)] font-bold'
+                                                    : 'text-[var(--color-primary)]'
+                                            }
+                                        >
                                             Service Charge
                                         </strong>{' '}
                                         diatur secara terpisah sebagai biaya layanan usaha restoran.
@@ -1294,7 +1300,7 @@ function PengaturanOutletInner() {
                                                     setTaxType('pbjt');
                                                     setTaxRateInput(10);
                                                 }}
-                                                className={`rounded-lg border px-4 py-3 text-sm font-medium text-left transition-colors ${taxType === 'pbjt' ? (isLight ? 'bg-blue-50 border-blue-500 text-blue-900 shadow-xs' : 'bg-blue-500/15 border-blue-500/40 text-blue-200') : isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
+                                                className={`rounded-lg border px-4 py-3 text-sm font-medium text-left transition-colors ${taxType === 'pbjt' ? (isLight ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] shadow-sm' : 'bg-[var(--color-primary)]/15 border-[var(--color-primary)]/40 text-[var(--color-primary)]') : isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
                                             >
                                                 <div className="font-semibold">PBJT</div>
                                                 <div className="text-xs mt-0.5 opacity-70">Pajak Restoran (Daerah)</div>
@@ -1304,7 +1310,7 @@ function PengaturanOutletInner() {
                                                     setTaxType('ppn');
                                                     setTaxRateInput(11);
                                                 }}
-                                                className={`rounded-lg border px-4 py-3 text-sm font-medium text-left transition-colors ${taxType === 'ppn' ? (isLight ? 'bg-blue-50 border-blue-500 text-blue-900 shadow-xs' : 'bg-blue-500/15 border-blue-500/40 text-blue-200') : isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
+                                                className={`rounded-lg border px-4 py-3 text-sm font-medium text-left transition-colors ${taxType === 'ppn' ? (isLight ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] shadow-sm' : 'bg-[var(--color-primary)]/15 border-[var(--color-primary)]/40 text-[var(--color-primary)]') : isLight ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
                                             >
                                                 <div className="font-semibold">PPN 11%</div>
                                                 <div className="text-xs mt-0.5 opacity-70">
@@ -1353,16 +1359,16 @@ function PengaturanOutletInner() {
 
                                 {/* Real-time tax calculation preview */}
                                 <div
-                                    className={`mt-5 rounded-xl border p-4 transition-all ${isTaxActive ? (isLight ? 'border-blue-300 bg-blue-50' : 'border-blue-500/10 bg-blue-500/5') : isLight ? 'border-slate-300 bg-slate-100' : 'border-slate-500/10 bg-slate-500/5'}`}
+                                    className={`mt-5 rounded-xl border p-4 transition-all ${isTaxActive ? (isLight ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10' : 'border-[var(--color-primary)]/10 bg-[var(--color-primary)]/5') : isLight ? 'border-slate-300 bg-slate-100' : 'border-slate-500/10 bg-slate-500/5'}`}
                                 >
                                     <p
-                                        className={`text-xs font-medium mb-1 flex items-center gap-1.5 ${isTaxActive ? (isLight ? 'text-blue-800' : 'text-blue-300') : 'text-slate-500'}`}
+                                        className={`text-xs font-medium mb-1 flex items-center gap-1.5 ${isTaxActive ? (isLight ? 'text-[var(--color-primary)]' : 'text-[var(--color-primary)]') : 'text-slate-500'}`}
                                     >
                                         <AlertTriangle className="size-3.5" /> Contoh kalkulasi struk (
                                         {isTaxActive ? 'Pajak & Layanan Aktif' : 'Pajak & Layanan Inactive'})
                                     </p>
                                     <p
-                                        className={`text-xs ${isTaxActive ? (isLight ? 'text-blue-900' : 'text-blue-200/70') : 'text-slate-500'}`}
+                                        className={`text-xs ${isTaxActive ? (isLight ? 'text-[var(--color-primary)]' : 'text-[var(--color-primary)]/70') : 'text-slate-500'}`}
                                     >
                                         Subtotal Rp 100.000
                                         {isTaxActive ? (
@@ -1667,8 +1673,8 @@ function PengaturanOutletInner() {
                                                     </div>
                                                 )}
                                                 {voidPolicy === 'zero_out' && (
-                                                    <div className="bg-blue-50 border border-blue-300 p-1.5 rounded text-[8px] text-blue-900 space-y-0.5 leading-tight font-sans shadow-sm animate-fadeIn">
-                                                        <div className="font-bold flex items-center gap-1 text-blue-700 text-[9px]">
+                                                    <div className="bg-[var(--color-primary)]/10 border border-[var(--color-primary)] p-1.5 rounded text-[8px] text-[var(--color-primary)] space-y-0.5 leading-tight font-sans shadow-sm animate-fadeIn">
+                                                        <div className="font-bold flex items-center gap-1 text-[var(--color-primary)] text-[9px]">
                                                             <span>📑 MODE VOID: ZERO-OUT (NOL-KAN)</span>
                                                         </div>
                                                         <div>
@@ -1784,11 +1790,11 @@ function PengaturanOutletInner() {
                                                     )}
                                                     {voidPolicy === 'zero_out' && (
                                                         <div className="border-t border-dashed border-slate-400 pt-2 mt-2">
-                                                            <div className="flex items-center justify-between text-slate-900 line-through text-[10px] bg-blue-100 p-1.5 rounded border border-blue-300 font-normal">
-                                                                <span className="font-bold text-blue-900">
+                                                            <div className="flex items-center justify-between text-slate-900 line-through text-[10px] bg-[var(--color-primary)]/10 p-1.5 rounded border border-[var(--color-primary)] font-normal">
+                                                                <span className="font-bold text-[var(--color-primary)]">
                                                                     [VOID ZERO-OUT] 1x Es Jeruk Nipis
                                                                 </span>
-                                                                <span className="text-[8px] uppercase font-bold text-blue-900">
+                                                                <span className="text-[8px] uppercase font-bold text-[var(--color-primary)]">
                                                                     (Stop Masak - Disembunyikan di Tamu)
                                                                 </span>
                                                             </div>
@@ -2141,7 +2147,7 @@ function PengaturanOutletInner() {
                                         onClick={() =>
                                             setJamOperasional((prev) => prev.map((d) => ({ ...d, isOpen: true })))
                                         }
-                                        className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors border ${isLight ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 shadow-xs' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20'}`}
+                                        className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors border ${isLight ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20'}`}
                                     >
                                         Buka Semua Hari
                                     </button>
@@ -2156,7 +2162,7 @@ function PengaturanOutletInner() {
                                                 ),
                                             )
                                         }
-                                        className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors border ${isLight ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300 shadow-xs' : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'}`}
+                                        className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors border ${isLight ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300 shadow-sm' : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'}`}
                                     >
                                         Libur Minggu Saja
                                     </button>
@@ -2167,7 +2173,7 @@ function PengaturanOutletInner() {
                                                 prev.map((d) => ({ ...d, openTime: '09:00', closeTime: '22:00' })),
                                             )
                                         }
-                                        className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors border ${isLight ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300 shadow-xs' : 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border-blue-500/20'}`}
+                                        className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors border ${isLight ? 'bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-[var(--color-primary)] shadow-sm' : 'bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/20'}`}
                                     >
                                         Set Waktu Standar (09:00 - 22:00)
                                     </button>
@@ -2177,7 +2183,7 @@ function PengaturanOutletInner() {
                                     {jamOperasional.map((item, idx) => (
                                         <div
                                             key={item.day}
-                                            className={`flex items-center gap-4 p-3 rounded-xl transition-colors border ${isLight ? 'bg-white border-slate-200 hover:bg-slate-50 shadow-xs' : 'bg-white/[0.01] border-white/5 hover:bg-white/[0.03]'}`}
+                                            className={`flex items-center gap-4 p-3 rounded-xl transition-colors border ${isLight ? 'bg-white border-slate-200 hover:bg-slate-50 shadow-sm' : 'bg-white/[0.01] border-white/5 hover:bg-white/[0.03]'}`}
                                         >
                                             <div
                                                 className={`w-20 text-xs font-bold ${isLight ? 'text-slate-900' : 'text-slate-200'}`}

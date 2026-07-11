@@ -63,7 +63,7 @@ export function PrintJobMonitor() {
                             142
                         </h3>
                     </div>
-                    <Printer className="size-8 text-blue-500/20" />
+                    <Printer className="size-8 text-[var(--color-primary)]/20" />
                 </Glass>
                 <Glass
                     className={`p-5 flex items-center justify-between border-l-4 border-l-emerald-500 ${isLight ? 'bg-white shadow-sm border-y border-r border-slate-200' : ''}`}
@@ -119,7 +119,7 @@ export function PrintJobMonitor() {
                             />
                         </div>
                         <select
-                            className={`rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 border ${isLight ? 'bg-white border-slate-300 text-slate-800' : 'bg-white/5 border-white/10 text-slate-300'}`}
+                            className={`rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--color-primary)] border ${isLight ? 'bg-white border-slate-300 text-slate-800' : 'bg-white/5 border-white/10 text-slate-300'}`}
                         >
                             <option>Semua Status</option>
                             <option>Failed</option>
@@ -159,8 +159,8 @@ export function PrintJobMonitor() {
                                 className={
                                     job.orderId !== '-'
                                         ? isLight
-                                            ? 'text-blue-600 font-bold hover:underline cursor-pointer'
-                                            : 'text-blue-400 hover:underline cursor-pointer'
+                                            ? 'text-[var(--color-primary)] font-bold hover:underline cursor-pointer'
+                                            : 'text-[var(--color-primary)] hover:underline cursor-pointer'
                                         : 'text-slate-500'
                                 }
                             >
@@ -203,7 +203,7 @@ export function PrintJobMonitor() {
 
                             <div>
                                 {job.status === 'failed' ? (
-                                    <button className="flex items-center gap-1 text-[11px] bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg border border-blue-500/30 hover:bg-blue-500/30 transition-colors font-bold">
+                                    <button className="flex items-center gap-1 text-[11px] bg-[var(--color-primary)]/20 text-[var(--color-primary)] px-3 py-1.5 rounded-lg border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/100/30 transition-colors font-bold">
                                         <RefreshCw className="size-3" /> Cetak Ulang
                                     </button>
                                 ) : (

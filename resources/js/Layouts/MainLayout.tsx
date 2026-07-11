@@ -1,19 +1,19 @@
 import { useState, useEffect, type ReactNode, type ElementType } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import {
-    Store,
-    Package,
-    Boxes,
-    BriefcaseBusiness,
-    BarChart3,
-    Settings,
-    Smartphone,
-    Menu,
-    ChevronDown,
-    ChevronRight,
-    Lock,
-    ArrowLeft,
-} from 'lucide-react';
+    StoreIcon,
+    PackageIcon,
+    BoxesIcon,
+    BriefcaseIcon,
+    BarChartIcon,
+    SettingsIcon,
+    SmartphoneIcon,
+    MenuIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    LockIcon,
+    ArrowLeftIcon,
+} from '../Components/icons';
 import { useTenantSettings, TenantBrandLockup } from '../Components/Shared';
 import GeminiCopilotWidget from '../Components/POS/GeminiCopilotWidget';
 import { useSubscription } from '../Hooks/useSubscription';
@@ -29,7 +29,7 @@ type NavGroup = { title: string; Icon: ElementType; roles: Role[]; items: NavIte
 const nav: NavGroup[] = [
     {
         title: 'Utama',
-        Icon: Store,
+        Icon: StoreIcon,
         roles: ['kasir', 'kitchen', 'waiter', 'manager', 'owner'],
         items: [
             { name: 'Dashboard', href: '/dashboard', phase: 1, roles: ['kasir', 'waiter', 'manager', 'owner'] },
@@ -47,7 +47,7 @@ const nav: NavGroup[] = [
     },
     {
         title: 'Manajemen',
-        Icon: Package,
+        Icon: PackageIcon,
         roles: ['kasir', 'waiter', 'manager', 'owner'],
         items: [
             { name: 'Produk & Menu', href: '/produk', phase: 1, roles: ['manager', 'owner'] },
@@ -63,7 +63,7 @@ const nav: NavGroup[] = [
     },
     {
         title: 'Inventaris',
-        Icon: Boxes,
+        Icon: BoxesIcon,
         roles: ['manager', 'owner'],
         items: [
             { name: 'Stok (Bahan Baku)', href: '/inventory', phase: 2, roles: ['manager', 'owner'] },
@@ -74,7 +74,7 @@ const nav: NavGroup[] = [
     },
     {
         title: 'Operasional',
-        Icon: BriefcaseBusiness,
+        Icon: BriefcaseIcon,
         roles: ['kasir', 'manager', 'owner'],
         items: [
             { name: 'Shift Kerja', href: '/staf-shift', phase: 2, roles: ['manager', 'owner'] },
@@ -83,7 +83,7 @@ const nav: NavGroup[] = [
     },
     {
         title: 'Laporan',
-        Icon: BarChart3,
+        Icon: BarChartIcon,
         roles: ['manager', 'owner'],
         items: [
             { name: 'Laporan Penjualan', href: '/laporan-penjualan', phase: 1, roles: ['manager', 'owner'] },
@@ -93,7 +93,7 @@ const nav: NavGroup[] = [
     },
     {
         title: 'Pengaturan',
-        Icon: Settings,
+        Icon: SettingsIcon,
         roles: ['manager', 'owner'],
         items: [
             { name: 'Pengaturan Outlet', href: '/pengaturan-outlet', phase: 1, roles: ['manager', 'owner'] },
@@ -107,7 +107,7 @@ const nav: NavGroup[] = [
     },
     {
         title: 'Owner View',
-        Icon: Smartphone,
+        Icon: SmartphoneIcon,
         roles: ['owner'],
         items: [
             { name: 'Data Karyawan', href: '/owner/employees', phase: 1, roles: ['owner'] },
@@ -235,9 +235,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
                             </span>
                             {!isCollapsed &&
                                 (open.includes(title) ? (
-                                    <ChevronDown className="size-3 opacity-50" />
+                                    <ChevronDownIcon className="size-3 opacity-50" />
                                 ) : (
-                                    <ChevronRight className="size-3 opacity-50" />
+                                    <ChevronRightIcon className="size-3 opacity-50" />
                                 ))}
                         </button>
                         {!isCollapsed && open.includes(title) && (
@@ -263,7 +263,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
                                                     </span>
                                                 )}
                                             </span>
-                                            {isLocked && <Lock className="size-3 text-slate-600 shrink-0" />}
+                                            {isLocked && <LockIcon className="size-3 text-slate-600 shrink-0" />}
                                         </Link>
                                     );
                                 })}
@@ -322,7 +322,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
                             className="shrink-0 p-1.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                             title="Kembali ke Website"
                         >
-                            <ArrowLeft className="size-4" />
+                            <ArrowLeftIcon className="size-4" />
                         </Link>
                     </div>
                 );
@@ -364,7 +364,7 @@ export default function MainLayout({ children, noScroll = false }: { children: R
                     className="absolute top-3 left-3 z-30 rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all shadow-sm"
                     title={isCollapsed ? 'Buka sidebar' : 'Tutup sidebar'}
                 >
-                    <Menu className="size-4" />
+                    <MenuIcon className="size-4" />
                 </button>
                 {isNanoBanana ? (
                     <>

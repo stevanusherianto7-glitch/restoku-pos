@@ -75,7 +75,7 @@ export function LocationLogs() {
                                         <span
                                             className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
                                                 log.method.includes('GPS')
-                                                    ? 'bg-blue-500/10 text-blue-400'
+                                                    ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                                                     : log.method.includes('Waiter')
                                                       ? 'bg-purple-500/10 text-purple-400'
                                                       : 'bg-rose-500/10 text-rose-400'
@@ -172,7 +172,7 @@ export function CustomerQRScan() {
             <div className="w-full max-w-sm">
                 {status === 'idle' && (
                     <div className="text-center space-y-6">
-                        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-3xl bg-blue-500/10 text-blue-400">
+                        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-3xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
                             <QrCode className="size-16" />
                         </div>
                         <div>
@@ -183,7 +183,7 @@ export function CustomerQRScan() {
                         </div>
                         <button
                             onClick={handleScan}
-                            className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-colors"
+                            className="w-full rounded-xl bg-[var(--color-primary)] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/100 transition-colors"
                         >
                             Scan QR & Verifikasi
                         </button>

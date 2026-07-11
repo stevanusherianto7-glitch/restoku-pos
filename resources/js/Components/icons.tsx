@@ -148,3 +148,153 @@ export function ShieldAlertIcon(p: P) {
         </svg>
     );
 }
+
+export function StoreIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M3 9l1.5-5h15L21 9" />
+            <path d="M4 9v11h16V9" />
+            <path d="M9 20v-6h6v6" />
+        </svg>
+    );
+}
+
+export function PackageIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
+            <path d="M3 8l9 5 9-5M12 13v8" />
+        </svg>
+    );
+}
+
+export function BoxesIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M21 8 12 3 3 8l9 5 9-5Z" />
+            <path d="M3 8v8l9 5 9-5V8M12 13v8" />
+            <path d="M21 8l-9 5-9-5" />
+        </svg>
+    );
+}
+
+export function BriefcaseIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <rect x="3" y="7" width="18" height="13" rx="2" />
+            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18" />
+        </svg>
+    );
+}
+
+export function BarChartIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+        </svg>
+    );
+}
+
+export function SettingsIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v3M12 19v3M5 5l2 2M17 17l2 2M2 12h3M19 12h3M5 19l2-2M17 7l2-2" />
+        </svg>
+    );
+}
+
+export function SmartphoneIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <rect x="6" y="2" width="12" height="20" rx="2" />
+            <path d="M11 18h2" />
+        </svg>
+    );
+}
+
+export function ChevronDownIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="m6 9 6 6 6-6" />
+        </svg>
+    );
+}
+
+export function ChevronRightIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="m9 6 6 6-6 6" />
+        </svg>
+    );
+}
+
+export function LockIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+    );
+}
+
+export function ArrowLeftIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+    );
+}
+
+export function MenuIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M3 6h18M3 12h18M3 18h18" />
+        </svg>
+    );
+}
+
+export function BellIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+        </svg>
+    );
+}
+
+export function LogOutIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+        </svg>
+    );
+}
+
+export function PanelLeftIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M9 3v18" />
+        </svg>
+    );
+}
+
+export function TrendingUpIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M3 17l6-6 4 4 7-7" />
+            <path d="M17 8h4v4" />
+        </svg>
+    );
+}
+
+export function UsersIcon(p: P) {
+    return (
+        <svg {...base(p)}>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11" />
+        </svg>
+    );
+}

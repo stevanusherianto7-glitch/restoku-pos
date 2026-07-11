@@ -62,7 +62,10 @@ const STATUS_CONFIG: Record<ReservationStatus, { label: string; cls: string }> =
     pending: { label: 'Menunggu', cls: 'bg-amber-500/15 text-amber-400 border border-amber-500/20' },
     confirmed: { label: 'Dikonfirmasi', cls: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' },
     cancelled: { label: 'Dibatalkan', cls: 'bg-red-500/15 text-red-400 border border-red-500/20' },
-    completed: { label: 'Selesai', cls: 'bg-blue-500/15 text-blue-400 border border-blue-500/20' },
+    completed: {
+        label: 'Selesai',
+        cls: 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border border-[var(--color-primary)]/20',
+    },
 };
 
 const MOCK_RESERVATIONS: Reservation[] = [
@@ -243,8 +246,8 @@ function MonitorReservasiContent() {
                             label: 'Total Reservasi',
                             value: stats.total,
                             icon: CalendarDays,
-                            cls: 'text-blue-400',
-                            bg: 'bg-blue-500/10 border-blue-500/20',
+                            cls: 'text-[var(--color-primary)]',
+                            bg: 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]/20',
                         },
                         {
                             label: 'Total Tamu',
@@ -354,7 +357,7 @@ function MonitorReservasiContent() {
                             <Section
                                 title="Mendatang"
                                 badge={upcomingReservations.length}
-                                badgeCls="bg-blue-500/20 text-blue-400"
+                                badgeCls="bg-[var(--color-primary)]/20 text-[var(--color-primary)]"
                             >
                                 {upcomingReservations.map((r) => (
                                     <ReservationCard key={r.id} r={r} onUpdate={updateStatus} />
@@ -465,7 +468,7 @@ function ReservationCard({ r, onUpdate }: { r: Reservation; onUpdate: (id: strin
                         {r.status === 'confirmed' && (
                             <button
                                 onClick={() => onUpdate(r.id, 'completed')}
-                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-blue-400 text-xs font-semibold border border-blue-500/20 transition-colors"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--color-primary)]/15 hover:bg-[var(--color-primary)]/100/25 text-[var(--color-primary)] text-xs font-semibold border border-[var(--color-primary)]/20 transition-colors"
                             >
                                 <PartyPopper className="size-3.5" /> Selesai
                             </button>

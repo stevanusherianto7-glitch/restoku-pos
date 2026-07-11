@@ -400,7 +400,7 @@ function POSInner() {
                                                 </div>
                                                 <div className="mt-3 flex flex-col gap-1.5">
                                                     <span
-                                                        className={`self-start text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide border ${isTakeAway ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}
+                                                        className={`self-start text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide border ${isTakeAway ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border-[var(--color-primary)]/20'}`}
                                                     >
                                                         {isTakeAway ? 'Take Away' : 'Dine In'}
                                                     </span>
@@ -457,7 +457,7 @@ function POSInner() {
                                                 className={`absolute top-2 right-2 z-10 size-5 rounded-full text-[10px] font-bold flex items-center justify-center shadow-lg ${
                                                     isNanoBanana
                                                         ? 'bg-amber-500 text-slate-950 ring-2 ring-[#030712]'
-                                                        : 'bg-blue-500 text-white'
+                                                        : 'bg-[var(--color-primary)]/100 text-white'
                                                 }`}
                                             >
                                                 {inCart.quantity}
@@ -502,7 +502,7 @@ function POSInner() {
                             <div className="flex items-center gap-2 shrink-0">
                                 {activeOrderId && (
                                     <span
-                                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${orderTableName?.toLowerCase().includes('takeaway') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}
+                                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${orderTableName?.toLowerCase().includes('takeaway') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/20'}`}
                                     >
                                         {orderTableName?.toLowerCase().includes('takeaway')
                                             ? '🛍️ Take Away'
@@ -589,7 +589,7 @@ function POSInner() {
                                                         if (e.key === 'Escape') setEditingNoteId(null);
                                                     }}
                                                     placeholder="Level 3, tanpa es, nasi setengah…"
-                                                    className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-[11px] text-slate-200 outline-none focus:border-blue-500/40"
+                                                    className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1 text-[11px] text-slate-200 outline-none focus:border-[var(--color-primary)]/40"
                                                 />
                                                 <button
                                                     type="button"
@@ -606,7 +606,7 @@ function POSInner() {
                                                     setEditingNoteId(item.id);
                                                     setNoteInput(item.note);
                                                 }}
-                                                className="text-[11px] text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1"
+                                                className="text-[11px] text-slate-500 hover:text-[var(--color-primary)] transition-colors flex items-center gap-1"
                                             >
                                                 <FileText className="size-3" />
                                                 {item.note ? 'Ubah catatan' : 'Catatan pesanan'}
@@ -631,19 +631,19 @@ function POSInner() {
                                     placeholder="Nama item (cth. Kerupuk, Extra Sambal)"
                                     value={adHocName}
                                     onChange={(e) => setAdHocName(e.target.value)}
-                                    className="flex-1 bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-blue-500/40"
+                                    className="flex-1 bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-[var(--color-primary)]/40"
                                 />
                                 <input
                                     type="number"
                                     placeholder="Harga (Rp)"
                                     value={adHocPrice}
                                     onChange={(e) => setAdHocPrice(e.target.value)}
-                                    className="w-20 bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-blue-500/40 font-mono"
+                                    className="w-20 bg-white/5 border border-white/10 rounded px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-[var(--color-primary)]/40 font-mono"
                                 />
                                 <button
                                     type="button"
                                     onClick={handleAddAdHoc}
-                                    className="px-3 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-bold transition-colors"
+                                    className="px-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/100 text-white rounded text-xs font-bold transition-colors"
                                 >
                                     Tambah
                                 </button>
@@ -676,7 +676,7 @@ function POSInner() {
                                     <button
                                         type="button"
                                         onClick={() => setIsDiscountModalOpen(true)}
-                                        className="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                                        className="text-[var(--color-primary)] hover:text-[var(--color-primary)] flex items-center gap-1 transition-colors"
                                     >
                                         <Percent className="size-3" /> Tambah Diskon
                                     </button>
@@ -709,7 +709,7 @@ function POSInner() {
                                             onClick={() => setSelectedPayment(key)}
                                             className={`rounded-lg py-2 px-2 text-[11px] font-medium text-center transition-colors border ${
                                                 selectedPayment === key
-                                                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+                                                    ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/40'
                                                     : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-slate-200'
                                             }`}
                                         >
@@ -783,13 +783,13 @@ function POSInner() {
                             <div className="flex gap-2 mb-4">
                                 <button
                                     onClick={() => setTempDiscountType('percentage')}
-                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border ${tempDiscountType === 'percentage' ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
+                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border ${tempDiscountType === 'percentage' ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
                                 >
                                     Persentase (%)
                                 </button>
                                 <button
                                     onClick={() => setTempDiscountType('nominal')}
-                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border ${tempDiscountType === 'nominal' ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
+                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border ${tempDiscountType === 'nominal' ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
                                 >
                                     Nominal (Rp)
                                 </button>
@@ -800,7 +800,7 @@ function POSInner() {
                                     value={tempDiscountValue}
                                     onChange={(e) => setTempDiscountValue(e.target.value)}
                                     placeholder={tempDiscountType === 'percentage' ? 'Contoh: 10' : 'Contoh: 15000'}
-                                    className="w-full bg-slate-900 border border-white/20 rounded-lg px-3 py-2 text-sm text-white mb-4 outline-none focus:border-blue-500"
+                                    className="w-full bg-slate-900 border border-white/20 rounded-lg px-3 py-2 text-sm text-white mb-4 outline-none focus:border-[var(--color-primary)]"
                                 />
                             )}
                             <div className="flex gap-2">
@@ -818,7 +818,7 @@ function POSInner() {
                                         cart.setDiscount(tempDiscountType, Number(tempDiscountValue));
                                         setIsDiscountModalOpen(false);
                                     }}
-                                    className="flex-1 rounded-lg py-2 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                                    className="flex-1 rounded-lg py-2 text-xs font-medium bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/100 text-white transition-colors"
                                 >
                                     Terapkan
                                 </button>
@@ -843,13 +843,13 @@ function POSInner() {
                             <div className="flex gap-2 mb-4 shrink-0">
                                 <button
                                     onClick={() => setSplitMode('evenly')}
-                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-colors ${splitMode === 'evenly' ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
+                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-colors ${splitMode === 'evenly' ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
                                 >
                                     Bagi Rata
                                 </button>
                                 <button
                                     onClick={() => setSplitMode('per_item')}
-                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-colors ${splitMode === 'per_item' ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
+                                    className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-colors ${splitMode === 'per_item' ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/40' : 'bg-white/5 text-slate-400 border-white/10'}`}
                                 >
                                     Pilih Item
                                 </button>
@@ -880,7 +880,7 @@ function POSInner() {
                                                 type="number"
                                                 value={splitCount}
                                                 onChange={(e) => setSplitCount(e.target.value)}
-                                                className="w-16 h-10 text-center bg-transparent border border-white/20 rounded-lg text-white font-mono text-lg outline-none focus:border-blue-500"
+                                                className="w-16 h-10 text-center bg-transparent border border-white/20 rounded-lg text-white font-mono text-lg outline-none focus:border-[var(--color-primary)]"
                                                 min="2"
                                                 max="20"
                                             />
@@ -892,9 +892,9 @@ function POSInner() {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="flex justify-between items-center bg-blue-500/10 rounded-lg p-3 border border-blue-500/20">
-                                        <span className="text-sm text-blue-200">Per Orang Membayar</span>
-                                        <span className="font-mono text-xl font-bold text-blue-400">
+                                    <div className="flex justify-between items-center bg-[var(--color-primary)]/10 rounded-lg p-3 border border-[var(--color-primary)]/20">
+                                        <span className="text-sm text-[var(--color-primary)]">Per Orang Membayar</span>
+                                        <span className="font-mono text-xl font-bold text-[var(--color-primary)]">
                                             {formatRupiah(Math.ceil(total / parseInt(splitCount || '1')))}
                                         </span>
                                     </div>
@@ -954,8 +954,8 @@ function POSInner() {
                                         )}
                                     </div>
 
-                                    <div className="bg-blue-500/10 rounded-lg p-3 border border-blue-500/20 shrink-0 space-y-2">
-                                        <div className="flex justify-between text-xs text-blue-200/70">
+                                    <div className="bg-[var(--color-primary)]/10 rounded-lg p-3 border border-[var(--color-primary)]/20 shrink-0 space-y-2">
+                                        <div className="flex justify-between text-xs text-[var(--color-primary)]/70">
                                             <span>Subtotal Terpilih</span>
                                             <span className="font-mono">{formatRupiah(subBillSubtotal)}</span>
                                         </div>
@@ -965,15 +965,15 @@ function POSInner() {
                                                 <span className="font-mono">-{formatRupiah(subBillDiscount)}</span>
                                             </div>
                                         )}
-                                        <div className="flex justify-between text-xs text-blue-200/70">
+                                        <div className="flex justify-between text-xs text-[var(--color-primary)]/70">
                                             <span>PBJT (10%)</span>
                                             <span className="font-mono">{formatRupiah(subBillPbjt)}</span>
                                         </div>
-                                        <div className="flex justify-between items-center pt-2 border-t border-blue-500/20">
-                                            <span className="text-sm font-medium text-blue-200">
+                                        <div className="flex justify-between items-center pt-2 border-t border-[var(--color-primary)]/20">
+                                            <span className="text-sm font-medium text-[var(--color-primary)]">
                                                 Total Tagihan Parsial
                                             </span>
-                                            <span className="font-mono text-xl font-bold text-blue-400">
+                                            <span className="font-mono text-xl font-bold text-[var(--color-primary)]">
                                                 {formatRupiah(subBillTotal)}
                                             </span>
                                         </div>

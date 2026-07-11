@@ -33,7 +33,7 @@ export default function TableManagement() {
             case 'available':
                 return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
             case 'occupied':
-                return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+                return 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/30';
             case 'reserved':
                 return 'bg-amber-500/20 text-amber-300 border-amber-500/30';
             case 'dirty':
@@ -65,7 +65,7 @@ export default function TableManagement() {
             <Screen
                 title="Manajemen Meja & QR"
                 action={
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/100 text-white rounded-xl transition-colors font-medium">
                         <Plus className="size-5" />
                         <span>Tambah Meja</span>
                     </button>
@@ -132,8 +132,8 @@ export default function TableManagement() {
                                 ✕
                             </button>
 
-                            <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-6">
-                                <QrCode className="size-8 text-blue-400" />
+                            <div className="w-16 h-16 rounded-full bg-[var(--color-primary)]/20 flex items-center justify-center mb-6">
+                                <QrCode className="size-8 text-[var(--color-primary)]" />
                             </div>
 
                             <h2 className="text-2xl font-bold text-white mb-2">QR Code {selectedTable.name}</h2>
@@ -152,7 +152,7 @@ export default function TableManagement() {
                                 <button className="flex-1 py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-medium transition-colors flex justify-center items-center gap-2">
                                     <Printer className="size-5" /> Cetak
                                 </button>
-                                <button className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-colors">
+                                <button className="flex-1 py-3 px-4 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/100 text-white rounded-xl font-medium transition-colors">
                                     Unduh PNG
                                 </button>
                             </div>

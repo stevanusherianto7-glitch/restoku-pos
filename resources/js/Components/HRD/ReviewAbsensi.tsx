@@ -115,7 +115,7 @@ export function ReviewAbsensi() {
                                         </div>
                                     </td>
                                     <td className="py-4">
-                                        <button className="flex items-center gap-1.5 text-xs font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 px-2.5 py-1.5 rounded-lg transition-colors border border-blue-500/20">
+                                        <button className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary)] bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 px-2.5 py-1.5 rounded-lg transition-colors border border-[var(--color-primary)]/20">
                                             <Eye className="size-3.5" /> Lihat Foto
                                         </button>
                                     </td>

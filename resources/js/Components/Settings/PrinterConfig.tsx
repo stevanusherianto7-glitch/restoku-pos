@@ -110,7 +110,7 @@ export function PrinterConfig() {
     };
 
     const labelClass = `text-sm font-medium block ${isLight ? 'text-slate-800 font-bold' : 'text-slate-300'}`;
-    const inputClass = `w-full rounded-lg p-3 focus:outline-none focus:border-emerald-500 border ${isLight ? 'bg-white border-slate-300 text-slate-900 shadow-xs' : 'bg-slate-900 border-white/10 text-white'}`;
+    const inputClass = `w-full rounded-lg p-3 focus:outline-none focus:border-emerald-500 border ${isLight ? 'bg-white border-slate-300 text-slate-900 shadow-sm' : 'bg-slate-900 border-white/10 text-white'}`;
 
     return (
         <Screen
@@ -126,21 +126,21 @@ export function PrinterConfig() {
                 {/* Sidebar Menu */}
                 <div className="w-64 shrink-0 space-y-2">
                     <button
-                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'kasir' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-xs' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'kasir' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-sm' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
                         onClick={() => setActiveTab('kasir')}
                     >
                         <Printer className="size-5" />
                         <div className="font-medium">Printer Kasir</div>
                     </button>
                     <button
-                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'dapur' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-xs' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'dapur' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-sm' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
                         onClick={() => setActiveTab('dapur')}
                     >
                         <Printer className="size-5" />
                         <div className="font-medium">Printer Dapur</div>
                     </button>
                     <button
-                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'receipt' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-xs' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'receipt' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-sm' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
                         onClick={() => setActiveTab('receipt')}
                     >
                         <FileText className="size-5" />
@@ -191,21 +191,21 @@ export function PrinterConfig() {
                                     <label className={labelClass}>Tipe Koneksi</label>
                                     <div className="grid grid-cols-3 gap-4">
                                         <div
-                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'bluetooth' ? (isLight ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-blue-500 bg-blue-500/10 text-blue-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'bluetooth' ? (isLight ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold shadow-sm' : 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setKasirConfig({ ...kasirConfig, connection: 'bluetooth' })}
                                         >
                                             <Bluetooth className="size-6" />
                                             <span className="font-medium">Bluetooth</span>
                                         </div>
                                         <div
-                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'usb' ? (isLight ? 'border-emerald-500 bg-emerald-50 text-emerald-700 font-bold shadow-xs' : 'border-emerald-500 bg-emerald-500/10 text-emerald-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'usb' ? (isLight ? 'border-emerald-500 bg-emerald-50 text-emerald-700 font-bold shadow-sm' : 'border-emerald-500 bg-emerald-500/10 text-emerald-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setKasirConfig({ ...kasirConfig, connection: 'usb' })}
                                         >
                                             <Usb className="size-6" />
                                             <span className="font-medium">USB (Windows)</span>
                                         </div>
                                         <div
-                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'network' ? (isLight ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-xs' : 'border-purple-500 bg-purple-500/10 text-purple-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'network' ? (isLight ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-sm' : 'border-purple-500 bg-purple-500/10 text-purple-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setKasirConfig({ ...kasirConfig, connection: 'network' })}
                                         >
                                             <Wifi className="size-6" />
@@ -284,14 +284,14 @@ export function PrinterConfig() {
                                     <label className={labelClass}>Tipe Koneksi</label>
                                     <div className="grid grid-cols-3 gap-4">
                                         <div
-                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${dapurConfig.connection === 'network' ? (isLight ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-xs' : 'border-purple-500 bg-purple-500/10 text-purple-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${dapurConfig.connection === 'network' ? (isLight ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-sm' : 'border-purple-500 bg-purple-500/10 text-purple-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setDapurConfig({ ...dapurConfig, connection: 'network' })}
                                         >
                                             <Wifi className="size-6" />
                                             <span className="font-medium">Network / LAN</span>
                                         </div>
                                         <div
-                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${dapurConfig.connection === 'bluetooth' ? (isLight ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-blue-500 bg-blue-500/10 text-blue-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                            className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${dapurConfig.connection === 'bluetooth' ? (isLight ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold shadow-sm' : 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setDapurConfig({ ...dapurConfig, connection: 'bluetooth' })}
                                         >
                                             <Bluetooth className="size-6" />
@@ -393,7 +393,7 @@ export function PrinterConfig() {
                                     ].map((toggle) => (
                                         <div
                                             key={toggle.key}
-                                            className={`flex justify-between items-center p-4 rounded-lg border ${isLight ? 'bg-white border-slate-300 shadow-xs' : 'bg-white/5 border-white/10'}`}
+                                            className={`flex justify-between items-center p-4 rounded-lg border ${isLight ? 'bg-white border-slate-300 shadow-sm' : 'bg-white/5 border-white/10'}`}
                                         >
                                             <div>
                                                 <div
@@ -436,7 +436,7 @@ export function PrinterConfig() {
                                     <label className={labelClass}>Lebar Kertas (Paper Width)</label>
                                     <div className="flex gap-4">
                                         <button
-                                            className={`flex-1 py-3 rounded-lg border font-medium transition-colors ${receiptConfig.paperWidth === '58mm' ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-xs' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                            className={`flex-1 py-3 rounded-lg border font-medium transition-colors ${receiptConfig.paperWidth === '58mm' ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-sm' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setReceiptConfig({ ...receiptConfig, paperWidth: '58mm' })}
                                         >
                                             58mm (Kecil)
@@ -444,7 +444,7 @@ export function PrinterConfig() {
                                             <span className="text-xs font-normal opacity-80">32 Karakter / Baris</span>
                                         </button>
                                         <button
-                                            className={`flex-1 py-3 rounded-lg border font-medium transition-colors ${receiptConfig.paperWidth === '80mm' ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-xs' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                            className={`flex-1 py-3 rounded-lg border font-medium transition-colors ${receiptConfig.paperWidth === '80mm' ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-sm' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setReceiptConfig({ ...receiptConfig, paperWidth: '80mm' })}
                                         >
                                             80mm (Standar)
@@ -456,7 +456,7 @@ export function PrinterConfig() {
 
                                 {/* Tulis Nama Kasir Otomatis */}
                                 <div
-                                    className={`col-span-2 flex justify-between items-center p-4 rounded-lg border ${isLight ? 'bg-white border-slate-300 shadow-xs' : 'bg-white/5 border-white/10'}`}
+                                    className={`col-span-2 flex justify-between items-center p-4 rounded-lg border ${isLight ? 'bg-white border-slate-300 shadow-sm' : 'bg-white/5 border-white/10'}`}
                                 >
                                     <div>
                                         <div
@@ -498,7 +498,7 @@ export function PrinterConfig() {
                                             <button
                                                 key={font.id}
                                                 type="button"
-                                                className={`py-2.5 px-3 rounded-lg border text-xs font-semibold transition-colors ${receiptConfig.fontType === font.id ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-xs' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                                className={`py-2.5 px-3 rounded-lg border text-xs font-semibold transition-colors ${receiptConfig.fontType === font.id ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-sm' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                                 onClick={() =>
                                                     setReceiptConfig({ ...receiptConfig, fontType: font.id as any })
                                                 }
@@ -523,7 +523,7 @@ export function PrinterConfig() {
                                             <button
                                                 key={density.id}
                                                 type="button"
-                                                className={`py-2.5 px-3 rounded-lg border text-xs font-semibold transition-colors ${receiptConfig.printDensity === density.id ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-xs' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                                className={`py-2.5 px-3 rounded-lg border text-xs font-semibold transition-colors ${receiptConfig.printDensity === density.id ? (isLight ? 'bg-emerald-100 border-emerald-500 text-emerald-800 font-bold shadow-sm' : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                                 onClick={() =>
                                                     setReceiptConfig({
                                                         ...receiptConfig,

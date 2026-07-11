@@ -97,7 +97,7 @@ export function EmployeeMaster() {
                         <p className="text-slate-400 text-sm">Total Karyawan</p>
                         <p className="text-2xl font-bold text-white mt-1">12</p>
                     </div>
-                    <div className="size-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                    <div className="size-10 rounded-full bg-[var(--color-primary)]/20 flex items-center justify-center text-[var(--color-primary)]">
                         <Users className="size-5" />
                     </div>
                 </Glass>
@@ -142,7 +142,10 @@ export function EmployeeMaster() {
                                 <span className="text-white font-medium">5 orang</span>
                             </div>
                             <div className="w-full bg-white/5 rounded-full h-2">
-                                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '40%' }}></div>
+                                <div
+                                    className="bg-[var(--color-primary)]/100 h-2 rounded-full"
+                                    style={{ width: '40%' }}
+                                ></div>
                             </div>
                         </div>
                         <div>
@@ -200,7 +203,7 @@ export function EmployeeMaster() {
                         <input
                             type="text"
                             placeholder="Cari karyawan..."
-                            className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)] transition-colors"
                         />
                     </div>
                     <div className="flex gap-2">
@@ -355,14 +358,14 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium text-slate-400 mb-1">Gender</label>
-                                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)]">
                                         <option>Laki-laki</option>
                                         <option>Perempuan</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium text-slate-400 mb-1">Agama</label>
-                                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)]">
                                         <option>Islam</option>
                                         <option>Kristen</option>
                                         <option>Katolik</option>
@@ -404,7 +407,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                                 Status PTKP (PPh 21)
                                             </label>
                                             <select
-                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)]"
                                                 defaultValue="TK/0"
                                             >
                                                 <option>TK/0 (Tidak Kawin, 0 Tanggungan)</option>
@@ -440,7 +443,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                             Alamat Sesuai KTP
                                         </label>
                                         <textarea
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)]"
                                             rows={2}
                                             defaultValue="Jl. Merdeka No. 123, Jakarta Pusat"
                                         ></textarea>
@@ -450,7 +453,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                             Alamat Domisili
                                         </label>
                                         <textarea
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)]"
                                             rows={2}
                                             defaultValue="Sama dengan KTP"
                                         ></textarea>
@@ -481,7 +484,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                 <div>
                                     <label className="block text-xs font-medium text-slate-400 mb-1">Jabatan</label>
                                     <select
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)]"
                                         defaultValue={user?.role}
                                     >
                                         <option>Waiter</option>
@@ -498,7 +501,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                         Status Karyawan
                                     </label>
                                     <select
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--color-primary)]"
                                         defaultValue={user?.status}
                                     >
                                         <option>Probation</option>
@@ -563,7 +566,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                         className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <FileText className="size-5 text-blue-400" />
+                                            <FileText className="size-5 text-[var(--color-primary)]" />
                                             <span className="text-sm text-white">{doc}</span>
                                         </div>
                                         <Badge tone="emerald">Terverifikasi</Badge>

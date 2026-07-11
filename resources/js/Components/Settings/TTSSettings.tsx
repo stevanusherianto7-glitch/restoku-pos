@@ -98,7 +98,7 @@ export function TTSSettings() {
                         <h3
                             className={`text-lg font-bold flex items-center gap-2 mb-4 ${isLight ? 'text-slate-900' : 'text-white'}`}
                         >
-                            <Settings2 className="size-5 text-blue-500" /> Kontrol Suara
+                            <Settings2 className="size-5 text-[var(--color-primary)]" /> Kontrol Suara
                         </h3>
 
                         <div className="space-y-4">
@@ -107,7 +107,9 @@ export function TTSSettings() {
                                     <span className={isLight ? 'text-slate-700 font-bold' : 'text-slate-300'}>
                                         Volume Pengumuman
                                     </span>
-                                    <span className={`font-bold ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>
+                                    <span
+                                        className={`font-bold ${isLight ? 'text-[var(--color-primary)]' : 'text-[var(--color-primary)]'}`}
+                                    >
                                         {Math.round(config.volume * 100)}%
                                     </span>
                                 </div>
@@ -127,7 +129,9 @@ export function TTSSettings() {
                                     <span className={isLight ? 'text-slate-700 font-bold' : 'text-slate-300'}>
                                         Kecepatan Bicara
                                     </span>
-                                    <span className={`font-bold ${isLight ? 'text-blue-600' : 'text-blue-400'}`}>
+                                    <span
+                                        className={`font-bold ${isLight ? 'text-[var(--color-primary)]' : 'text-[var(--color-primary)]'}`}
+                                    >
                                         {config.rate}x
                                     </span>
                                 </div>
@@ -158,7 +162,7 @@ export function TTSSettings() {
                             </h4>
                             <div className="flex gap-3">
                                 <button
-                                    className={`flex-1 py-3 px-4 rounded-xl border flex flex-col items-center gap-1 transition-all ${config.engine === 'browser' ? (isLight ? 'bg-blue-50 border-blue-500 text-blue-700 font-bold shadow-xs' : 'bg-blue-500/20 border-blue-500 text-blue-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                    className={`flex-1 py-3 px-4 rounded-xl border flex flex-col items-center gap-1 transition-all ${config.engine === 'browser' ? (isLight ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] font-bold shadow-sm' : 'bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-[var(--color-primary)]') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                     onClick={() => setConfig({ ...config, engine: 'browser' })}
                                 >
                                     <Globe className="size-5 mb-1" />
@@ -166,7 +170,7 @@ export function TTSSettings() {
                                     <span className="text-[10px] opacity-70">Gratis & Offline</span>
                                 </button>
                                 <button
-                                    className={`flex-1 py-3 px-4 rounded-xl border flex flex-col items-center gap-1 transition-all ${config.engine === 'google' ? (isLight ? 'bg-blue-50 border-blue-500 text-blue-700 font-bold shadow-xs' : 'bg-blue-500/20 border-blue-500 text-blue-400') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
+                                    className={`flex-1 py-3 px-4 rounded-xl border flex flex-col items-center gap-1 transition-all ${config.engine === 'google' ? (isLight ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] font-bold shadow-sm' : 'bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-[var(--color-primary)]') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                     onClick={() => setConfig({ ...config, engine: 'google' })}
                                 >
                                     <Mic className="size-5 mb-1" />
@@ -209,7 +213,7 @@ export function TTSSettings() {
                             ].map((event) => (
                                 <div
                                     key={event.key}
-                                    className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${isLight ? 'bg-white border-slate-200 shadow-xs' : 'bg-white/5 border-white/10'}`}
+                                    className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-white/5 border-white/10'}`}
                                 >
                                     <div className="flex items-start gap-3">
                                         <input

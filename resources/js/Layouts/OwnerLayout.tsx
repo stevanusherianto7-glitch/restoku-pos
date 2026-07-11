@@ -1,6 +1,15 @@
 import { type ReactNode } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, Users, Package, Settings, TrendingUp, LogOut, Bell, Store } from 'lucide-react';
+import {
+    BarChartIcon,
+    UsersIcon,
+    PackageIcon,
+    SettingsIcon,
+    TrendingUpIcon,
+    LogOutIcon,
+    BellIcon,
+    StoreIcon,
+} from '../Components/icons';
 import { PlanBadge, useTenantSettings, TenantBrandLockup } from '../Components/Shared';
 import GeminiCopilotWidget from '../Components/POS/GeminiCopilotWidget';
 import { useSubscription } from '../Hooks/useSubscription';
@@ -9,12 +18,12 @@ import type { SharedProps } from '../Types';
 type OwnerNavItem = { name: string; href: string; Icon: React.ElementType };
 
 const ownerNav: OwnerNavItem[] = [
-    { name: 'Dasbor Keuangan', href: '/laporan-keuangan', Icon: TrendingUp },
-    { name: 'Analitik Owner', href: '/owner/dashboard', Icon: BarChart3 },
-    { name: 'Data Karyawan', href: '/owner/employees', Icon: Users },
-    { name: 'Stok & Inventaris', href: '/owner/inventory/alerts', Icon: Package },
-    { name: 'Multi Outlet', href: '/perbandingan-outlet', Icon: Store },
-    { name: 'Pengaturan', href: '/owner/settings', Icon: Settings },
+    { name: 'Dasbor Keuangan', href: '/laporan-keuangan', Icon: TrendingUpIcon },
+    { name: 'Analitik Owner', href: '/owner/dashboard', Icon: BarChartIcon },
+    { name: 'Data Karyawan', href: '/owner/employees', Icon: UsersIcon },
+    { name: 'Stok & Inventaris', href: '/owner/inventory/alerts', Icon: PackageIcon },
+    { name: 'Multi Outlet', href: '/perbandingan-outlet', Icon: StoreIcon },
+    { name: 'Pengaturan', href: '/owner/settings', Icon: SettingsIcon },
 ];
 
 /**
@@ -85,13 +94,13 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
                     </div>
                     <div className="flex gap-2">
                         <button className="flex-1 flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-white py-1.5 rounded-lg hover:bg-white/5 transition-colors">
-                            <Bell className="size-3" /> Notif
+                            <BellIcon className="size-3" /> Notif
                         </button>
                         <Link
                             href="/"
                             className="flex-1 flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-white py-1.5 rounded-lg hover:bg-white/5 transition-colors"
                         >
-                            <LogOut className="size-3" /> Keluar
+                            <LogOutIcon className="size-3" /> Keluar
                         </Link>
                     </div>
                 </div>

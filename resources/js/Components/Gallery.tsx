@@ -203,7 +203,7 @@ export function CustomerGallery() {
                         {/* Info Container */}
                         <div className="w-full md:w-80 shrink-0 bg-[#09090b] border border-white/10 p-6 rounded-2xl flex flex-col">
                             <h2 className="text-2xl font-bold mb-2">{currentEvent.title}</h2>
-                            <div className="text-sm font-medium text-blue-400 mb-6 flex items-center gap-2">
+                            <div className="text-sm font-medium text-[var(--color-primary)] mb-6 flex items-center gap-2">
                                 🗓️ {currentEvent.event_date}
                             </div>
                             <p className="text-slate-300 text-sm leading-relaxed mb-8 flex-1">
@@ -216,7 +216,7 @@ export function CustomerGallery() {
                                         <button
                                             key={p.id}
                                             onClick={() => setPhotoIndex(idx)}
-                                            className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${idx === photoIndex ? 'border-blue-500' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                                            className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${idx === photoIndex ? 'border-[var(--color-primary)]' : 'border-transparent opacity-50 hover:opacity-100'}`}
                                         >
                                             <img
                                                 src={p.path}
@@ -253,7 +253,7 @@ export function GalleryManager({ onPreviewCustomer }: { onPreviewCustomer?: () =
                     </button>
                     <button
                         onClick={() => setView('form')}
-                        className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                        className="flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-primary-hover)] transition-colors"
                     >
                         <Plus className="size-4" /> Tambah Event
                     </button>
@@ -326,7 +326,7 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
                                 <label className="text-sm font-medium text-slate-300">Judul Event</label>
                                 <input
                                     type="text"
-                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
                                     placeholder="Contoh: Live Music Night"
                                 />
                             </div>
@@ -334,7 +334,7 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
                                 <label className="text-sm font-medium text-slate-300">Tanggal Event</label>
                                 <input
                                     type="date"
-                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-primary)]"
                                 />
                             </div>
                         </div>
@@ -342,14 +342,14 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300">Deskripsi</label>
                             <textarea
-                                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-blue-500 h-24 resize-none"
+                                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-[var(--color-primary)] h-24 resize-none"
                                 placeholder="Ceritakan detail event ini..."
                             />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300">Status</label>
-                            <select className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-blue-500 appearance-none text-slate-200">
+                            <select className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-primary)] appearance-none text-slate-200">
                                 <option value="draft" className="text-slate-900">
                                     Draft (Sembunyikan)
                                 </option>
@@ -370,7 +370,7 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
                     </div>
 
                     <div className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center bg-black/20 hover:bg-white/5 transition-colors cursor-pointer mb-6 group">
-                        <div className="size-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <div className="size-12 rounded-full bg-[var(--color-primary)]/20 text-[var(--color-primary)] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <UploadCloud className="size-6" />
                         </div>
                         <p className="text-sm font-medium text-slate-200">Klik atau Drag & Drop foto di sini</p>
@@ -417,7 +417,7 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
                 </Glass>
 
                 <div className="flex justify-end pt-4 pb-12">
-                    <button className="rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+                    <button className="rounded-xl bg-[var(--color-primary)] px-8 py-3 text-sm font-semibold text-white hover:bg-[var(--color-primary-hover)] transition-colors shadow-lg shadow-[var(--color-primary)]/20">
                         Simpan Event
                     </button>
                 </div>
