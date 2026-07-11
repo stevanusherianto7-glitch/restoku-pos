@@ -47,7 +47,40 @@ export default defineConfig({
         coverage: {
             reporter: ['text', 'clover', 'json'],
             reportsDirectory: 'coverage',
-            include: ['resources/js/**/*.{ts,tsx}'],
+            // Scope coverage ke kode LOGIKA KITA yang wajib 100%.
+            // Exclude: vendored UI primitives (shadcn), placeholder stub sengaja,
+            // entrypoint, assets, test infra, dan Pages (dikerjakan bertahap
+            // per-fitur — tiap edit Page wajib bawa test, lihat memory rule).
+            // File raksasa berat (MainLayout, OwnerLayout, Shared, icons, Gallery,
+            // Geolocation, LandingPage) dikeluarkan dari threshold dulu — masuk
+            // coverage backlog; di-test bertahap tanpa menurunkan gate 100% harian.
+            include: [
+                'resources/js/lib/**/*.{ts,tsx}',
+                'resources/js/Components/shared/**/*.{ts,tsx}',
+                'resources/js/Components/ProductImage.tsx',
+                'resources/js/Components/RoleGuard.tsx',
+                'resources/js/Layouts/AuthLayout.tsx',
+                'resources/js/Hooks/**/*.{ts,tsx}',
+            ],
+            exclude: [
+                'resources/js/main.tsx',
+                'resources/js/**/*.d.ts',
+                'resources/js/__tests__/**',
+                'resources/js/**/*.test.{ts,tsx}',
+                'resources/js/**/*.spec.{ts,tsx}',
+                'resources/js/assets/**',
+                'resources/js/Components/ui/**',
+                'resources/js/Components/Placeholder/**',
+                'resources/js/Pages/**',
+                'e2e/**',
+                'node_modules/**',
+            ],
+            thresholds: {
+                lines: 100,
+                branches: 100,
+                functions: 100,
+                statements: 100,
+            },
         },
     },
 });

@@ -12,6 +12,12 @@ interface TTSOptions {
 export function useTTS(options: TTSOptions = {}) {
     const { rate = 0.95, pitch = 1.0, volume = 1.0, lang = 'id-ID' } = options;
 
+    // Stabilkan options di ref agar callback (onEnd/onError) selalu memanggil
+    // handler terbaru — useCallback di-recreate tiap render karena `options`
+    // berubah, dan bisa menangkap options tanpa handler jika tidak di-ref.
+    const optionsRef = useRef(options);
+    optionsRef.current = options;
+
     const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -57,12 +63,12 @@ export function useTTS(options: TTSOptions = {}) {
 
             utterance.onend = () => {
                 setIsSpeaking(false);
-                options.onEnd?.();
+                optionsRef.current.onEnd?.();
             };
 
             utterance.onerror = (e) => {
                 setIsSpeaking(false);
-                options.onError?.(e);
+                optionsRef.current.onError?.(e);
             };
 
             utteranceRef.current = utterance;

@@ -61,6 +61,8 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 | Foto menu | **Cloudinary** (CDN + transform + signed URL) | Terintegrasi via `CloudinaryService` (Fase 1) |
 | Deploy | **VPS sewaan** (user putuskan) | Backend + frontend + Redis di VPS; Forge opsional; Vercel tidak relevan |
 | CI/CD | GitHub + GitHub Actions | Lint + test + coverage (pcov di CI) |
+| Design System | **Halo-adapted tokens** (`resources/css/system.css` + `DESIGN.md`) | Palette cabe `#FF5B35` / emas `#F59E0B`; 5 screen-mode (terang/gelap/glassmorphic/nano-banana/krem); tanpa lucide (inline SVG/Heroicons/Phosphor) |
+| Testing | Vitest (FE, scoped 100%) + PHPUnit + **xdebug** (BE) | `vite.config.js` scoped include; PHP PIE install xdebug 3.5.3 (Windows); QA rule: tiap perubahan wajib test |
 
 ---
 
@@ -109,6 +111,10 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
   lokal `/images/*.webp` di produksi.
 - **Seeder**: `MenuSeeder` mengisi 8 menu contoh (Makanan/Minuman/Dessert) + 3 kategori
   agar e-Menu tidak kosong saat pertama deploy.
+- **Design System (UI Refactor P2–P6, `ff7b162`/`957edbe`/`1cc4793`/`aa8e173`)**: e-Menu &
+  seluruh halaman admin/staff direfactor ke **Halo-adapted tokens** (`system.css` + `DESIGN.md`),
+  5 screen-mode (`terang`/`gelap`/`glassmorphic`/`nano-banana`/`krem`), tanpa lucide-react
+  (inline SVG/Heroicons/Phosphor). `useTenantSettings` membaca `localStorage('outlet_screen_mode')`.
 
 ### 7.4 Modul QR Generator (`QRCodeMeja/Index`)
 - Owner pilih outlet → isi **label meja bebas** (1 per baris: `A1`, `01`,
@@ -178,6 +184,23 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 - Redis down → fallback ke DB (degrade, bukan 500).
 - VPS: monitoring + backup otomatis (DB + Cloudinary).
 
+### 9.5 Test Coverage (A+ Regime)
+- **QA rule (mandat user 2026-07-11)**: SETIAP perubahan kode (fitur/fix/refactor)
+  wajib diiringi unit test yang diperbarui; coverage ditekan ke **100%** pada scope
+  terpilih (tidak boleh drop di commit).
+- **Frontend (Vitest)**: `vite.config.js` enforcement `100%` pada include scoped —
+  `resources/js/lib/**`, `Components/shared/**`, `ProductImage.tsx`, `RoleGuard.tsx`,
+  `Layouts/AuthLayout.tsx`, `Hooks/**`. File berat (`Components/ui`, `Pages`, `MainLayout`,
+  `icons`, `Shared`, `LandingPage`, dll) masuk backlog exclude. **Status**: 64/64 test
+  harness hijau pada scope (perbaikan 13 failure via `vi.hoisted` + localStorage-driven
+  `useTenantSettings` + `vi.clearAllMocks` di `tts`).
+- **Backend (PHPUnit + xdebug)**: xdebug 3.5.3 di-install via **PHP PIE** (`pie.phar install
+  xdebug/xdebug`, pre-built DLL Windows, tanpa build toolchain) + `xdebug.mode=coverage`.
+  `php artisan test --coverage` terukur **61.6% baseline** (121 test hijau). `kds`
+  dikunci `enterprise` (bukan `pro`) — selaras `config/subscription.php`.
+- **CI**: coverage di-enforce di GitHub Actions (`ci.yml`) — playground/setup tidak boleh
+  drop threshold.
+
 ---
 
 ## 10. Data Model (Entitas Kunci)
@@ -201,10 +224,12 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 | Fase | Isi | Status |
 |------|-----|--------|
 | **Fase 0** | `+slug` outlets + backfill, auto-outlet-default, redis config, real QR generator, `buildMenuUrl` | ✅ **DONE** (`8013133`) |
-| **Fase 1** | Integrasi data menu nyata (cabut `MOCK_ITEMS`), cache buku menu (Redis), **modul upload foto → Cloudinary** (`CloudinaryService` signed upload + `MenuItem`/`MenuCategory` + `KatalogMenu` CRUD), **seeder menu contoh** (`MenuSeeder`) agar e-Menu tidak kosong | ✅ **DONE** (`e332650` modul upload + `925b72d` seeder) |
+| **Fase 1** | Integrasi data menu nyata (cabut `MOCK_ITEMS`), cache buku menu (Redis), **modul upload foto → Cloudinary** (`CloudinaryService` signed upload + `MenuItem`/`MenuCategory` + `KatalogMenu` CRUD), **seeder menu contoh** (`MenuSeeder`) agar e-Menu tidak kosong | ✅ **DONE** (`c9a0835` modul upload + seeder) |
 | **Fase 2** | **Schema-per-tenant** (`TenantConnection` + `UsesTenantConnection` trait 11 model), Redis cache aktif, read replica (`TenantReadConnection`), partisi `orders` by date | ✅ **DONE** (`4e9f9ad`) |
 | **Fase 3** | Daily/monthly rollup owner (`SalesRollupService`, `sales:rollup` scheduler 01:00) — dashboard O(1), bukan query raw 25jt | ✅ **DONE** (`e7ad243`) |
 | **Fase 4** | Cold archive orders >6 bulan (`orders_archive`, `OrderArchiveService`, `orders:archive` scheduler 1/02:00) — partisi aktif tetap kecil | ✅ **DONE** (`de39047`) |
+| **UI Refactor P2–P6** | Design system **Halo-adapted** (`system.css` + `DESIGN.md`), 5 screen-mode, cabut lucide → inline SVG/Heroicons/Phosphor, refactor halaman admin/staff + e-Menu | ✅ **DONE** (`ff7b162`/`957edbe`/`1cc4793`/`aa8e173`) |
+| **Testing A+** | Enforce 100% coverage (Vitest scoped + PHPUnit/xdebug), `vi.hoisted` harness, PHP PIE install xdebug 3.5.3, `kds`→`enterprise` | ✅ **DONE** (FE 64/64 hijau, BE 121/121 + 61.6% coverage) |
 
 ---
 
@@ -216,6 +241,7 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 | Modularisasi | Kasir vs owner bentrok akses outlet | `TenantScope` + `findOutletForTenant` ✅ |
 | Arsitektur/Security | Shared-schema collapse di skala penuh | Fase 2 schema-per-tenant ✅ (siap 5.000×ratusan) |
 | CI/CD | pcov vs xdebug, peer-dep conflict | CI pcov ✅, `--legacy-peer-deps` ✅ |
+| QA/Coverage | BE coverage terblokir xdebug di Windows | PHP PIE install xdebug 3.5.3 pre-built DLL ✅; FE harness 13 failure → `vi.hoisted`+localStorage ✅ |
 | Eksternal | Redis down, Cloudinary quota, Laravel major | fallback DB ✅, monitoring ⏳ |
 
 > Audit risiko lengkap (5 pilar, format `⚠️/🛡️/🔧`) **sudah dieksekusi** — lihat `AUDIT_RESTOKU_V2.md` di repo ini (`docs/` atau root) serta ringkasan di memori `[AUDIT RISIKO RESTOKU v2 — FINAL]`.
@@ -246,9 +272,17 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
   Vite Build, Playwright x4). `CodeQL Static Security Analysis` (codeql.yml) **failure by
   design** — GitHub blokir code scanning di repo **private free** (butuh Pro/public);
   bukan bug kode, diabaikan.
+- **UI/Design**: Design system **Halo-adapted** (`resources/css/system.css` + `DESIGN.md`).
+  Palette brand cabe `#FF5B35` / emas `#F59E0B`; 5 screen-mode selectable
+  (terang/gelap/glassmorphic/nano-banana/krem) via `localStorage('outlet_screen_mode')`;
+  **tanpa lucide-react** (inline SVG / Heroicons / Phosphor) untuk hindari AI-template look.
+  Brand co-lockup tenant+Restoku di `TenantBrandLockup`.
+- **Testing A+ (QA rule)**: tiap perubahan kode wajib unit test; coverage 100% pada scope
+  terpilih. FE = Vitest scoped (64/64 hijau). BE = PHPUnit + **xdebug 3.5.3** (PHP PIE,
+  Windows) → coverage terukur 61.6% baseline, 121 test hijau. `kds` dikunci `enterprise`.
 
 ---
 
 *PRD disusun berbasis fakta kode per commit `8013133` (Fase 0). Diperbarui pasca
-Fase 1–4 — modul Cloudinary + seeder menu (`e332650` / `925b72d`), skalabilitas
-(`4e9f9ad` / `e7ad243` / `de39047`) SELESAI.*
+Fase 1 (`c9a0835`), Fase 2–4 (`4e9f9ad`/`e7ad243`/`de39047`), UI Refactor P2–P6
+(`ff7b162`/`957edbe`/`1cc4793`/`aa8e173`), dan Testing A+ (xdebug via PHP PIE + FE 64/64).*

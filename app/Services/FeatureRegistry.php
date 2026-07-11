@@ -38,8 +38,8 @@ class FeatureRegistry
      * Naming convention: snake_case, match dengan route names & sidebar keys.
      */
     public const FEATURE_LOCKS = [
-        // ── Pro features (operational core) ───────────────────────────────
-        'kds' => 'pro',
+        // ── Enterprise features (exclusive) ───────────────────────────────
+        'kds' => 'enterprise',
         'white_label' => 'enterprise',
         'priority_support' => 'enterprise',
         'unlimited_outlet' => 'enterprise',
@@ -84,7 +84,6 @@ class FeatureRegistry
             'perbandingan_outlet', 'arus_kas', 'staf_shift',
             'stok_opname', 'pembelian_vendor', 'dashboard_inventory',
             'inventory', 'cashier_session', 'refund_void',
-            'kds',
         ],
         'enterprise' => [
             // Semua fitur pro
