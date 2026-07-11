@@ -2,7 +2,7 @@
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass, formatRupiah } from '../../Components/Shared';
-import { MapPin, TrendingUp, TrendingDown, Store, Award, Percent } from 'lucide-react';
+import { MapPin, TrendingUp, TrendingDown, Store, Award } from 'lucide-react';
 import { RoleGuard } from '../../Components/RoleGuard';
 
 function PerbandinganOutletInner() {

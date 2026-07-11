@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ChefHat, Delete, ArrowRight } from 'lucide-react';
-import { RestokuLogo, RestokuWordmark, verifyPin, DEFAULT_EMPLOYEES } from '../../Components/Shared';
+import { Delete } from 'lucide-react';
+import { RestokuWordmark, verifyPin, DEFAULT_EMPLOYEES } from '../../Components/Shared';
 
 export default function StaffLogin() {
     const [pin, setPin] = useState('');

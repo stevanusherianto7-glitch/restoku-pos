@@ -42,7 +42,7 @@ export function DigitalReceiptPreview({ onClose, config }: DigitalReceiptPreview
                             if (activeKaryawanStr) {
                                 try {
                                     cashierName = JSON.parse(activeKaryawanStr).name;
-                                } catch (e) {
+                                } catch {
                                     cashierName = 'Kasir Utama';
                                 }
                             } else {

@@ -1,10 +1,10 @@
 import { useState, type ChangeEvent } from 'react';
 import { Head } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { useSubscription } from '../../Hooks/useSubscription';
+
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from '../../Components/Shared';
-import { ChefHat, Search, Plus, Upload, Pencil, Trash2, X } from 'lucide-react';
+import { Screen, Glass, formatRupiah } from '../../Components/Shared';
+import { ChefHat, Plus, Upload, Pencil, Trash2, X } from 'lucide-react';
 import { ProductImage } from '../../Components/ProductImage';
 
 type Category = { id: number; name: string };
@@ -22,7 +22,7 @@ type MenuItemType = {
     sort_order: number;
 };
 
-function convertToWebP(file: File): Promise<string> {
+function convertToWebP(_file: File): Promise<string> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {

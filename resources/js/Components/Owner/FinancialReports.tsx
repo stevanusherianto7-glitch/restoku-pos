@@ -1,5 +1,5 @@
 import { Screen, Glass, Button, formatRupiah as formatRp } from '../Shared';
-import { Download, FileText, FileSpreadsheet, FileJson, TrendingUp } from 'lucide-react';
+import { FileText, FileSpreadsheet, FileJson, TrendingUp } from 'lucide-react';
 
 export function FinancialReports() {
     const revenueBreakdown = [

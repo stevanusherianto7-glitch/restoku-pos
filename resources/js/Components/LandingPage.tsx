@@ -1,28 +1,11 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 
 /* ── Inline icons (no lucide — avoids AI-template look) ── */
 function FlameIcon({ className = '' }: { className?: string }) {
     return (
         <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
             <path d="M12 2c1.2 3-1 4.2-1 4.2S8 7.8 8 11a4 4 0 008 0c0-1.6-1-2.7-1-2.7s.6 3-2 3c0-3.2-1-5.5-1-9.3Z" />
-        </svg>
-    );
-}
-function BowlIcon({ className = '' }: { className?: string }) {
-    return (
-        <svg
-            viewBox="0 0 24 24"
-            className={className}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-        >
-            <path d="M3 11h18a9 9 0 0 1-18 0Z" />
-            <path d="M7 7c0-1.5 1-2 2-2M12 6V4M17 7c0-1.5-1-2-2-2" />
         </svg>
     );
 }

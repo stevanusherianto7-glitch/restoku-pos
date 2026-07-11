@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, Badge, cardToneMap } from '../../Components/Shared';
+import { Screen, Glass } from '../../Components/Shared';
 import { QrCode, Plus, LayoutGrid, Printer, Users } from 'lucide-react';
 import { useState } from 'react';
 

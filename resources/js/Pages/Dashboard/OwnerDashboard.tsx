@@ -12,7 +12,6 @@ import {
     Activity,
     Wallet,
     Receipt,
-    CreditCard,
     ShoppingCart,
 } from 'lucide-react';
 
@@ -46,12 +45,9 @@ interface Props {
     metrics: Metrics;
     leaderboard: OutletPerformance[];
     menuPerformance: MenuPerformance;
-    filters: {
-        date_range: string;
-    };
 }
 
-export default function OwnerDashboard({ metrics, leaderboard, menuPerformance, filters }: Props) {
+export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }: Props) {
     const kpis = [
         {
             label: 'Total Pendapatan',

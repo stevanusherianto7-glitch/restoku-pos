@@ -15,12 +15,9 @@ interface Financials {
 
 interface Props {
     financials: Financials;
-    filters: {
-        date_range: string;
-    };
 }
 
-export default function Reports({ financials, filters }: Props) {
+export default function Reports({ financials }: Props) {
     const [startDate, setStartDate] = useState('2026-07-01');
     const [endDate, setEndDate] = useState('2026-07-31');
 

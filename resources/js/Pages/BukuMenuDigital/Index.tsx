@@ -1,33 +1,11 @@
 import { useState, useMemo, ElementType } from 'react';
 import { Head, usePage } from '@inertiajs/react';
-import { useSubscription } from '../../Hooks/useSubscription';
+
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from '../../Components/Shared';
+import { Screen, Glass, formatRupiah } from '../../Components/Shared';
 import {
-    DollarSign,
-    Utensils,
-    Package,
-    Users,
-    Search,
-    Clock3,
-    CheckCheck,
-    Plus,
-    SlidersHorizontal,
-    ArrowDownToLine,
-    Smartphone,
     QrCode,
-    UserPlus,
-    FileText,
-    ChevronRight,
-    Calculator,
-    AlertTriangle,
-    MessageSquare,
-    TicketPercent,
     CheckCircle2,
-    RefreshCcw,
-    Download,
-    DownloadCloud,
-    Volume2,
     Link2,
     Copy,
     LayoutTemplate,
@@ -37,7 +15,7 @@ import {
     Upload,
     Printer,
 } from 'lucide-react';
-import { ProductImage } from '../../Components/ProductImage';
+
 import { RoleGuard } from '../../Components/RoleGuard';
 import { QRCodeSVG } from 'qrcode.react';
 import { buildMenuUrl } from '../../lib/menuUrl';

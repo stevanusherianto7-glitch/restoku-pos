@@ -9,7 +9,6 @@ import {
     Users,
     Sparkles,
     Clock,
-    TrendingUp,
     AlertTriangle,
     Building2,
     ChevronRight,

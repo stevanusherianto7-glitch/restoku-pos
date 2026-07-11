@@ -1,22 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, Badge, formatRupiah } from '../../Components/Shared';
-import {
-    ShoppingBag,
-    Printer,
-    Clock,
-    ArrowRight,
-    Utensils,
-    CheckCircle,
-    RefreshCw,
-    Layers,
-    CheckSquare,
-    Sparkles,
-    MessageCircle,
-    CreditCard,
-    GlassWater,
-} from 'lucide-react';
+import { Screen, Glass, Badge } from '../../Components/Shared';
+import { ShoppingBag, Clock, Utensils, RefreshCw, Layers, CreditCard, GlassWater } from 'lucide-react';
 
 interface Order {
     id: string;

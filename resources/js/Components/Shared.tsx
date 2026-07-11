@@ -412,7 +412,7 @@ export function getOutletTaxConfig() {
                 serviceCharge: parsed.isTaxActive ? (parsed.serviceCharge ?? 0) : 0,
                 isTaxActive: parsed.isTaxActive !== false,
             };
-        } catch (e) {}
+        } catch {}
     }
     return {
         taxType: 'pbjt',

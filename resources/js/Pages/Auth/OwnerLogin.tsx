@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ChefHat, Mail, Lock, ArrowRight, Quote, Eye, EyeOff } from 'lucide-react';
-import { Input, Button, RestokuLogo, RestokuWordmark } from '../../Components/Shared';
+import { Mail, Lock, ArrowRight, Quote, Eye, EyeOff } from 'lucide-react';
+import { Input, Button, RestokuWordmark } from '../../Components/Shared';
 
 export default function OwnerLogin() {
     const [email, setEmail] = useState('');

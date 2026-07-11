@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Screen, Glass, Button } from '../Shared';
-import { ScanLine, CheckCircle2, XCircle, Camera, MapPin, AlertTriangle } from 'lucide-react';
+import { ScanLine, CheckCircle2, Camera, MapPin, AlertTriangle } from 'lucide-react';
 
 export function QrScanner() {
     const [scanState, setScanState] = useState<

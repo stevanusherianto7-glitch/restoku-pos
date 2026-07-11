@@ -8,8 +8,6 @@ import {
     Download,
     Save,
     RefreshCw,
-    User,
-    Clock,
     ArrowLeft,
     Check,
     X,
@@ -146,7 +144,7 @@ export function StafShift() {
                 if (parsed.role) {
                     setActiveRole(parsed.role);
                 }
-            } catch (e) {
+            } catch {
                 // ignore
             }
         }

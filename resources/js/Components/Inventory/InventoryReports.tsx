@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Screen, Glass, Badge, Button, Input, formatRupiah as formatRp } from '../Shared';
-import { Search, Filter, Download, FileText, TrendingUp, TrendingDown } from 'lucide-react';
+import { Search, Download, FileText, TrendingUp } from 'lucide-react';
 
 export function InventoryReports() {
     const [activeTab, setActiveTab] = useState<'hpp' | 'mutasi'>('hpp');

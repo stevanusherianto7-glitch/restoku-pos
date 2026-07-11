@@ -1,34 +1,9 @@
 import { Head } from '@inertiajs/react';
-import { useSubscription } from '../../Hooks/useSubscription';
+
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, Badge, formatRupiah, toneMap, cardToneMap, PlanBadge } from '../../Components/Shared';
-import {
-    DollarSign,
-    Utensils,
-    Package,
-    Users,
-    Search,
-    Clock3,
-    CheckCheck,
-    Plus,
-    SlidersHorizontal,
-    ArrowDownToLine,
-    Smartphone,
-    QrCode,
-    UserPlus,
-    FileText,
-    ChevronRight,
-    Calculator,
-    AlertTriangle,
-    MessageSquare,
-    TicketPercent,
-    CheckCircle2,
-    RefreshCcw,
-    Download,
-    DownloadCloud,
-    Volume2,
-} from 'lucide-react';
-import { ProductImage } from '../../Components/ProductImage';
+import { Screen, Glass, Badge, formatRupiah } from '../../Components/Shared';
+import { Utensils, Plus } from 'lucide-react';
+
 import { RoleGuard } from '../../Components/RoleGuard';
 
 function ProdukMenuInner() {

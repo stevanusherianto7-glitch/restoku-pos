@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, Badge, formatRupiah, cardToneMap } from '../../Components/Shared';
+import { Screen, Glass } from '../../Components/Shared';
 import { Clock3, CheckCheck, Volume2, VolumeX, GlassWater, BellRing, ShieldAlert } from 'lucide-react';
 
 type KdsOrder = {

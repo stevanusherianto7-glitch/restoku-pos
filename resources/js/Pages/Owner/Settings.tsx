@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass } from '../../Components/Shared';
-import { User, Bell, Mail, Smartphone, Save, Key, Lock, CheckCircle2 } from 'lucide-react';
+import { User, Bell, Smartphone, Save, Key, Lock, CheckCircle2 } from 'lucide-react';
 
 export default function OwnerSettings() {
     // Mock State for Settings

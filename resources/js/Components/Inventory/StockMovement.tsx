@@ -1,16 +1,6 @@
 import { useState } from 'react';
 import { Screen, Glass, Badge, Button, Input } from '../Shared';
-import {
-    Search,
-    Plus,
-    FileDown,
-    FileUp,
-    ClipboardList,
-    RotateCcw,
-    Filter,
-    ChevronDown,
-    CheckCircle2,
-} from 'lucide-react';
+import { Search, Plus, FileDown, FileUp, ClipboardList, RotateCcw, Filter, CheckCircle2 } from 'lucide-react';
 
 export function StockMovement({ initialTab = 'riwayat' }: { initialTab?: 'riwayat' | 'masuk' | 'waste' | 'opname' }) {
     const [activeTab, setActiveTab] = useState(initialTab);

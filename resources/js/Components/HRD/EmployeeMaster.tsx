@@ -8,14 +8,12 @@ import {
     FileText,
     CheckCircle2,
     AlertTriangle,
-    Clock,
     Briefcase,
     FileBadge,
     CalendarOff,
     ShieldAlert,
     Save,
     Upload,
-    MapPin,
 } from 'lucide-react';
 
 type Employee = {

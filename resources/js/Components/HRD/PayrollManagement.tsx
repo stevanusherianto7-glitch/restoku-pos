@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import { Screen, Glass, Badge, Button, formatRupiah as formatCurrency } from '../Shared';
-import {
-    Calculator,
-    CheckCircle2,
-    ChevronRight,
-    Download,
-    FileText,
-    Search,
-    Send,
-    DollarSign,
-    Calendar,
-} from 'lucide-react';
+import { Calculator, CheckCircle2, Download, FileText, Search, Send, DollarSign, Calendar } from 'lucide-react';
 
 const MOCK_PAYROLL = [
     {

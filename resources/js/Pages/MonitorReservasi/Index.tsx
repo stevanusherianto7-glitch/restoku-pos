@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { RoleGuard } from '../../Components/RoleGuard';
-import { Screen, Glass, Badge } from '../../Components/Shared';
+import { Screen, Glass } from '../../Components/Shared';
 import {
     CalendarDays,
     Clock3,
@@ -11,10 +11,8 @@ import {
     CheckCircle2,
     XCircle,
     Calendar,
-    MapPin,
     PartyPopper,
     RefreshCw,
-    ChevronDown,
     Filter,
     Search,
     Cake,

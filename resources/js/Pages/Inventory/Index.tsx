@@ -1,46 +1,9 @@
 import { Head } from '@inertiajs/react';
-import { useSubscription } from '../../Hooks/useSubscription';
+
 import MainLayout from '../../Layouts/MainLayout';
-import {
-    Screen,
-    Glass,
-    Badge,
-    formatRupiah,
-    toneMap,
-    cardToneMap,
-    PlanBadge,
-    MOCK_PLAN,
-    MOCK_OUTLET,
-    planHasFeature,
-    FEATURE_LOCKS,
-} from '../../Components/Shared';
-import {
-    DollarSign,
-    Utensils,
-    Package,
-    Users,
-    Search,
-    Clock3,
-    CheckCheck,
-    Plus,
-    SlidersHorizontal,
-    ArrowDownToLine,
-    Smartphone,
-    QrCode,
-    UserPlus,
-    FileText,
-    ChevronRight,
-    Calculator,
-    AlertTriangle,
-    MessageSquare,
-    TicketPercent,
-    CheckCircle2,
-    RefreshCcw,
-    Download,
-    DownloadCloud,
-    Volume2,
-} from 'lucide-react';
-import { ProductImage } from '../../Components/ProductImage';
+import { Screen, Glass, Badge, formatRupiah, MOCK_OUTLET } from '../../Components/Shared';
+import { Search, Plus, SlidersHorizontal, Download } from 'lucide-react';
+
 import { RoleGuard } from '../../Components/RoleGuard';
 
 function InventoryInner() {

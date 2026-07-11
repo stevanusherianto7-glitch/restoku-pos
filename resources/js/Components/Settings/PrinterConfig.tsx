@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Screen, Glass, Button, useTenantSettings } from '../Shared';
-import { Printer, Bluetooth, Wifi, Usb, Save, Settings2, FileText, CheckCircle2 } from 'lucide-react';
+import { Printer, Bluetooth, Wifi, Usb, Save, FileText, CheckCircle2 } from 'lucide-react';
 import { DigitalReceiptPreview } from './DigitalReceiptPreview';
 
 export function PrinterConfig() {

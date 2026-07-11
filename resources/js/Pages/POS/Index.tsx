@@ -6,7 +6,6 @@ import { ProductImage } from '../../Components/ProductImage';
 import {
     Screen,
     Glass,
-    Badge,
     formatRupiah,
     PAYMENT_METHODS,
     TAX_LABELS,

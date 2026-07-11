@@ -1,20 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, Badge, formatRupiah, useTenantSettings } from '../../Components/Shared';
-import {
-    Star,
-    RefreshCw,
-    Send,
-    CheckCircle2,
-    AlertTriangle,
-    Settings,
-    Sparkles,
-    AlertCircle,
-    X,
-    Check,
-    MessageSquare,
-} from 'lucide-react';
+import { Screen, Glass, Badge, useTenantSettings } from '../../Components/Shared';
+import { Star, RefreshCw, Send, CheckCircle2, Settings, Sparkles, AlertCircle, X, MessageSquare } from 'lucide-react';
 
 interface Review {
     id: number;

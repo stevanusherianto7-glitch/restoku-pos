@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Screen, Glass, Badge, Button } from '../Shared';
-import { CalendarOff, ShieldAlert, FileText, CheckCircle2, AlertTriangle, Plus } from 'lucide-react';
+import { CalendarOff, ShieldAlert, FileText, AlertTriangle } from 'lucide-react';
 
 export function LeaveAndDiscipline() {
     const [activeTab, setActiveTab] = useState<'cuti' | 'sp'>('cuti');

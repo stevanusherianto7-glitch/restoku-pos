@@ -1,21 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import {
-    ChefHat,
     Search,
     MessageCircle,
     ShoppingBag,
     Plus,
     Minus,
     Check,
-    MapPin,
     Sparkles,
     ShoppingCart,
     HelpCircle,
     CalendarDays,
     Image as ImageIcon,
-    Users,
-    Phone,
     Clock3,
     Calendar,
     CheckCircle2,

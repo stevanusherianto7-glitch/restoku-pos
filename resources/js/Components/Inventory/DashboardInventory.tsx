@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Screen, Glass, Badge, Button, Input, formatRupiah as formatRp } from '../Shared';
+import { Screen, Glass, Badge, Input, formatRupiah as formatRp } from '../Shared';
 import { Search, AlertTriangle, PackageX, CheckCircle2, PackageSearch } from 'lucide-react';
 
 export function DashboardInventory() {

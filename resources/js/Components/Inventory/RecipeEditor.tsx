@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { Screen, Glass, Badge, Button, Input, formatRupiah as formatRp } from '../Shared';
-import { Search, Plus, Save, ChevronLeft, Trash2, Edit2, AlertCircle } from 'lucide-react';
+import { Plus, Save, ChevronLeft, Trash2, AlertCircle } from 'lucide-react';
 
 export function RecipeEditor() {
     const [sellingPrice, setSellingPrice] = useState(25000);

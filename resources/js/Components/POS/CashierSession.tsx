@@ -1,17 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { Screen, Glass, Button, Input, Badge, formatRupiah } from '../Shared';
-import {
-    Calculator,
-    CheckCircle2,
-    Clock,
-    DollarSign,
-    LogOut,
-    Minus,
-    Plus,
-    Search,
-    TerminalSquare,
-    AlertTriangle,
-} from 'lucide-react';
+import { Calculator, Clock, DollarSign, LogOut, TerminalSquare, AlertTriangle } from 'lucide-react';
 
 export function CashierSession() {
     const [sessionState, setSessionState] = useState<'closed' | 'open'>('closed');

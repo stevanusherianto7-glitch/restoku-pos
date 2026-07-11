@@ -1,17 +1,7 @@
 import { useState, ElementType, useEffect } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import {
-    Screen,
-    Glass,
-    Badge,
-    formatRupiah,
-    toneMap,
-    cardToneMap,
-    PlanBadge,
-    TAX_LABELS,
-    useTenantSettings,
-} from '../../Components/Shared';
+import { Screen, Glass, PlanBadge, TAX_LABELS, useTenantSettings } from '../../Components/Shared';
 import { useSubscription } from '../../Hooks/useSubscription';
 import {
     Store,
@@ -35,7 +25,7 @@ import {
     Check,
     X,
 } from 'lucide-react';
-import { ProductImage } from '../../Components/ProductImage';
+
 import { RoleGuard } from '../../Components/RoleGuard';
 
 function PengaturanOutletInner() {

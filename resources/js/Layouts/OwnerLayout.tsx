@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { ChefHat, BarChart3, Users, Package, Settings, TrendingUp, LogOut, Bell, Store } from 'lucide-react';
+import { BarChart3, Users, Package, Settings, TrendingUp, LogOut, Bell, Store } from 'lucide-react';
 import { PlanBadge, useTenantSettings, TenantBrandLockup } from '../Components/Shared';
 import GeminiCopilotWidget from '../Components/POS/GeminiCopilotWidget';
 import { useSubscription } from '../Hooks/useSubscription';
