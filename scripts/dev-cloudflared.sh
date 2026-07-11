@@ -51,8 +51,13 @@ if [ -z "$TUNNEL_URL" ]; then
   cleanup
 fi
 
-# 4. Tulis MENU_BASE_URL ke .env (biar QR encode URL publik, bukan localhost)
-sed -i "s|^MENU_BASE_URL=.*|MENU_BASE_URL=$TUNNEL_URL|" .env
+# 4. Tulis APP_URL + ASSET_URL + MENU_BASE_URL ke .env (biar asset & QR encode URL publik, bukan localhost)
+set_env() { # $1=key $2=value
+  if grep -q "^$1=" .env; then sed -i "s|^$1=.*|$1=$2|" .env; else echo "$1=$2" >> .env; fi
+}
+set_env APP_URL "$TUNNEL_URL"
+set_env ASSET_URL "$TUNNEL_URL"
+set_env MENU_BASE_URL "$TUNNEL_URL"
 
 echo ""
 echo "==================================================="

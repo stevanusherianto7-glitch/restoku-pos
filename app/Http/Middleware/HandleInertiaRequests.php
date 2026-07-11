@@ -93,7 +93,7 @@ class HandleInertiaRequests extends Middleware
             'outlet' => $user ? (function () use ($user, $ctx) {
                 $outlet = $user->outlet;
                 if (! $outlet && $ctx) {
-                    $outlet = Outlet::where('tenant_id', $ctx->tenantId())->first();
+                    $outlet = Outlet::where('tenant_id', $ctx->id())->first();
                 }
 
                 return $outlet ? ['id' => $outlet->id, 'name' => $outlet->name] : null;
