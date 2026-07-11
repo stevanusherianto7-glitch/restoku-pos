@@ -1,0 +1,122 @@
+/* ════════════════════════════════════════════════════════════════════════
+   Restoku Design System — css/system.css
+   Diimpor TEPAT SEKALI dari app.css (setelah theme.css).
+   Meng-extend token Tailwind v4 + override --primary ke brand cabe.
+   Jangan hardcode warna/spasi di JSX — pakai token di sini.
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root,
+.dark,
+.nano-banana,
+.light {
+    /* ── Brand palette (foodie: cabe + emas + krem) ─────────────────────── */
+    --brand-cabe: #ff5b35;
+    --brand-cabe-600: #e04e2b;
+    --brand-emas: #f59e0b;
+    --brand-emas-600: #d97706;
+    --brand-cream: #faf5ee;
+    --brand-cream-200: #fce3d6;
+
+    /* ── Spacing scale (4px base) ────────────────────────────────────────── */
+    --space-1: 0.25rem; /* 4px  */
+    --space-2: 0.5rem; /* 8px  */
+    --space-3: 0.75rem; /* 12px */
+    --space-4: 1rem; /* 16px */
+    --space-6: 1.5rem; /* 24px */
+    --space-8: 2rem; /* 32px */
+
+    /* ── Radius (hangat/foodie) ──────────────────────────────────────────── */
+    --radius-card: 1rem; /* 16px */
+    --radius-panel: 1.125rem; /* 18px */
+
+    /* ── Font roles ──────────────────────────────────────────────────────── */
+    --font-display: 'Poppins', 'Inter', system-ui, sans-serif;
+}
+
+/* ── Override primary → brand cabe (koreksi blue shadcn legacy) ──────────── */
+:root,
+.dark {
+    --primary: #ff5b35;
+    --primary-foreground: #ffffff;
+    --ring: rgba(255, 91, 53, 0.55);
+    --sidebar-primary: #ff5b35;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-ring: rgba(255, 91, 53, 0.55);
+    --chart-1: #ff5b35; /* chart utama = cabe */
+    --chart-3: #f59e0b;
+}
+
+.nano-banana {
+    --primary: #eab308;
+    --primary-foreground: #030712;
+    --ring: rgba(250, 204, 21, 0.65);
+    --sidebar-primary: #eab308;
+}
+
+.light {
+    --primary: #ea4e2b;
+    --primary-foreground: #ffffff;
+    --ring: rgba(234, 78, 43, 0.5);
+    --sidebar-primary: #ea4e2b;
+}
+
+/* ── Expose sebagai color utility Tailwind v4 ────────────────────────────── */
+@theme inline {
+    --color-brand-cabe: var(--brand-cabe);
+    --color-brand-cabe-600: var(--brand-cabe-600);
+    --color-brand-emas: var(--brand-emas);
+    --color-brand-emas-600: var(--brand-emas-600);
+    --color-brand-cream: var(--brand-cream);
+    --color-brand-cream-200: var(--brand-cream-200);
+    --font-display: var(--font-display);
+    --radius-card: var(--radius-card);
+    --radius-panel: var(--radius-panel);
+}
+
+/* ── Utility komponen (DRY, hindari duplikasi class di JSX) ───────────────── */
+@layer components {
+    .rs-screen {
+        @apply min-h-screen bg-background text-foreground;
+    }
+    .rs-container {
+        @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+    }
+    .rs-card {
+        @apply rounded-2xl border border-white/10 bg-card backdrop-blur-xl;
+    }
+    .rs-card-pad {
+        @apply p-6;
+    }
+    .rs-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium transition-colors;
+    }
+    .rs-btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-cabe px-4 py-2 font-medium text-white transition-colors hover:bg-brand-cabe-600 active:scale-95;
+    }
+    .rs-btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 font-medium text-foreground transition-colors hover:bg-white/10 active:scale-95;
+    }
+    .rs-btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium text-muted-foreground transition-colors hover:bg-white/5 active:scale-95;
+    }
+    .rs-btn-danger {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2 font-medium text-destructive-foreground transition-colors hover:opacity-90 active:scale-95;
+    }
+    .rs-input {
+        @apply w-full rounded-xl border border-border bg-input px-4 py-2.5 text-base text-foreground outline-none transition;
+    }
+    .rs-input:focus {
+        @apply border-brand-cabe ring-2 ring-brand-cabe/40;
+    }
+    .rs-input-error {
+        @apply border-destructive ring-2 ring-destructive/40;
+    }
+    .rs-heading {
+        @apply font-display font-semibold tracking-tight text-foreground;
+    }
+}
+
+/* ── Brand gradient (hanya untuk lockup/logo, BUKAN background halaman) ───── */
+.rs-brand-gradient {
+    background-image: linear-gradient(90deg, #ff5b35 0%, #f59e0b 100%);
+}
