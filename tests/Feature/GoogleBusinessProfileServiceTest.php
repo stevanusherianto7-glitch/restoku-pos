@@ -134,4 +134,24 @@ class GoogleBusinessProfileServiceTest extends TestCase
         $raw = \DB::table('google_bp_tokens')->where('tenant_id', $this->user->tenant_id)->first();
         $this->assertNotEquals('rt', $raw->refresh_token);
     }
+
+    public function test_fetch_uses_config_location_id_override_when_token_has_none(): void
+    {
+        // Token TIDAK punya location_id → service harus fallback ke config override.
+        $this->token->update(['location_id' => null]);
+
+        Http::fake([
+            'mybusinessaccountmanagement.googleapis.com/*' => Http::response(['accounts' => [['name' => 'accounts/11440950457431200377']]]),
+            'businessprofile.googleapis.com/*' => Http::response([
+                'reviews' => [['reviewId' => 'r9', 'reviewer' => ['displayName' => 'Dewi'], 'starRating' => 'FOUR', 'comment' => 'Mantap', 'createTime' => now()->toRfc3339String()]],
+            ]),
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $reviews = $service->fetchReviews($this->user, $this->token);
+
+        $this->assertCount(1, $reviews);
+        // Endpoint harus pakai accounts/{account}/locations/{location} dengan angka override.
+        Http::assertSent(fn ($req) => str_contains((string) $req->url(), '/accounts/11440950457431200377/locations/11440950457431200377/reviews'));
+    }
 }

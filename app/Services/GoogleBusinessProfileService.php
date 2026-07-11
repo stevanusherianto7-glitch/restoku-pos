@@ -141,7 +141,7 @@ class GoogleBusinessProfileService
     public function fetchReviews(User $user, GoogleBpToken $token, ?string $locationId = null): array
     {
         $token = $this->refreshIfNeeded($token);
-        $loc = $locationId ?? $token->location_id;
+        $loc = $locationId ?? $token->location_id ?? config('google-business-profile.location_id');
         if (! $loc) {
             throw new \RuntimeException('Location GBP belum dipilih.');
         }
@@ -199,7 +199,7 @@ class GoogleBusinessProfileService
     public function postReply(User $user, GoogleBpToken $token, string $reviewId, string $text): void
     {
         $token = $this->refreshIfNeeded($token);
-        $loc = $token->location_id;
+        $loc = $token->location_id ?? config('google-business-profile.location_id');
         if (! $loc) {
             throw new \RuntimeException('Location GBP belum dipilih.');
         }

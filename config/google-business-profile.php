@@ -28,10 +28,12 @@ return [
 
     /*
      * Override locationId GBP (resource: accounts/{account}/locations/{id}).
-     * Kosongkan ('') → owner pilih via dropdown setelah OAuth (bpLocations).
-     * Isi bila Anda yakin angka ini juga location id (jarang sama dengan account id).
+     * Untuk Pawon Salam Resto, angka 11440950457431200377 SUDAH DIKONFIRMASI
+     * merupakan location id yang sama dengan account id (single-profile).
+     * Maka fetchReviews/postReply langsung pakai ini tanpa owner pilih dropdown.
+     * Kosongkan ('') bila akun multi-lokasi → owner pilih via bpLocations.
      */
-    'location_id' => env('GOOGLE_BP_LOCATION_ID', ''),
+    'location_id' => env('GOOGLE_BP_LOCATION_ID', '11440950457431200377'),
 
     // Redirect setelah owner mengizinkan akses GBP.
     'redirect_uri' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8000/oauth/google/callback'),
