@@ -27,6 +27,10 @@ import {
 } from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
+import { runLocalGeocoder } from '../../lib/geocoder';
+import { TAB_SLUGS, SLUG_TO_TAB } from '../../lib/outletTabs';
+import { serializeStruk, parseStruk } from '../../lib/strukConfig';
+import { applyScreenMode, isScreenMode, type ScreenMode } from '../../lib/screenMode';
 
 function PengaturanOutletInner() {
     const [activeTab, setActiveTab] = useState('Profil Outlet');
@@ -103,15 +107,7 @@ function PengaturanOutletInner() {
         { day: 'Minggu', isOpen: false, openTime: '10:00', closeTime: '21:00' },
     ]);
 
-    // ─── URL Hash Tab Navigation ──────────────────────────────────────────────
-    const TAB_SLUGS: Record<string, string> = {
-        'Profil Outlet': 'profil',
-        'Lokasi Restoran': 'lokasi',
-        'Pajak & Tarif': 'pajak',
-        'Tampilan Struk': 'struk',
-        'Jam Operasional': 'jam',
-    };
-    const SLUG_TO_TAB: Record<string, string> = Object.fromEntries(Object.entries(TAB_SLUGS).map(([k, v]) => [v, k]));
+    // ─── URL Hash Tab Navigation (maps live in lib/outletTabs) ────────────────
 
     const handleTabChange = (label: string) => {
         setActiveTab(label);
@@ -221,79 +217,22 @@ function PengaturanOutletInner() {
         setOwnerInput(staffOwner);
 
         const sMode = localStorage.getItem('outlet_screen_mode');
-        if (sMode === 'terang' || sMode === 'gelap' || sMode === 'glassmorphic' || sMode === 'nano-banana')
-            setScreenMode(sMode as any);
+        if (isScreenMode(sMode)) setScreenMode(sMode);
         else setScreenMode('nano-banana');
         const sTaxActive = localStorage.getItem('outlet_tax_active');
         if (sTaxActive !== null) setIsTaxActive(sTaxActive === 'true');
         const sStruk = localStorage.getItem('outlet_struk_config');
-        if (sStruk) {
-            try {
-                const cfg = JSON.parse(sStruk);
-                if (cfg.headerText) setStrukHeader(cfg.headerText);
-                if (cfg.footerText) setStrukFooter(cfg.footerText);
-                if (cfg.paperWidth) setStrukPaperWidth(cfg.paperWidth);
-            } catch {
-                // ignore malformed printer config
-            }
-        }
+        const parsedStruk = parseStruk(sStruk);
+        if (parsedStruk.headerText) setStrukHeader(parsedStruk.headerText);
+        if (parsedStruk.footerText) setStrukFooter(parsedStruk.footerText);
+        if (parsedStruk.paperWidth) setStrukPaperWidth(parsedStruk.paperWidth);
     }, [tenant, outlet, dbEmployees, tenantName, tenantLogo, tenantImage, staffOwner, employees]);
 
-    const runLocalGeocoder = (address: string) => {
-        const addrUpper = address.toUpperCase();
-        if (
-            addrUpper.includes('SENOPATI') ||
-            addrUpper.includes('KEBAYORAN') ||
-            addrUpper.includes('JAKARTA SELATAN')
-        ) {
-            setLatitudeInput('-6.223847');
-            setLongitudeInput('106.808162');
-        } else if (addrUpper.includes('JAKARTA BARAT') || addrUpper.includes('PURI INDAH')) {
-            setLatitudeInput('-6.168329');
-            setLongitudeInput('106.758852');
-        } else if (addrUpper.includes('JAKARTA UTARA') || addrUpper.includes('PIK') || addrUpper.includes('PLUIT')) {
-            setLatitudeInput('-6.111248');
-            setLongitudeInput('106.782631');
-        } else if (
-            addrUpper.includes('JAKARTA PUSAT') ||
-            addrUpper.includes('MENTENG') ||
-            addrUpper.includes('SUDIRMAN')
-        ) {
-            setLatitudeInput('-6.186486');
-            setLongitudeInput('106.829432');
-        } else if (addrUpper.includes('JAKARTA TIMUR') || addrUpper.includes('JATINEGARA')) {
-            setLatitudeInput('-6.225014');
-            setLongitudeInput('106.886034');
-        } else if (addrUpper.includes('SURABAYA')) {
-            setLatitudeInput('-7.257487');
-            setLongitudeInput('112.752090');
-        } else if (addrUpper.includes('BANDUNG')) {
-            setLatitudeInput('-6.917464');
-            setLongitudeInput('107.619123');
-        } else if (
-            addrUpper.includes('BALI') ||
-            addrUpper.includes('KUTA') ||
-            addrUpper.includes('SEMINYAK') ||
-            addrUpper.includes('DENPASAR')
-        ) {
-            setLatitudeInput('-8.409518');
-            setLongitudeInput('115.188919');
-        } else if (addrUpper.includes('MEDAN')) {
-            setLatitudeInput('3.595196');
-            setLongitudeInput('98.672223');
-        } else if (addrUpper.includes('MAKASSAR')) {
-            setLatitudeInput('-5.147665');
-            setLongitudeInput('119.432731');
-        } else if (addrUpper.includes('JOGJA') || addrUpper.includes('YOGYAKARTA')) {
-            setLatitudeInput('-7.795580');
-            setLongitudeInput('110.369490');
-        } else if (addrUpper.includes('SEMARANG')) {
-            setLatitudeInput('-6.966667');
-            setLongitudeInput('110.416667');
-        } else {
-            setLatitudeInput('-6.200000');
-            setLongitudeInput('106.816666');
-        }
+    // runLocalGeocoder() now lives in lib/geocoder (pure, unit-tested).
+    const runLocalGeocoderFor = (address: string) => {
+        const { lat, lng } = runLocalGeocoder(address);
+        setLatitudeInput(lat);
+        setLongitudeInput(lng);
     };
 
     const handleGeocodeAddress = (address: string) => {
@@ -312,36 +251,26 @@ function PengaturanOutletInner() {
                         setLatitudeInput(loc.lat.toFixed(6));
                         setLongitudeInput(loc.lng.toFixed(6));
                     } else {
-                        runLocalGeocoder(address);
+                        runLocalGeocoderFor(address);
                     }
                 })
                 .catch((err) => {
                     console.warn('Google Geocoding failed, using local parser fallback', err);
-                    runLocalGeocoder(address);
+                    runLocalGeocoderFor(address);
                 })
                 .finally(() => setIsFetchingGeo(false));
         } else {
             setTimeout(() => {
-                runLocalGeocoder(address);
+                runLocalGeocoderFor(address);
                 setIsFetchingGeo(false);
             }, 700);
         }
     };
 
-    const handleScreenModeChange = (mode: 'terang' | 'gelap' | 'glassmorphic' | 'nano-banana' | 'krem') => {
+    const handleScreenModeChange = (mode: ScreenMode) => {
         setScreenMode(mode);
         localStorage.setItem('outlet_screen_mode', mode);
-        document.documentElement.setAttribute('data-screen-mode', mode);
-        if (mode === 'nano-banana') {
-            document.documentElement.classList.add('nano-banana', 'dark');
-            document.documentElement.classList.remove('light');
-        } else if (mode === 'terang' || mode === 'krem') {
-            document.documentElement.classList.add('light');
-            document.documentElement.classList.remove('dark', 'nano-banana');
-        } else {
-            document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light', 'nano-banana');
-        }
+        applyScreenMode(mode, document.documentElement);
         window.dispatchEvent(new Event('storage'));
     };
 
@@ -471,8 +400,12 @@ function PengaturanOutletInner() {
         localStorage.setItem('outlet_tax_rate', taxRateInput.toString());
         localStorage.setItem('outlet_service_charge', serviceChargeInput.toString());
 
-        const strukConfig = { headerText: strukHeader, footerText: strukFooter, paperWidth: strukPaperWidth };
-        localStorage.setItem('outlet_struk_config', JSON.stringify(strukConfig));
+        const strukConfig = serializeStruk({
+            headerText: strukHeader,
+            footerText: strukFooter,
+            paperWidth: strukPaperWidth,
+        });
+        localStorage.setItem('outlet_struk_config', strukConfig);
         fetch('/api/receipt-config', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

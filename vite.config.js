@@ -76,12 +76,14 @@ export default defineConfig({
                 'node_modules/**',
             ],
             thresholds: {
-                // Baseline transparan: angka riil terukur (batch 5-6 hardening).
-                // NAIKKAN bertahap tiap batch Page di-test (target akhir 100%).
-                lines: 50,
-                branches: 47,
-                functions: 43,
-                statements: 50,
+                // Baseline transparan: angka riil terukur (batch 6 hardening).
+                // Naik bertahap tiap batch Page di-test (target akhir 100%).
+                // Batch 6: ekstrak 4 modul lib murni (geocoder/outletTabs/strukConfig/
+                // screenMode) + test 100% → lines 53, branches 50, funcs 44.
+                lines: 53,
+                branches: 50,
+                functions: 44,
+                statements: 53,
             },
         },
     },
