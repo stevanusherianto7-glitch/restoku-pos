@@ -25,12 +25,22 @@ import { ReceiptPreview } from '../../Components/POS/ReceiptPreview';
 import { RoleGuard } from '../../Components/RoleGuard';
 
 // ─── Menu Catalog ─────────────────────────────────────────────────────────────
+// Foto menu diarahkan ke Cloudinary (sesuai konvensi Restoku: jangan hardcode
+// /images lokal). Saat modul upload owner aktif, path diganti jadi URL Cloudinary
+// penuh; ProductImage menangani fallback bila gambar gagal dimuat.
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/restoku/image/upload';
 const MENU_CATALOG = [
-    { id: 1, name: 'Nasi Goreng Spesial', price: 25000, category: 'Makanan', image: '/images/nasi_goreng.webp' },
+    {
+        id: 1,
+        name: 'Nasi Goreng Spesial',
+        price: 25000,
+        category: 'Makanan',
+        image: `${CLOUDINARY_BASE}/nasi_goreng.webp`,
+    },
     { id: 2, name: 'Mie Goreng Jawa', price: 25000, category: 'Makanan' },
     { id: 3, name: 'Sate Ayam Madura', price: 35000, category: 'Makanan' },
     { id: 4, name: 'Soto Ayam Lamongan', price: 22000, category: 'Makanan' },
-    { id: 7, name: 'Es Teh Manis', price: 5000, category: 'Minuman', image: '/images/es_teh.webp' },
+    { id: 7, name: 'Es Teh Manis', price: 5000, category: 'Minuman', image: `${CLOUDINARY_BASE}/es_teh.webp` },
     { id: 8, name: 'Es Jeruk Peras', price: 8000, category: 'Minuman' },
     { id: 9, name: 'Kopi Susu Aren', price: 18000, category: 'Minuman' },
     { id: 10, name: 'Pisang Goreng Keju', price: 15000, category: 'Pelengkap' },
