@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Download, Printer } from 'lucide-react';
+import { XIcon, DownloadIcon, PrinterIcon } from '../icons';
 import { Button } from '../Shared';
 
 interface DigitalReceiptPreviewProps {
@@ -28,7 +28,7 @@ export function DigitalReceiptPreview({ onClose, config }: DigitalReceiptPreview
                 <div className="bg-slate-100 p-4 flex justify-between items-center border-b">
                     <h3 className="font-bold text-slate-800">Pratinjau Struk ({config.paperWidth})</h3>
                     <button onClick={onClose} className="text-slate-500 hover:text-slate-800 transition-colors">
-                        <X className="size-5" />
+                        <XIcon className="size-5" />
                     </button>
                 </div>
 
@@ -211,10 +211,10 @@ export function DigitalReceiptPreview({ onClose, config }: DigitalReceiptPreview
                         className="text-slate-700 border-slate-300 hover:bg-slate-200 gap-2"
                         onClick={onClose}
                     >
-                        <Download className="size-4" /> Download PDF
+                        <DownloadIcon className="size-4" /> DownloadIcon PDF
                     </Button>
                     <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2 text-white" onClick={onClose}>
-                        <Printer className="size-4" /> Cetak (Tes)
+                        <PrinterIcon className="size-4" /> Cetak (Tes)
                     </Button>
                 </div>
             </div>

@@ -23,11 +23,9 @@ vi.mock('@inertiajs/react', () => ({
     usePage: vi.fn(),
 }));
 
-// Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-    ChefHat: () => <svg data-testid="icon-chef-hat" />,
-    Delete: () => <svg data-testid="icon-delete" />,
-    ArrowRight: () => <svg data-testid="icon-arrow-right" />,
+// Mock icons
+vi.mock('../Components/icons', () => ({
+    DeleteIcon: () => <svg data-testid="icon-delete" />,
 }));
 
 // Mock Shared components & utilities

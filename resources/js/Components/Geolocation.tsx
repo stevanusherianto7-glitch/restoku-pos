@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Glass, Screen } from './Shared';
-import { MapPin, CheckCircle2, XCircle, QrCode, ShieldAlert } from 'lucide-react';
+import { MapPinIcon, CheckCircle2Icon, XCircleIcon, QrCodeIcon, ShieldAlertIcon } from './icons';
 
 // Haversine formula
 function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -66,9 +66,9 @@ export function LocationLogs() {
                                     <td className="px-4 py-3 whitespace-nowrap">{log.acc}</td>
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         {log.within ? (
-                                            <CheckCircle2 className="size-4 text-emerald-400" />
+                                            <CheckCircle2Icon className="size-4 text-emerald-400" />
                                         ) : (
-                                            <XCircle className="size-4 text-rose-400" />
+                                            <XCircleIcon className="size-4 text-rose-400" />
                                         )}
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
@@ -173,7 +173,7 @@ export function CustomerQRScan() {
                 {status === 'idle' && (
                     <div className="text-center space-y-6">
                         <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-3xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-                            <QrCode className="size-16" />
+                            <QrCodeIcon className="size-16" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold font-display text-white">Scan QR Meja</h1>
@@ -203,7 +203,7 @@ export function CustomerQRScan() {
                 {status === 'success' && (
                     <div className="text-center space-y-6">
                         <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-3xl bg-emerald-500/10 text-emerald-400">
-                            <CheckCircle2 className="size-16" />
+                            <CheckCircle2Icon className="size-16" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold font-display text-white">Lokasi Terverifikasi</h1>
@@ -223,8 +223,8 @@ export function CustomerQRScan() {
                 {status === 'error' && (
                     <div className="text-center space-y-6">
                         <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-3xl bg-rose-500/10 text-rose-400 relative">
-                            <MapPin className="size-16" />
-                            <ShieldAlert className="absolute -bottom-2 -right-2 size-10 text-rose-500 drop-shadow-md bg-[#030303] rounded-full p-1" />
+                            <MapPinIcon className="size-16" />
+                            <ShieldAlertIcon className="absolute -bottom-2 -right-2 size-10 text-rose-500 drop-shadow-md bg-[#030303] rounded-full p-1" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold font-display text-white">Lokasi Ditolak</h1>
@@ -261,7 +261,7 @@ export function CustomerQRScan() {
                 {status === 'waiver' && (
                     <div className="text-center space-y-6">
                         <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-3xl bg-purple-500/10 text-purple-400">
-                            <CheckCircle2 className="size-16" />
+                            <CheckCircle2Icon className="size-16" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold font-display text-white">Waiver Diberikan</h1>

@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Screen, Glass, Badge, Button, Input } from '../Shared';
-import { Search, Plus, FileDown, FileUp, ClipboardList, RotateCcw, Filter, CheckCircle2 } from 'lucide-react';
+import {
+    SearchIcon,
+    PlusIcon,
+    FileDownIcon,
+    FileUpIcon,
+    ClipboardListIcon,
+    RotateCcwIcon,
+    FilterIcon,
+    CheckCircle2Icon,
+} from '../icons';
 
 export function StockMovement({ initialTab = 'riwayat' }: { initialTab?: 'riwayat' | 'masuk' | 'waste' | 'opname' }) {
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -112,25 +121,25 @@ export function StockMovement({ initialTab = 'riwayat' }: { initialTab?: 'riwaya
                     onClick={() => setActiveTab('riwayat')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'riwayat' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <RotateCcw className="size-4" /> Riwayat Mutasi
+                    <RotateCcwIcon className="size-4" /> Riwayat Mutasi
                 </button>
                 <button
                     onClick={() => setActiveTab('masuk')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'masuk' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <FileDown className="size-4" /> Barang Masuk (PO)
+                    <FileDownIcon className="size-4" /> Barang Masuk (PO)
                 </button>
                 <button
                     onClick={() => setActiveTab('waste')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'waste' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <FileUp className="size-4" /> Barang Keluar / Rusak
+                    <FileUpIcon className="size-4" /> Barang Keluar / Rusak
                 </button>
                 <button
                     onClick={() => setActiveTab('opname')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'opname' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <ClipboardList className="size-4" /> Stock Opname
+                    <ClipboardListIcon className="size-4" /> Stock Opname
                 </button>
             </div>
 
@@ -138,14 +147,14 @@ export function StockMovement({ initialTab = 'riwayat' }: { initialTab?: 'riwaya
                 {/* Toolbar */}
                 <div className="flex flex-col md:flex-row gap-4 mb-6 md:items-center justify-between">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                         <Input placeholder={`Cari data...`} className="pl-9 w-full md:w-80" />
                     </div>
                     <div className="flex gap-2">
                         {activeTab === 'riwayat' && (
                             <>
                                 <Button variant="outline" className="gap-2">
-                                    <Filter className="size-4" /> Filter Jenis
+                                    <FilterIcon className="size-4" /> FilterIcon Jenis
                                 </Button>
                                 <Button variant="outline" className="gap-2">
                                     Export Data
@@ -154,17 +163,17 @@ export function StockMovement({ initialTab = 'riwayat' }: { initialTab?: 'riwaya
                         )}
                         {activeTab === 'masuk' && (
                             <Button className="gap-2">
-                                <Plus className="size-4" /> Catat Barang Masuk
+                                <PlusIcon className="size-4" /> Catat Barang Masuk
                             </Button>
                         )}
                         {activeTab === 'waste' && (
                             <Button className="gap-2">
-                                <Plus className="size-4" /> Catat Barang Rusak
+                                <PlusIcon className="size-4" /> Catat Barang Rusak
                             </Button>
                         )}
                         {activeTab === 'opname' && (
                             <Button className="gap-2">
-                                <Plus className="size-4" /> Mulai Opname Baru
+                                <PlusIcon className="size-4" /> Mulai Opname Baru
                             </Button>
                         )}
                     </div>
@@ -201,9 +210,9 @@ export function StockMovement({ initialTab = 'riwayat' }: { initialTab?: 'riwaya
                                     <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
                                         <div className="flex flex-col items-center gap-2">
                                             {activeTab === 'masuk' ? (
-                                                <FileDown className="size-8 text-slate-600" />
+                                                <FileDownIcon className="size-8 text-slate-600" />
                                             ) : (
-                                                <FileUp className="size-8 text-slate-600" />
+                                                <FileUpIcon className="size-8 text-slate-600" />
                                             )}
                                             <p>
                                                 Silakan klik tombol "Catat{' '}
@@ -250,7 +259,7 @@ export function StockMovement({ initialTab = 'riwayat' }: { initialTab?: 'riwaya
                                                 </span>
                                             ) : (
                                                 <span className="text-emerald-400 font-medium flex items-center gap-1">
-                                                    <CheckCircle2 className="size-4" /> Cocok
+                                                    <CheckCircle2Icon className="size-4" /> Cocok
                                                 </span>
                                             )}
                                         </td>

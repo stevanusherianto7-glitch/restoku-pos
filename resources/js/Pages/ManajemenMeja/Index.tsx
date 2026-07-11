@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass } from '../../Components/Shared';
-import { QrCode, Plus, LayoutGrid, Printer, Users } from 'lucide-react';
+import { QrCodeIcon, PlusIcon, LayoutGridIcon, PrinterIcon, UsersIcon } from '../../Components/icons';
 import { useState } from 'react';
 
 type TableStatus = 'available' | 'occupied' | 'reserved' | 'dirty';
@@ -66,7 +66,7 @@ export default function TableManagement() {
                 title="Manajemen Meja & QR"
                 action={
                     <button className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/100 text-white rounded-xl transition-colors font-medium">
-                        <Plus className="size-5" />
+                        <PlusIcon className="size-5" />
                         <span>Tambah Meja</span>
                     </button>
                 }
@@ -76,7 +76,7 @@ export default function TableManagement() {
                     <div className="flex-1 space-y-6">
                         <Glass className="p-4 flex gap-4 overflow-x-auto">
                             <button className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg border border-white/20 whitespace-nowrap">
-                                <LayoutGrid className="size-4" /> Semua Meja
+                                <LayoutGridIcon className="size-4" /> Semua Meja
                             </button>
                             <button className="flex items-center gap-2 px-4 py-2 hover:bg-white/5 text-slate-300 rounded-lg whitespace-nowrap">
                                 Lantai 1
@@ -99,7 +99,7 @@ export default function TableManagement() {
                                     <div className="flex justify-between items-start mb-6">
                                         <h3 className="text-2xl font-bold font-mono tracking-tight">{table.name}</h3>
                                         <div className="flex items-center gap-1 opacity-70">
-                                            <Users className="size-4" />
+                                            <UsersIcon className="size-4" />
                                             <span className="text-sm font-medium">{table.capacity}</span>
                                         </div>
                                     </div>
@@ -112,7 +112,7 @@ export default function TableManagement() {
                                             className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
                                             title="Generate QR Code"
                                         >
-                                            <QrCode className="size-5" />
+                                            <QrCodeIcon className="size-5" />
                                         </button>
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@ export default function TableManagement() {
                             </button>
 
                             <div className="w-16 h-16 rounded-full bg-[var(--color-primary)]/20 flex items-center justify-center mb-6">
-                                <QrCode className="size-8 text-[var(--color-primary)]" />
+                                <QrCodeIcon className="size-8 text-[var(--color-primary)]" />
                             </div>
 
                             <h2 className="text-2xl font-bold text-white mb-2">QR Code {selectedTable.name}</h2>
@@ -150,7 +150,7 @@ export default function TableManagement() {
 
                             <div className="flex gap-4 w-full">
                                 <button className="flex-1 py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl font-medium transition-colors flex justify-center items-center gap-2">
-                                    <Printer className="size-5" /> Cetak
+                                    <PrinterIcon className="size-5" /> Cetak
                                 </button>
                                 <button className="flex-1 py-3 px-4 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/100 text-white rounded-xl font-medium transition-colors">
                                     Unduh PNG

@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Screen, Glass, Badge, Button, Input, formatRupiah as formatRp } from '../Shared';
-import { Search, Plus, Filter, Edit2, Trash2, Package, Truck, LayoutList } from 'lucide-react';
+import {
+    SearchIcon,
+    PlusIcon,
+    FilterIcon,
+    Edit2Icon,
+    Trash2Icon,
+    PackageIcon,
+    TruckIcon,
+    LayoutListIcon,
+} from '../icons';
 
 export function IngredientsMaster({ initialTab = 'bahan' }: { initialTab?: 'bahan' | 'kategori' | 'supplier' }) {
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -64,7 +73,7 @@ export function IngredientsMaster({ initialTab = 'bahan' }: { initialTab?: 'baha
             title="Master Bahan Baku & Supplier"
             action={
                 <Button className="gap-2">
-                    <Plus className="size-4" />
+                    <PlusIcon className="size-4" />
                     {activeTab === 'bahan'
                         ? 'Tambah Bahan Baku'
                         : activeTab === 'kategori'
@@ -79,31 +88,31 @@ export function IngredientsMaster({ initialTab = 'bahan' }: { initialTab?: 'baha
                     onClick={() => setActiveTab('bahan')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'bahan' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <Package className="size-4" /> Bahan Baku
+                    <PackageIcon className="size-4" /> Bahan Baku
                 </button>
                 <button
                     onClick={() => setActiveTab('kategori')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'kategori' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <LayoutList className="size-4" /> Kategori
+                    <LayoutListIcon className="size-4" /> Kategori
                 </button>
                 <button
                     onClick={() => setActiveTab('supplier')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'supplier' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <Truck className="size-4" /> Supplier
+                    <TruckIcon className="size-4" /> Supplier
                 </button>
             </div>
 
             <Glass className="p-6">
                 <div className="flex flex-col md:flex-row gap-4 mb-6 md:items-center justify-between">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                         <Input placeholder={`Cari ${activeTab}...`} className="pl-9 w-full md:w-80" />
                     </div>
                     {activeTab === 'bahan' && (
                         <Button variant="outline" className="gap-2">
-                            <Filter className="size-4" /> Filter Kategori
+                            <FilterIcon className="size-4" /> FilterIcon Kategori
                         </Button>
                     )}
                 </div>
@@ -175,10 +184,10 @@ export function IngredientsMaster({ initialTab = 'bahan' }: { initialTab?: 'baha
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button className="p-1 hover:bg-white/10 rounded-md transition-colors text-slate-400 hover:text-white">
-                                                    <Edit2 className="size-4" />
+                                                    <Edit2Icon className="size-4" />
                                                 </button>
                                                 <button className="p-1 hover:bg-red-500/20 rounded-md transition-colors text-slate-400 hover:text-red-400">
-                                                    <Trash2 className="size-4" />
+                                                    <Trash2Icon className="size-4" />
                                                 </button>
                                             </div>
                                         </td>
@@ -193,10 +202,10 @@ export function IngredientsMaster({ initialTab = 'bahan' }: { initialTab?: 'baha
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button className="p-1 hover:bg-white/10 rounded-md transition-colors text-slate-400 hover:text-white">
-                                                    <Edit2 className="size-4" />
+                                                    <Edit2Icon className="size-4" />
                                                 </button>
                                                 <button className="p-1 hover:bg-red-500/20 rounded-md transition-colors text-slate-400 hover:text-red-400">
-                                                    <Trash2 className="size-4" />
+                                                    <Trash2Icon className="size-4" />
                                                 </button>
                                             </div>
                                         </td>
@@ -215,10 +224,10 @@ export function IngredientsMaster({ initialTab = 'bahan' }: { initialTab?: 'baha
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button className="p-1 hover:bg-white/10 rounded-md transition-colors text-slate-400 hover:text-white">
-                                                    <Edit2 className="size-4" />
+                                                    <Edit2Icon className="size-4" />
                                                 </button>
                                                 <button className="p-1 hover:bg-red-500/20 rounded-md transition-colors text-slate-400 hover:text-red-400">
-                                                    <Trash2 className="size-4" />
+                                                    <Trash2Icon className="size-4" />
                                                 </button>
                                             </div>
                                         </td>

@@ -2,7 +2,17 @@ import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, useTenantSettings } from '../../Components/Shared';
-import { Star, RefreshCw, Send, CheckCircle2, Settings, Sparkles, AlertCircle, X, MessageSquare } from 'lucide-react';
+import {
+    StarIcon,
+    RefreshCwIcon,
+    SendIcon,
+    CheckCircle2Icon,
+    SettingsIcon,
+    SparklesIcon,
+    AlertCircleIcon,
+    XIcon,
+    MessageSquareIcon,
+} from '../../Components/icons';
 
 interface Review {
     id: number;
@@ -25,7 +35,7 @@ export default function GoogleReviews() {
     const [filterRating, setFilterRating] = useState<'all' | 'complaints' | 'positive'>('all');
     const [filterStatus, setFilterStatus] = useState<'all' | 'unreplied' | 'replied'>('all');
 
-    // Settings states
+    // SettingsIcon states
     const [showSettings, setShowSettings] = useState(false);
     const [placeId, setPlaceId] = useState('ChIJrTLr-GzsaS4R350O6vCqzw4');
     const [apiKey, setApiKey] = useState('AIzaSyA1234567890-XYZ-restoku-gmaps');
@@ -101,7 +111,7 @@ export default function GoogleReviews() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
+                    'XIcon-CSRF-TOKEN':
                         (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
                 },
             });
@@ -127,7 +137,7 @@ export default function GoogleReviews() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
+                    'XIcon-CSRF-TOKEN':
                         (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
                 },
                 body: JSON.stringify({ reply_text: replyText }),
@@ -150,7 +160,7 @@ export default function GoogleReviews() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
+                    'XIcon-CSRF-TOKEN':
                         (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
                 },
             });
@@ -171,7 +181,7 @@ export default function GoogleReviews() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
+                    'XIcon-CSRF-TOKEN':
                         (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
                 },
                 body: JSON.stringify({ google_place_id: placeId, api_key: apiKey }),
@@ -205,7 +215,7 @@ export default function GoogleReviews() {
         return (
             <div className="flex gap-0.5">
                 {[1, 2, 3, 4, 5].map((s) => (
-                    <Star
+                    <StarIcon
                         key={s}
                         className={`size-3.5 ${s <= rating ? 'fill-amber-400 text-amber-400' : 'text-white/10'}`}
                     />
@@ -223,7 +233,7 @@ export default function GoogleReviews() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl gap-4">
                         <div className="flex items-center gap-3">
                             <div className="grid size-11 place-items-center rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                <MessageSquare className="size-5" />
+                                <MessageSquareIcon className="size-5" />
                             </div>
                             <div>
                                 <h3 className="text-base font-bold text-emerald-200">Google Review & Complaint Hub</h3>
@@ -238,7 +248,7 @@ export default function GoogleReviews() {
                                 onClick={() => setShowSettings(true)}
                                 className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl px-4 py-2.5 text-xs font-semibold flex items-center gap-2 transition-all"
                             >
-                                <Settings className="size-3.5" /> Pengaturan GBP
+                                <SettingsIcon className="size-3.5" /> Pengaturan GBP
                             </button>
                             <button
                                 onClick={handleSync}
@@ -249,7 +259,7 @@ export default function GoogleReviews() {
                                         : 'bg-emerald-400 hover:bg-emerald-500'
                                 } disabled:opacity-50`}
                             >
-                                <RefreshCw className={`size-3.5 ${syncing ? 'animate-spin' : ''}`} />
+                                <RefreshCwIcon className={`size-3.5 ${syncing ? 'animate-spin' : ''}`} />
                                 {syncing ? 'Sinkronisasi...' : 'Sinkronkan Ulasan'}
                             </button>
                         </div>
@@ -346,12 +356,12 @@ export default function GoogleReviews() {
                     {/* Reviews List */}
                     {loading ? (
                         <div className="text-center py-12 text-slate-400 flex flex-col items-center gap-3">
-                            <RefreshCw className="size-8 animate-spin text-emerald-400" />
+                            <RefreshCwIcon className="size-8 animate-spin text-emerald-400" />
                             Memuat ulasan Google...
                         </div>
                     ) : filteredReviews.length === 0 ? (
                         <Glass className="p-12 text-center text-slate-400 flex flex-col items-center justify-center border-white/5">
-                            <CheckCircle2 className="size-12 text-slate-600 mb-3" />
+                            <CheckCircle2Icon className="size-12 text-slate-600 mb-3" />
                             <p className="font-bold text-white">Tidak ada ulasan ditemukan</p>
                             <p className="text-xs text-slate-500 mt-1">
                                 Coba sinkronkan ulasan Anda atau sesuaikan filter pencarian.
@@ -414,8 +424,8 @@ export default function GoogleReviews() {
                                             <div className="ml-13 p-4 bg-white/[0.02] border border-white/5 rounded-xl space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
-                                                        <CheckCircle2 className="size-3.5 text-emerald-400" /> Balasan
-                                                        dari Anda:
+                                                        <CheckCircle2Icon className="size-3.5 text-emerald-400" />{' '}
+                                                        Balasan dari Anda:
                                                     </span>
                                                     <span className="text-[10px] text-slate-500">
                                                         {new Date(review.replied_at || '').toLocaleDateString('id-ID', {
@@ -442,7 +452,7 @@ export default function GoogleReviews() {
                                                                 disabled={generatingAi}
                                                                 className="bg-gradient-to-r from-amber-400 to-yellow-500 text-black px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(234,179,8,0.2)] disabled:opacity-50"
                                                             >
-                                                                <Sparkles className="size-3" />
+                                                                <SparklesIcon className="size-3" />
                                                                 {generatingAi
                                                                     ? 'AI Berpikir...'
                                                                     : 'Auto Balas dengan AI'}
@@ -472,7 +482,7 @@ export default function GoogleReviews() {
                                                                 disabled={!replyText.trim()}
                                                                 className="bg-emerald-500 hover:bg-emerald-600 text-black px-4 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-all disabled:opacity-50"
                                                             >
-                                                                <Send className="size-3" /> Kirim Balasan
+                                                                <SendIcon className="size-3" /> Kirim Balasan
                                                             </button>
                                                         </div>
                                                     </div>
@@ -495,7 +505,7 @@ export default function GoogleReviews() {
                                                             }}
                                                             className="bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 text-amber-300 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-inner"
                                                         >
-                                                            <Sparkles className="size-3 text-amber-400 animate-pulse" />{' '}
+                                                            <SparklesIcon className="size-3 text-amber-400 animate-pulse" />{' '}
                                                             Tulis Balasan dengan AI
                                                         </button>
                                                     </div>
@@ -508,7 +518,7 @@ export default function GoogleReviews() {
                         </div>
                     )}
 
-                    {/* GBP Settings Modal */}
+                    {/* GBP SettingsIcon Modal */}
                     {showSettings && (
                         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                             <div className="bg-zinc-950 border border-white/10 rounded-2xl w-full max-w-md p-6 relative shadow-2xl">
@@ -516,10 +526,10 @@ export default function GoogleReviews() {
                                     onClick={() => setShowSettings(false)}
                                     className="absolute top-4 right-4 text-slate-400 hover:text-white"
                                 >
-                                    <X className="size-5" />
+                                    <XIcon className="size-5" />
                                 </button>
                                 <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-2">
-                                    <Settings className="size-5 text-emerald-400" />
+                                    <SettingsIcon className="size-5 text-emerald-400" />
                                     Pengaturan Google Business
                                 </h3>
                                 <p className="text-xs text-slate-400 mb-5">
@@ -618,7 +628,7 @@ export default function GoogleReviews() {
 
                                         {helperMessage && (
                                             <p className="text-[10px] text-amber-300/90 leading-normal flex items-start gap-1">
-                                                <AlertCircle className="size-3.5 shrink-0 text-amber-400 mt-0.5" />
+                                                <AlertCircleIcon className="size-3.5 shrink-0 text-amber-400 mt-0.5" />
                                                 {helperMessage}
                                             </p>
                                         )}

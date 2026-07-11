@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Screen, Glass, Badge, Button, Input, formatRupiah as formatRp } from '../Shared';
-import { Search, Download, FileText, TrendingUp } from 'lucide-react';
+import { SearchIcon, DownloadIcon, FileTextIcon, TrendingUpIcon } from '../icons';
 
 export function InventoryReports() {
     const [activeTab, setActiveTab] = useState<'hpp' | 'mutasi'>('hpp');
@@ -26,13 +26,13 @@ export function InventoryReports() {
                     onClick={() => setActiveTab('hpp')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'hpp' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <TrendingUp className="size-4" /> Laporan HPP & Food Cost
+                    <TrendingUpIcon className="size-4" /> Laporan HPP & Food Cost
                 </button>
                 <button
                     onClick={() => setActiveTab('mutasi')}
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'mutasi' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
                 >
-                    <FileText className="size-4" /> Laporan Mutasi Stok
+                    <FileTextIcon className="size-4" /> Laporan Mutasi Stok
                 </button>
             </div>
 
@@ -46,11 +46,11 @@ export function InventoryReports() {
                     </div>
                     <div className="flex gap-2">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                             <Input placeholder={`Cari data...`} className="pl-9 w-full md:w-64" />
                         </div>
                         <Button variant="outline" className="gap-2">
-                            <Download className="size-4" /> Export CSV
+                            <DownloadIcon className="size-4" /> Export CSV
                         </Button>
                     </div>
                 </div>

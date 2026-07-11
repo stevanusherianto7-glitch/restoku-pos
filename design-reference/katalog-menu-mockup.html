@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Katalog Menu — Mockup Phase 2 (Restoku Design System)</title>
+<style>
+  /* ── Tokens (mirror resources/css/system.css) ── */
+  :root {
+    --bg: #0a0b0f; --surface: #14151c; --elevated: #1e2029;
+    --border: #2a2d38; --border-strong: #3a3d4a;
+    --text-1: #f2f4f8; --text-2: #9aa0ae; --text-3: #5c6170;
+    --primary: #ff5b35; --primary-hover: #e04e2b; --primary-pressed: #c9431f;
+    --primary-soft: rgba(255,91,53,.14);
+    --accent: #f59e0b; --accent-soft: rgba(245,158,11,.14);
+    --success: #2be08c; --success-soft: rgba(43,224,140,.12);
+    --danger: #ff3a5c; --danger-soft: rgba(255,58,92,.14);
+    --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px;
+    --space-6:24px; --space-8:32px; --radius-md:10px; --radius-lg:16px; --radius-xl:24px;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-display: 'Poppins', 'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text-1); font-family: var(--font-body);
+    padding: 32px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .title-block { display: flex; align-items: center; gap: 14px; }
+  .icon-badge {
+    width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--primary-soft); border: 1px solid rgba(255,91,53,.25); color: var(--primary);
+  }
+  h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; }
+  .sub { font-size: .8rem; color: var(--text-2); margin-top: 2px; }
+
+  /* ── Buttons (Halo anatomy) ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px;
+    border-radius: var(--radius-md); font-size: .875rem; font-weight: 600;
+    border: 1px solid transparent; cursor: pointer; transition: all .15s ease;
+  }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 2px 8px rgba(255,91,53,.25); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-primary:active { background: var(--primary-pressed); }
+  .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
+  .btn-ghost:hover { background: var(--elevated); color: var(--text-1); }
+
+  /* ── Search + filter row ── */
+  .toolbar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+  .search {
+    flex: 1; min-width: 240px; display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 10px 14px; color: var(--text-2);
+  }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--text-1); font-size: .875rem; font-family: inherit; }
+  .pills { display: flex; gap: 8px; }
+  .pill {
+    padding: 8px 16px; border-radius: 999px; font-size: .8125rem; font-weight: 600;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-2); cursor: pointer; transition: all .15s;
+  }
+  .pill:hover { color: var(--text-1); border-color: var(--border-strong); }
+  .pill.active { background: var(--primary-soft); border-color: rgba(255,91,53,.35); color: var(--primary); }
+
+  /* ── Grid + cards ── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    overflow: hidden; display: flex; flex-direction: column; transition: all .2s ease;
+  }
+  .card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .thumb {
+    aspect-ratio: 1; background: linear-gradient(135deg, #2a2030, #1a2230);
+    position: relative; display: grid; place-items: center; border-bottom: 1px solid var(--border);
+  }
+  .thumb svg { width: 48px; height: 48px; opacity: .25; }
+  .badge {
+    position: absolute; top: 10px; right: 10px; font-size: .6875rem; font-weight: 600;
+    padding: 4px 8px; border-radius: 999px; backdrop-filter: blur(8px);
+  }
+  .badge.on { background: var(--success-soft); color: var(--success); }
+  .badge.off { background: var(--danger-soft); color: var(--danger); }
+  .body { padding: 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+  .name { font-size: .875rem; font-weight: 600; color: var(--text-1); line-height: 1.3; }
+  .cat { font-size: .6875rem; color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; }
+  .price { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--accent); }
+  .actions { display: flex; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .act {
+    flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 7px; border-radius: var(--radius-md); font-size: .75rem; font-weight: 600;
+    background: var(--elevated); border: 1px solid var(--border); color: var(--text-2); cursor: pointer; transition: all .15s;
+  }
+  .act:hover { color: var(--text-1); border-color: var(--border-strong); }
+  .act.danger:hover { color: var(--danger); border-color: rgba(255,58,92,.3); background: var(--danger-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title-block">
+      <div class="icon-badge">
+        <!-- inline SVG (no lucide): bowl -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11h18a9 9 0 0 1-18 0Z"/><path d="M7 7c0-1.5 1-2 2-2M12 6V4M17 7c0-1.5-1-2-2-2"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Katalog Menu</h1>
+        <div class="sub">Pawon Salam — Bandung · 8 item</div>
+      </div>
+    </div>
+    <button class="btn btn-primary">
+      <!-- inline SVG plus -->
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Tambah Menu
+    </button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search">
+      <!-- inline SVG search -->
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input placeholder="Cari menu…" />
+    </div>
+    <div class="pills">
+      <span class="pill active">Semua</span>
+      <span class="pill">Makanan</span>
+      <span class="pill">Minuman</span>
+      <span class="pill">Pelengkap</span>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="grid">
+    <!-- Card: available -->
+    <div class="card">
+      <div class="thumb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2c1.2 3-1 4.2-1 4.2S8 7.8 8 11a4 4 0 008 0c0-1.6-1-2.7-1-2.7s.6 3-2 3c0-3.2-1-5.5-1-9.3Z"/></svg>
+        <span class="badge on">Tersedia</span>
+      </div>
+      <div class="body">
+        <div>
+          <div class="name">Soto Ayam Lamongan</div>
+          <div class="cat">Makanan</div>
+        </div>
+        <div class="price">Rp 25.000</div>
+        <div class="actions">
+          <span class="act"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit</span>
+          <span class="act danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Hapus</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: sold out -->
+    <div class="card">
+      <div class="thumb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 8l8 8"/></svg>
+        <span class="badge off">Habis</span>
+      </div>
+      <div class="body">
+        <div>
+          <div class="name">Es Cendol Dawet</div>
+          <div class="cat">Minuman</div>
+        </div>
+        <div class="price">Rp 18.000</div>
+        <div class="actions">
+          <span class="act"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit</span>
+          <span class="act danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Hapus</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: available -->
+    <div class="card">
+      <div class="thumb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2c1.2 3-1 4.2-1 4.2S8 7.8 8 11a4 4 0 008 0c0-1.6-1-2.7-1-2.7s.6 3-2 3c0-3.2-1-5.5-1-9.3Z"/></svg>
+        <span class="badge on">Tersedia</span>
+      </div>
+      <div class="body">
+        <div>
+          <div class="name">Ayam Bakar Kecap</div>
+          <div class="cat">Makanan</div>
+        </div>
+        <div class="price">Rp 32.000</div>
+        <div class="actions">
+          <span class="act"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit</span>
+          <span class="act danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Hapus</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: add-new placeholder -->
+    <div class="card" style="border-style: dashed; cursor: pointer; min-height: 260px; display: grid; place-items: center;">
+      <div style="text-align: center; color: var(--text-3);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <div style="font-size:.8125rem; font-weight:600; margin-top:8px;">Tambah Menu Baru</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

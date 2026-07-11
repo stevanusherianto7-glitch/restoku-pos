@@ -2,7 +2,16 @@ import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass, formatRupiah as formatRp } from '../../Components/Shared';
-import { Download, Calculator, FileText, ArrowUpRight, ArrowDownRight, Wallet, Receipt, Percent } from 'lucide-react';
+import {
+    DownloadIcon,
+    CalculatorIcon,
+    FileTextIcon,
+    ArrowUpRightIcon,
+    ArrowDownRightIcon,
+    WalletIcon,
+    ReceiptIcon,
+    PercentIcon,
+} from '../../Components/icons';
 
 interface Financials {
     gross_profit: number;
@@ -111,7 +120,7 @@ export default function Reports({ financials }: Props) {
                         onClick={handleExportPDF}
                         className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)]"
                     >
-                        <Download className="size-4" /> Export PDF
+                        <DownloadIcon className="size-4" /> Export PDF
                     </button>
                 </div>
             </div>
@@ -128,13 +137,13 @@ export default function Reports({ financials }: Props) {
                 {/* Laba Rugi (P&L) Detail */}
                 <Glass className="p-6">
                     <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-                        <Calculator className="size-5 text-emerald-400" /> Ringkasan Laba & Rugi (P&L)
+                        <CalculatorIcon className="size-5 text-emerald-400" /> Ringkasan Laba & Rugi (P&L)
                     </h3>
 
                     {/* Pendapatan */}
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
-                            <Wallet className="size-4 text-emerald-400" />
+                            <WalletIcon className="size-4 text-emerald-400" />
                             <h4 className="font-semibold text-slate-200 uppercase tracking-widest text-xs">
                                 Pendapatan
                             </h4>
@@ -171,7 +180,7 @@ export default function Reports({ financials }: Props) {
                     {/* Biaya */}
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
-                            <Receipt className="size-4 text-red-400" />
+                            <ReceiptIcon className="size-4 text-red-400" />
                             <h4 className="font-semibold text-slate-200 uppercase tracking-widest text-xs">Biaya</h4>
                         </div>
                         <div className="space-y-3 pl-6 mb-4">
@@ -218,7 +227,7 @@ export default function Reports({ financials }: Props) {
                     {/* Pajak */}
                     <div className="mt-8">
                         <div className="flex items-center gap-2 mb-4">
-                            <Percent className="size-4 text-purple-400" />
+                            <PercentIcon className="size-4 text-purple-400" />
                             <h4 className="font-semibold text-slate-200 uppercase tracking-widest text-xs">
                                 Pajak & Titipan
                             </h4>
@@ -239,7 +248,7 @@ export default function Reports({ financials }: Props) {
                 {/* Arus Kas (Cash Flow) */}
                 <Glass className="p-6 flex flex-col">
                     <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-                        <FileText className="size-5 text-blue-400" /> Arus Kas (Cash Flow)
+                        <FileTextIcon className="size-5 text-blue-400" /> Arus Kas (Cash Flow)
                     </h3>
 
                     <div className="flex gap-4 mb-8">
@@ -247,7 +256,7 @@ export default function Reports({ financials }: Props) {
                             <div className="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="flex items-center gap-2 text-emerald-400 mb-3 relative z-10">
                                 <div className="p-1.5 bg-emerald-500/20 rounded-lg">
-                                    <ArrowDownRight className="size-4" />
+                                    <ArrowDownRightIcon className="size-4" />
                                 </div>
                                 <span className="font-medium text-sm">Kas Masuk</span>
                             </div>
@@ -260,7 +269,7 @@ export default function Reports({ financials }: Props) {
                             <div className="absolute inset-0 bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="flex items-center gap-2 text-red-400 mb-3 relative z-10">
                                 <div className="p-1.5 bg-red-500/20 rounded-lg">
-                                    <ArrowUpRight className="size-4" />
+                                    <ArrowUpRightIcon className="size-4" />
                                 </div>
                                 <span className="font-medium text-sm">Kas Keluar</span>
                             </div>

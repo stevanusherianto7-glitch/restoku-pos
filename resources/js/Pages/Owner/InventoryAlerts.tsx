@@ -2,7 +2,7 @@ import React from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass } from '../../Components/Shared';
-import { AlertCircle, AlertTriangle, CheckCircle2, Info, PackageX } from 'lucide-react';
+import { AlertCircleIcon, AlertTriangleIcon, CheckCircle2Icon, InfoIcon, PackageXIcon } from '../../Components/icons';
 
 export default function InventoryAlerts() {
     // Mock Data based on Spec
@@ -28,7 +28,7 @@ export default function InventoryAlerts() {
                 <Glass className="p-8 border-t-2 border-red-500/50">
                     <div className="flex items-center gap-3 mb-8">
                         <div className="p-3 bg-red-500/10 rounded-xl">
-                            <AlertTriangle className="size-6 text-red-500" />
+                            <AlertTriangleIcon className="size-6 text-red-500" />
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-white">Status Bahan Baku</h2>
@@ -44,9 +44,9 @@ export default function InventoryAlerts() {
                             >
                                 <div className="flex items-center gap-4">
                                     {alert.type === 'critical' ? (
-                                        <PackageX className="size-5 text-red-400" />
+                                        <PackageXIcon className="size-5 text-red-400" />
                                     ) : (
-                                        <AlertCircle className="size-5 text-amber-400" />
+                                        <AlertCircleIcon className="size-5 text-amber-400" />
                                     )}
                                     <div>
                                         <h4 className="font-semibold text-white">{alert.item}</h4>
@@ -69,7 +69,7 @@ export default function InventoryAlerts() {
                     </div>
 
                     <div className="flex items-center gap-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                        <CheckCircle2 className="size-5 text-emerald-400 shrink-0" />
+                        <CheckCircle2Icon className="size-5 text-emerald-400 shrink-0" />
                         <p className="text-emerald-300 font-medium text-sm">
                             Semua bahan baku lainnya (45 item) dalam kondisi aman dan tercukupi.
                         </p>
@@ -77,7 +77,7 @@ export default function InventoryAlerts() {
                 </Glass>
 
                 <div className="mt-6 flex items-start gap-3 p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl">
-                    <Info className="size-5 text-blue-400 shrink-0" />
+                    <InfoIcon className="size-5 text-blue-400 shrink-0" />
                     <p className="text-sm text-slate-300">
                         Halaman ini bersifat <strong className="text-white">Read-only</strong>. Sebagai Owner, Anda
                         tidak dapat mengubah data stok secara langsung. Sistem secara otomatis telah mengirimkan

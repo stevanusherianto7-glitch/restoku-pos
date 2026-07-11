@@ -1,5 +1,5 @@
 import { Screen, Glass, formatRupiah as formatRp } from '../Shared';
-import { Store, TrendingUp, TrendingDown, MapPin } from 'lucide-react';
+import { StoreIcon, TrendingUpIcon, TrendingDownIcon, MapPinIcon } from '../icons';
 
 export function MultiOutletView() {
     const outlets = [
@@ -20,7 +20,7 @@ export function MultiOutletView() {
                     >
                         <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-2">
-                                <Store className="size-5 text-slate-400" />
+                                <StoreIcon className="size-5 text-slate-400" />
                                 <h3 className="font-semibold text-white">{outlet.name}</h3>
                             </div>
                             <div
@@ -31,9 +31,9 @@ export function MultiOutletView() {
                                 }`}
                             >
                                 {outlet.growth >= 0 ? (
-                                    <TrendingUp className="size-3" />
+                                    <TrendingUpIcon className="size-3" />
                                 ) : (
-                                    <TrendingDown className="size-3" />
+                                    <TrendingDownIcon className="size-3" />
                                 )}
                                 {outlet.growth > 0 ? '+' : ''}
                                 {outlet.growth}%
@@ -62,7 +62,7 @@ export function MultiOutletView() {
 
             <Glass className="p-6 max-w-4xl">
                 <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-                    <MapPin className="size-5 text-blue-400" /> Kontribusi Omzet per Cabang
+                    <MapPinIcon className="size-5 text-blue-400" /> Kontribusi Omzet per Cabang
                 </h3>
 
                 <div className="space-y-6">

@@ -1,21 +1,21 @@
 import { Screen, Glass, formatRupiah as formatRp } from '../Shared';
 import {
-    TrendingUp,
-    Users,
-    DollarSign,
-    PieChart,
-    AlertCircle,
-    CalendarClock,
-    CreditCard,
-    Activity,
-} from 'lucide-react';
+    TrendingUpIcon,
+    UsersIcon,
+    DollarSignIcon,
+    PieChartIcon,
+    AlertCircleIcon,
+    CalendarClockIcon,
+    CreditCardIcon,
+    ActivityIcon,
+} from '../icons';
 
 export function OwnerDashboard() {
     const kpis = [
         {
             label: 'Omzet Bulan Ini',
             value: 'Rp 45,8jt',
-            icon: DollarSign,
+            icon: DollarSignIcon,
             trend: '+12.3%',
             color: 'text-amber-400',
             bg: 'bg-amber-400/10',
@@ -23,7 +23,7 @@ export function OwnerDashboard() {
         {
             label: 'Total Pesanan',
             value: '1.250',
-            icon: Activity,
+            icon: ActivityIcon,
             trend: '+8.7%',
             color: 'text-blue-400',
             bg: 'bg-blue-400/10',
@@ -31,7 +31,7 @@ export function OwnerDashboard() {
         {
             label: 'Rata-rata Order',
             value: 'Rp 36.650',
-            icon: PieChart,
+            icon: PieChartIcon,
             trend: '+3.2%',
             color: 'text-emerald-400',
             bg: 'bg-emerald-400/10',
@@ -39,7 +39,7 @@ export function OwnerDashboard() {
         {
             label: 'Okupansi Meja',
             value: '68%',
-            icon: Users,
+            icon: UsersIcon,
             trend: '+2.0%',
             color: 'text-purple-400',
             bg: 'bg-purple-400/10',
@@ -84,7 +84,7 @@ export function OwnerDashboard() {
                         <div className="text-right">
                             <div className="text-2xl font-bold text-amber-400">{formatRp(45823500)}</div>
                             <div className="text-sm text-emerald-400 font-medium flex items-center gap-1 justify-end">
-                                <TrendingUp className="size-3" /> +12.3% vs bln lalu
+                                <TrendingUpIcon className="size-3" /> +12.3% vs bln lalu
                             </div>
                         </div>
                     </div>
@@ -116,7 +116,7 @@ export function OwnerDashboard() {
                     {/* Breakdown */}
                     <Glass className="p-5">
                         <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                            <CreditCard className="size-4 text-amber-500" /> Metode Pembayaran
+                            <CreditCardIcon className="size-4 text-amber-500" /> Metode Pembayaran
                         </h3>
                         <div className="space-y-4">
                             {[
@@ -144,11 +144,11 @@ export function OwnerDashboard() {
                     {/* Alerts */}
                     <Glass className="p-5">
                         <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                            <AlertCircle className="size-4 text-red-400" /> Perhatian Khusus
+                            <AlertCircleIcon className="size-4 text-red-400" /> Perhatian Khusus
                         </h3>
                         <div className="space-y-3">
                             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex gap-3 items-start">
-                                <AlertCircle className="size-4 text-red-400 shrink-0 mt-0.5" />
+                                <AlertCircleIcon className="size-4 text-red-400 shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium text-red-200">Stok Habis</p>
                                     <p className="text-xs text-red-300/70 mt-0.5">
@@ -157,7 +157,7 @@ export function OwnerDashboard() {
                                 </div>
                             </div>
                             <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 flex gap-3 items-start">
-                                <CalendarClock className="size-4 text-amber-400 shrink-0 mt-0.5" />
+                                <CalendarClockIcon className="size-4 text-amber-400 shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium text-amber-200">Kontrak Hampir Habis</p>
                                     <p className="text-xs text-amber-300/70 mt-0.5">2 karyawan (Sisa 15 hari)</p>

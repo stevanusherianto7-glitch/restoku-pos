@@ -12,7 +12,15 @@ import {
     useTenantSettings,
     getOutletTaxConfig,
 } from '../../Components/Shared';
-import { Search, Utensils, FileText, XCircle, Pencil, Percent, Sparkles } from 'lucide-react';
+import {
+    SearchIcon,
+    UtensilsIcon,
+    FileTextIcon,
+    XCircleIcon,
+    PencilIcon,
+    PercentIcon,
+    SparklesIcon,
+} from '../../Components/icons';
 import { ReceiptPreview } from '../../Components/POS/ReceiptPreview';
 import { RoleGuard } from '../../Components/RoleGuard';
 
@@ -361,7 +369,8 @@ function POSInner() {
                             <div className="mb-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4">
                                 <div className="flex items-center justify-between mb-3">
                                     <h4 className="text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
-                                        <Sparkles className="size-3.5 text-emerald-400" /> Antrean Meja Siap Bayar (QR)
+                                        <SparklesIcon className="size-3.5 text-emerald-400" /> Antrean Meja Siap Bayar
+                                        (QR)
                                     </h4>
                                     <span className="text-[10px] text-slate-500">
                                         Klik meja untuk memproses tagihan
@@ -428,7 +437,7 @@ function POSInner() {
                                 ))}
                             </div>
                             <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 focus-within:border-white/20 transition-colors">
-                                <Search className="size-4 text-slate-400" />
+                                <SearchIcon className="size-4 text-slate-400" />
                                 <input
                                     placeholder="Cari menu..."
                                     value={searchQuery}
@@ -486,7 +495,7 @@ function POSInner() {
                             })}
                             {filteredMenu.length === 0 && (
                                 <div className="col-span-4 flex flex-col items-center justify-center h-40 text-slate-500">
-                                    <Search className="size-8 mb-2 opacity-40" />
+                                    <SearchIcon className="size-8 mb-2 opacity-40" />
                                     <p className="text-sm">Tidak ada menu ditemukan</p>
                                 </div>
                             )}
@@ -524,7 +533,7 @@ function POSInner() {
                         <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
                             {cart.items.length === 0 && (
                                 <div className="h-full flex flex-col items-center justify-center text-slate-600">
-                                    <Utensils className="size-10 mb-3 opacity-30" />
+                                    <UtensilsIcon className="size-10 mb-3 opacity-30" />
                                     <p className="text-sm">Klik menu di kiri untuk menambah pesanan</p>
                                 </div>
                             )}
@@ -608,7 +617,7 @@ function POSInner() {
                                                 }}
                                                 className="text-[11px] text-slate-500 hover:text-[var(--color-primary)] transition-colors flex items-center gap-1"
                                             >
-                                                <FileText className="size-3" />
+                                                <FileTextIcon className="size-3" />
                                                 {item.note ? 'Ubah catatan' : 'Catatan pesanan'}
                                             </button>
                                         )}
@@ -666,7 +675,7 @@ function POSInner() {
                                         }}
                                     >
                                         Diskon {cart.discountType === 'percentage' ? `(${cart.discountValue}%)` : ''}{' '}
-                                        <Pencil className="size-3" />
+                                        <PencilIcon className="size-3" />
                                     </span>
                                     <span className="font-mono">-{formatRupiah(cart.discountAmount)}</span>
                                 </div>
@@ -678,7 +687,7 @@ function POSInner() {
                                         onClick={() => setIsDiscountModalOpen(true)}
                                         className="text-[var(--color-primary)] hover:text-[var(--color-primary)] flex items-center gap-1 transition-colors"
                                     >
-                                        <Percent className="size-3" /> Tambah Diskon
+                                        <PercentIcon className="size-3" /> Tambah Diskon
                                     </button>
                                 </div>
                             )}
@@ -777,7 +786,7 @@ function POSInner() {
                                     onClick={() => setIsDiscountModalOpen(false)}
                                     className="text-slate-400 hover:text-white"
                                 >
-                                    <XCircle className="size-4" />
+                                    <XCircleIcon className="size-4" />
                                 </button>
                             </div>
                             <div className="flex gap-2 mb-4">
@@ -836,7 +845,7 @@ function POSInner() {
                                     onClick={() => setIsSplitBillModalOpen(false)}
                                     className="text-slate-400 hover:text-white"
                                 >
-                                    <XCircle className="size-5" />
+                                    <XCircleIcon className="size-5" />
                                 </button>
                             </div>
 

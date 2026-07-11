@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import {
-    MessageCircle,
-    Store,
-    Printer,
-    QrCode,
-    Copy,
-    CheckCircle2,
-    AlertTriangle,
-    MessageSquare,
-    PhoneCall,
-} from 'lucide-react';
+    MessageCircleIcon,
+    StoreIcon,
+    PrinterIcon,
+    QrCodeIcon,
+    CopyIcon,
+    CheckCircle2Icon,
+    AlertTriangleIcon,
+    MessageSquareIcon,
+    PhoneCallIcon,
+} from '../icons';
 import { Screen, Glass, Badge, FeatureLock, planHasFeature } from '../Shared';
 
 // ─── WhatsApp API ─────────────────────────────────────────────────────────────
@@ -32,10 +32,10 @@ export function WhatsAppIntegration() {
                 <Glass className="p-3">
                     <div className="space-y-1">
                         {[
-                            { label: 'Profil Toko', Icon: Store },
-                            { label: 'WhatsApp API', Icon: MessageCircle },
-                            { label: 'Printer', Icon: Printer },
-                            { label: 'QR Code Meja', Icon: QrCode },
+                            { label: 'Profil Toko', Icon: StoreIcon },
+                            { label: 'WhatsApp API', Icon: MessageCircleIcon },
+                            { label: 'PrinterIcon', Icon: PrinterIcon },
+                            { label: 'QR Code Meja', Icon: QrCodeIcon },
                         ].map(({ label, Icon }) => (
                             <button
                                 key={label}
@@ -54,7 +54,7 @@ export function WhatsAppIntegration() {
                         <h2 className="mb-5 text-base font-medium text-slate-200">Koneksi Meta Business</h2>
                         {!isConnected ? (
                             <div className="flex flex-col items-center justify-center py-8 px-4 border border-dashed border-white/20 rounded-xl bg-white/5">
-                                <MessageSquare className="size-10 text-slate-400 mb-4" />
+                                <MessageSquareIcon className="size-10 text-slate-400 mb-4" />
                                 <h3 className="text-sm font-medium text-white mb-2">Hubungkan WhatsApp Business</h3>
                                 <p className="text-xs text-slate-400 text-center max-w-md mb-6">
                                     Integrasikan nomor WhatsApp Anda dengan Meta Cloud API untuk mengirim notifikasi
@@ -73,12 +73,12 @@ export function WhatsAppIntegration() {
                                 <div className="flex items-center justify-between p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10">
                                     <div className="flex items-center gap-4">
                                         <div className="size-12 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg">
-                                            <PhoneCall className="size-6 text-white" />
+                                            <PhoneCallIcon className="size-6 text-white" />
                                         </div>
                                         <div>
                                             <h3 className="text-sm font-bold text-white flex items-center gap-2">
                                                 WhatsApp Business Terhubung{' '}
-                                                <CheckCircle2 className="size-4 text-emerald-400" />
+                                                <CheckCircle2Icon className="size-4 text-emerald-400" />
                                             </h3>
                                             <p className="text-xs text-emerald-200/70 mt-1">
                                                 Status Webhook: Aktif & Menerima Pesan
@@ -122,7 +122,7 @@ export function WhatsAppIntegration() {
                                                 className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-2 text-slate-400 hover:text-white transition-colors"
                                                 title="Salin"
                                             >
-                                                <Copy className="size-4" />
+                                                <CopyIcon className="size-4" />
                                             </button>
                                         </div>
                                     </div>
@@ -179,7 +179,7 @@ export function WhatsAppIntegration() {
                                     ))}
                                 </div>
                                 <div className="mt-5 rounded-xl border border-blue-500/20 bg-blue-500/10 p-4 flex gap-3">
-                                    <AlertTriangle className="size-5 text-blue-400 shrink-0" />
+                                    <AlertTriangleIcon className="size-5 text-blue-400 shrink-0" />
                                     <p className="text-xs text-blue-200 leading-relaxed">
                                         Pengajuan template baru harus dilakukan melalui Meta Business Suite. Restoku
                                         akan secara otomatis mensinkronisasi template yang disetujui setiap hari.

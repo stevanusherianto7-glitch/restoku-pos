@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah } from '../../Components/Shared';
-import { Utensils, Plus } from 'lucide-react';
+import { UtensilsIcon, PlusIcon } from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 
@@ -14,7 +14,7 @@ function ProdukMenuInner() {
                 title="Produk & Menu"
                 action={
                     <button className="rounded-lg bg-slate-100 hover:bg-white text-slate-900 px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
-                        <Plus className="size-4" />
+                        <PlusIcon className="size-4" />
                         Tambah Menu
                     </button>
                 }
@@ -45,7 +45,7 @@ function ProdukMenuInner() {
                                     <tr key={i} className="group">
                                         <td className="py-3 font-medium flex items-center gap-3 text-slate-200">
                                             <div className="size-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                                                <Utensils className="size-3.5 text-slate-500" />
+                                                <UtensilsIcon className="size-3.5 text-slate-500" />
                                             </div>
                                             {item.name}
                                         </td>

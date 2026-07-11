@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Screen, Glass, Button, useTenantSettings } from '../Shared';
-import { Printer, Bluetooth, Wifi, Usb, Save, FileText, CheckCircle2 } from 'lucide-react';
+import { PrinterIcon, BluetoothIcon, WifiIcon, UsbIcon, SaveIcon, FileTextIcon, CheckCircle2Icon } from '../icons';
 import { DigitalReceiptPreview } from './DigitalReceiptPreview';
 
 export function PrinterConfig() {
@@ -114,10 +114,10 @@ export function PrinterConfig() {
 
     return (
         <Screen
-            title="Pengaturan Printer & Struk"
+            title="Pengaturan PrinterIcon & Struk"
             action={
                 <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2 text-white font-bold" onClick={handleSave}>
-                    {saved ? <CheckCircle2 className="size-4" /> : <Save className="size-4" />}
+                    {saved ? <CheckCircle2Icon className="size-4" /> : <SaveIcon className="size-4" />}
                     {saved ? 'Tersimpan' : 'Simpan Pengaturan'}
                 </Button>
             }
@@ -129,21 +129,21 @@ export function PrinterConfig() {
                         className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'kasir' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-sm' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
                         onClick={() => setActiveTab('kasir')}
                     >
-                        <Printer className="size-5" />
-                        <div className="font-medium">Printer Kasir</div>
+                        <PrinterIcon className="size-5" />
+                        <div className="font-medium">PrinterIcon Kasir</div>
                     </button>
                     <button
                         className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'dapur' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-sm' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
                         onClick={() => setActiveTab('dapur')}
                     >
-                        <Printer className="size-5" />
-                        <div className="font-medium">Printer Dapur</div>
+                        <PrinterIcon className="size-5" />
+                        <div className="font-medium">PrinterIcon Dapur</div>
                     </button>
                     <button
                         className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${activeTab === 'receipt' ? (isLight ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-400 shadow-sm' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30') : isLight ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent' : 'text-slate-400 hover:bg-white/5 border border-transparent'}`}
                         onClick={() => setActiveTab('receipt')}
                     >
-                        <FileText className="size-5" />
+                        <FileTextIcon className="size-5" />
                         <div className="font-medium">Format Struk</div>
                     </button>
                 </div>
@@ -155,10 +155,10 @@ export function PrinterConfig() {
                         <div className="max-w-2xl animate-in fade-in duration-300 space-y-8">
                             <div>
                                 <h2 className={`text-2xl font-bold mb-2 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                                    Printer Kasir
+                                    PrinterIcon Kasir
                                 </h2>
                                 <p className={isLight ? 'text-slate-600 font-medium' : 'text-slate-400'}>
-                                    Pengaturan cetak struk pembayaran untuk pelanggan (Bluetooth Thermal / USB).
+                                    Pengaturan cetak struk pembayaran untuk pelanggan (BluetoothIcon Thermal / USB).
                                 </p>
                             </div>
 
@@ -169,7 +169,7 @@ export function PrinterConfig() {
                                     <div
                                         className={`font-medium ${isLight ? 'text-slate-900 font-bold' : 'text-white'}`}
                                     >
-                                        Aktifkan Printer Kasir
+                                        Aktifkan PrinterIcon Kasir
                                     </div>
                                     <div className={`text-sm ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
                                         Otomatis mencetak struk setelah pembayaran lunas.
@@ -194,21 +194,21 @@ export function PrinterConfig() {
                                             className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'bluetooth' ? (isLight ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold shadow-sm' : 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setKasirConfig({ ...kasirConfig, connection: 'bluetooth' })}
                                         >
-                                            <Bluetooth className="size-6" />
-                                            <span className="font-medium">Bluetooth</span>
+                                            <BluetoothIcon className="size-6" />
+                                            <span className="font-medium">BluetoothIcon</span>
                                         </div>
                                         <div
                                             className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'usb' ? (isLight ? 'border-emerald-500 bg-emerald-50 text-emerald-700 font-bold shadow-sm' : 'border-emerald-500 bg-emerald-500/10 text-emerald-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setKasirConfig({ ...kasirConfig, connection: 'usb' })}
                                         >
-                                            <Usb className="size-6" />
+                                            <UsbIcon className="size-6" />
                                             <span className="font-medium">USB (Windows)</span>
                                         </div>
                                         <div
                                             className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${kasirConfig.connection === 'network' ? (isLight ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-sm' : 'border-purple-500 bg-purple-500/10 text-purple-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setKasirConfig({ ...kasirConfig, connection: 'network' })}
                                         >
-                                            <Wifi className="size-6" />
+                                            <WifiIcon className="size-6" />
                                             <span className="font-medium">Network / LAN</span>
                                         </div>
                                     </div>
@@ -216,7 +216,7 @@ export function PrinterConfig() {
 
                                 {kasirConfig.connection === 'bluetooth' && (
                                     <div className="space-y-2">
-                                        <label className={labelClass}>Bluetooth COM Port</label>
+                                        <label className={labelClass}>BluetoothIcon COM Port</label>
                                         <input
                                             type="text"
                                             value={kasirConfig.port}
@@ -236,7 +236,7 @@ export function PrinterConfig() {
                                         className={`w-full font-bold ${isLight ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-600'}`}
                                         onClick={() => setShowPreview(true)}
                                     >
-                                        <Printer className="size-4 mr-2" /> Uji Coba Cetak (Test Print)
+                                        <PrinterIcon className="size-4 mr-2" /> Uji Coba Cetak (Test Print)
                                     </Button>
                                 </div>
                             </div>
@@ -248,7 +248,7 @@ export function PrinterConfig() {
                         <div className="max-w-2xl animate-in fade-in duration-300 space-y-8">
                             <div>
                                 <h2 className={`text-2xl font-bold mb-2 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                                    Printer Dapur
+                                    PrinterIcon Dapur
                                 </h2>
                                 <p className={isLight ? 'text-slate-600 font-medium' : 'text-slate-400'}>
                                     Otomatis mencetak pesanan masuk (tanpa harga) ke area dapur (Kitchen Receipt).
@@ -262,7 +262,7 @@ export function PrinterConfig() {
                                     <div
                                         className={`font-medium ${isLight ? 'text-slate-900 font-bold' : 'text-white'}`}
                                     >
-                                        Aktifkan Printer Dapur
+                                        Aktifkan PrinterIcon Dapur
                                     </div>
                                     <div className={`text-sm ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
                                         Otomatis cetak tiket ke koki saat pesanan dikonfirmasi.
@@ -287,22 +287,22 @@ export function PrinterConfig() {
                                             className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${dapurConfig.connection === 'network' ? (isLight ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-sm' : 'border-purple-500 bg-purple-500/10 text-purple-400') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setDapurConfig({ ...dapurConfig, connection: 'network' })}
                                         >
-                                            <Wifi className="size-6" />
+                                            <WifiIcon className="size-6" />
                                             <span className="font-medium">Network / LAN</span>
                                         </div>
                                         <div
                                             className={`p-4 border rounded-xl flex flex-col items-center gap-2 cursor-pointer transition-colors ${dapurConfig.connection === 'bluetooth' ? (isLight ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold shadow-sm' : 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]') : isLight ? 'border-slate-300 text-slate-600 hover:bg-slate-50' : 'border-white/10 text-slate-400 hover:bg-white/5'}`}
                                             onClick={() => setDapurConfig({ ...dapurConfig, connection: 'bluetooth' })}
                                         >
-                                            <Bluetooth className="size-6" />
-                                            <span className="font-medium">Bluetooth</span>
+                                            <BluetoothIcon className="size-6" />
+                                            <span className="font-medium">BluetoothIcon</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 {dapurConfig.connection === 'network' && (
                                     <div className="space-y-2">
-                                        <label className={labelClass}>Alamat IP Printer</label>
+                                        <label className={labelClass}>Alamat IP PrinterIcon</label>
                                         <input
                                             type="text"
                                             value={dapurConfig.ip}
@@ -322,7 +322,7 @@ export function PrinterConfig() {
                                         className={`w-full font-bold ${isLight ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-600'}`}
                                         onClick={() => setShowPreview(true)}
                                     >
-                                        <Printer className="size-4 mr-2" /> Uji Coba Cetak (Kitchen Tiket)
+                                        <PrinterIcon className="size-4 mr-2" /> Uji Coba Cetak (Kitchen Tiket)
                                     </Button>
                                 </div>
                             </div>
@@ -348,7 +348,7 @@ export function PrinterConfig() {
                                     className={`gap-2 ${isLight ? 'border-emerald-500 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold' : 'text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10'}`}
                                     onClick={() => setShowPreview(true)}
                                 >
-                                    <FileText className="size-4" /> Pratinjau Struk
+                                    <FileTextIcon className="size-4" /> Pratinjau Struk
                                 </Button>
                             </div>
 
@@ -484,11 +484,11 @@ export function PrinterConfig() {
                                     </label>
                                 </div>
 
-                                {/* Jenis Font Printer */}
+                                {/* Jenis Font PrinterIcon */}
                                 <div
                                     className={`col-span-2 space-y-3 pt-4 border-t ${isLight ? 'border-slate-200' : 'border-white/10'}`}
                                 >
-                                    <label className={labelClass}>Jenis Font Printer (ESC/POS Font)</label>
+                                    <label className={labelClass}>Jenis Font PrinterIcon (ESC/POS Font)</label>
                                     <div className="grid grid-cols-3 gap-3">
                                         {[
                                             { id: 'font-a', label: 'Font A (12x24 - Standar)' },

@@ -4,27 +4,27 @@ import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, PlanBadge, TAX_LABELS, useTenantSettings } from '../../Components/Shared';
 import { useSubscription } from '../../Hooks/useSubscription';
 import {
-    Store,
-    MapPin,
-    Receipt,
-    Clock,
-    LocateFixed,
-    Percent,
-    AlertTriangle,
-    ChefHat,
-    Coffee,
-    Wine,
-    Flame,
-    Cake,
-    Pizza,
-    Image as ImageIcon,
-    Sparkles,
-    Plus,
-    Trash2,
-    Edit2,
-    Check,
-    X,
-} from 'lucide-react';
+    StoreIcon,
+    MapPinIcon,
+    ReceiptIcon,
+    ClockIcon,
+    LocateFixedIcon,
+    PercentIcon,
+    AlertTriangleIcon,
+    ChefHatIcon,
+    CoffeeIcon,
+    WineIcon,
+    FlameIcon,
+    CakeIcon,
+    PizzaIcon,
+    ImageIcon,
+    SparklesIcon,
+    PlusIcon,
+    Trash2Icon,
+    Edit2Icon,
+    CheckIcon,
+    XIcon,
+} from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 
@@ -82,7 +82,7 @@ function PengaturanOutletInner() {
     const [taxRateInput, setTaxRateInput] = useState(10);
     const [serviceChargeInput, setServiceChargeInput] = useState(0);
 
-    // ─── NEW: Receipt/Struk States ────────────────────────────────────────────
+    // ─── NEW: ReceiptIcon/Struk States ────────────────────────────────────────────
     const [strukHeader, setStrukHeader] = useState('Terima Kasih Telah Berkunjung!');
     const [strukFooter, setStrukFooter] = useState('Barang yang sudah dibeli tidak dapat ditukar');
     const [strukPaperWidth, setStrukPaperWidth] = useState('80mm');
@@ -543,12 +543,12 @@ function PengaturanOutletInner() {
     };
 
     const logoOptions = [
-        { name: 'ChefHat', label: 'Topi Chef', Icon: ChefHat },
-        { name: 'Coffee', label: 'Kopi & Cafe', Icon: Coffee },
-        { name: 'Wine', label: 'Bar & Drinks', Icon: Wine },
-        { name: 'Flame', label: 'Grill & Steak', Icon: Flame },
-        { name: 'Cake', label: 'Bakery', Icon: Cake },
-        { name: 'Pizza', label: 'Pizza', Icon: Pizza },
+        { name: 'ChefHatIcon', label: 'Topi Chef', Icon: ChefHatIcon },
+        { name: 'CoffeeIcon', label: 'Kopi & Cafe', Icon: CoffeeIcon },
+        { name: 'WineIcon', label: 'Bar & Drinks', Icon: WineIcon },
+        { name: 'FlameIcon', label: 'Grill & Steak', Icon: FlameIcon },
+        { name: 'CakeIcon', label: 'Bakery', Icon: CakeIcon },
+        { name: 'PizzaIcon', label: 'PizzaIcon', Icon: PizzaIcon },
     ];
 
     const isLight = screenMode === 'terang';
@@ -579,11 +579,11 @@ function PengaturanOutletInner() {
                         <div className="space-y-1">
                             {(
                                 [
-                                    { label: 'Profil Outlet', Icon: Store },
-                                    { label: 'Lokasi Restoran', Icon: MapPin },
-                                    { label: 'Pajak & Tarif', Icon: Percent },
-                                    { label: 'Tampilan Struk', Icon: Receipt },
-                                    { label: 'Jam Operasional', Icon: Clock },
+                                    { label: 'Profil Outlet', Icon: StoreIcon },
+                                    { label: 'Lokasi Restoran', Icon: MapPinIcon },
+                                    { label: 'Pajak & Tarif', Icon: PercentIcon },
+                                    { label: 'Tampilan Struk', Icon: ReceiptIcon },
+                                    { label: 'Jam Operasional', Icon: ClockIcon },
                                 ] as Array<{ label: string; Icon: ElementType }>
                             ).map(({ label, Icon }) => (
                                 <button
@@ -612,7 +612,7 @@ function PengaturanOutletInner() {
                             {/* Tenant White-Label Branding Customization */}
                             <Glass className="p-6 border-emerald-500/10">
                                 <h2 className={h2Class}>
-                                    <Sparkles className="size-4 text-emerald-400" /> Branding Kustom Tenant
+                                    <SparklesIcon className="size-4 text-emerald-400" /> Branding Kustom Tenant
                                     (White-Label)
                                 </h2>
                                 <div className="space-y-5">
@@ -782,7 +782,7 @@ function PengaturanOutletInner() {
                                                                     className="p-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-colors"
                                                                     title="Simpan Edit"
                                                                 >
-                                                                    <Check className="size-3.5" />
+                                                                    <CheckIcon className="size-3.5" />
                                                                 </button>
                                                                 <button
                                                                     type="button"
@@ -790,7 +790,7 @@ function PengaturanOutletInner() {
                                                                     className={`p-1 rounded-lg transition-colors ${isLight ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-300'}`}
                                                                     title="Batal"
                                                                 >
-                                                                    <X className="size-3.5" />
+                                                                    <XIcon className="size-3.5" />
                                                                 </button>
                                                             </>
                                                         ) : (
@@ -801,7 +801,7 @@ function PengaturanOutletInner() {
                                                                     className={`p-1 rounded-lg transition-colors ${isLight ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-300'}`}
                                                                     title="Ubah Staf"
                                                                 >
-                                                                    <Edit2 className="size-3.5" />
+                                                                    <Edit2Icon className="size-3.5" />
                                                                 </button>
                                                                 <button
                                                                     type="button"
@@ -809,7 +809,7 @@ function PengaturanOutletInner() {
                                                                     className={`p-1 rounded-lg transition-colors ${isLight ? 'bg-slate-200 hover:bg-red-100 text-slate-700 hover:text-red-600' : 'bg-white/5 hover:bg-red-500/10 text-slate-400 hover:text-red-400'}`}
                                                                     title="Hapus Staf"
                                                                 >
-                                                                    <Trash2 className="size-3.5" />
+                                                                    <Trash2Icon className="size-3.5" />
                                                                 </button>
                                                             </>
                                                         )}
@@ -865,7 +865,7 @@ function PengaturanOutletInner() {
                                                         className="rounded-lg bg-emerald-500 hover:bg-emerald-400 p-2 text-slate-950 transition-colors flex items-center justify-center"
                                                         title="Tambah Staf"
                                                     >
-                                                        <Plus className="size-4" />
+                                                        <PlusIcon className="size-4" />
                                                     </button>
                                                 </div>
                                             </div>
@@ -957,7 +957,8 @@ function PengaturanOutletInner() {
 
                             <Glass className="p-6">
                                 <h2 className={h2Class}>
-                                    <Sparkles className="size-4 text-emerald-500" /> Mode Screen UI (Tema Sistem & POS)
+                                    <SparklesIcon className="size-4 text-emerald-500" /> Mode Screen UI (Tema Sistem &
+                                    POS)
                                 </h2>
                                 <div className="space-y-4">
                                     <p className={descClass}>
@@ -1041,7 +1042,8 @@ function PengaturanOutletInner() {
 
                             <Glass className="p-6">
                                 <h2 className={h2Class}>
-                                    <Sparkles className="size-4 text-emerald-500" /> Tampilan Frontend (Buku Menu Tamu)
+                                    <SparklesIcon className="size-4 text-emerald-500" /> Tampilan Frontend (Buku Menu
+                                    Tamu)
                                 </h2>
                                 <div className="space-y-4">
                                     <p className={descClass}>
@@ -1114,7 +1116,7 @@ function PengaturanOutletInner() {
                         <div id="lokasi" className="space-y-5">
                             <Glass className="p-6">
                                 <h2 className={h2Class}>
-                                    <MapPin className="size-4 text-emerald-500" /> Lokasi Restoran (Geolokasi)
+                                    <MapPinIcon className="size-4 text-emerald-500" /> Lokasi Restoran (Geolokasi)
                                 </h2>
                                 <div className="space-y-4">
                                     <p className={descClass}>
@@ -1175,7 +1177,7 @@ function PengaturanOutletInner() {
                                             }}
                                             className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors border ${isLight ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20'}`}
                                         >
-                                            <LocateFixed className="size-4" /> Deteksi Otomatis
+                                            <LocateFixedIcon className="size-4" /> Deteksi Otomatis
                                         </button>
                                         <button
                                             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isLight ? 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white shadow-sm' : 'bg-slate-100 hover:bg-white text-slate-900'}`}
@@ -1191,7 +1193,8 @@ function PengaturanOutletInner() {
                         <div id="pajak" className="space-y-5">
                             <Glass className="p-6">
                                 <h2 className={h2Class}>
-                                    <Percent className="size-4 text-[var(--color-primary)]" /> Konfigurasi Pajak & Biaya
+                                    <PercentIcon className="size-4 text-[var(--color-primary)]" /> Konfigurasi Pajak &
+                                    Biaya
                                 </h2>
 
                                 {/* Referensi Regulasi Pemerintah */}
@@ -1202,7 +1205,7 @@ function PengaturanOutletInner() {
                                         <span
                                             className={`text-xs font-bold flex items-center gap-1.5 ${isLight ? 'text-emerald-800' : 'text-emerald-400'}`}
                                         >
-                                            <Sparkles className="size-3.5 text-emerald-500" /> Referensi Regulasi
+                                            <SparklesIcon className="size-3.5 text-emerald-500" /> Referensi Regulasi
                                             Perpajakan Restoran (Indonesia)
                                         </span>
                                         <span
@@ -1273,7 +1276,7 @@ function PengaturanOutletInner() {
                                                     : 'text-slate-500 hover:text-slate-800'
                                             }`}
                                         >
-                                            <Check className="size-3.5" /> Active
+                                            <CheckIcon className="size-3.5" /> Active
                                         </button>
                                         <button
                                             type="button"
@@ -1284,7 +1287,7 @@ function PengaturanOutletInner() {
                                                     : 'text-slate-500 hover:text-slate-800'
                                             }`}
                                         >
-                                            <X className="size-3.5" /> Inactive
+                                            <XIcon className="size-3.5" /> Inactive
                                         </button>
                                     </div>
                                 </div>
@@ -1364,7 +1367,7 @@ function PengaturanOutletInner() {
                                     <p
                                         className={`text-xs font-medium mb-1 flex items-center gap-1.5 ${isTaxActive ? (isLight ? 'text-[var(--color-primary)]' : 'text-[var(--color-primary)]') : 'text-slate-500'}`}
                                     >
-                                        <AlertTriangle className="size-3.5" /> Contoh kalkulasi struk (
+                                        <AlertTriangleIcon className="size-3.5" /> Contoh kalkulasi struk (
                                         {isTaxActive ? 'Pajak & Layanan Aktif' : 'Pajak & Layanan Inactive'})
                                     </p>
                                     <p
@@ -1401,7 +1404,7 @@ function PengaturanOutletInner() {
                         <div id="struk" className="space-y-5">
                             <Glass className="p-6">
                                 <h2 className={h2Class}>
-                                    <Receipt className="size-4 text-emerald-500" /> Pengaturan Tampilan Struk
+                                    <ReceiptIcon className="size-4 text-emerald-500" /> Pengaturan Tampilan Struk
                                 </h2>
                                 <p className={`${descClass} mb-5`}>
                                     Kustomisasi informasi header dan footer yang tercetak pada struk pembelian
@@ -1483,7 +1486,7 @@ function PengaturanOutletInner() {
                                                           : 'text-slate-400 hover:text-slate-200'
                                                 }`}
                                             >
-                                                <Receipt className="size-3.5 shrink-0" /> Struk Pelanggan
+                                                <ReceiptIcon className="size-3.5 shrink-0" /> Struk Pelanggan
                                             </button>
                                             <button
                                                 type="button"
@@ -1496,7 +1499,7 @@ function PengaturanOutletInner() {
                                                           : 'text-slate-400 hover:text-slate-200'
                                                 }`}
                                             >
-                                                <ChefHat className="size-3.5 shrink-0" /> Tiket Dapur (KDS)
+                                                <ChefHatIcon className="size-3.5 shrink-0" /> Tiket Dapur (KDS)
                                             </button>
                                             <button
                                                 type="button"
@@ -1509,7 +1512,7 @@ function PengaturanOutletInner() {
                                                           : 'text-slate-400 hover:text-slate-200'
                                                 }`}
                                             >
-                                                <Clock className="size-3.5 shrink-0" /> Laporan Shift
+                                                <ClockIcon className="size-3.5 shrink-0" /> Laporan Shift
                                             </button>
                                         </div>
 
@@ -2127,7 +2130,7 @@ function PengaturanOutletInner() {
                         <div id="jam" className="space-y-5">
                             <Glass className="p-6">
                                 <h2 className={h2Class}>
-                                    <Clock className="size-4 text-emerald-500" /> Jam Operasional Outlet
+                                    <ClockIcon className="size-4 text-emerald-500" /> Jam Operasional Outlet
                                 </h2>
                                 <p className={`${descClass} mb-4`}>
                                     Atur jadwal operasional outlet Anda untuk membatasi pemesanan online oleh pelanggan
@@ -2271,7 +2274,7 @@ function PengaturanOutletInner() {
                                     <div
                                         className={`font-bold text-sm flex items-center gap-2 ${isLight ? 'text-slate-900' : 'text-slate-100'}`}
                                     >
-                                        <Check className="size-4 text-emerald-500" /> Simpan Semua Pengaturan Outlet
+                                        <CheckIcon className="size-4 text-emerald-500" /> Simpan Semua Pengaturan Outlet
                                     </div>
                                     <p className={descClass}>
                                         Perubahan pada branding, profil, lokasi, pajak, struk, mode UI, dan jam
@@ -2291,7 +2294,7 @@ function PengaturanOutletInner() {
                                         onClick={handleSaveAllChanges}
                                         className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 px-6 py-3 text-xs font-extrabold text-slate-950 transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
                                     >
-                                        <Check className="size-4 stroke-[3]" />
+                                        <CheckIcon className="size-4 stroke-[3]" />
                                         Simpan Semua Perubahan
                                     </button>
                                 </div>

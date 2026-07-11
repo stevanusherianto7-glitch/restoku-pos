@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass } from '../../Components/Shared';
-import { User, Bell, Smartphone, Save, Key, Lock, CheckCircle2 } from 'lucide-react';
+import {
+    UserIcon,
+    BellIcon,
+    SmartphoneIcon,
+    SaveIcon,
+    KeyIcon,
+    LockIcon,
+    CheckCircle2Icon,
+} from '../../Components/icons';
 
 export default function OwnerSettings() {
     // Mock State for Settings
@@ -31,7 +39,7 @@ export default function OwnerSettings() {
                     <form onSubmit={handleSave}>
                         <Glass className="p-8">
                             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                <User className="size-5 text-blue-400" /> Profil Pribadi
+                                <UserIcon className="size-5 text-blue-400" /> Profil Pribadi
                             </h2>
 
                             <div className="space-y-5">
@@ -77,7 +85,7 @@ export default function OwnerSettings() {
 
                         <Glass className="p-8 mt-8">
                             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                <Bell className="size-5 text-amber-400" /> Preferensi Laporan & Notifikasi
+                                <BellIcon className="size-5 text-amber-400" /> Preferensi Laporan & Notifikasi
                             </h2>
 
                             <div className="space-y-6">
@@ -162,14 +170,14 @@ export default function OwnerSettings() {
                         <div className="mt-8 flex justify-end items-center gap-4">
                             {saved && (
                                 <span className="flex items-center gap-2 text-emerald-400 text-sm font-medium animate-in fade-in">
-                                    <CheckCircle2 className="size-4" /> Pengaturan berhasil disimpan
+                                    <CheckCircle2Icon className="size-4" /> Pengaturan berhasil disimpan
                                 </span>
                             )}
                             <button
                                 type="submit"
                                 className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95"
                             >
-                                <Save className="size-5" /> Simpan Perubahan
+                                <SaveIcon className="size-5" /> Simpan Perubahan
                             </button>
                         </div>
                     </form>
@@ -179,7 +187,7 @@ export default function OwnerSettings() {
                 <div className="space-y-6">
                     <Glass className="p-6 border-t-2 border-emerald-500/30">
                         <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                            <Lock className="size-5 text-emerald-400" /> Keamanan Akun
+                            <LockIcon className="size-5 text-emerald-400" /> Keamanan Akun
                         </h3>
 
                         <div className="space-y-4">
@@ -203,14 +211,14 @@ export default function OwnerSettings() {
                                 type="button"
                                 className="w-full flex justify-center items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2.5 rounded-xl font-medium transition-colors mt-2"
                             >
-                                <Key className="size-4" /> Ganti Password
+                                <KeyIcon className="size-4" /> Ganti Password
                             </button>
                         </div>
                     </Glass>
 
                     <div className="p-5 bg-gradient-to-br from-emerald-900/40 to-blue-900/20 border border-emerald-500/20 rounded-2xl">
                         <div className="flex justify-center mb-4">
-                            <Smartphone className="size-10 text-emerald-400" />
+                            <SmartphoneIcon className="size-10 text-emerald-400" />
                         </div>
                         <h4 className="text-center font-bold text-white mb-2">Aplikasi Mobile Restoku</h4>
                         <p className="text-center text-sm text-slate-400 mb-4 leading-relaxed">

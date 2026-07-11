@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Screen, Glass, Badge, Button } from '../Shared';
-import { CalendarOff, ShieldAlert, FileText, AlertTriangle } from 'lucide-react';
+import { CalendarOffIcon, ShieldAlertIcon, FileTextIcon, AlertTriangleIcon } from '../icons';
 
 export function LeaveAndDiscipline() {
     const [activeTab, setActiveTab] = useState<'cuti' | 'sp'>('cuti');
@@ -11,11 +11,11 @@ export function LeaveAndDiscipline() {
             actions={
                 activeTab === 'cuti' ? (
                     <Button>
-                        <CalendarOff className="size-4 mr-2" /> Ajukan Cuti
+                        <CalendarOffIcon className="size-4 mr-2" /> Ajukan Cuti
                     </Button>
                 ) : (
                     <Button className="bg-red-500 hover:bg-red-600">
-                        <ShieldAlert className="size-4 mr-2" /> Terbitkan SP
+                        <ShieldAlertIcon className="size-4 mr-2" /> Terbitkan SP
                     </Button>
                 )
             }
@@ -106,28 +106,28 @@ export function LeaveAndDiscipline() {
                                 <p className="text-slate-400 text-sm">SP 1 (Lisan/Tertulis)</p>
                                 <p className="text-xl font-bold text-amber-400">3</p>
                             </div>
-                            <AlertTriangle className="size-8 text-amber-500/20" />
+                            <AlertTriangleIcon className="size-8 text-amber-500/20" />
                         </Glass>
                         <Glass className="p-4 flex justify-between items-center border-orange-500/30">
                             <div>
                                 <p className="text-slate-400 text-sm">SP 2</p>
                                 <p className="text-xl font-bold text-orange-400">1</p>
                             </div>
-                            <AlertTriangle className="size-8 text-orange-500/20" />
+                            <AlertTriangleIcon className="size-8 text-orange-500/20" />
                         </Glass>
                         <Glass className="p-4 flex justify-between items-center border-red-500/30">
                             <div>
                                 <p className="text-slate-400 text-sm">SP 3 / Skorsing</p>
                                 <p className="text-xl font-bold text-red-500">0</p>
                             </div>
-                            <ShieldAlert className="size-8 text-red-500/20" />
+                            <ShieldAlertIcon className="size-8 text-red-500/20" />
                         </Glass>
                         <Glass className="p-4 flex justify-between items-center border-slate-500/30">
                             <div>
                                 <p className="text-slate-400 text-sm">PHK / Terminasi</p>
                                 <p className="text-xl font-bold text-slate-300">0</p>
                             </div>
-                            <FileText className="size-8 text-slate-500/20" />
+                            <FileTextIcon className="size-8 text-slate-500/20" />
                         </Glass>
                     </div>
 

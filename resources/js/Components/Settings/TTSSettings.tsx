@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Screen, Glass, Button, useTenantSettings } from '../Shared';
-import { Volume2, Mic, Play, Square, Settings2, Globe, Save, CheckCircle2 } from 'lucide-react';
+import {
+    Volume2Icon,
+    MicIcon,
+    PlayIcon,
+    SquareIcon,
+    Settings2Icon,
+    GlobeIcon,
+    SaveIcon,
+    CheckCircle2Icon,
+} from '../icons';
 import { useTTS } from '../../Hooks/useTTS';
 
 export function TTSSettings() {
@@ -52,7 +61,7 @@ export function TTSSettings() {
             title="Pengaturan Text-to-Speech (TTS)"
             action={
                 <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2 text-white font-bold" onClick={handleSave}>
-                    {saved ? <CheckCircle2 className="size-4" /> : <Save className="size-4" />}
+                    {saved ? <CheckCircle2Icon className="size-4" /> : <SaveIcon className="size-4" />}
                     {saved ? 'Tersimpan' : 'Simpan Pengaturan'}
                 </Button>
             }
@@ -67,7 +76,7 @@ export function TTSSettings() {
                             <div
                                 className={`p-3 rounded-xl ${config.enabled ? (isLight ? 'bg-emerald-600 text-white shadow-md' : 'bg-emerald-500 text-white') : isLight ? 'bg-slate-200 text-slate-500' : 'bg-slate-800 text-slate-400'}`}
                             >
-                                <Volume2 className="size-6" />
+                                <Volume2Icon className="size-6" />
                             </div>
                             <div>
                                 <h2 className={`text-xl font-bold mb-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
@@ -98,7 +107,7 @@ export function TTSSettings() {
                         <h3
                             className={`text-lg font-bold flex items-center gap-2 mb-4 ${isLight ? 'text-slate-900' : 'text-white'}`}
                         >
-                            <Settings2 className="size-5 text-[var(--color-primary)]" /> Kontrol Suara
+                            <Settings2Icon className="size-5 text-[var(--color-primary)]" /> Kontrol Suara
                         </h3>
 
                         <div className="space-y-4">
@@ -165,7 +174,7 @@ export function TTSSettings() {
                                     className={`flex-1 py-3 px-4 rounded-xl border flex flex-col items-center gap-1 transition-all ${config.engine === 'browser' ? (isLight ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] font-bold shadow-sm' : 'bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-[var(--color-primary)]') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                     onClick={() => setConfig({ ...config, engine: 'browser' })}
                                 >
-                                    <Globe className="size-5 mb-1" />
+                                    <GlobeIcon className="size-5 mb-1" />
                                     <span className="font-semibold text-sm">Browser API</span>
                                     <span className="text-[10px] opacity-70">Gratis & Offline</span>
                                 </button>
@@ -173,7 +182,7 @@ export function TTSSettings() {
                                     className={`flex-1 py-3 px-4 rounded-xl border flex flex-col items-center gap-1 transition-all ${config.engine === 'google' ? (isLight ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)] font-bold shadow-sm' : 'bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-[var(--color-primary)]') : isLight ? 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50' : 'bg-slate-900 border-white/10 text-slate-400 hover:bg-white/5'}`}
                                     onClick={() => setConfig({ ...config, engine: 'google' })}
                                 >
-                                    <Mic className="size-5 mb-1" />
+                                    <MicIcon className="size-5 mb-1" />
                                     <span className="font-semibold text-sm">Google Cloud</span>
                                     <span className="text-[10px] opacity-70">Natural (Premium)</span>
                                 </button>
@@ -193,7 +202,7 @@ export function TTSSettings() {
                         <h3
                             className={`text-lg font-bold flex items-center gap-2 mb-6 ${isLight ? 'text-slate-900' : 'text-white'}`}
                         >
-                            <Volume2 className="size-5 text-emerald-500" /> Skenario & Uji Coba
+                            <Volume2Icon className="size-5 text-emerald-500" /> Skenario & Uji Coba
                         </h3>
 
                         <div className="space-y-4">
@@ -247,11 +256,11 @@ export function TTSSettings() {
                                     >
                                         {isSpeaking ? (
                                             <>
-                                                <Square className="size-3 mr-2" /> Stop
+                                                <SquareIcon className="size-3 mr-2" /> Stop
                                             </>
                                         ) : (
                                             <>
-                                                <Play className="size-3 mr-2" /> Dengarkan
+                                                <PlayIcon className="size-3 mr-2" /> Dengarkan
                                             </>
                                         )}
                                     </Button>
@@ -270,7 +279,7 @@ export function TTSSettings() {
                             <div className="flex items-center gap-2 text-sm">
                                 {'speechSynthesis' in window ? (
                                     <>
-                                        <CheckCircle2 className="size-4 text-emerald-500" />{' '}
+                                        <CheckCircle2Icon className="size-4 text-emerald-500" />{' '}
                                         <span className={isLight ? 'text-emerald-800 font-bold' : 'text-emerald-400'}>
                                             Web Speech API Tersedia
                                         </span>

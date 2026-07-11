@@ -2,7 +2,15 @@ import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge } from '../../Components/Shared';
-import { ShoppingBag, Clock, Utensils, RefreshCw, Layers, CreditCard, GlassWater } from 'lucide-react';
+import {
+    ShoppingBagIcon,
+    ClockIcon,
+    UtensilsIcon,
+    RefreshCwIcon,
+    LayersIcon,
+    CreditCardIcon,
+    GlassWaterIcon,
+} from '../../Components/icons';
 
 interface Order {
     id: string;
@@ -68,13 +76,13 @@ export default function MonitorPesanan() {
                             href="/waiter-bar"
                             className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 text-amber-300 rounded-xl text-xs font-bold transition-all"
                         >
-                            <GlassWater className="size-3.5 text-amber-400" /> Monitor Minuman (Waiter/Bar)
+                            <GlassWaterIcon className="size-3.5 text-amber-400" /> Monitor Minuman (Waiter/Bar)
                         </Link>
                         <button
                             onClick={handleRefresh}
                             className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-slate-200 rounded-xl text-xs font-bold transition-all"
                         >
-                            <RefreshCw className={`size-3.5 ${isRefreshing ? 'animate-spin' : ''}`} /> Muat Ulang
+                            <RefreshCwIcon className={`size-3.5 ${isRefreshing ? 'animate-spin' : ''}`} /> Muat Ulang
                         </button>
                     </div>
                 }
@@ -88,7 +96,7 @@ export default function MonitorPesanan() {
                             </p>
                             <h3 className="text-2xl font-black text-slate-100 mt-1">{orders.length}</h3>
                         </div>
-                        <Layers className="size-8 text-amber-500/20" />
+                        <LayersIcon className="size-8 text-amber-500/20" />
                     </Glass>
                     <Glass className="p-5 flex items-center justify-between border-l-4 border-l-blue-500">
                         <div>
@@ -99,7 +107,7 @@ export default function MonitorPesanan() {
                                 {orders.filter((o) => !o.table.toLowerCase().includes('takeaway')).length}
                             </h3>
                         </div>
-                        <Utensils className="size-8 text-blue-500/20" />
+                        <UtensilsIcon className="size-8 text-blue-500/20" />
                     </Glass>
                     <Glass className="p-5 flex items-center justify-between border-l-4 border-l-emerald-500">
                         <div>
@@ -110,7 +118,7 @@ export default function MonitorPesanan() {
                                 {orders.filter((o) => o.table.toLowerCase().includes('takeaway')).length}
                             </h3>
                         </div>
-                        <ShoppingBag className="size-8 text-emerald-500/20" />
+                        <ShoppingBagIcon className="size-8 text-emerald-500/20" />
                     </Glass>
                 </div>
 
@@ -178,7 +186,7 @@ export default function MonitorPesanan() {
 
                                         {/* Time Counter */}
                                         <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                                            <Clock className="size-3.5" />
+                                            <ClockIcon className="size-3.5" />
                                             <span>Masuk {order.time} mnt lalu</span>
                                         </div>
                                     </div>
@@ -189,7 +197,7 @@ export default function MonitorPesanan() {
                                             href={`/pos?loadOrder=${order.id}`}
                                             className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black transition-all shadow-md shadow-emerald-500/10"
                                         >
-                                            <CreditCard className="size-4" /> Proses Pembayaran
+                                            <CreditCardIcon className="size-4" /> Proses Pembayaran
                                         </Link>
                                     </div>
                                 </Glass>
@@ -198,7 +206,7 @@ export default function MonitorPesanan() {
                     </div>
                 ) : (
                     <Glass className="py-20 text-center flex flex-col items-center justify-center">
-                        <Layers className="size-16 text-slate-700 mb-4 animate-pulse" />
+                        <LayersIcon className="size-16 text-slate-700 mb-4 animate-pulse" />
                         <h4 className="text-base font-bold text-slate-300">Belum Ada Pesanan Masuk</h4>
                         <p className="text-xs text-slate-500 mt-1 max-w-xs">
                             Antrean pembayaran akan otomatis muncul di sini ketika tamu melakukan pemesanan via buku

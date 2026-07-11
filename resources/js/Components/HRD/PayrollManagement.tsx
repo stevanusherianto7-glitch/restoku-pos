@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { Screen, Glass, Badge, Button, formatRupiah as formatCurrency } from '../Shared';
-import { Calculator, CheckCircle2, Download, FileText, Search, Send, DollarSign, Calendar } from 'lucide-react';
+import {
+    CalculatorIcon,
+    CheckCircle2Icon,
+    DownloadIcon,
+    FileTextIcon,
+    SearchIcon,
+    SendIcon,
+    DollarSignIcon,
+    CalendarIcon,
+} from '../icons';
 
 const MOCK_PAYROLL = [
     {
@@ -56,10 +65,10 @@ export function PayrollManagement() {
             actions={
                 <>
                     <Button variant="outline">
-                        <Calendar className="size-4 mr-2" /> Juli 2026
+                        <CalendarIcon className="size-4 mr-2" /> Juli 2026
                     </Button>
                     <Button>
-                        <Calculator className="size-4 mr-2" /> Generate Gaji Bulan Ini
+                        <CalculatorIcon className="size-4 mr-2" /> Generate Gaji Bulan Ini
                     </Button>
                 </>
             }
@@ -68,7 +77,7 @@ export function PayrollManagement() {
                 <Glass className="p-5 border-blue-500/30">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="size-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
-                            <FileText className="size-5" />
+                            <FileTextIcon className="size-5" />
                         </div>
                         <div>
                             <p className="text-slate-400 text-sm">Total Draft</p>
@@ -79,7 +88,7 @@ export function PayrollManagement() {
                 <Glass className="p-5 border-amber-500/30">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="size-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
-                            <CheckCircle2 className="size-5" />
+                            <CheckCircle2Icon className="size-5" />
                         </div>
                         <div>
                             <p className="text-slate-400 text-sm">Menunggu Pembayaran</p>
@@ -90,7 +99,7 @@ export function PayrollManagement() {
                 <Glass className="p-5 border-emerald-500/30">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="size-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                            <DollarSign className="size-5" />
+                            <DollarSignIcon className="size-5" />
                         </div>
                         <div>
                             <p className="text-slate-400 text-sm">Total Telah Dibayar</p>
@@ -103,7 +112,7 @@ export function PayrollManagement() {
             <Glass className="p-0 overflow-hidden relative">
                 <div className="p-4 border-b border-white/5 flex items-center justify-between">
                     <div className="relative w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                         <input
                             type="text"
                             placeholder="Cari karyawan..."
@@ -112,7 +121,7 @@ export function PayrollManagement() {
                     </div>
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm">
-                            <Send className="size-4 mr-2" />
+                            <SendIcon className="size-4 mr-2" />
                             Kirim Semua Slip via WA
                         </Button>
                     </div>
@@ -164,7 +173,7 @@ export function PayrollManagement() {
                                 </td>
                                 <td className="px-4 py-3 text-right space-x-2">
                                     <Button variant="ghost" size="sm" onClick={() => setSelectedPayslip(pr)}>
-                                        <FileText className="size-4" />
+                                        <FileTextIcon className="size-4" />
                                     </Button>
                                     {pr.status === 'draft' && (
                                         <Button size="sm" onClick={() => approvePayroll(pr.id)}>
@@ -199,7 +208,7 @@ export function PayrollManagement() {
                                     size="sm"
                                     className="text-slate-600 hover:bg-slate-200 h-8 w-8 p-0 rounded-full"
                                 >
-                                    <Download className="size-4" />
+                                    <DownloadIcon className="size-4" />
                                 </Button>
                                 <Button
                                     variant="ghost"

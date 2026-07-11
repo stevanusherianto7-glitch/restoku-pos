@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlertIcon } from './icons';
 
 // ─── Role Guard Hook ──────────────────────────────────────────────────────────
 /**
@@ -89,7 +89,7 @@ export function AccessDenied({ pageName, allowedRoleLabel }: AccessDeniedProps) 
         <MainLayout>
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6 animate-in fade-in duration-300">
                 <div className="p-5 rounded-full bg-red-500/10 border border-red-500/20">
-                    <ShieldAlert className="size-12 text-red-400" />
+                    <ShieldAlertIcon className="size-12 text-red-400" />
                 </div>
                 <div className="space-y-2 max-w-sm">
                     <h1 className="text-2xl font-bold text-white">Akses Ditolak</h1>

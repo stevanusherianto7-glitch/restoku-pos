@@ -2,7 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass } from '../../Components/Shared';
-import { Clock3, CheckCheck, Volume2, VolumeX, GlassWater, BellRing, ShieldAlert } from 'lucide-react';
+import {
+    Clock3Icon,
+    CheckCheckIcon,
+    Volume2Icon,
+    VolumeXIcon,
+    GlassWaterIcon,
+    BellRingIcon,
+    ShieldAlertIcon,
+} from '../../Components/icons';
 
 type KdsOrder = {
     id: string;
@@ -42,7 +50,7 @@ export default function WaiterBar() {
                 <Head title="Akses Ditolak — Waiter Display" />
                 <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
                     <div className="p-5 rounded-full bg-red-500/10 border border-red-500/20">
-                        <ShieldAlert className="size-12 text-red-400" />
+                        <ShieldAlertIcon className="size-12 text-red-400" />
                     </div>
                     <div className="space-y-2">
                         <h1 className="text-2xl font-bold text-white">Akses Ditolak</h1>
@@ -195,7 +203,7 @@ function WaiterBarContent() {
                                 : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-200'
                         }`}
                     >
-                        {isAudioEnabled ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
+                        {isAudioEnabled ? <Volume2Icon className="size-5" /> : <VolumeXIcon className="size-5" />}
                         <span className="text-sm font-medium pr-1">Notifikasi Suara HP</span>
                     </button>
                 }
@@ -205,7 +213,7 @@ function WaiterBarContent() {
                     <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-3xl p-5 flex items-center justify-between font-mono animate-pulse">
                         <div className="flex items-center gap-3">
                             <div className="size-10 rounded-2xl bg-amber-500/15 flex items-center justify-center text-amber-400">
-                                <BellRing className="size-5" />
+                                <BellRingIcon className="size-5" />
                             </div>
                             <div>
                                 <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider">
@@ -225,7 +233,7 @@ function WaiterBarContent() {
                 {orders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                         <div className="size-20 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mb-4">
-                            <GlassWater className="size-10 text-slate-600" />
+                            <GlassWaterIcon className="size-10 text-slate-600" />
                         </div>
                         <p className="text-base font-bold text-slate-400">Antrean Minuman Kosong</p>
                         <p className="text-xs text-slate-500 mt-1">Belum ada orderan minuman masuk dari pelanggan.</p>
@@ -242,7 +250,7 @@ function WaiterBarContent() {
                                         <p className="text-lg opacity-70 mt-1 font-medium">{o.id}</p>
                                     </div>
                                     <span className="font-mono text-2xl opacity-90 flex items-center gap-1.5 font-bold bg-black/20 px-2.5 py-1.5 rounded-xl">
-                                        <Clock3 className="size-5" />
+                                        <Clock3Icon className="size-5" />
                                         {o.time}'
                                     </span>
                                 </div>
@@ -269,7 +277,7 @@ function WaiterBarContent() {
                                     onClick={() => handleServeDrinks(o.id)}
                                     className="mt-6 w-full rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 py-4 text-xl font-bold text-amber-200 transition-colors flex items-center justify-center gap-2 active:scale-95 duration-200"
                                 >
-                                    <CheckCheck className="size-5" /> SAJIKAN MINUMAN
+                                    <CheckCheckIcon className="size-5" /> SAJIKAN MINUMAN
                                 </button>
                             </Glass>
                         ))}

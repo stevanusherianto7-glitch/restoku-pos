@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Screen, Glass, Button, Badge, useTenantSettings } from '../Shared';
-import { Printer, Search, RefreshCw, AlertTriangle, CheckCircle2, FileText, Settings, Download } from 'lucide-react';
+import {
+    PrinterIcon,
+    SearchIcon,
+    RefreshCwIcon,
+    AlertTriangleIcon,
+    CheckCircle2Icon,
+    FileTextIcon,
+    SettingsIcon,
+    DownloadIcon,
+} from '../icons';
 
 export function PrintJobMonitor() {
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -40,13 +49,13 @@ export function PrintJobMonitor() {
                         variant="outline"
                         className={`gap-2 ${isLight ? 'text-slate-700 border-slate-300 hover:bg-slate-100 font-bold' : 'text-slate-300 border-white/10 hover:bg-white/10'}`}
                     >
-                        <Settings className="size-4" /> Pengaturan Printer
+                        <SettingsIcon className="size-4" /> Pengaturan PrinterIcon
                     </Button>
                     <Button
                         onClick={handleRefresh}
                         className={`gap-2 font-bold ${isLight ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
                     >
-                        <RefreshCw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} /> Muat Ulang
+                        <RefreshCwIcon className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} /> Muat Ulang
                     </Button>
                 </div>
             }
@@ -63,7 +72,7 @@ export function PrintJobMonitor() {
                             142
                         </h3>
                     </div>
-                    <Printer className="size-8 text-[var(--color-primary)]/20" />
+                    <PrinterIcon className="size-8 text-[var(--color-primary)]/20" />
                 </Glass>
                 <Glass
                     className={`p-5 flex items-center justify-between border-l-4 border-l-emerald-500 ${isLight ? 'bg-white shadow-sm border-y border-r border-slate-200' : ''}`}
@@ -76,7 +85,7 @@ export function PrintJobMonitor() {
                             138
                         </h3>
                     </div>
-                    <CheckCircle2 className="size-8 text-emerald-500/20" />
+                    <CheckCircle2Icon className="size-8 text-emerald-500/20" />
                 </Glass>
                 <Glass
                     className={`p-5 flex items-center justify-between border-l-4 border-l-red-500 ${isLight ? 'bg-white shadow-sm border-y border-r border-slate-200' : ''}`}
@@ -87,7 +96,7 @@ export function PrintJobMonitor() {
                         </p>
                         <h3 className={`text-2xl font-bold mt-1 ${isLight ? 'text-red-700' : 'text-red-400'}`}>4</h3>
                     </div>
-                    <AlertTriangle className="size-8 text-red-500/20" />
+                    <AlertTriangleIcon className="size-8 text-red-500/20" />
                 </Glass>
                 <Glass
                     className={`p-5 flex items-center justify-between border-l-4 border-l-amber-500 ${isLight ? 'bg-white shadow-sm border-y border-r border-slate-200' : ''}`}
@@ -100,7 +109,7 @@ export function PrintJobMonitor() {
                             1
                         </h3>
                     </div>
-                    <RefreshCw className="size-8 text-amber-500/20 animate-spin-slow" />
+                    <RefreshCwIcon className="size-8 text-amber-500/20 animate-spin-slow" />
                 </Glass>
             </div>
 
@@ -112,7 +121,7 @@ export function PrintJobMonitor() {
                         <div
                             className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors w-64 ${isLight ? 'border-slate-300 bg-white' : 'border-white/10 bg-white/5'}`}
                         >
-                            <Search className="size-4 text-slate-400" />
+                            <SearchIcon className="size-4 text-slate-400" />
                             <input
                                 placeholder="Cari Job ID atau Order ID..."
                                 className={`w-full bg-transparent text-sm outline-none ${isLight ? 'text-slate-900 placeholder:text-slate-400' : 'text-slate-200 placeholder:text-slate-400'}`}
@@ -136,7 +145,7 @@ export function PrintJobMonitor() {
                         <span>Job ID</span>
                         <span>Tipe Struk</span>
                         <span>Order ID</span>
-                        <span>Printer Target</span>
+                        <span>PrinterIcon Target</span>
                         <span>Status</span>
                         <span>Waktu & Info</span>
                         <span>Aksi</span>
@@ -152,7 +161,7 @@ export function PrintJobMonitor() {
                             <span
                                 className={`flex items-center gap-2 ${isLight ? 'text-slate-800 font-medium' : 'text-slate-200'}`}
                             >
-                                <FileText className="size-4 text-slate-400" />
+                                <FileTextIcon className="size-4 text-slate-400" />
                                 {job.type}
                             </span>
                             <span
@@ -173,17 +182,17 @@ export function PrintJobMonitor() {
                             <div>
                                 {job.status === 'done' && (
                                     <Badge tone="emerald">
-                                        <CheckCircle2 className="size-3 mr-1" /> Selesai
+                                        <CheckCircle2Icon className="size-3 mr-1" /> Selesai
                                     </Badge>
                                 )}
                                 {job.status === 'failed' && (
                                     <Badge tone="red">
-                                        <AlertTriangle className="size-3 mr-1" /> Gagal
+                                        <AlertTriangleIcon className="size-3 mr-1" /> Gagal
                                     </Badge>
                                 )}
                                 {job.status === 'printing' && (
                                     <Badge tone="amber">
-                                        <RefreshCw className="size-3 mr-1 animate-spin" /> Printing
+                                        <RefreshCwIcon className="size-3 mr-1 animate-spin" /> Printing
                                     </Badge>
                                 )}
                             </div>
@@ -204,13 +213,13 @@ export function PrintJobMonitor() {
                             <div>
                                 {job.status === 'failed' ? (
                                     <button className="flex items-center gap-1 text-[11px] bg-[var(--color-primary)]/20 text-[var(--color-primary)] px-3 py-1.5 rounded-lg border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/100/30 transition-colors font-bold">
-                                        <RefreshCw className="size-3" /> Cetak Ulang
+                                        <RefreshCwIcon className="size-3" /> Cetak Ulang
                                     </button>
                                 ) : (
                                     <button
                                         className={`flex items-center gap-1 text-[11px] px-3 py-1.5 rounded-lg border transition-colors ${isLight ? 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 font-bold' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'}`}
                                     >
-                                        <Download className="size-3" /> Unduh PDF
+                                        <DownloadIcon className="size-3" /> Unduh PDF
                                     </button>
                                 )}
                             </div>

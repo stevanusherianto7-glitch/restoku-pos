@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Screen, Glass, Button } from '../Shared';
-import { CalendarDays, Save, Upload, UserPlus, AlertTriangle, CheckCircle2, MoreHorizontal } from 'lucide-react';
+import {
+    CalendarDaysIcon,
+    SaveIcon,
+    UploadIcon,
+    UserPlusIcon,
+    AlertTriangleIcon,
+    CheckCircle2Icon,
+    MoreHorizontalIcon,
+} from '../icons';
 
 export function ShiftManager() {
     const [selectedWeek, setSelectedWeek] = useState('06 Jul - 12 Jul 2026');
@@ -41,10 +49,10 @@ export function ShiftManager() {
             action={
                 <div className="flex gap-2">
                     <Button variant="outline" className="gap-2 text-xs">
-                        <CalendarDays className="size-4" /> Minggu Ini
+                        <CalendarDaysIcon className="size-4" /> Minggu Ini
                     </Button>
                     <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2 text-xs">
-                        <Upload className="size-4" /> Publikasikan Jadwal
+                        <UploadIcon className="size-4" /> Publikasikan Jadwal
                     </Button>
                 </div>
             }
@@ -54,12 +62,12 @@ export function ShiftManager() {
                     <div className="flex items-center gap-4">
                         <h3 className="font-semibold text-white">Minggu: {selectedWeek}</h3>
                         <span className="bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 px-3 py-1 text-xs rounded-full flex items-center gap-1">
-                            <AlertTriangle className="size-3" /> Draft (Belum Dipublikasi)
+                            <AlertTriangleIcon className="size-3" /> Draft (Belum Dipublikasi)
                         </span>
                     </div>
                     <div className="flex gap-2 text-xs">
                         <Button variant="outline" className="gap-2 bg-white/5 border-white/10 text-slate-300">
-                            <Save className="size-3" /> Simpan Draft
+                            <SaveIcon className="size-3" /> Simpan Draft
                         </Button>
                     </div>
                 </div>
@@ -108,7 +116,7 @@ export function ShiftManager() {
                                                                 ))}
                                                             </span>
                                                             <div className="absolute inset-0 bg-black/60 rounded-lg opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                                                <MoreHorizontal className="size-4 text-white" />
+                                                                <MoreHorizontalIcon className="size-4 text-white" />
                                                             </div>
                                                         </div>
                                                     ) : (
@@ -120,9 +128,9 @@ export function ShiftManager() {
                                                                 roleName,
                                                                 idx,
                                                             ) ? (
-                                                                <AlertTriangle className="size-4 text-red-400 mb-1" />
+                                                                <AlertTriangleIcon className="size-4 text-red-400 mb-1" />
                                                             ) : (
-                                                                <UserPlus className="size-4 text-slate-500 mb-1" />
+                                                                <UserPlusIcon className="size-4 text-slate-500 mb-1" />
                                                             )}
                                                             <span
                                                                 className={
@@ -151,10 +159,10 @@ export function ShiftManager() {
 
                 <div className="mt-6 flex gap-4 text-xs">
                     <div className="flex items-center gap-2 text-slate-400">
-                        <AlertTriangle className="size-4 text-red-400" /> Kurang Waiter (Kamis, Jumat)
+                        <AlertTriangleIcon className="size-4 text-red-400" /> Kurang Waiter (Kamis, Jumat)
                     </div>
                     <div className="flex items-center gap-2 text-slate-400">
-                        <CheckCircle2 className="size-4 text-emerald-400" /> Cashier & Kitchen Lengkap
+                        <CheckCircle2Icon className="size-4 text-emerald-400" /> Cashier & Kitchen Lengkap
                     </div>
                 </div>
             </Glass>

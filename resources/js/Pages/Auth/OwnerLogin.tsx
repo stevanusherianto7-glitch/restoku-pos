@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Mail, Lock, ArrowRight, Quote, Eye, EyeOff } from 'lucide-react';
+import { MailIcon, LockIcon, ArrowRightIcon, QuoteIcon, EyeIcon, EyeOffIcon } from '../../Components/icons';
 import { Input, Button, RestokuWordmark } from '../../Components/Shared';
 
 export default function OwnerLogin() {
@@ -57,7 +57,7 @@ export default function OwnerLogin() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-300 ml-1">Email Bisnis</label>
                             <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                                <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                                 <Input
                                     type="email"
                                     placeholder="owner@restoran.com"
@@ -81,7 +81,7 @@ export default function OwnerLogin() {
                                 </a>
                             </div>
                             <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                                <LockIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                                 <Input
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder="••••••••"
@@ -96,7 +96,7 @@ export default function OwnerLogin() {
                                     className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
                                     title={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                                 >
-                                    {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                                    {showPassword ? <EyeOffIcon className="size-5" /> : <EyeIcon className="size-5" />}
                                 </button>
                             </div>
                         </div>
@@ -115,7 +115,7 @@ export default function OwnerLogin() {
                                 ) : (
                                     <span className="flex items-center gap-2">
                                         Masuk Dasbor{' '}
-                                        <ArrowRight className="size-5 group-hover:translate-x-1.5 transition-transform" />
+                                        <ArrowRightIcon className="size-5 group-hover:translate-x-1.5 transition-transform" />
                                     </span>
                                 )}
                             </Button>
@@ -186,7 +186,7 @@ export default function OwnerLogin() {
 
                 {/* Testimonial Overlay */}
                 <div className="absolute bottom-12 right-12 left-12 max-w-md p-6 rounded-2xl bg-black/55 backdrop-blur-md border border-white/10 shadow-2xl">
-                    <Quote className="size-8 text-amber-500/60 mb-3" />
+                    <QuoteIcon className="size-8 text-amber-500/60 mb-3" />
                     <p className="text-slate-200 leading-relaxed italic mb-4">
                         &quot;Sejak menggunakan Restoku, memantau penjualan dari 5 cabang berbeda menjadi semudah
                         membalikkan telapak tangan.&quot;

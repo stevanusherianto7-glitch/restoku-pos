@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah } from '../../Components/Shared';
-import { Plus, Download, ArrowUpRight, ArrowDownLeft, Banknote } from 'lucide-react';
+import { PlusIcon, DownloadIcon, ArrowUpRightIcon, ArrowDownLeftIcon, BanknoteIcon } from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 
@@ -37,11 +37,11 @@ function ArusKasInner() {
                             onClick={() => window.print()}
                             className="rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-4 py-2 text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center gap-2"
                         >
-                            <Download className="size-4" />
+                            <DownloadIcon className="size-4" />
                             Cetak PDF
                         </button>
                         <button className="rounded-lg bg-slate-100 hover:bg-white text-slate-900 px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
-                            <Plus className="size-4" />
+                            <PlusIcon className="size-4" />
                             Catat Transaksi
                         </button>
                     </div>
@@ -52,7 +52,7 @@ function ArusKasInner() {
                         <Glass className="p-5">
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="size-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                    <ArrowUpRight className="size-4 text-emerald-400" />
+                                    <ArrowUpRightIcon className="size-4 text-emerald-400" />
                                 </div>
                                 <p className="text-sm text-slate-400">Uang Masuk (Hari Ini)</p>
                             </div>
@@ -61,7 +61,7 @@ function ArusKasInner() {
                         <Glass className="p-5">
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="size-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                    <ArrowDownLeft className="size-4 text-red-400" />
+                                    <ArrowDownLeftIcon className="size-4 text-red-400" />
                                 </div>
                                 <p className="text-sm text-slate-400">Uang Keluar (Hari Ini)</p>
                             </div>
@@ -70,7 +70,7 @@ function ArusKasInner() {
                         <Glass className="p-5">
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="size-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                                    <Banknote className="size-4 text-blue-400" />
+                                    <BanknoteIcon className="size-4 text-blue-400" />
                                 </div>
                                 <p className="text-sm text-slate-400">Saldo Akhir</p>
                             </div>

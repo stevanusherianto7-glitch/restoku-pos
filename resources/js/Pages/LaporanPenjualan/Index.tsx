@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah, TAX_LABELS } from '../../Components/Shared';
-import { Download } from 'lucide-react';
+import { DownloadIcon } from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 
@@ -55,11 +55,11 @@ function LaporanPenjualanInner() {
                             onClick={() => window.print()}
                             className="rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-4 py-2 text-sm font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center gap-2"
                         >
-                            <Download className="size-4" />
+                            <DownloadIcon className="size-4" />
                             Cetak PDF
                         </button>
                         <button className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition-colors flex items-center gap-2">
-                            <Download className="size-4" />
+                            <DownloadIcon className="size-4" />
                             Export Excel
                         </button>
                     </div>

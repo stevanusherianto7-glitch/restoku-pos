@@ -1,12 +1,12 @@
 import { Screen, Glass, Badge, Input, formatRupiah as formatRp } from '../Shared';
-import { Search, AlertTriangle, PackageX, CheckCircle2, PackageSearch } from 'lucide-react';
+import { SearchIcon, AlertTriangleIcon, PackageXIcon, CheckCircle2Icon, PackageSearchIcon } from '../icons';
 
 export function DashboardInventory() {
     const summary = [
-        { label: 'Total Item', value: 250, icon: PackageSearch, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-        { label: 'Stok Aman', value: 232, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-        { label: 'Hampir Habis', value: 15, icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-        { label: 'Stok Habis', value: 3, icon: PackageX, color: 'text-red-400', bg: 'bg-red-500/10' },
+        { label: 'Total Item', value: 250, icon: PackageSearchIcon, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+        { label: 'Stok Aman', value: 232, icon: CheckCircle2Icon, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+        { label: 'Hampir Habis', value: 15, icon: AlertTriangleIcon, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+        { label: 'Stok Habis', value: 3, icon: PackageXIcon, color: 'text-red-400', bg: 'bg-red-500/10' },
     ];
 
     const stockAlerts = [
@@ -42,7 +42,7 @@ export function DashboardInventory() {
                     <h2 className="text-lg font-semibold text-white">Status Stok Bahan Baku</h2>
                     <div className="flex gap-2">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                             <Input placeholder="Cari bahan baku..." className="pl-9 w-full md:w-64" />
                         </div>
                         <select className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">

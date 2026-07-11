@@ -2,18 +2,18 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 import { Glass, Button } from '../Shared';
 import {
-    ChevronLeft,
-    ChevronRight,
-    Calendar,
-    Download,
-    Save,
-    RefreshCw,
-    ArrowLeft,
-    Check,
-    X,
-    AlertCircle,
-    ShieldAlert,
-} from 'lucide-react';
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    CalendarIcon,
+    DownloadIcon,
+    SaveIcon,
+    RefreshCwIcon,
+    ArrowLeftIcon,
+    CheckIcon,
+    XIcon,
+    AlertCircleIcon,
+    ShieldAlertIcon,
+} from '../icons';
 
 // Shift Types and Styles
 type ShiftType = 'P' | 'S' | 'M' | 'O';
@@ -327,7 +327,7 @@ export function StafShift() {
                             href="/dashboard"
                             className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors print:hidden"
                         >
-                            <ArrowLeft className="size-4" />
+                            <ArrowLeftIcon className="size-4" />
                         </Link>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight text-white print:text-black">
@@ -342,13 +342,13 @@ export function StafShift() {
                     {/* Month Selector */}
                     <div className="flex items-center gap-3 bg-black/30 rounded-xl px-4 py-2 border border-white/5 print:border-slate-300">
                         <button className="text-slate-400 hover:text-white print:hidden">
-                            <ChevronLeft className="size-4" />
+                            <ChevronLeftIcon className="size-4" />
                         </button>
                         <span className="text-sm font-semibold text-slate-200 print:text-black flex items-center gap-2">
-                            <Calendar className="size-4 text-emerald-400" /> {selectedMonth}
+                            <CalendarIcon className="size-4 text-emerald-400" /> {selectedMonth}
                         </span>
                         <button className="text-slate-400 hover:text-white print:hidden">
-                            <ChevronRight className="size-4" />
+                            <ChevronRightIcon className="size-4" />
                         </button>
                     </div>
 
@@ -401,7 +401,7 @@ export function StafShift() {
             {/* Read-Only Warning Banner */}
             {isReadOnly && (
                 <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-amber-400 text-xs leading-relaxed">
-                    <ShieldAlert className="size-4 shrink-0 mt-0.5" />
+                    <ShieldAlertIcon className="size-4 shrink-0 mt-0.5" />
                     <p>
                         <strong className="font-bold">⚠ Mode Baca Saja:</strong> Anda masuk sebagai staf biasa. Hanya{' '}
                         <strong>Manager</strong> atau <strong>Owner</strong> yang berwenang menyunting atau menyimpan
@@ -412,7 +412,7 @@ export function StafShift() {
 
             {savedSuccess && (
                 <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-emerald-400 text-sm">
-                    <Check className="size-4" /> Pola jadwal shift mingguan berhasil diterapkan ke bulan ini!
+                    <CheckIcon className="size-4" /> Pola jadwal shift mingguan berhasil diterapkan ke bulan ini!
                 </div>
             )}
 
@@ -422,7 +422,7 @@ export function StafShift() {
                     {/* ABSENCE MATRIX */}
                     <Glass className="p-6">
                         <h3 className="text-xs font-extrabold tracking-wider text-slate-500 uppercase mb-4 flex items-center gap-2">
-                            <AlertCircle className="size-4 text-rose-500" /> ABSENCE MATRIX (ALPHA)
+                            <AlertCircleIcon className="size-4 text-rose-500" /> ABSENCE MATRIX (ALPHA)
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             {EMPLOYEES.map((emp) => (
@@ -504,7 +504,7 @@ export function StafShift() {
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/10 gap-2 print:hidden"
                         onClick={triggerDownloadPDF}
                     >
-                        <Download className="size-4" /> UNDUH JADWAL BULANAN (PDF)
+                        <DownloadIcon className="size-4" /> UNDUH JADWAL BULANAN (PDF)
                     </Button>
 
                     {/* LOG PRESENSI KEHADIRAN */}
@@ -570,10 +570,10 @@ export function StafShift() {
                                                             onClick={() => handleToggleAttendance(emp.id, day)}
                                                             className={`size-6 rounded-lg border flex items-center justify-center text-[9px] font-extrabold transition-all hover:scale-110 active:scale-95 ${statusColor}`}
                                                         >
-                                                            {status === 'H' && <Check className="size-3" />}
+                                                            {status === 'H' && <CheckIcon className="size-3" />}
                                                             {status === 'S' && 'S'}
                                                             {status === 'I' && 'I'}
-                                                            {status === 'A' && <X className="size-3" />}
+                                                            {status === 'A' && <XIcon className="size-3" />}
                                                         </button>
                                                     </td>
                                                 );
@@ -592,7 +592,7 @@ export function StafShift() {
                 <div className="space-y-6">
                     {/* Info Alert Box */}
                     <div className="flex gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-amber-400 text-xs leading-relaxed">
-                        <AlertCircle className="size-4 shrink-0" />
+                        <AlertCircleIcon className="size-4 shrink-0" />
                         <p>
                             <strong>ATUR JADWAL STANDAR UNTUK 1 MINGGU.</strong> POLA INI AKAN DIULANG SETIAP MINGGU.
                             DALAM SEBULAN SETIAP SENIN AKAN MENDAPAT POLA SENIN, DST. UNTUK MEMPERCEPAT PENGISIAN
@@ -657,20 +657,20 @@ export function StafShift() {
                                         setTimeout(() => setSavedSuccess(false), 2000);
                                     }}
                                 >
-                                    <Save className="size-4" /> SIMPAN POLA
+                                    <SaveIcon className="size-4" /> SIMPAN POLA
                                 </Button>
                                 <Button
                                     className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg gap-2"
                                     onClick={handleApplyPattern}
                                 >
-                                    <RefreshCw className="size-4" /> TERAPKAN KE BULAN INI
+                                    <RefreshCwIcon className="size-4" /> TERAPKAN KE BULAN INI
                                 </Button>
                             </div>
 
                             {/* Effective Starting Date Picker */}
                             <div className="space-y-2 max-w-sm">
                                 <label className="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
-                                    <Calendar className="size-3.5" /> BERLAKU MULAI TANGGAL
+                                    <CalendarIcon className="size-3.5" /> BERLAKU MULAI TANGGAL
                                 </label>
                                 <input
                                     type="date"
@@ -687,7 +687,7 @@ export function StafShift() {
                         className="w-full bg-slate-900 hover:bg-slate-800 text-slate-200 border border-white/10 font-bold py-3.5 rounded-xl shadow-lg gap-2 print:hidden"
                         onClick={triggerDownloadPDF}
                     >
-                        <Download className="size-4" /> UNDUH POLA MINGGUAN (PDF)
+                        <DownloadIcon className="size-4" /> UNDUH POLA MINGGUAN (PDF)
                     </Button>
                 </div>
             )}

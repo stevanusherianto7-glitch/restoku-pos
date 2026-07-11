@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { Screen, Glass, Button, Input } from '../Shared';
-import { QrCode, Printer, Download, Users, Store, Settings, LayoutGrid } from 'lucide-react';
+import { QrCodeIcon, PrinterIcon, DownloadIcon, UsersIcon, StoreIcon, SettingsIcon, LayoutGridIcon } from '../icons';
 import { QRTableCard } from '../QR/QRTableCard';
 import { QRDisplay } from '../QR/QRDisplay';
 
@@ -22,7 +22,7 @@ export function QRManager() {
             action={
                 <div className="flex gap-2">
                     <Button variant="outline" className="gap-2 text-xs">
-                        <Settings className="size-3" /> Konfigurasi
+                        <SettingsIcon className="size-3" /> Konfigurasi
                     </Button>
                 </div>
             }
@@ -37,7 +37,7 @@ export function QRManager() {
                             : 'border-transparent text-slate-400 hover:text-white'
                     }`}
                 >
-                    <LayoutGrid className="size-4" /> QR Meja (Self-Order)
+                    <LayoutGridIcon className="size-4" /> QR Meja (Self-Order)
                 </button>
                 <button
                     onClick={() => setActiveTab('staff')}
@@ -47,7 +47,7 @@ export function QRManager() {
                             : 'border-transparent text-slate-400 hover:text-white'
                     }`}
                 >
-                    <Users className="size-4" /> QR Absensi Staff
+                    <UsersIcon className="size-4" /> QR Absensi Staff
                 </button>
                 <button
                     onClick={() => setActiveTab('menu')}
@@ -57,7 +57,7 @@ export function QRManager() {
                             : 'border-transparent text-slate-400 hover:text-white'
                     }`}
                 >
-                    <Store className="size-4" /> QR Menu Digital (Statis)
+                    <StoreIcon className="size-4" /> QR Menu Digital (Statis)
                 </button>
             </div>
 
@@ -81,7 +81,7 @@ export function QRManager() {
                                 />
                             </div>
                             <Button onClick={() => setShowPrintPreview(true)} className="gap-2">
-                                <QrCode className="size-4" /> Generate QR
+                                <QrCodeIcon className="size-4" /> Generate QR
                             </Button>
                         </div>
                     </Glass>
@@ -97,10 +97,10 @@ export function QRManager() {
                                 </div>
                                 <div className="flex gap-2">
                                     <Button variant="outline" className="gap-2">
-                                        <Download className="size-4" /> Download ZIP
+                                        <DownloadIcon className="size-4" /> DownloadIcon ZIP
                                     </Button>
                                     <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2">
-                                        <Printer className="size-4" /> Cetak Sekarang
+                                        <PrinterIcon className="size-4" /> Cetak Sekarang
                                     </Button>
                                 </div>
                             </div>
@@ -135,7 +135,7 @@ export function QRManager() {
                             </p>
                         </div>
                         <Button variant="outline" className="gap-2">
-                            <Download className="size-4" /> Export Semua
+                            <DownloadIcon className="size-4" /> Export Semua
                         </Button>
                     </div>
 
@@ -154,7 +154,7 @@ export function QRManager() {
                                         {staff.id} • {staff.role}
                                     </div>
                                     <button className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-medium mt-2">
-                                        <Printer className="size-3" /> Cetak ID Card
+                                        <PrinterIcon className="size-3" /> Cetak ID Card
                                     </button>
                                 </div>
                             </div>
@@ -183,10 +183,10 @@ export function QRManager() {
 
                         <div className="flex gap-3 w-full">
                             <Button className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white">
-                                <Download className="size-4" /> Unduh PNG
+                                <DownloadIcon className="size-4" /> Unduh PNG
                             </Button>
                             <Button className="flex-1 gap-2 bg-purple-600 hover:bg-purple-700 text-white">
-                                <Download className="size-4" /> Unduh SVG
+                                <DownloadIcon className="size-4" /> Unduh SVG
                             </Button>
                         </div>
                     </Glass>

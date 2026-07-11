@@ -4,21 +4,21 @@ import MainLayout from '../../Layouts/MainLayout';
 import { RoleGuard } from '../../Components/RoleGuard';
 import { Screen, Glass } from '../../Components/Shared';
 import {
-    CalendarDays,
-    Clock3,
-    Users,
-    Phone,
-    CheckCircle2,
-    XCircle,
-    Calendar,
-    PartyPopper,
-    RefreshCw,
-    Filter,
-    Search,
-    Cake,
-    Utensils,
-    Star,
-} from 'lucide-react';
+    CalendarDaysIcon,
+    Clock3Icon,
+    UsersIcon,
+    PhoneIcon,
+    CheckCircle2Icon,
+    XCircleIcon,
+    CalendarIcon,
+    PartyPopperIcon,
+    RefreshCwIcon,
+    FilterIcon,
+    SearchIcon,
+    CakeIcon,
+    UtensilsIcon,
+    StarIcon,
+} from '../../Components/icons';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ReservationStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
@@ -50,12 +50,12 @@ const TYPE_LABEL: Record<ReservationType, string> = {
 };
 
 const TYPE_ICON: Record<ReservationType, React.ElementType> = {
-    meja: Utensils,
-    ulang_tahun: Cake,
-    gathering: Users,
-    pernikahan: Star,
-    acara_kantor: Calendar,
-    lainnya: CalendarDays,
+    meja: UtensilsIcon,
+    ulang_tahun: CakeIcon,
+    gathering: UsersIcon,
+    pernikahan: StarIcon,
+    acara_kantor: CalendarIcon,
+    lainnya: CalendarDaysIcon,
 };
 
 const STATUS_CONFIG: Record<ReservationStatus, { label: string; cls: string }> = {
@@ -205,7 +205,7 @@ function MonitorReservasiContent() {
         guests: reservations.filter((r) => r.status !== 'cancelled').reduce((s, r) => s + r.guests, 0),
     };
 
-    // Filter
+    // FilterIcon
     const today = new Date().toISOString().slice(0, 10);
     const filtered = reservations
         .filter((r) => {
@@ -231,28 +231,28 @@ function MonitorReservasiContent() {
                         {
                             label: 'Menunggu Konfirmasi',
                             value: stats.pending,
-                            icon: Clock3,
+                            icon: Clock3Icon,
                             cls: 'text-amber-400',
                             bg: 'bg-amber-500/10 border-amber-500/20',
                         },
                         {
                             label: 'Dikonfirmasi',
                             value: stats.confirmed,
-                            icon: CheckCircle2,
+                            icon: CheckCircle2Icon,
                             cls: 'text-emerald-400',
                             bg: 'bg-emerald-500/10 border-emerald-500/20',
                         },
                         {
                             label: 'Total Reservasi',
                             value: stats.total,
-                            icon: CalendarDays,
+                            icon: CalendarDaysIcon,
                             cls: 'text-[var(--color-primary)]',
                             bg: 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]/20',
                         },
                         {
                             label: 'Total Tamu',
                             value: `${stats.guests} org`,
-                            icon: Users,
+                            icon: UsersIcon,
                             cls: 'text-purple-400',
                             bg: 'bg-purple-500/10 border-purple-500/20',
                         },
@@ -267,11 +267,11 @@ function MonitorReservasiContent() {
                     ))}
                 </div>
 
-                {/* Filter Bar */}
+                {/* FilterIcon Bar */}
                 <Glass className="p-3 mb-5 flex flex-wrap gap-3 items-center">
-                    {/* Search */}
+                    {/* SearchIcon */}
                     <div className="relative flex-1 min-w-48">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-500" />
+                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-500" />
                         <input
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -280,9 +280,9 @@ function MonitorReservasiContent() {
                         />
                     </div>
 
-                    {/* Status Filter */}
+                    {/* Status FilterIcon */}
                     <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
-                        <Filter className="size-3.5 text-slate-500" />
+                        <FilterIcon className="size-3.5 text-slate-500" />
                         <select
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
@@ -296,9 +296,9 @@ function MonitorReservasiContent() {
                         </select>
                     </div>
 
-                    {/* Type Filter */}
+                    {/* Type FilterIcon */}
                     <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
-                        <CalendarDays className="size-3.5 text-slate-500" />
+                        <CalendarDaysIcon className="size-3.5 text-slate-500" />
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value as typeof filterType)}
@@ -322,19 +322,19 @@ function MonitorReservasiContent() {
                         }}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-400 transition-colors"
                     >
-                        <RefreshCw className="size-3.5" /> Reset
+                        <RefreshCwIcon className="size-3.5" /> Reset
                     </button>
                 </Glass>
 
                 {/* Reservation Sections */}
                 {isLoading ? (
                     <Glass className="p-10 flex flex-col items-center justify-center text-center gap-3">
-                        <RefreshCw className="size-8 text-slate-600 animate-spin" />
+                        <RefreshCwIcon className="size-8 text-slate-600 animate-spin" />
                         <p className="text-slate-500 text-sm">Memuat data reservasi...</p>
                     </Glass>
                 ) : filtered.length === 0 ? (
                     <Glass className="p-10 flex flex-col items-center justify-center text-center gap-3">
-                        <CalendarDays className="size-10 text-slate-700" />
+                        <CalendarDaysIcon className="size-10 text-slate-700" />
                         <p className="text-slate-400 font-medium">Tidak ada reservasi ditemukan</p>
                         <p className="text-slate-600 text-xs">Coba ubah filter pencarian</p>
                     </Glass>
@@ -434,16 +434,16 @@ function ReservationCard({ r, onUpdate }: { r: Reservation; onUpdate: (id: strin
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
-                                <CalendarDays className="size-3" /> {dateLabel}
+                                <CalendarDaysIcon className="size-3" /> {dateLabel}
                             </span>
                             <span className="flex items-center gap-1">
-                                <Clock3 className="size-3" /> {r.time} WIB
+                                <Clock3Icon className="size-3" /> {r.time} WIB
                             </span>
                             <span className="flex items-center gap-1">
-                                <Users className="size-3" /> {r.guests} tamu
+                                <UsersIcon className="size-3" /> {r.guests} tamu
                             </span>
                             <span className="flex items-center gap-1">
-                                <Phone className="size-3" /> {r.phone}
+                                <PhoneIcon className="size-3" /> {r.phone}
                             </span>
                         </div>
                         {r.notes && (
@@ -462,7 +462,7 @@ function ReservationCard({ r, onUpdate }: { r: Reservation; onUpdate: (id: strin
                                 onClick={() => onUpdate(r.id, 'confirmed')}
                                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 text-xs font-semibold border border-emerald-500/20 transition-colors"
                             >
-                                <CheckCircle2 className="size-3.5" /> Konfirmasi
+                                <CheckCircle2Icon className="size-3.5" /> Konfirmasi
                             </button>
                         )}
                         {r.status === 'confirmed' && (
@@ -470,14 +470,14 @@ function ReservationCard({ r, onUpdate }: { r: Reservation; onUpdate: (id: strin
                                 onClick={() => onUpdate(r.id, 'completed')}
                                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--color-primary)]/15 hover:bg-[var(--color-primary)]/100/25 text-[var(--color-primary)] text-xs font-semibold border border-[var(--color-primary)]/20 transition-colors"
                             >
-                                <PartyPopper className="size-3.5" /> Selesai
+                                <PartyPopperIcon className="size-3.5" /> Selesai
                             </button>
                         )}
                         <button
                             onClick={() => onUpdate(r.id, 'cancelled')}
                             className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/20 transition-colors"
                         >
-                            <XCircle className="size-3.5" /> Tolak
+                            <XCircleIcon className="size-3.5" /> Tolak
                         </button>
                     </div>
                 )}

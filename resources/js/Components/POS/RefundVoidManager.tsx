@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Screen, Glass, Badge, formatRupiah } from '../Shared';
-import { Search, SlidersHorizontal, Download, FileX, ArrowLeftRight, CheckCircle2, XCircle } from 'lucide-react';
+import {
+    SearchIcon,
+    SlidersHorizontalIcon,
+    DownloadIcon,
+    FileXIcon,
+    ArrowLeftRightIcon,
+    CheckCircle2Icon,
+    XCircleIcon,
+} from '../icons';
 
 export function RefundVoidManager() {
     const [activeTab, setActiveTab] = useState<'refund' | 'void'>('refund');
@@ -76,19 +84,19 @@ export function RefundVoidManager() {
             <div className="space-y-4">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 flex-1 max-w-sm focus-within:border-white/20 transition-colors">
-                        <Search className="size-4 text-slate-400" />
+                        <SearchIcon className="size-4 text-slate-400" />
                         <input
                             placeholder={`Cari ID Order atau alasan ${activeTab}...`}
                             className="w-full bg-transparent py-2 text-sm outline-none text-slate-200 placeholder:text-slate-400"
                         />
                     </div>
                     <button className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 flex items-center gap-2">
-                        <SlidersHorizontal className="size-4" />
+                        <SlidersHorizontalIcon className="size-4" />
                         Filter Status
                     </button>
                     <div className="ml-auto">
                         <button className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition-colors flex items-center gap-2">
-                            <Download className="size-4" />
+                            <DownloadIcon className="size-4" />
                             Export CSV
                         </button>
                     </div>
@@ -98,7 +106,7 @@ export function RefundVoidManager() {
                     {activeTab === 'refund' ? (
                         <div className="p-5">
                             <div className="flex items-center gap-2 mb-4 text-sm text-blue-300 bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg">
-                                <ArrowLeftRight className="size-4" />
+                                <ArrowLeftRightIcon className="size-4" />
                                 <span>
                                     <b>Refund</b> adalah pengembalian dana ke pelanggan untuk order yang sudah LUNAS.
                                 </span>
@@ -134,7 +142,7 @@ export function RefundVoidManager() {
                                     <div className="flex items-center gap-2">
                                         {r.status === 'Approved' ? (
                                             <Badge tone="emerald">
-                                                <CheckCircle2 className="size-3 mr-1" /> Approved
+                                                <CheckCircle2Icon className="size-3 mr-1" /> Approved
                                             </Badge>
                                         ) : (
                                             <>
@@ -156,7 +164,7 @@ export function RefundVoidManager() {
                     ) : (
                         <div className="p-5">
                             <div className="flex items-center gap-2 mb-4 text-sm text-red-300 bg-red-500/10 border border-red-500/20 p-3 rounded-lg">
-                                <FileX className="size-4" />
+                                <FileXIcon className="size-4" />
                                 <span>
                                     <b>Void</b> adalah pembatalan transaksi order yang BELUM dibayar (meja belum close
                                     bill).
@@ -189,11 +197,11 @@ export function RefundVoidManager() {
                                     <div>
                                         {v.status === 'Approved' ? (
                                             <Badge tone="emerald">
-                                                <CheckCircle2 className="size-3 mr-1" /> Approved
+                                                <CheckCircle2Icon className="size-3 mr-1" /> Approved
                                             </Badge>
                                         ) : (
                                             <Badge tone="red">
-                                                <XCircle className="size-3 mr-1" /> Rejected
+                                                <XCircleIcon className="size-3 mr-1" /> Rejected
                                             </Badge>
                                         )}
                                     </div>

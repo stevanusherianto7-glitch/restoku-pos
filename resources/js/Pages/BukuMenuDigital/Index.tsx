@@ -4,17 +4,17 @@ import { Head, usePage } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, formatRupiah } from '../../Components/Shared';
 import {
-    QrCode,
-    CheckCircle2,
-    Link2,
-    Copy,
-    LayoutTemplate,
-    Palette,
-    Image as ImageIcon,
-    MessageCircle,
-    Upload,
-    Printer,
-} from 'lucide-react';
+    QrCodeIcon,
+    CheckCircle2Icon,
+    Link2Icon,
+    CopyIcon,
+    LayoutTemplateIcon,
+    PaletteIcon,
+    ImageIcon,
+    MessageCircleIcon,
+    UploadIcon,
+    PrinterIcon,
+} from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 import { QRCodeSVG } from 'qrcode.react';
@@ -67,7 +67,7 @@ function BukuMenuDigitalInner() {
                     <div className="space-y-5">
                         <Glass className="p-5">
                             <h2 className="text-base font-medium text-slate-200 mb-4 flex items-center gap-2">
-                                <Link2 className="size-4 text-emerald-400" /> Tautan Menu Digital
+                                <Link2Icon className="size-4 text-emerald-400" /> Tautan Menu Digital
                             </h2>
                             <div className="flex items-center gap-3">
                                 <div className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 flex items-center justify-between">
@@ -80,9 +80,9 @@ function BukuMenuDigitalInner() {
                                         title="Salin Tautan"
                                     >
                                         {copied ? (
-                                            <CheckCircle2 className="size-4 text-emerald-400" />
+                                            <CheckCircle2Icon className="size-4 text-emerald-400" />
                                         ) : (
-                                            <Copy className="size-4" />
+                                            <CopyIcon className="size-4" />
                                         )}
                                     </button>
                                 </div>
@@ -98,7 +98,7 @@ function BukuMenuDigitalInner() {
                             <div className="mt-5 grid grid-cols-2 gap-4">
                                 <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex items-center gap-4">
                                     <div className="size-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                                        <QrCode className="size-5 text-blue-400" />
+                                        <QrCodeIcon className="size-5 text-blue-400" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-slate-200">QR Code Meja</p>
@@ -109,7 +109,7 @@ function BukuMenuDigitalInner() {
                                 </div>
                                 <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex items-center gap-4">
                                     <div className="size-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                                        <LayoutTemplate className="size-5 text-amber-400" />
+                                        <LayoutTemplateIcon className="size-5 text-amber-400" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-slate-200">Kategori Tampil</p>
@@ -123,13 +123,13 @@ function BukuMenuDigitalInner() {
                         <Glass className="p-5">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-base font-medium text-slate-200 flex items-center gap-2">
-                                    <QrCode className="size-4 text-blue-400" /> Generator QR Code Meja
+                                    <QrCodeIcon className="size-4 text-blue-400" /> Generator QR Code Meja
                                 </h2>
                                 <button
                                     onClick={() => window.print()}
                                     className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-medium text-slate-200 transition-colors flex items-center gap-2"
                                 >
-                                    <Printer className="size-3.5" /> Cetak Semua
+                                    <PrinterIcon className="size-3.5" /> Cetak Semua
                                 </button>
                             </div>
 
@@ -182,7 +182,7 @@ function BukuMenuDigitalInner() {
 
                         <Glass className="p-5">
                             <h2 className="text-base font-medium text-slate-200 mb-5 flex items-center gap-2">
-                                <Palette className="size-4 text-blue-400" /> Kustomisasi Tampilan
+                                <PaletteIcon className="size-4 text-blue-400" /> Kustomisasi Tampilan
                             </h2>
                             <div className="space-y-6">
                                 <div>
@@ -208,8 +208,8 @@ function BukuMenuDigitalInner() {
                                 <div className="grid grid-cols-2 gap-5">
                                     {(
                                         [
-                                            { label: 'Logo Restoran', hint: 'Upload (1:1)', Icon: ImageIcon },
-                                            { label: 'Banner / Cover', hint: 'Upload (16:9)', Icon: Upload },
+                                            { label: 'Logo Restoran', hint: 'UploadIcon (1:1)', Icon: ImageIcon },
+                                            { label: 'Banner / Cover', hint: 'UploadIcon (16:9)', Icon: UploadIcon },
                                         ] as Array<{ label: string; hint: string; Icon: ElementType }>
                                     ).map(({ label, hint, Icon }) => (
                                         <div key={label}>
@@ -297,7 +297,7 @@ function BukuMenuDigitalInner() {
                                 <div className="bg-white p-3 rounded-xl border border-slate-100 flex items-center justify-between shadow-sm">
                                     <div className="flex items-center gap-3">
                                         <div className="size-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                                            <MessageCircle className="size-4 text-emerald-500" />
+                                            <MessageCircleIcon className="size-4 text-emerald-500" />
                                         </div>
                                         <div>
                                             <p className="text-xs font-semibold text-slate-900">Kirim struk ke WA?</p>

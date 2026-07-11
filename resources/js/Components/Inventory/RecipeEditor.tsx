@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { Screen, Glass, Badge, Button, Input, formatRupiah as formatRp } from '../Shared';
-import { Plus, Save, ChevronLeft, Trash2, AlertCircle } from 'lucide-react';
+import { PlusIcon, SaveIcon, ChevronLeftIcon, Trash2Icon, AlertCircleIcon } from '../icons';
 
 export function RecipeEditor() {
     const [sellingPrice, setSellingPrice] = useState(25000);
@@ -23,10 +23,10 @@ export function RecipeEditor() {
             action={
                 <div className="flex gap-2">
                     <Button variant="outline" className="gap-2">
-                        <ChevronLeft className="size-4" /> Kembali
+                        <ChevronLeftIcon className="size-4" /> Kembali
                     </Button>
                     <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700">
-                        <Save className="size-4" /> Simpan Resep
+                        <SaveIcon className="size-4" /> Simpan Resep
                     </Button>
                 </div>
             }
@@ -43,7 +43,7 @@ export function RecipeEditor() {
                                 </p>
                             </div>
                             <Button className="gap-2">
-                                <Plus className="size-4" /> Tambah Bahan
+                                <PlusIcon className="size-4" /> Tambah Bahan
                             </Button>
                         </div>
 
@@ -74,7 +74,7 @@ export function RecipeEditor() {
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <button className="p-1 hover:bg-red-500/20 rounded-md transition-colors text-slate-400 hover:text-red-400">
-                                                        <Trash2 className="size-4" />
+                                                        <Trash2Icon className="size-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -85,7 +85,7 @@ export function RecipeEditor() {
                         </div>
 
                         <div className="mt-4 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 flex gap-3">
-                            <AlertCircle className="size-5 text-blue-400 shrink-0" />
+                            <AlertCircleIcon className="size-5 text-blue-400 shrink-0" />
                             <p className="text-sm text-blue-200">
                                 Setiap kali menu ini terjual, stok bahan baku di atas akan otomatis dikurangi dari
                                 inventaris berdasarkan takaran.

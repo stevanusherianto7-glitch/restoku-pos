@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Wifi, Bell } from 'lucide-react';
+import { WifiIcon, BellIcon } from '../icons';
 import { Badge } from './Badge';
 import { formatDate } from '../../lib/formatters';
 import { usePage } from '@inertiajs/react';
@@ -58,13 +58,13 @@ export function Screen({
                 <div className="flex items-center gap-3 shrink-0">
                     {actions || action}
                     <Badge tone="emerald" dot>
-                        <Wifi className="size-3" /> Live
+                        <WifiIcon className="size-3" /> Live
                     </Badge>
                     <button
                         className={`transition-all duration-200 p-2.5 rounded-xl border ${isLight ? 'text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border-slate-200 shadow-sm' : 'text-slate-400 hover:text-slate-100 bg-white/[0.03] hover:bg-white/[0.08] border-transparent hover:border-white/10'}`}
                         aria-label="Notifikasi"
                     >
-                        <Bell className="size-4" />
+                        <BellIcon className="size-4" />
                     </button>
                 </div>
             </div>

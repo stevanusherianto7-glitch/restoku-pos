@@ -1,5 +1,5 @@
 import { Screen, Glass, formatRupiah as formatRp } from '../Shared';
-import { Users, AlertCircle, Clock } from 'lucide-react';
+import { UsersIcon, AlertCircleIcon, ClockIcon } from '../icons';
 
 export function EmployeeOverview() {
     const departments = [
@@ -18,7 +18,7 @@ export function EmployeeOverview() {
                 <Glass className="p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                            <Users className="size-5 text-blue-400" />
+                            <UsersIcon className="size-5 text-blue-400" />
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold text-white">Total Karyawan</h3>
@@ -62,12 +62,12 @@ export function EmployeeOverview() {
                 <div className="space-y-6">
                     <Glass className="p-6">
                         <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                            <AlertCircle className="size-4 text-amber-500" /> Perhatian HRD
+                            <AlertCircleIcon className="size-4 text-amber-500" /> Perhatian HRD
                         </h3>
 
                         <div className="space-y-3">
                             <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 flex gap-3 items-start">
-                                <Clock className="size-4 text-amber-400 shrink-0 mt-0.5" />
+                                <ClockIcon className="size-4 text-amber-400 shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium text-amber-200">Kontrak Habis Bulan Depan</p>
                                     <p className="text-xs text-amber-300/70 mt-0.5">
@@ -81,7 +81,7 @@ export function EmployeeOverview() {
 
                     <Glass className="p-6 bg-white/5 border border-white/5 flex items-center justify-center text-center">
                         <div className="max-w-xs">
-                            <Users className="size-8 text-slate-500 mx-auto mb-3 opacity-50" />
+                            <UsersIcon className="size-8 text-slate-500 mx-auto mb-3 opacity-50" />
                             <p className="text-sm font-medium text-slate-300 mb-1">Mode Read-Only</p>
                             <p className="text-xs text-slate-500">
                                 Anda masuk sebagai Owner. Pengelolaan data karyawan, shift, dan payroll hanya dapat

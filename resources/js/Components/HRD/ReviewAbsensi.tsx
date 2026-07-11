@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Screen, Glass, Button } from '../Shared';
-import { CheckCircle2, AlertTriangle, Search, Eye, MapPin } from 'lucide-react';
+import { CheckCircle2Icon, AlertTriangleIcon, SearchIcon, EyeIcon, MapPinIcon } from '../icons';
 
 export function ReviewAbsensi() {
     const [reviews, setReviews] = useState([
@@ -48,7 +48,7 @@ export function ReviewAbsensi() {
             title="Review Absensi Karyawan"
             action={
                 <div className="relative w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <input
                         type="text"
                         placeholder="Cari nama karyawan..."
@@ -104,7 +104,7 @@ export function ReviewAbsensi() {
                                     </td>
                                     <td className="py-4">
                                         <div className="flex items-center gap-1.5">
-                                            <MapPin
+                                            <MapPinIcon
                                                 className={`size-4 ${item.distance > 50 ? 'text-amber-400' : 'text-emerald-400'}`}
                                             />
                                             <span
@@ -116,7 +116,7 @@ export function ReviewAbsensi() {
                                     </td>
                                     <td className="py-4">
                                         <button className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary)] bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 px-2.5 py-1.5 rounded-lg transition-colors border border-[var(--color-primary)]/20">
-                                            <Eye className="size-3.5" /> Lihat Foto
+                                            <EyeIcon className="size-3.5" /> Lihat Foto
                                         </button>
                                     </td>
                                     <td className="py-4 text-right">
@@ -137,11 +137,11 @@ export function ReviewAbsensi() {
                                             </div>
                                         ) : item.status === 'ok' ? (
                                             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                                                <CheckCircle2 className="size-3.5" /> Telah Disetujui
+                                                <CheckCircle2Icon className="size-3.5" /> Telah Disetujui
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
-                                                <AlertTriangle className="size-3.5" /> Mencurigakan
+                                                <AlertTriangleIcon className="size-3.5" /> Mencurigakan
                                             </span>
                                         )}
                                     </td>

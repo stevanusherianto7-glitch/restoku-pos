@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { Screen, Glass, Input, Button, useTenantSettings } from '../Shared';
-import { User, Bell, Save, CheckSquare, Square } from 'lucide-react';
+import { UserIcon, BellIcon, SaveIcon, CheckSquareIcon, SquareIcon } from '../icons';
 
 export function OwnerSettings() {
     const [profile, setProfile] = useState({
@@ -30,7 +30,7 @@ export function OwnerSettings() {
                     <h3
                         className={`text-lg font-semibold mb-6 flex items-center gap-2 ${isLight ? 'text-slate-900' : 'text-white'}`}
                     >
-                        <User className="size-5 text-amber-500" /> Profil Owner
+                        <UserIcon className="size-5 text-amber-500" /> Profil Owner
                     </h3>
 
                     <div className="space-y-4">
@@ -107,7 +107,7 @@ export function OwnerSettings() {
                         <h3
                             className={`text-lg font-semibold mb-6 flex items-center gap-2 ${isLight ? 'text-slate-900' : 'text-white'}`}
                         >
-                            <Bell className="size-5 text-amber-500" /> Pengaturan Notifikasi
+                            <BellIcon className="size-5 text-amber-500" /> Pengaturan Notifikasi
                         </h3>
 
                         <div className="space-y-4">
@@ -116,9 +116,9 @@ export function OwnerSettings() {
                                 className="flex items-center gap-3 w-full text-left group"
                             >
                                 {notifications.dailyWa ? (
-                                    <CheckSquare className="size-5 text-emerald-500" />
+                                    <CheckSquareIcon className="size-5 text-emerald-500" />
                                 ) : (
-                                    <Square className="size-5 text-slate-500 group-hover:text-slate-400" />
+                                    <SquareIcon className="size-5 text-slate-500 group-hover:text-slate-400" />
                                 )}
                                 <div>
                                     <div
@@ -155,9 +155,9 @@ export function OwnerSettings() {
                                 className="flex items-center gap-3 w-full text-left group"
                             >
                                 {notifications.stockWa ? (
-                                    <CheckSquare className="size-5 text-emerald-500" />
+                                    <CheckSquareIcon className="size-5 text-emerald-500" />
                                 ) : (
-                                    <Square className="size-5 text-slate-500 group-hover:text-slate-400" />
+                                    <SquareIcon className="size-5 text-slate-500 group-hover:text-slate-400" />
                                 )}
                                 <div>
                                     <div
@@ -176,9 +176,9 @@ export function OwnerSettings() {
                                 className="flex items-center gap-3 w-full text-left group"
                             >
                                 {notifications.contractWa ? (
-                                    <CheckSquare className="size-5 text-emerald-500" />
+                                    <CheckSquareIcon className="size-5 text-emerald-500" />
                                 ) : (
-                                    <Square className="size-5 text-slate-500 group-hover:text-slate-400" />
+                                    <SquareIcon className="size-5 text-slate-500 group-hover:text-slate-400" />
                                 )}
                                 <div>
                                     <div
@@ -197,9 +197,9 @@ export function OwnerSettings() {
                                 className="flex items-center gap-3 w-full text-left group"
                             >
                                 {notifications.monthlyEmail ? (
-                                    <CheckSquare className="size-5 text-emerald-500" />
+                                    <CheckSquareIcon className="size-5 text-emerald-500" />
                                 ) : (
-                                    <Square className="size-5 text-slate-500 group-hover:text-slate-400" />
+                                    <SquareIcon className="size-5 text-slate-500 group-hover:text-slate-400" />
                                 )}
                                 <div>
                                     <div
@@ -217,7 +217,7 @@ export function OwnerSettings() {
 
                     <div className="flex justify-end">
                         <Button className="bg-amber-600 hover:bg-amber-700 gap-2 px-6 text-white font-bold">
-                            <Save className="size-4" /> Simpan Pengaturan
+                            <SaveIcon className="size-4" /> Simpan Pengaturan
                         </Button>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import { Screen, Glass, Button, formatRupiah as formatRp } from '../Shared';
-import { FileText, FileSpreadsheet, FileJson, TrendingUp } from 'lucide-react';
+import { FileTextIcon, FileSpreadsheetIcon, FileJsonIcon, TrendingUpIcon } from '../icons';
 
 export function FinancialReports() {
     const revenueBreakdown = [
@@ -31,13 +31,13 @@ export function FinancialReports() {
             action={
                 <div className="flex gap-2">
                     <Button variant="outline" className="gap-2 text-xs">
-                        <FileText className="size-3" /> PDF
+                        <FileTextIcon className="size-3" /> PDF
                     </Button>
                     <Button variant="outline" className="gap-2 text-xs">
-                        <FileSpreadsheet className="size-3" /> Excel
+                        <FileSpreadsheetIcon className="size-3" /> Excel
                     </Button>
                     <Button variant="outline" className="gap-2 text-xs">
-                        <FileJson className="size-3" /> CSV
+                        <FileJsonIcon className="size-3" /> CSV
                     </Button>
                 </div>
             }
@@ -46,7 +46,7 @@ export function FinancialReports() {
                 {/* Income / Revenue */}
                 <Glass className="p-6 border-emerald-500/20">
                     <h3 className="text-lg font-semibold text-emerald-400 mb-6 flex items-center gap-2">
-                        <TrendingUp className="size-5" /> Pendapatan (Revenue)
+                        <TrendingUpIcon className="size-5" /> Pendapatan (Revenue)
                     </h3>
 
                     <div className="space-y-4 mb-6">
@@ -84,7 +84,7 @@ export function FinancialReports() {
                 <div className="space-y-6">
                     <Glass className="p-6 border-red-500/20">
                         <h3 className="text-lg font-semibold text-red-400 mb-6 flex items-center gap-2">
-                            <TrendingUp className="size-5 rotate-180" /> Pengeluaran (Biaya)
+                            <TrendingUpIcon className="size-5 rotate-180" /> Pengeluaran (Biaya)
                         </h3>
 
                         <div className="space-y-4 mb-6">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Delete } from 'lucide-react';
+import { DeleteIcon } from '../../Components/icons';
 import { RestokuWordmark, verifyPin, DEFAULT_EMPLOYEES } from '../../Components/Shared';
 
 export default function StaffLogin() {
@@ -226,7 +226,7 @@ export default function StaffLogin() {
                             disabled={isLoading || pin.length === 0}
                             className="h-16 md:h-20 rounded-2xl bg-red-500/10 hover:bg-red-500/20 active:bg-red-500/30 border border-red-500/20 hover:border-red-500/40 text-red-400 transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 flex items-center justify-center"
                         >
-                            <Delete className="size-6 md:size-8" />
+                            <DeleteIcon className="size-6 md:size-8" />
                         </button>
                     </div>
 

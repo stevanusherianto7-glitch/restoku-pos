@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah, MOCK_OUTLET } from '../../Components/Shared';
-import { Search, Plus, SlidersHorizontal, Download } from 'lucide-react';
+import { SearchIcon, PlusIcon, SlidersHorizontalIcon, DownloadIcon } from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 
@@ -30,7 +30,7 @@ function InventoryInner() {
                 title="Master Bahan Baku & Stok"
                 action={
                     <button className="rounded-lg bg-slate-100 hover:bg-white px-4 py-2 text-sm font-medium text-slate-900 transition-colors flex items-center gap-2">
-                        <Plus className="size-4" />
+                        <PlusIcon className="size-4" />
                         Tambah Bahan Baru
                     </button>
                 }
@@ -38,14 +38,14 @@ function InventoryInner() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 flex-1 max-w-xs focus-within:border-white/20 transition-colors">
-                            <Search className="size-4 text-slate-400" />
+                            <SearchIcon className="size-4 text-slate-400" />
                             <input
                                 placeholder="Cari bahan baku..."
                                 className="w-full bg-transparent py-2 text-sm outline-none text-slate-200 placeholder:text-slate-400"
                             />
                         </div>
                         <button className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 flex items-center gap-2">
-                            <SlidersHorizontal className="size-4" />
+                            <SlidersHorizontalIcon className="size-4" />
                             Kategori
                         </button>
                         <button className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10">
@@ -53,7 +53,7 @@ function InventoryInner() {
                         </button>
                         <div className="ml-auto flex gap-3">
                             <button className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition-colors flex items-center gap-2">
-                                <Download className="size-4" />
+                                <DownloadIcon className="size-4" />
                                 Export Excel
                             </button>
                         </div>

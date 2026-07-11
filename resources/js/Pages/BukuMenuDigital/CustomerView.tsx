@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import {
-    Search,
-    MessageCircle,
-    ShoppingBag,
-    Plus,
-    Minus,
-    Check,
-    Sparkles,
-    ShoppingCart,
-    HelpCircle,
-    CalendarDays,
-    Image as ImageIcon,
-    Clock3,
-    Calendar,
-    CheckCircle2,
-} from 'lucide-react';
+    SearchIcon,
+    MessageCircleIcon,
+    ShoppingBagIcon,
+    PlusIcon,
+    MinusIcon,
+    CheckIcon,
+    SparklesIcon,
+    ShoppingCartIcon,
+    HelpCircleIcon,
+    CalendarDaysIcon,
+    ImageIcon,
+    Clock3Icon,
+    CalendarIcon,
+    CheckCircle2Icon,
+} from '../../Components/icons';
 import { formatRupiah } from '../../lib/formatters';
 import { ProductImage } from '../../Components/ProductImage';
 import { useTenantSettings } from '../../Components/Shared';
@@ -501,7 +501,7 @@ export default function CustomerView() {
             {/* Operating Hours Alert Banner */}
             {!isOutletOpen && (
                 <div className="bg-rose-500/20 border-b border-rose-500/30 px-4 py-3 flex items-center gap-3 text-rose-300">
-                    <Clock3 className="size-5 shrink-0 text-rose-400 animate-pulse" />
+                    <Clock3Icon className="size-5 shrink-0 text-rose-400 animate-pulse" />
                     <div className="text-xs">
                         <p className="font-bold">Pemesanan Online Ditutup</p>
                         <p className="text-[11px] opacity-90">
@@ -512,7 +512,7 @@ export default function CustomerView() {
             )}
             {isOutletOpen && outletScheduleMsg && (
                 <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-2 flex items-center gap-2 text-emerald-300 text-[11px]">
-                    <Clock3 className="size-3.5 shrink-0 text-emerald-400" />
+                    <Clock3Icon className="size-3.5 shrink-0 text-emerald-400" />
                     <span>{outletScheduleMsg}</span>
                 </div>
             )}
@@ -580,7 +580,7 @@ export default function CustomerView() {
                                 : 'text-slate-400'
                         }`}
                     >
-                        <ShoppingCart className="size-3" />
+                        <ShoppingCartIcon className="size-3" />
                         {cartTotalItems > 0 && <span>{cartTotalItems}</span>}
                     </button>
                 </div>
@@ -595,7 +595,7 @@ export default function CustomerView() {
                         />
                         <div className="relative z-10">
                             <span className={activeTheme.badge}>
-                                <Sparkles
+                                <SparklesIcon
                                     className={`size-3 ${isNanoBanana ? 'text-amber-300' : 'text-emerald-400'}`}
                                 />{' '}
                                 {isNanoBanana ? 'Cyber Gold Executive Dining' : 'Premium Dining Experience'}
@@ -609,10 +609,10 @@ export default function CustomerView() {
                         </div>
                     </section>
 
-                    {/* Search bar */}
+                    {/* SearchIcon bar */}
                     <div className="px-4 pt-4 pb-1">
                         <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 shadow-inner focus-within:border-emerald-500/40 focus-within:ring-1 focus-within:ring-emerald-500/25 transition-all">
-                            <Search className="size-4.5 text-slate-400" />
+                            <SearchIcon className="size-4.5 text-slate-400" />
                             <input
                                 type="text"
                                 placeholder="Cari menu terlaris kami..."
@@ -689,7 +689,7 @@ export default function CustomerView() {
                                                             onClick={() => removeFromCart(item.id)}
                                                             className={`size-6 rounded-full text-slate-950 flex items-center justify-center font-bold transition-colors ${isNanoBanana ? 'bg-amber-500 hover:bg-amber-400' : 'bg-emerald-500 hover:bg-emerald-400'}`}
                                                         >
-                                                            <Minus className="size-3" />
+                                                            <MinusIcon className="size-3" />
                                                         </button>
                                                         <span className="w-8 text-center text-xs font-bold text-white">
                                                             {cart[item.id]}
@@ -698,7 +698,7 @@ export default function CustomerView() {
                                                             onClick={() => addToCart(item.id)}
                                                             className={`size-6 rounded-full text-slate-950 flex items-center justify-center font-bold transition-colors ${isNanoBanana ? 'bg-amber-500 hover:bg-amber-400' : 'bg-emerald-500 hover:bg-emerald-400'}`}
                                                         >
-                                                            <Plus className="size-3" />
+                                                            <PlusIcon className="size-3" />
                                                         </button>
                                                     </div>
                                                 ) : (
@@ -716,7 +716,7 @@ export default function CustomerView() {
                             ))
                         ) : (
                             <div className="py-16 text-center text-slate-500">
-                                <HelpCircle className="size-12 mx-auto text-slate-600 mb-3" />
+                                <HelpCircleIcon className="size-12 mx-auto text-slate-600 mb-3" />
                                 <p className="text-sm font-semibold">Menu tidak tersedia</p>
                                 <p className="text-xs text-slate-500 mt-1">Cari hidangan yang lain.</p>
                             </div>
@@ -730,7 +730,7 @@ export default function CustomerView() {
                 <main className="flex-1 p-5 pb-28 flex flex-col justify-between">
                     <div className="space-y-4">
                         <h2 className="text-base font-extrabold text-white flex items-center gap-2 mb-2">
-                            <ShoppingBag className="size-5 text-emerald-400" /> Ringkasan Pesanan
+                            <ShoppingBagIcon className="size-5 text-emerald-400" /> Ringkasan Pesanan
                         </h2>
 
                         {cartTotalItems > 0 ? (
@@ -785,7 +785,7 @@ export default function CustomerView() {
                                                     onClick={() => removeFromCart(id)}
                                                     className="size-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold"
                                                 >
-                                                    <Minus className="size-2.5" />
+                                                    <MinusIcon className="size-2.5" />
                                                 </button>
                                                 <span className="w-6 text-center text-xs font-bold text-white">
                                                     {qty}
@@ -794,7 +794,7 @@ export default function CustomerView() {
                                                     onClick={() => addToCart(id)}
                                                     className="size-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold"
                                                 >
-                                                    <Plus className="size-2.5" />
+                                                    <PlusIcon className="size-2.5" />
                                                 </button>
                                             </div>
                                         </div>
@@ -837,7 +837,7 @@ export default function CustomerView() {
                             </div>
                         ) : (
                             <div className="py-24 text-center text-slate-500">
-                                <ShoppingCart className="size-16 mx-auto text-slate-700 mb-3" />
+                                <ShoppingCartIcon className="size-16 mx-auto text-slate-700 mb-3" />
                                 <p className="text-sm font-bold">Keranjang Anda Kosong</p>
                                 <p className="text-xs text-slate-500 mt-1">
                                     Kembali ke tab menu untuk memilih hidangan terbaik kami.
@@ -858,13 +858,13 @@ export default function CustomerView() {
                 <main className="flex-1 p-5 pb-28 flex flex-col justify-between overflow-y-auto">
                     <div className="space-y-4">
                         <h2 className="text-base font-extrabold text-white flex items-center gap-2 mb-2">
-                            <CalendarDays className="size-5 text-emerald-400" /> Booking & Reservasi
+                            <CalendarDaysIcon className="size-5 text-emerald-400" /> Booking & Reservasi
                         </h2>
 
                         {reservationSuccess ? (
                             <div className="py-12 px-4 text-center space-y-4 bg-emerald-950/10 border border-emerald-500/20 rounded-3xl animate-in fade-in duration-300">
                                 <div className="size-16 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20 mx-auto">
-                                    <CheckCircle2 className="size-8 text-emerald-400" />
+                                    <CheckCircle2Icon className="size-8 text-emerald-400" />
                                 </div>
                                 <div className="space-y-1">
                                     <h3 className="text-sm font-bold text-white">Reservasi Terkirim!</h3>
@@ -1016,7 +1016,7 @@ export default function CustomerView() {
                         <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-gradient-to-r from-emerald-950/40 to-slate-950 p-5 shadow-2xl">
                             <div className="absolute -top-10 -right-10 size-32 bg-emerald-500/10 rounded-full blur-2xl" />
                             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-bold text-emerald-400 tracking-wider uppercase mb-2">
-                                <Sparkles className="size-2.5" /> Event & Venue Booking
+                                <SparklesIcon className="size-2.5" /> Event & Venue Booking
                             </span>
                             <h2 className="text-sm font-extrabold text-white">Booking Tempat & Acara</h2>
                             <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
@@ -1087,7 +1087,7 @@ export default function CustomerView() {
                             onClick={() => setActiveTab('reservasi')}
                             className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10"
                         >
-                            <Calendar className="size-3.5" /> Hubungi & Reservasi Sekarang
+                            <CalendarIcon className="size-3.5" /> Hubungi & Reservasi Sekarang
                         </button>
                     </div>
                 </main>
@@ -1098,7 +1098,7 @@ export default function CustomerView() {
                 <div className="absolute bottom-20 inset-x-4 z-40 bg-slate-900/60 backdrop-blur-md p-4 rounded-3xl border border-white/10 flex items-center justify-between shadow-2xl">
                     <div className="flex items-center gap-3">
                         <div className="size-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                            <MessageCircle className="size-4.5 text-emerald-400" />
+                            <MessageCircleIcon className="size-4.5 text-emerald-400" />
                         </div>
                         <div>
                             <p className="text-xs font-bold text-white">Kirim struk ke WA?</p>
@@ -1148,7 +1148,7 @@ export default function CustomerView() {
                             }`}
                         >
                             {orderStatus === 'Siap Sajikan' || orderStatus === 'Selesai' ? (
-                                <Check className="size-8 stroke-[3]" />
+                                <CheckIcon className="size-8 stroke-[3]" />
                             ) : (
                                 <span className="size-6 rounded-full border-4 border-t-transparent animate-spin border-current" />
                             )}

@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { Screen, Glass, Button, Input, Badge, formatRupiah } from '../Shared';
-import { Calculator, Clock, DollarSign, LogOut, TerminalSquare, AlertTriangle } from 'lucide-react';
+import { CalculatorIcon, ClockIcon, DollarSignIcon, LogOutIcon, TerminalSquareIcon, AlertTriangleIcon } from '../icons';
 
 export function CashierSession() {
     const [sessionState, setSessionState] = useState<'closed' | 'open'>('closed');
@@ -50,7 +50,7 @@ export function CashierSession() {
                         className="text-red-400 hover:text-red-300 border-red-500/20 hover:bg-red-500/10"
                         onClick={() => setIsClosingModalOpen(true)}
                     >
-                        <LogOut className="size-4 mr-2" />
+                        <LogOutIcon className="size-4 mr-2" />
                         Tutup Shift
                     </Button>
                 )
@@ -60,7 +60,7 @@ export function CashierSession() {
                 <div className="flex flex-col items-center justify-center py-20 px-4">
                     <Glass className="p-8 max-w-md w-full text-center">
                         <div className="mx-auto size-16 bg-blue-500/10 rounded-full flex items-center justify-center mb-6 border border-blue-500/20">
-                            <TerminalSquare className="size-8 text-blue-400" />
+                            <TerminalSquareIcon className="size-8 text-blue-400" />
                         </div>
                         <h2 className="text-xl font-semibold text-slate-200 mb-2">Buka Shift Kasir</h2>
                         <p className="text-sm text-slate-400 mb-8">
@@ -107,7 +107,7 @@ export function CashierSession() {
                         <Glass className="p-6">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="size-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                                    <Clock className="size-5 text-blue-400" />
+                                    <ClockIcon className="size-5 text-blue-400" />
                                 </div>
                                 <Badge tone="emerald">Shift Aktif</Badge>
                             </div>
@@ -121,7 +121,7 @@ export function CashierSession() {
                         <Glass className="p-6">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="size-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                                    <DollarSign className="size-5 text-amber-400" />
+                                    <DollarSignIcon className="size-5 text-amber-400" />
                                 </div>
                             </div>
                             <p className="text-sm font-medium text-slate-400">Saldo Awal (Modal)</p>
@@ -133,7 +133,7 @@ export function CashierSession() {
                         <Glass className="p-6">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="size-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                    <Calculator className="size-5 text-emerald-400" />
+                                    <CalculatorIcon className="size-5 text-emerald-400" />
                                 </div>
                             </div>
                             <p className="text-sm font-medium text-slate-400">Total Penjualan Tunai</p>
@@ -254,7 +254,7 @@ export function CashierSession() {
                                 <div
                                     className={`p-4 rounded-lg flex items-start gap-3 border ${difference > 0 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`}
                                 >
-                                    <AlertTriangle
+                                    <AlertTriangleIcon
                                         className={`size-5 shrink-0 ${difference > 0 ? 'text-emerald-400' : 'text-red-400'}`}
                                     />
                                     <div>

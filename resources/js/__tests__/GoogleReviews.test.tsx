@@ -22,35 +22,36 @@ vi.mock('@inertiajs/react', () => ({
     usePage: vi.fn(() => ({ props: {} })),
 }));
 
-vi.mock('lucide-react', () => {
+vi.mock('../Components/icons', () => {
     const mockIcons = [
-        'Store',
-        'Package',
-        'Boxes',
-        'BriefcaseBusiness',
-        'BarChart3',
-        'Settings',
-        'Smartphone',
-        'Menu',
-        'ChevronDown',
-        'ChevronRight',
-        'Lock',
-        'ArrowLeft',
-        'Star',
-        'RefreshCw',
-        'Send',
-        'CheckCircle2',
-        'AlertTriangle',
-        'Sparkles',
-        'AlertCircle',
-        'X',
-        'Check',
-        'MessageSquare',
-        'Wifi',
+        'StoreIcon',
+        'PackageIcon',
+        'BoxesIcon',
+        'BriefcaseIcon',
+        'BarChartIcon',
+        'SettingsIcon',
+        'SmartphoneIcon',
+        'MenuIcon',
+        'ChevronDownIcon',
+        'ChevronRightIcon',
+        'LockIcon',
+        'ArrowLeftIcon',
+        'StarIcon',
+        'RefreshCwIcon',
+        'SendIcon',
+        'CheckCircle2Icon',
+        'AlertTriangleIcon',
+        'SparklesIcon',
+        'AlertCircleIcon',
+        'XIcon',
+        'CheckIcon',
+        'MessageSquareIcon',
+        'WifiIcon',
     ];
     const mockExports: Record<string, any> = {};
     mockIcons.forEach((iconName) => {
-        mockExports[iconName] = (props: any) => <svg data-testid={`icon-${iconName.toLowerCase()}`} {...props} />;
+        const testId = iconName.toLowerCase().replace(/icon$/, '');
+        mockExports[iconName] = (props: any) => <svg data-testid={`icon-${testId}`} {...props} />;
     });
     return mockExports;
 });

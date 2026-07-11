@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { EmployeeMaster } from '../../Components/HRD/EmployeeMaster';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlertIcon } from '../../Components/icons';
 
 const AUTHORIZED_ROLES = ['manager', 'owner'];
 
@@ -35,7 +35,7 @@ export default function AdminEmployeesPage() {
                 <Head title="Akses Ditolak" />
                 <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
                     <div className="p-5 rounded-full bg-red-500/10 border border-red-500/20">
-                        <ShieldAlert className="size-12 text-red-400" />
+                        <ShieldAlertIcon className="size-12 text-red-400" />
                     </div>
                     <div className="space-y-2">
                         <h1 className="text-2xl font-bold text-white">Akses Ditolak</h1>

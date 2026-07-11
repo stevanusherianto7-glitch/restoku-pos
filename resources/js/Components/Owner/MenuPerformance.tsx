@@ -1,5 +1,5 @@
 import { Screen, Glass, Badge, formatRupiah as formatRp } from '../Shared';
-import { Trophy, AlertTriangle } from 'lucide-react';
+import { TrophyIcon, AlertTriangleIcon } from '../icons';
 
 export function MenuPerformance() {
     const topMenu = [
@@ -15,7 +15,7 @@ export function MenuPerformance() {
             <Glass className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                        <Trophy className="size-5 text-amber-400" />
+                        <TrophyIcon className="size-5 text-amber-400" />
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold text-white">Top Menu Terlaris</h3>
@@ -61,7 +61,7 @@ export function MenuPerformance() {
                                             </Badge>
                                             {item.foodCost > 40 && (
                                                 <span title="Food cost terlalu tinggi">
-                                                    <AlertTriangle
+                                                    <AlertTriangleIcon
                                                         className="size-4 text-red-400"
                                                         aria-label="Food cost terlalu tinggi"
                                                     />

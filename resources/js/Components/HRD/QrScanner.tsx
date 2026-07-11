@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Screen, Glass, Button } from '../Shared';
-import { ScanLine, CheckCircle2, Camera, MapPin, AlertTriangle } from 'lucide-react';
+import { ScanLineIcon, CheckCircle2Icon, CameraIcon, MapPinIcon, AlertTriangleIcon } from '../icons';
 
 export function QrScanner() {
     const [scanState, setScanState] = useState<
@@ -76,14 +76,14 @@ export function QrScanner() {
                                 <div className="absolute bottom-4 left-4 w-8 h-8 border-b-4 border-l-4 border-emerald-500 rounded-bl-lg" />
                                 <div className="absolute bottom-4 right-4 w-8 h-8 border-b-4 border-r-4 border-emerald-500 rounded-br-lg" />
                                 <div className="z-10 text-emerald-400 font-mono text-sm flex items-center gap-2">
-                                    <ScanLine className="size-4 animate-bounce" /> Memindai QR...
+                                    <ScanLineIcon className="size-4 animate-bounce" /> Memindai QR...
                                 </div>
                             </>
                         )}
 
                         {scanState === 'taking-selfie' && (
                             <div className="absolute inset-0 bg-slate-800 flex flex-col items-center justify-center p-4 text-center z-20">
-                                <Camera className="size-12 text-slate-400 mb-4" />
+                                <CameraIcon className="size-12 text-slate-400 mb-4" />
                                 <h3 className="text-white font-medium text-sm mb-4">Verifikasi Wajah (Selfie)</h3>
                                 {!selfieTaken ? (
                                     <Button
@@ -97,7 +97,7 @@ export function QrScanner() {
                                     </Button>
                                 ) : (
                                     <div className="text-emerald-400 text-sm flex items-center gap-2">
-                                        <CheckCircle2 className="size-4" /> Tersimpan
+                                        <CheckCircle2Icon className="size-4" /> Tersimpan
                                     </div>
                                 )}
                             </div>
@@ -105,7 +105,7 @@ export function QrScanner() {
 
                         {scanState === 'verifying-location' && (
                             <div className="absolute inset-0 bg-slate-800 flex flex-col items-center justify-center p-4 text-center z-20">
-                                <MapPin className="size-12 text-blue-400 mb-4 animate-bounce" />
+                                <MapPinIcon className="size-12 text-blue-400 mb-4 animate-bounce" />
                                 <h3 className="text-white font-medium text-sm">Memverifikasi Lokasi...</h3>
                                 <p className="text-slate-400 text-xs mt-2">Mengecek jarak ke outlet</p>
                             </div>
@@ -113,7 +113,7 @@ export function QrScanner() {
 
                         {scanState === 'success' && (
                             <div className="absolute inset-0 bg-emerald-600 flex flex-col items-center justify-center p-4 text-center z-20 animate-in fade-in duration-300">
-                                <CheckCircle2 className="size-16 text-white mb-4" />
+                                <CheckCircle2Icon className="size-16 text-white mb-4" />
                                 <h3 className="text-white font-bold text-lg">Clock In Berhasil!</h3>
                                 <p className="text-emerald-100 text-sm mt-1">Budi (Waiter) — 14:55</p>
                                 <div className="bg-emerald-800/50 text-white text-xs px-3 py-1 rounded-full mt-3">
@@ -124,7 +124,7 @@ export function QrScanner() {
 
                         {scanState === 'flagged' && (
                             <div className="absolute inset-0 bg-amber-600 flex flex-col items-center justify-center p-4 text-center z-20 animate-in fade-in duration-300">
-                                <AlertTriangle className="size-16 text-white mb-4" />
+                                <AlertTriangleIcon className="size-16 text-white mb-4" />
                                 <h3 className="text-white font-bold text-lg">Clock In Tercatat!</h3>
                                 <p className="text-amber-100 text-sm mt-1">Budi (Waiter) — 14:55</p>
                                 <div className="bg-amber-900/50 text-white text-xs px-3 py-1 rounded-lg mt-3 leading-relaxed">

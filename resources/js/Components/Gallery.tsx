@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import {
     Image as ImageIcon,
-    Plus,
-    Trash2,
-    ChevronLeft,
-    ChevronRight,
-    X,
-    GripVertical,
-    UploadCloud,
-} from 'lucide-react';
+    PlusIcon,
+    Trash2Icon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    XIcon,
+    GripVerticalIcon,
+    UploadCloudIcon,
+} from './icons';
 
 // --- Types ---
 export interface GalleryPhoto {
@@ -159,7 +159,7 @@ export function CustomerGallery() {
                         onClick={closeLightbox}
                         className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-50"
                     >
-                        <X className="size-6" />
+                        <XIcon className="size-6" />
                     </button>
 
                     <div className="flex flex-col md:flex-row gap-6 max-w-6xl w-full max-h-[90vh]">
@@ -181,7 +181,7 @@ export function CustomerGallery() {
                                         }}
                                         disabled={photoIndex === 0}
                                     >
-                                        <ChevronLeft className="size-6" />
+                                        <ChevronLeftIcon className="size-6" />
                                     </button>
                                     <button
                                         className="absolute right-4 p-3 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-all disabled:opacity-30"
@@ -191,7 +191,7 @@ export function CustomerGallery() {
                                         }}
                                         disabled={photoIndex === currentEvent.photos.length - 1}
                                     >
-                                        <ChevronRight className="size-6" />
+                                        <ChevronRightIcon className="size-6" />
                                     </button>
                                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 px-3 py-1 rounded-full text-sm font-mono backdrop-blur-md">
                                         {photoIndex + 1} / {currentEvent.photos.length}
@@ -255,7 +255,7 @@ export function GalleryManager({ onPreviewCustomer }: { onPreviewCustomer?: () =
                         onClick={() => setView('form')}
                         className="flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-primary-hover)] transition-colors"
                     >
-                        <Plus className="size-4" /> Tambah Event
+                        <PlusIcon className="size-4" /> Tambah Event
                     </button>
                 </div>
             }
@@ -313,7 +313,7 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
             <div className="max-w-4xl mx-auto space-y-6">
                 <div className="flex items-center gap-4 mb-2">
                     <button onClick={onBack} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300">
-                        <ChevronLeft className="size-5" />
+                        <ChevronLeftIcon className="size-5" />
                     </button>
                     <h2 className="text-lg font-semibold">Kembali ke Galeri</h2>
                 </div>
@@ -371,7 +371,7 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
 
                     <div className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center bg-black/20 hover:bg-white/5 transition-colors cursor-pointer mb-6 group">
                         <div className="size-12 rounded-full bg-[var(--color-primary)]/20 text-[var(--color-primary)] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <UploadCloud className="size-6" />
+                            <UploadCloudIcon className="size-6" />
                         </div>
                         <p className="text-sm font-medium text-slate-200">Klik atau Drag & Drop foto di sini</p>
                         <p className="text-xs text-slate-500 mt-1">Format: JPG, PNG (Max. 5MB, Auto-convert WebP)</p>
@@ -394,10 +394,10 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
                                     />
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                         <button className="p-2 bg-white/20 rounded-lg hover:bg-white/30 text-white cursor-grab">
-                                            <GripVertical className="size-4" />
+                                            <GripVerticalIcon className="size-4" />
                                         </button>
                                         <button className="p-2 bg-red-500/80 rounded-lg hover:bg-red-500 text-white">
-                                            <Trash2 className="size-4" />
+                                            <Trash2Icon className="size-4" />
                                         </button>
                                     </div>
                                     <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[10px] font-mono font-bold text-white">
@@ -408,7 +408,7 @@ function GalleryForm({ onBack }: { onBack: () => void }) {
 
                             {photos.length < 10 && (
                                 <div className="aspect-square rounded-xl border border-dashed border-white/20 flex flex-col items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-white/5 cursor-pointer transition-colors">
-                                    <Plus className="size-6 mb-2" />
+                                    <PlusIcon className="size-6 mb-2" />
                                     <span className="text-xs font-medium">Tambah</span>
                                 </div>
                             )}

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Restoku — Mockup Landing (Bold Foodie)</title>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+  :root{
+    --ink:#161310; --ink-2:#221d18; --paper:#fbf6f0; --paper-2:#f3e9df;
+    --cabe:#e23b1f; --cabe-d:#b92a12; --oranye:#f4731c; --emerald:#0f8a5f;
+    --muted:#6f655c; --line:#e7dccf;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Inter",-apple-system,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  .ph-duo{--ph-c-1:var(--cabe);--ph-c-2:var(--oranye)} /* duotone weight */
+
+  /* Announce bar */
+  .announce{background:var(--ink);color:#fff;font-size:13px;text-align:center;padding:9px 16px;letter-spacing:.2px}
+  .announce b{color:var(--oranye)}
+
+  /* Nav */
+  nav{position:sticky;top:0;z-index:50;background:rgba(251,246,240,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;letter-spacing:-.5px}
+  .brand .mark{width:38px;height:38px;border-radius:11px;background:var(--ink);color:var(--oranye);display:grid;place-items:center;font-size:22px}
+  .nav-links{display:flex;gap:30px;font-size:15px;font-weight:500;color:var(--muted)}
+  .nav-links a{text-decoration:none;color:inherit;transition:.2s}
+  .nav-links a:hover{color:var(--cabe)}
+  .nav-cta{display:flex;gap:12px;align-items:center}
+  .btn{font-weight:700;font-size:15px;border:none;cursor:pointer;border-radius:12px;padding:11px 20px;transition:.18s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{color:var(--cabe)}
+  .btn-cabe{background:var(--cabe);color:#fff;box-shadow:0 8px 22px -8px var(--cabe)}
+  .btn-cabe:hover{background:var(--cabe-d);transform:translateY(-1px)}
+
+  /* Hero */
+  .hero{position:relative;overflow:hidden;padding:70px 0 80px;background:
+    radial-gradient(900px 500px at 85% -10%, rgba(244,115,28,.18), transparent 60%),
+    radial-gradient(700px 400px at 0% 110%, rgba(226,59,31,.12), transparent 55%);}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);color:var(--cabe);font-weight:700;font-size:13px;padding:7px 14px;border-radius:999px;box-shadow:0 2px 10px -6px rgba(0,0,0,.2)}
+  h1{font-size:56px;line-height:1.04;letter-spacing:-1.5px;font-weight:850;margin:22px 0 18px}
+  h1 .hl{color:var(--cabe);position:relative;white-space:nowrap}
+  h1 .hl::after{content:"";position:absolute;left:0;right:0;bottom:6px;height:12px;background:rgba(244,115,28,.28);z-index:-1;border-radius:4px}
+  .lead{font-size:18px;line-height:1.65;color:var(--muted);max-width:480px;margin-bottom:30px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-trust{display:flex;align-items:center;gap:14px;margin-top:34px;color:var(--muted);font-size:14px}
+  .avatars{display:flex}
+  .avatars span{width:38px;height:38px;border-radius:50%;border:3px solid var(--paper);margin-left:-12px;background:var(--paper-2);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--ink-2)}
+  .avatars span:first-child{margin-left:0}
+
+  /* Hero phone mock (QR menu) */
+  .phone{width:300px;height:600px;background:var(--ink);border-radius:38px;padding:14px;box-shadow:0 40px 80px -30px rgba(0,0,0,.55);margin:0 auto;position:relative}
+  .phone::before{content:"";position:absolute;top:18px;left:50%;transform:translateX(-50%);width:90px;height:7px;border-radius:9px;background:#333}
+  .screen{width:100%;height:100%;background:var(--paper);border-radius:26px;overflow:hidden;display:flex;flex-direction:column}
+  .scr-top{background:var(--cabe);color:#fff;padding:34px 18px 16px}
+  .scr-top .t{font-weight:800;font-size:17px}
+  .scr-top .s{font-size:12px;opacity:.85;margin-top:2px}
+  .scr-body{padding:16px;flex:1;overflow:hidden}
+  .dish{display:flex;gap:11px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .thumb{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--oranye),var(--cabe));flex:none}
+  .dish .n{font-weight:700;font-size:13.5px}
+  .dish .p{font-size:12px;color:var(--muted)}
+  .qr{margin:8px auto 0;width:120px;height:120px;background:
+    repeating-conic-gradient(var(--ink) 0 25%, transparent 0 50%) 0 0/24px 24px;
+    border-radius:12px;padding:8px;background-color:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+  .qr-cap{text-align:center;font-size:11px;color:var(--muted);margin-top:8px;font-weight:600}
+  .scr-foot{background:var(--ink);color:#fff;text-align:center;font-size:11px;padding:10px}
+
+  /* Stats band */
+  .stats{background:var(--ink);color:#fff}
+  .stats-in{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding:48px 0;text-align:center}
+  .stat .n{font-size:40px;font-weight:850;color:var(--oranye);letter-spacing:-1px}
+  .stat .l{font-size:14px;color:#bdb3a9;margin-top:4px}
+
+  /* Section shell */
+  section.block{padding:84px 0}
+  .sec-head{text-align:center;max-width:620px;margin:0 auto 52px}
+  .kick{color:var(--cabe);font-weight:800;font-size:13px;letter-spacing:1.5px;text-transform:uppercase}
+  .sec-head h2{font-size:38px;font-weight:850;letter-spacing:-1px;margin:12px 0 10px}
+  .sec-head p{color:var(--muted);font-size:17px;line-height:1.6}
+
+  /* Bento features */
+  .bento{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;transition:.2s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 24px 40px -28px rgba(0,0,0,.4)}
+  .ic{width:52px;height:52px;border-radius:14px;background:var(--paper-2);display:grid;place-items:center;font-size:28px;color:var(--cabe);margin-bottom:16px}
+  .card h3{font-size:19px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+  .card p{color:var(--muted);font-size:14.5px;line-height:1.6}
+  .card.wide{grid-column:span 2;background:var(--ink);color:#fff;border:none}
+  .card.wide .ic{background:rgba(255,255,255,.08);color:var(--oranye)}
+  .card.wide p{color:#bdb3a9}
+  .card.wide h3{color:#fff}
+
+  /* How it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;counter-reset:s}
+  .step{text-align:center;padding:0 12px}
+  .step .num{width:54px;height:54px;border-radius:50%;background:var(--cabe);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center;margin:0 auto 18px;position:relative}
+  .step .num::before{content:counter(s);counter-increment:s}
+  .step h4{font-size:18px;font-weight:800;margin-bottom:8px}
+  .step p{color:var(--muted);font-size:14.5px;line-height:1.6}
+
+  /* CTA */
+  .cta{background:var(--cabe);color:#fff;border-radius:28px;padding:56px 48px;display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap;box-shadow:0 30px 60px -30px var(--cabe)}
+  .cta h2{font-size:32px;font-weight:850;letter-spacing:-.5px;max-width:520px}
+  .cta p{opacity:.9;margin-top:8px;font-size:16px}
+  .cta .btn-white{background:#fff;color:var(--cabe)}
+  .cta .btn-white:hover{background:var(--paper)}
+
+  /* Footer */
+  footer{background:var(--ink);color:#cfc5ba;padding:60px 0 30px;margin-top:84px}
+  .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px}
+  .fgrid h4{color:#fff;font-size:14px;font-weight:800;margin-bottom:16px}
+  .fgrid ul{list-style:none;font-size:14px;line-height:2}
+  .fgrid a{color:#cfc5ba;text-decoration:none}
+  .fgrid a:hover{color:var(--oranye)}
+  .fbrand{font-weight:800;font-size:20px;color:#fff;display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .fbrand .mark{width:34px;height:34px;border-radius:9px;background:#fff;color:var(--cabe);display:grid;place-items:center}
+  .fbrand-sub{font-size:13.5px;line-height:1.6;max-width:280px}
+  .copy{border-top:1px solid #2c2620;margin-top:40px;padding-top:22px;font-size:12.5px;color:#8c8278;text-align:center}
+
+  @media(max-width:880px){
+    .hero-grid{grid-template-columns:1fr;gap:40px}
+    .nav-links{display:none}
+    h1{font-size:42px}
+    .bento,.steps,.stats-in{grid-template-columns:1fr}
+    .card.wide{grid-column:span 1}
+    .cta{flex-direction:column;align-items:flex-start}
+    .fgrid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- Announce -->
+<div class="announce">🔥 Baru! <b>Buku Menu Digital + QR Code</b> — tamu pesan langsung dari HP, tanpa scan aplikasi.</div>
+
+<!-- Nav -->
+<nav>
+  <div class="wrap nav-in">
+    <div class="brand"><span class="mark"><i class="ph ph-cooking-pot"></i></span>Restoku</div>
+    <div class="nav-links">
+      <a href="#fitur">Fitur</a>
+      <a href="#cara">Cara Kerja</a>
+      <a href="#harga">Harga</a>
+      <a href="#testi">Testimoni</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="#"><i class="ph ph-storefront"></i> Login Owner</a>
+      <a class="btn btn-cabe" href="#"><i class="ph ph-receipt"></i> Login Staf</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill"><i class="ph-duotone ph-sparkle"></i> Sistem restoran untuk resto lokal</span>
+      <h1>Dapur jalan,<br>kasir tenang,<br><span class="hl">tamu puas.</span></h1>
+      <p class="lead">Restoku bantu kamu kelola pesanan, dapur, dan laporan dari satu tempat — plus buku menu digital yang tamu bisa buka pakai QR di meja.</p>
+      <div class="hero-cta">
+        <a class="btn btn-cabe" href="#"><i class="ph ph-receipt"></i> Masuk sebagai Staf / Kasir</a>
+        <a class="btn btn-ghost" href="#" style="border:1px solid var(--line)"><i class="ph ph-chart-line-up"></i> Lihat Analitik Owner</a>
+      </div>
+      <div class="hero-trust">
+        <div class="avatars"><span>WD</span><span>KM</span><span>BG</span><span>+2rb</span></div>
+        <span>Dipercaya 2.000+ resto & warung di Indonesia</span>
+      </div>
+    </div>
+
+    <!-- Phone mock: QR menu -->
+    <div>
+      <div class="phone">
+        <div class="screen">
+          <div class="scr-top">
+            <div class="t">Warung Senopati</div>
+            <div class="s">Pindai & pesan dari meja kamu</div>
+          </div>
+          <div class="scr-body">
+            <div class="dish"><div class="thumb"></div><div><div class="n">Ayam Bakar Kecap</div><div class="p">Rp 28.000</div></div></div>
+            <div class="dish"><div class="thumb"></div><div><div class="n">Es Teh Manis</div><div class="p">Rp 8.000</div></div></div>
+            <div class="dish"><div class="thumb"></div><div><div class="n">Sambal Terasi</div><div class="p">Rp 5.000</div></div></div>
+            <div class="qr"></div>
+            <div class="qr-cap">Pindai untuk buka menu lengkap</div>
+          </div>
+          <div class="scr-foot">Restoku · Pesan tanpa antre</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Stats -->
+<section class="stats">
+  <div class="wrap stats-in">
+    <div class="stat"><div class="n">2.000+</div><div class="l">Resto & warung</div></div>
+    <div class="stat"><div class="n">12,4 jt</div><div class="l">Pesanan / bulan</div></div>
+    <div class="stat"><div class="n">98%</div><div class="l">Uptime dapur</div></div>
+    <div class="stat"><div class="n">&lt;3 dtk</div><div class="l">Order ke KDS</div></div>
+  </div>
+</section>
+
+<!-- Features (bento) -->
+<section class="block" id="fitur">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kick">Semua dalam satu kompor</div>
+      <h2>Operasional yang nggak bikin kepala panas</h2>
+      <p>Dari kasir sampai laporan malam — satu sistem yang paham cara kerja resto lokal.</p>
+    </div>
+    <div class="bento">
+      <div class="card"><div class="ic"><i class="ph-duotone ph-receipt"></i></div><h3>Kasir Cepat</h3><p>Transaksi hitungan detik, split bill, dan QRIS langsung nyambung ke stok.</p></div>
+      <div class="card"><div class="ic"><i class="ph-duotone ph-cooking-pot"></i></div><h3>Dapur (KDS)</h3><p>Order langsung nongol di layar dapur. Nggak ada lagi nota hilang atau salah racik.</p></div>
+      <div class="card"><div class="ic"><i class="ph-duotone ph-qr-code"></i></div><h3>Buku Menu Digital</h3><p>Tamu scan QR di meja, lihat foto menu, langsung pesan. Tanpa install aplikasi.</p></div>
+      <div class="card wide"><div class="ic"><i class="ph-duotone ph-chart-line-up"></i></div><h3>Laporan Malam Jadi Otomatis</h3><p>Penjualan, menu terlaris, dan stok tipis dikirim ke HP owner tiap tutup warung. Keputusan pagi hari jadi gampang.</p></div>
+      <div class="card"><div class="ic"><i class="ph-duotone ph-users-three"></i></div><h3>Kelola Karyawan</h3><p>Role kasir/dapur/owner, jam kerja, sampai payroll — rapi di satu tempat.</p></div>
+      <div class="card"><div class="ic"><i class="ph-duotone ph-storefront"></i></div><h3>Multi-Outlet</h3><p>Cabang banyak? Pantau semua dari dashboard yang sama, branding tiap outlet bebas.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="block" id="cara" style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kick">Cara kerja</div>
+      <h2>Tiga langkah, warung langsung online</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="num"></div><h4>Pasang & login</h4><p>Buka Restoku di tablet kasir. Login staf, langsung bisa terima order.</p></div>
+      <div class="step"><div class="num"></div><h4>Taruh QR di meja</h4><p>Cetak QR menu sekali. Tamu pindai, lihat foto, pesan sendiri tanpa panggil pelayan.</p></div>
+      <div class="step"><div class="num"></div><h4>Lihat laporan</h4><p>Tutup warung, laporan otomatis masuk. Besok pagi sudah tahu menu apa yang laris.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="block">
+  <div class="wrap">
+    <div class="cta">
+      <div>
+        <h2>Siap bikin warung jalan tanpa ribet?</h2>
+        <p>Mulai gratis 14 hari. Tanpa kartu kredit.</p>
+      </div>
+      <a class="btn btn-white" href="#"><i class="ph ph-rocket-launch"></i> Coba Restoku Sekarang</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap fgrid">
+    <div>
+      <div class="fbrand"><span class="mark"><i class="ph ph-cooking-pot"></i></span>Restoku</div>
+      <p class="fbrand-sub">Sistem restoran all-in-one untuk resto & warung lokal di Indonesia — dari kasir sampai laporan malam.</p>
+    </div>
+    <div><h4>Produk</h4><ul><li><a href="#">Fitur</a></li><li><a href="#">Harga</a></li><li><a href="#">Buku Menu Digital</a></li><li><a href="#">Integrasi</a></li></ul></div>
+    <div><h4>Perusahaan</h4><ul><li><a href="#">Tentang</a></li><li><a href="#">Karir</a></li><li><a href="#">Blog</a></li><li><a href="#">Kontak</a></li></ul></div>
+    <div><h4>Bantuan</h4><ul><li><a href="#">0812-3456-7890</a></li><li><a href="#">hello@restoku.com</a></li><li>Sen–Jum 09–18</li></ul></div>
+  </div>
+  <div class="wrap copy">© 2026 Restoku. Dibuat untuk resto lokal Indonesia.</div>
+</footer>
+
+</body>
+</html>

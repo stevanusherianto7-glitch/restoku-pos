@@ -3,17 +3,17 @@ import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass, formatRupiah as formatRp } from '../../Components/Shared';
 import {
-    DollarSign,
-    TrendingUp,
-    Users,
-    Award,
-    AlertCircle,
-    PieChart,
-    Activity,
-    Wallet,
-    Receipt,
-    ShoppingCart,
-} from 'lucide-react';
+    DollarSignIcon,
+    TrendingUpIcon,
+    UsersIcon,
+    AwardIcon,
+    AlertCircleIcon,
+    PieChartIcon,
+    ActivityIcon,
+    WalletIcon,
+    ReceiptIcon,
+    ShoppingCartIcon,
+} from '../../Components/icons';
 
 interface Metrics {
     total_revenue: number;
@@ -52,7 +52,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
         {
             label: 'Total Pendapatan',
             value: formatRp(metrics.total_revenue),
-            icon: DollarSign,
+            icon: DollarSignIcon,
             trend: metrics.revenue_growth,
             color: 'text-amber-400',
             bg: 'bg-amber-400/10',
@@ -61,7 +61,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
         {
             label: 'Total Transaksi',
             value: metrics.total_transactions.toString(),
-            icon: Activity,
+            icon: ActivityIcon,
             trend: '+5.2%',
             color: 'text-blue-400',
             bg: 'bg-blue-400/10',
@@ -70,7 +70,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
         {
             label: 'Rata-rata Order',
             value: formatRp(metrics.average_order_value),
-            icon: PieChart,
+            icon: PieChartIcon,
             trend: '+1.5%',
             color: 'text-emerald-400',
             bg: 'bg-emerald-400/10',
@@ -79,7 +79,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
         {
             label: 'Total Outlet Aktif',
             value: leaderboard.length.toString(),
-            icon: Users,
+            icon: UsersIcon,
             trend: 'Tetap',
             color: 'text-purple-400',
             bg: 'bg-purple-400/10',
@@ -114,9 +114,9 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
     ];
 
     const alerts = [
-        { type: 'stok', msg: 'Stok Habis: Nasi Putih, Minyak Goreng', icon: AlertCircle, color: 'text-red-400' },
-        { type: 'kontrak', msg: 'Kontrak Habis (15 hari): Budi, Siti', icon: Users, color: 'text-amber-400' },
-        { type: 'cuti', msg: 'Karyawan Cuti Hari Ini: 2 Orang', icon: Users, color: 'text-blue-400' },
+        { type: 'stok', msg: 'Stok Habis: Nasi Putih, Minyak Goreng', icon: AlertCircleIcon, color: 'text-red-400' },
+        { type: 'kontrak', msg: 'Kontrak Habis (15 hari): Budi, Siti', icon: UsersIcon, color: 'text-amber-400' },
+        { type: 'cuti', msg: 'Karyawan Cuti Hari Ini: 2 Orang', icon: UsersIcon, color: 'text-blue-400' },
     ];
 
     return (
@@ -173,7 +173,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <TrendingUp className="size-5 text-blue-400" /> Grafik Omzet Harian
+                            <TrendingUpIcon className="size-5 text-blue-400" /> Grafik Omzet Harian
                         </h3>
                         <p className="text-sm text-slate-400 mt-1">Pergerakan omzet selama 30 hari terakhir.</p>
                     </div>
@@ -208,7 +208,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
                 {/* Metode Pembayaran */}
                 <Glass className="p-6">
                     <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wider flex items-center gap-2">
-                        <Wallet className="size-4 text-emerald-400" /> Metode Pembayaran
+                        <WalletIcon className="size-4 text-emerald-400" /> Metode Pembayaran
                     </h3>
                     <div className="space-y-4">
                         {paymentMethods.map((pm, i) => (
@@ -231,7 +231,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
                 {/* Penjualan Kategori */}
                 <Glass className="p-6">
                     <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wider flex items-center gap-2">
-                        <ShoppingCart className="size-4 text-amber-400" /> Penjualan per Kategori
+                        <ShoppingCartIcon className="size-4 text-amber-400" /> Penjualan per Kategori
                     </h3>
                     <div className="space-y-4">
                         {categorySales.map((cat, i) => (
@@ -255,7 +255,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
                 <div className="space-y-6 flex flex-col">
                     <Glass className="p-5 flex-1">
                         <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                            <Receipt className="size-4 text-red-400" /> Biaya vs Revenue
+                            <ReceiptIcon className="size-4 text-red-400" /> Biaya vs Revenue
                         </h3>
                         <div className="space-y-3">
                             {costVsRevenue.map((item, i) => (
@@ -277,7 +277,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
 
                     <Glass className="p-5">
                         <h3 className="text-sm font-semibold text-white mb-3 uppercase tracking-wider flex items-center gap-2">
-                            <AlertCircle className="size-4 text-red-400" /> Peringatan
+                            <AlertCircleIcon className="size-4 text-red-400" /> Peringatan
                         </h3>
                         <div className="space-y-2">
                             {alerts.map((alert, i) => (
@@ -298,7 +298,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
                     <div className="flex justify-between items-center mb-6">
                         <div>
                             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                                <Award className="size-5 text-amber-400" /> Leaderboard Outlet
+                                <AwardIcon className="size-5 text-amber-400" /> Leaderboard Outlet
                             </h3>
                             <p className="text-sm text-slate-400 mt-1">Peringkat cabang berdasarkan pendapatan.</p>
                         </div>
@@ -353,7 +353,7 @@ export default function OwnerDashboard({ metrics, leaderboard, menuPerformance }
                 {/* Top Performers */}
                 <Glass className="p-6">
                     <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
-                        <TrendingUp className="size-5 text-emerald-400" /> Menu Terlaris
+                        <TrendingUpIcon className="size-5 text-emerald-400" /> Menu Terlaris
                     </h3>
                     <p className="text-sm text-slate-400 mb-6">Menu dengan pendapatan tertinggi bulan ini.</p>
                     <div className="space-y-4">

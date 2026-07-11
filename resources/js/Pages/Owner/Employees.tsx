@@ -2,7 +2,15 @@ import React from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass, formatRupiah } from '../../Components/Shared';
-import { Users, AlertTriangle, Briefcase, ChefHat, Calculator, UserCheck, ShieldAlert } from 'lucide-react';
+import {
+    UsersIcon,
+    AlertTriangleIcon,
+    BriefcaseIcon,
+    ChefHatIcon,
+    CalculatorIcon,
+    UserCheckIcon,
+    ShieldAlertIcon,
+} from '../../Components/icons';
 
 export default function Employees() {
     // Mock Data based on Spec
@@ -17,7 +25,7 @@ export default function Employees() {
             name: 'Service (Waiter)',
             head_count: 5,
             salary: 4200000,
-            icon: UserCheck,
+            icon: UserCheckIcon,
             color: 'text-blue-400',
             bg: 'bg-blue-500/20',
         },
@@ -25,7 +33,7 @@ export default function Employees() {
             name: 'Kitchen',
             head_count: 7,
             salary: 6500000,
-            icon: ChefHat,
+            icon: ChefHatIcon,
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/20',
         },
@@ -33,7 +41,7 @@ export default function Employees() {
             name: 'Cashier',
             head_count: 2,
             salary: 1400000,
-            icon: Calculator,
+            icon: CalculatorIcon,
             color: 'text-amber-400',
             bg: 'bg-amber-500/20',
         },
@@ -41,7 +49,7 @@ export default function Employees() {
             name: 'Management',
             head_count: 1,
             salary: 730580,
-            icon: Briefcase,
+            icon: BriefcaseIcon,
             color: 'text-purple-400',
             bg: 'bg-purple-500/20',
         },
@@ -61,7 +69,7 @@ export default function Employees() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <Glass className="p-6 flex flex-col items-center justify-center text-center">
                     <div className="p-4 rounded-full bg-blue-500/10 mb-4 border border-blue-500/20">
-                        <Users className="size-8 text-blue-400" />
+                        <UsersIcon className="size-8 text-blue-400" />
                     </div>
                     <p className="text-sm font-medium text-slate-400 uppercase tracking-widest mb-1">Total Karyawan</p>
                     <p className="text-4xl font-black text-white">
@@ -71,7 +79,7 @@ export default function Employees() {
 
                 <Glass className="p-6 flex flex-col items-center justify-center text-center">
                     <div className="p-4 rounded-full bg-emerald-500/10 mb-4 border border-emerald-500/20">
-                        <Calculator className="size-8 text-emerald-400" />
+                        <CalculatorIcon className="size-8 text-emerald-400" />
                     </div>
                     <p className="text-sm font-medium text-slate-400 uppercase tracking-widest mb-1">
                         Total Gaji Bulan Ini
@@ -81,10 +89,10 @@ export default function Employees() {
 
                 <Glass className="p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
                     <div className="absolute -right-4 -bottom-4 text-amber-500/5">
-                        <Users className="size-48" />
+                        <UsersIcon className="size-48" />
                     </div>
                     <div className="p-4 rounded-full bg-amber-500/10 mb-4 border border-amber-500/20 relative z-10">
-                        <Briefcase className="size-8 text-amber-400" />
+                        <BriefcaseIcon className="size-8 text-amber-400" />
                     </div>
                     <p className="text-sm font-medium text-slate-400 uppercase tracking-widest mb-1 relative z-10">
                         Labor Cost
@@ -129,7 +137,7 @@ export default function Employees() {
                         <div className="absolute inset-0 bg-amber-500/5" />
                         <div className="relative z-10">
                             <h3 className="text-lg font-bold text-amber-400 flex items-center gap-2 mb-4">
-                                <ShieldAlert className="size-5" /> Peringatan Kontrak
+                                <ShieldAlertIcon className="size-5" /> Peringatan Kontrak
                             </h3>
 
                             <div className="p-4 bg-black/40 rounded-xl border border-white/10">
@@ -143,7 +151,7 @@ export default function Employees() {
                     </Glass>
 
                     <div className="p-4 border border-blue-500/20 bg-blue-500/10 rounded-2xl text-blue-200 text-sm flex gap-3 items-start">
-                        <AlertTriangle className="size-5 text-blue-400 shrink-0 mt-0.5" />
+                        <AlertTriangleIcon className="size-5 text-blue-400 shrink-0 mt-0.5" />
                         <p>
                             <strong>Status Read-only:</strong> Sebagai Owner, Anda hanya dapat melihat rekap data
                             karyawan. Untuk manajemen data, penambahan staf, atau *approval* cuti, silakan hubungi tim

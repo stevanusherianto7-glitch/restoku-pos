@@ -1,5 +1,5 @@
 import { Screen, Glass } from '../Shared';
-import { AlertCircle, Package } from 'lucide-react';
+import { AlertCircleIcon, PackageIcon } from '../icons';
 
 export function InventoryAlerts() {
     const alerts = [
@@ -14,7 +14,7 @@ export function InventoryAlerts() {
             <div className="max-w-3xl space-y-6">
                 <Glass className="p-6 border-amber-500/20">
                     <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-                        <AlertCircle className="size-5 text-amber-500" /> Barang Perlu Perhatian
+                        <AlertCircleIcon className="size-5 text-amber-500" /> Barang Perlu Perhatian
                     </h3>
 
                     <div className="space-y-3">
@@ -31,7 +31,7 @@ export function InventoryAlerts() {
                                     <div
                                         className={`p-2 rounded-lg ${alert.tone === 'red' ? 'bg-red-500/20' : 'bg-amber-500/20'}`}
                                     >
-                                        <Package
+                                        <PackageIcon
                                             className={`size-4 ${alert.tone === 'red' ? 'text-red-400' : 'text-amber-400'}`}
                                         />
                                     </div>
@@ -70,7 +70,7 @@ export function InventoryAlerts() {
 
                 <Glass className="p-6 bg-white/5 border border-white/5 flex items-center justify-center text-center">
                     <div className="max-w-xs">
-                        <Package className="size-8 text-slate-500 mx-auto mb-3 opacity-50" />
+                        <PackageIcon className="size-8 text-slate-500 mx-auto mb-3 opacity-50" />
                         <p className="text-sm font-medium text-slate-300 mb-1">Mode Read-Only</p>
                         <p className="text-xs text-slate-500">
                             Anda masuk sebagai Owner. Restock dan pengelolaan inventaris dilakukan oleh Admin/Dapur.

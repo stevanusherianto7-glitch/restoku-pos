@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { Screen, Glass, Badge, Button, Input } from '../Shared';
 import {
-    Users,
-    UserPlus,
-    Search,
-    ChevronRight,
-    FileText,
-    CheckCircle2,
-    AlertTriangle,
-    Briefcase,
-    FileBadge,
-    CalendarOff,
-    ShieldAlert,
-    Save,
-    Upload,
-} from 'lucide-react';
+    UsersIcon,
+    UserPlusIcon,
+    SearchIcon,
+    ChevronRightIcon,
+    FileTextIcon,
+    CheckCircle2Icon,
+    AlertTriangleIcon,
+    BriefcaseIcon,
+    FileBadgeIcon,
+    CalendarOffIcon,
+    ShieldAlertIcon,
+    SaveIcon,
+    UploadIcon,
+} from '../icons';
 
 type Employee = {
     id: number;
@@ -86,7 +86,7 @@ export function EmployeeMaster() {
                         setView('form');
                     }}
                 >
-                    <UserPlus className="size-4 mr-2" /> Tambah Karyawan
+                    <UserPlusIcon className="size-4 mr-2" /> Tambah Karyawan
                 </Button>
             }
         >
@@ -98,7 +98,7 @@ export function EmployeeMaster() {
                         <p className="text-2xl font-bold text-white mt-1">12</p>
                     </div>
                     <div className="size-10 rounded-full bg-[var(--color-primary)]/20 flex items-center justify-center text-[var(--color-primary)]">
-                        <Users className="size-5" />
+                        <UsersIcon className="size-5" />
                     </div>
                 </Glass>
                 <Glass className="p-4 flex items-center justify-between">
@@ -107,7 +107,7 @@ export function EmployeeMaster() {
                         <p className="text-2xl font-bold text-white mt-1">10</p>
                     </div>
                     <div className="size-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <CheckCircle2 className="size-5" />
+                        <CheckCircle2Icon className="size-5" />
                     </div>
                 </Glass>
                 <Glass className="p-4 flex items-center justify-between">
@@ -116,7 +116,7 @@ export function EmployeeMaster() {
                         <p className="text-2xl font-bold text-white mt-1">2</p>
                     </div>
                     <div className="size-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
-                        <CalendarOff className="size-5" />
+                        <CalendarOffIcon className="size-5" />
                     </div>
                 </Glass>
                 <Glass className="p-4 flex items-center justify-between border-red-500/30">
@@ -127,7 +127,7 @@ export function EmployeeMaster() {
                         </p>
                     </div>
                     <div className="size-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400">
-                        <AlertTriangle className="size-5" />
+                        <AlertTriangleIcon className="size-5" />
                     </div>
                 </Glass>
             </div>
@@ -199,7 +199,7 @@ export function EmployeeMaster() {
             <Glass className="p-0 overflow-hidden">
                 <div className="p-4 border-b border-white/5 flex items-center justify-between">
                     <div className="relative w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                         <input
                             type="text"
                             placeholder="Cari karyawan..."
@@ -265,7 +265,7 @@ export function EmployeeMaster() {
                                 <td className="px-4 py-3 text-slate-400">{emp.contractEnd}</td>
                                 <td className="px-4 py-3 text-right">
                                     <Button variant="ghost" className="opacity-0 group-hover:opacity-100">
-                                        <ChevronRight className="size-4" />
+                                        <ChevronRightIcon className="size-4" />
                                     </Button>
                                 </td>
                             </tr>
@@ -290,7 +290,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                         Batal
                     </Button>
                     <Button>
-                        <Save className="size-4 mr-2" /> Simpan Data
+                        <SaveIcon className="size-4 mr-2" /> Simpan Data
                     </Button>
                 </>
             }
@@ -318,8 +318,8 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                             <h2 className="text-lg font-semibold text-white mb-6">Informasi Dasar</h2>
                             <div className="flex gap-6 mb-8">
                                 <div className="size-24 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center text-slate-400 gap-2 cursor-pointer hover:bg-white/10 transition-colors">
-                                    <Upload className="size-6" />
-                                    <span className="text-[10px] uppercase tracking-wider">Upload Foto</span>
+                                    <UploadIcon className="size-6" />
+                                    <span className="text-[10px] uppercase tracking-wider">UploadIcon Foto</span>
                                 </div>
                                 <div className="flex-1 grid grid-cols-2 gap-4">
                                     <div>
@@ -556,7 +556,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-lg font-semibold text-white">Dokumen Tersimpan</h2>
                                 <Button variant="outline" size="sm">
-                                    <Upload className="size-4 mr-2" /> Upload Dokumen
+                                    <UploadIcon className="size-4 mr-2" /> UploadIcon Dokumen
                                 </Button>
                             </div>
                             <div className="space-y-3">
@@ -566,7 +566,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                         className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <FileText className="size-5 text-[var(--color-primary)]" />
+                                            <FileTextIcon className="size-5 text-[var(--color-primary)]" />
                                             <span className="text-sm text-white">{doc}</span>
                                         </div>
                                         <Badge tone="emerald">Terverifikasi</Badge>
@@ -581,7 +581,7 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-lg font-semibold text-white">Riwayat Kontrak</h2>
                                 <Button variant="outline" size="sm">
-                                    <Briefcase className="size-4 mr-2" /> Buat Kontrak Baru
+                                    <BriefcaseIcon className="size-4 mr-2" /> Buat Kontrak Baru
                                 </Button>
                             </div>
                             <div className="space-y-4">
@@ -615,11 +615,11 @@ function EmployeeForm({ user, onBack }: { user: Employee | null; onBack: () => v
                                     Catatan Pelanggaran & Surat Peringatan
                                 </h2>
                                 <Button variant="outline" size="sm">
-                                    <ShieldAlert className="size-4 mr-2" /> Catat Pelanggaran
+                                    <ShieldAlertIcon className="size-4 mr-2" /> Catat Pelanggaran
                                 </Button>
                             </div>
                             <div className="text-center py-12">
-                                <FileBadge className="size-12 mx-auto text-slate-600 mb-3" />
+                                <FileBadgeIcon className="size-12 mx-auto text-slate-600 mb-3" />
                                 <p className="text-slate-400">Belum ada catatan pelanggaran untuk karyawan ini.</p>
                             </div>
                         </Glass>

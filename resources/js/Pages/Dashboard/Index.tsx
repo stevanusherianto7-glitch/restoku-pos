@@ -3,20 +3,20 @@ import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah, toneMap, type Tone, useTenantSettings } from '../../Components/Shared';
 import {
-    DollarSign,
-    Utensils,
-    Package,
-    Users,
-    Sparkles,
-    Clock,
-    AlertTriangle,
-    Building2,
-    ChevronRight,
-    Award,
-    ShieldAlert,
-    BarChart3,
-    Calendar,
-} from 'lucide-react';
+    DollarSignIcon,
+    UtensilsIcon,
+    PackageIcon,
+    UsersIcon,
+    SparklesIcon,
+    ClockIcon,
+    AlertTriangleIcon,
+    Building2Icon,
+    ChevronRightIcon,
+    AwardIcon,
+    ShieldAlertIcon,
+    BarChart3Icon,
+    CalendarIcon,
+} from '../../Components/icons';
 
 type Timeframe = 'today' | 'weekly' | 'semester' | 'yearly';
 
@@ -529,7 +529,7 @@ function RevenueChart({
                 }`}
             >
                 <div className="flex items-center gap-2">
-                    <Calendar className="size-3.5 text-amber-400" />
+                    <CalendarIcon className="size-3.5 text-amber-400" />
                     <span className="font-semibold">{activePoint.fullDate}</span>
                 </div>
                 <div className="flex items-center gap-4">
@@ -695,7 +695,7 @@ function PeakOrderHours({ isNanoBanana = false }: { isNanoBanana?: boolean }) {
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 gap-2">
                 <span className="flex items-center gap-2">
-                    <Clock className="size-3.5 text-blue-400 shrink-0" /> Distribusi Pesanan (Hari Ini)
+                    <ClockIcon className="size-3.5 text-blue-400 shrink-0" /> Distribusi Pesanan (Hari Ini)
                 </span>
                 <span className="flex items-center gap-3 font-mono text-[10px] shrink-0">
                     <span className="flex items-center gap-1.5">
@@ -894,7 +894,7 @@ export default function Dashboard() {
             label: 'Total Pendapatan Global',
             value: formatRupiah(revenueValue),
             sub: revenueSub,
-            Icon: DollarSign,
+            Icon: DollarSignIcon,
             tone: 'emerald',
             delta: revenueDelta,
         },
@@ -902,7 +902,7 @@ export default function Dashboard() {
             label: 'Okupansi & Rotasi Meja',
             value: occupancyValue,
             sub: occupancySub,
-            Icon: Utensils,
+            Icon: UtensilsIcon,
             tone: 'emerald',
             delta: occupancyDelta,
         },
@@ -910,7 +910,7 @@ export default function Dashboard() {
             label: 'Consolidated Food Cost',
             value: foodCostValue,
             sub: foodCostSub,
-            Icon: Package,
+            Icon: PackageIcon,
             tone: 'amber',
             delta: foodCostDelta,
         },
@@ -918,7 +918,7 @@ export default function Dashboard() {
             label: 'Kondisi Kesehatan Outlet',
             value: healthValue,
             sub: healthSub,
-            Icon: Building2,
+            Icon: Building2Icon,
             tone: 'violet',
             delta: healthDelta,
         },
@@ -936,7 +936,7 @@ export default function Dashboard() {
             label: 'Total Penjualan Cabang',
             value: formatRupiah(revenueValue),
             sub: revenueSub,
-            Icon: DollarSign,
+            Icon: DollarSignIcon,
             tone: 'emerald',
             delta: revenueDelta,
         },
@@ -944,7 +944,7 @@ export default function Dashboard() {
             label: 'Meja Aktif Cabang',
             value: occupancyValue,
             sub: occupancySub,
-            Icon: Utensils,
+            Icon: UtensilsIcon,
             tone: 'emerald',
             delta: occupancyDelta,
         },
@@ -952,7 +952,7 @@ export default function Dashboard() {
             label: 'Food Cost Cabang',
             value: foodCostValue,
             sub: foodCostSub,
-            Icon: Package,
+            Icon: PackageIcon,
             tone: 'amber',
             delta: foodCostDelta,
         },
@@ -960,7 +960,7 @@ export default function Dashboard() {
             label: 'Kehadiran Staff Cabang',
             value: healthValue,
             sub: healthSub,
-            Icon: Users,
+            Icon: UsersIcon,
             tone: 'violet',
             delta: healthDelta,
         },
@@ -1073,9 +1073,9 @@ export default function Dashboard() {
                                 className={`grid size-11 place-items-center rounded-xl border ${isNanoBanana ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'}`}
                             >
                                 {isNanoBanana ? (
-                                    <Sparkles className="size-5 animate-pulse" />
+                                    <SparklesIcon className="size-5 animate-pulse" />
                                 ) : (
-                                    <Building2 className="size-5" />
+                                    <Building2Icon className="size-5" />
                                 )}
                             </div>
                             <div>
@@ -1151,9 +1151,9 @@ export default function Dashboard() {
                                 <div>
                                     <h2 className="text-base font-bold text-white flex items-center gap-2">
                                         {isNanoBanana ? (
-                                            <Sparkles className="size-4 text-amber-400" />
+                                            <SparklesIcon className="size-4 text-amber-400" />
                                         ) : (
-                                            <BarChart3 className="size-4 text-emerald-400" />
+                                            <BarChart3Icon className="size-4 text-emerald-400" />
                                         )}
                                         Tren Pendapatan & Volume Transaksi ({timeframeLabels[timeframe]})
                                     </h2>
@@ -1194,7 +1194,7 @@ export default function Dashboard() {
                             <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin space-y-4">
                                 <div>
                                     <h2 className="text-base font-bold text-white flex items-center gap-2 mb-1">
-                                        <Clock className="size-4 text-blue-400" />
+                                        <ClockIcon className="size-4 text-blue-400" />
                                         Jam Ramai Order (Peak Hours)
                                     </h2>
                                     <p className="text-xs text-slate-400">
@@ -1213,7 +1213,7 @@ export default function Dashboard() {
                                 <div className="flex justify-between items-center mb-4">
                                     <div>
                                         <h2 className="text-base font-bold text-white flex items-center gap-2">
-                                            <Award className="size-4 text-amber-400" />
+                                            <AwardIcon className="size-4 text-amber-400" />
                                             Peringkat Kinerja Cabang Terbaik (Top Revenue Generators)
                                         </h2>
                                         <p className="text-xs text-slate-400">
@@ -1222,7 +1222,7 @@ export default function Dashboard() {
                                         </p>
                                     </div>
                                     <span className="text-xs text-blue-400 font-semibold cursor-pointer hover:underline flex items-center gap-1">
-                                        Lihat Semua 100 Cabang <ChevronRight className="size-3.5" />
+                                        Lihat Semua 100 Cabang <ChevronRightIcon className="size-3.5" />
                                     </span>
                                 </div>
                                 <div className="space-y-3">
@@ -1262,7 +1262,7 @@ export default function Dashboard() {
 
                             <Glass className="p-6 border-red-500/30 bg-red-500/[0.03]" hover>
                                 <div className="flex items-center gap-2 text-red-400 mb-2">
-                                    <ShieldAlert className="size-5 animate-bounce" />
+                                    <ShieldAlertIcon className="size-5 animate-bounce" />
                                     <h2 className="text-base font-bold text-white">Radar Audit & Peringatan Cabang</h2>
                                 </div>
                                 <p className="text-xs text-slate-400 mb-4">
@@ -1277,7 +1277,7 @@ export default function Dashboard() {
                                         >
                                             <div className="flex items-center justify-between">
                                                 <span className="text-xs font-bold text-red-300 flex items-center gap-1.5">
-                                                    <AlertTriangle className="size-3.5 text-red-400" /> {a.name}
+                                                    <AlertTriangleIcon className="size-3.5 text-red-400" /> {a.name}
                                                 </span>
                                                 <Badge tone="red">
                                                     {a.type === 'fraud' ? 'AUDIT REQUIRED' : 'UNDERPERFORMING'}
@@ -1296,7 +1296,7 @@ export default function Dashboard() {
                         <div className="flex justify-between items-center mb-4">
                             <div>
                                 <h2 className="text-base font-bold text-white flex items-center gap-2">
-                                    {isNanoBanana && <Sparkles className="size-4 text-amber-400" />}
+                                    {isNanoBanana && <SparklesIcon className="size-4 text-amber-400" />}
                                     Produk Terlaris {isGlobal ? '(Akumulasi 100 Cabang)' : `(${selectedOutlet})`}
                                 </h2>
                                 <p className="text-xs text-slate-400">

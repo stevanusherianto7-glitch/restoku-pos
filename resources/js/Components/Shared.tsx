@@ -41,7 +41,7 @@ export {
 export type { Plan } from '../Types';
 
 // PlanBadge — kept here since it depends on PLAN_TONES and PLAN_LABELS
-import { Crown } from 'lucide-react';
+import { CrownIcon } from './icons';
 import { PLAN_TONES, PLAN_LABELS } from '../lib/constants';
 import type { Plan } from '../Types';
 
@@ -50,7 +50,7 @@ export function PlanBadge({ plan }: { plan: Plan }) {
         <span
             className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold ${PLAN_TONES[plan]}`}
         >
-            {plan === 'enterprise' && <Crown className="size-3" />}
+            {plan === 'enterprise' && <CrownIcon className="size-3" />}
             {PLAN_LABELS[plan]}
         </span>
     );
@@ -58,13 +58,13 @@ export function PlanBadge({ plan }: { plan: Plan }) {
 
 // FeatureLock — kept here for backward compatibility
 import { type ReactNode } from 'react';
-import { Lock } from 'lucide-react';
+import { LockIcon } from './icons';
 export function FeatureLock({ requiredPlan, children }: { requiredPlan: Plan; children: ReactNode }) {
     return (
         <div className="relative">
             <div className="opacity-40 pointer-events-none select-none">{children}</div>
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/30 rounded-2xl backdrop-blur-sm">
-                <Lock className="size-6 text-slate-400" />
+                <LockIcon className="size-6 text-slate-400" />
                 <p className="text-xs text-slate-400">
                     Fitur <PlanBadge plan={requiredPlan} />
                 </p>
@@ -78,7 +78,7 @@ export function FeatureLock({ requiredPlan, children }: { requiredPlan: Plan; ch
 
 import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
-import * as LucideIcons from 'lucide-react';
+import * as LucideIcons from './icons';
 
 export interface StaffMember {
     id: string;
@@ -287,7 +287,7 @@ export function useTenantSettings() {
         if (tenantLogo === 'ChefHat') {
             return <RestokuLogo className={className} />;
         }
-        const IconComponent = (LucideIcons as any)[tenantLogo] || LucideIcons.ChefHat;
+        const IconComponent = (LucideIcons as any)[tenantLogo + 'Icon'] || LucideIcons.ChefHatIcon;
         return <IconComponent className={className} />;
     };
 

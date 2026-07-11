@@ -2,7 +2,7 @@
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Glass, formatRupiah } from '../../Components/Shared';
-import { MapPin, TrendingUp, TrendingDown, Store, Award } from 'lucide-react';
+import { MapPinIcon, TrendingUpIcon, TrendingDownIcon, StoreIcon, AwardIcon } from '../../Components/icons';
 import { RoleGuard } from '../../Components/RoleGuard';
 
 function PerbandinganOutletInner() {
@@ -89,7 +89,7 @@ function PerbandinganOutletInner() {
                         <div className="flex justify-between items-start mb-6">
                             <div className="flex items-center gap-3">
                                 <div className={`p-2.5 rounded-xl ${o.icon}`}>
-                                    <Store className={`size-5 ${o.color}`} />
+                                    <StoreIcon className={`size-5 ${o.color}`} />
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-white text-lg">{o.name}</h3>
@@ -97,9 +97,9 @@ function PerbandinganOutletInner() {
                                         className={`text-sm font-medium flex items-center gap-1 mt-0.5 ${o.growth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}
                                     >
                                         {o.growth >= 0 ? (
-                                            <TrendingUp className="size-3" />
+                                            <TrendingUpIcon className="size-3" />
                                         ) : (
-                                            <TrendingDown className="size-3" />
+                                            <TrendingDownIcon className="size-3" />
                                         )}
                                         {o.growth > 0 ? '+' : ''}
                                         {o.growth}% vs bulan lalu
@@ -130,7 +130,7 @@ function PerbandinganOutletInner() {
 
             <Glass className="p-8 mb-8">
                 <h3 className="text-lg font-semibold text-white mb-8 flex items-center gap-2">
-                    <Award className="size-5 text-blue-400" /> Kontribusi Pendapatan per Outlet
+                    <AwardIcon className="size-5 text-blue-400" /> Kontribusi Pendapatan per Outlet
                 </h3>
 
                 <div className="space-y-6">
@@ -166,7 +166,7 @@ function PerbandinganOutletInner() {
 
             <Glass className="p-6">
                 <div className="flex items-center gap-4 bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl text-blue-200">
-                    <MapPin className="size-6 shrink-0 text-blue-400" />
+                    <MapPinIcon className="size-6 shrink-0 text-blue-400" />
                     <p className="text-sm">
                         <strong className="text-blue-300 block mb-0.5">Analisis Lokasi:</strong>
                         Cabang B memiliki pertumbuhan tertinggi (+15%) bulan ini. Pertimbangkan untuk mereplikasi

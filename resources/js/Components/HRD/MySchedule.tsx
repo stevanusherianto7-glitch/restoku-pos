@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Screen, Glass, Button } from '../Shared';
-import { Calendar, Clock, CheckCircle2, ArrowRightLeft, Plane } from 'lucide-react';
+import { CalendarIcon, ClockIcon, CheckCircle2Icon, ArrowRightLeftIcon, PlaneIcon } from '../icons';
 
 export function MySchedule() {
     const [clockInStatus, setClockInStatus] = useState<'pending' | 'clocked_in' | 'clocked_out'>('pending');
@@ -30,20 +30,20 @@ export function MySchedule() {
                         <div className="w-48 h-48 rounded-full bg-slate-900 border-8 border-slate-800 flex flex-col items-center justify-center mb-6 shadow-inner relative overflow-hidden">
                             {clockInStatus === 'pending' && (
                                 <div className="absolute inset-0 bg-emerald-500/10 flex flex-col items-center justify-center">
-                                    <Clock className="size-8 text-emerald-400 mb-2 opacity-50" />
+                                    <ClockIcon className="size-8 text-emerald-400 mb-2 opacity-50" />
                                     <span className="text-slate-400 text-sm">Menunggu</span>
                                 </div>
                             )}
                             {clockInStatus === 'clocked_in' && (
                                 <div className="absolute inset-0 bg-emerald-500/20 flex flex-col items-center justify-center">
-                                    <CheckCircle2 className="size-8 text-emerald-400 mb-2" />
+                                    <CheckCircle2Icon className="size-8 text-emerald-400 mb-2" />
                                     <span className="text-emerald-400 text-sm font-bold">Tepat Waktu</span>
                                     <span className="text-white text-2xl font-mono mt-1">{time}</span>
                                 </div>
                             )}
                             {clockInStatus === 'clocked_out' && (
                                 <div className="absolute inset-0 bg-slate-800 flex flex-col items-center justify-center">
-                                    <span className="text-slate-400 text-sm font-bold">Clock Out</span>
+                                    <span className="text-slate-400 text-sm font-bold">ClockIcon Out</span>
                                     <span className="text-white text-xl font-mono mt-1">{time}</span>
                                 </div>
                             )}
@@ -72,10 +72,10 @@ export function MySchedule() {
                         <h4 className="font-semibold text-white mb-4">Aksi Lainnya</h4>
                         <div className="space-y-3">
                             <Button variant="outline" className="w-full justify-start gap-3 bg-white/5 border-white/10">
-                                <ArrowRightLeft className="size-4 text-blue-400" /> Ajukan Tukar Shift
+                                <ArrowRightLeftIcon className="size-4 text-blue-400" /> Ajukan Tukar Shift
                             </Button>
                             <Button variant="outline" className="w-full justify-start gap-3 bg-white/5 border-white/10">
-                                <Plane className="size-4 text-purple-400" /> Ajukan Cuti / Izin
+                                <PlaneIcon className="size-4 text-purple-400" /> Ajukan Cuti / Izin
                             </Button>
                         </div>
                     </Glass>
@@ -86,7 +86,7 @@ export function MySchedule() {
                     <Glass className="p-6 h-full">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                <Calendar className="size-5 text-emerald-400" /> Jadwal Mendatang
+                                <CalendarIcon className="size-5 text-emerald-400" /> Jadwal Mendatang
                             </h3>
                         </div>
 
@@ -117,12 +117,12 @@ export function MySchedule() {
                                     <div className="text-right">
                                         {item.status === 'clocked_in' && (
                                             <span className="bg-emerald-500/20 text-emerald-400 px-3 py-1 text-xs rounded-full border border-emerald-500/30 flex items-center gap-1">
-                                                <CheckCircle2 className="size-3" /> Sedang Berlangsung
+                                                <CheckCircle2Icon className="size-3" /> Sedang Berlangsung
                                             </span>
                                         )}
                                         {item.status === 'confirmed' && (
                                             <span className="text-emerald-400 text-xs flex items-center gap-1">
-                                                <CheckCircle2 className="size-3" /> Terjadwal
+                                                <CheckCircle2Icon className="size-3" /> Terjadwal
                                             </span>
                                         )}
                                         {item.status === 'off' && (
@@ -132,7 +132,7 @@ export function MySchedule() {
                                         )}
                                         {item.status === 'pending_publish' && (
                                             <span className="text-yellow-500/80 text-xs flex items-center gap-1">
-                                                <Clock className="size-3" /> Menunggu Konfirmasi
+                                                <ClockIcon className="size-3" /> Menunggu Konfirmasi
                                             </span>
                                         )}
                                     </div>
