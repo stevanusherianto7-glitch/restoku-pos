@@ -169,4 +169,9 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::post('/api/google-reviews/{id}/reply',    [GoogleReviewController::class, 'reply']);
     Route::post('/api/google-reviews/{id}/generate-ai-reply', [GoogleReviewController::class, 'generateAiReply']);
     Route::post('/api/google-reviews/settings',      [GoogleReviewController::class, 'saveSettings']);
+    // ── Google Business Profile OAuth (ulasan sungguhan) ──────────────────────
+    Route::get('/owner/google-reviews/connect',       [GoogleReviewController::class, 'bpConnect']);
+    Route::get('/owner/google-reviews/callback',      [GoogleReviewController::class, 'bpCallback']);
+    Route::get('/api/google-reviews/locations',       [GoogleReviewController::class, 'bpLocations']);
+    Route::post('/api/google-reviews/select-location',[GoogleReviewController::class, 'bpSelectLocation']);
 });

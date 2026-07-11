@@ -10,6 +10,7 @@ import {
     SettingsIcon,
     SparklesIcon,
     AlertCircleIcon,
+    StoreIcon,
     XIcon,
     MessageSquareIcon,
 } from '../../Components/icons';
@@ -33,6 +34,7 @@ export default function GoogleReviews() {
     const [loading, setLoading] = useState(false);
     const [syncing, setSyncing] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [connected, setConnected] = useState(false);
     const [filterRating, setFilterRating] = useState<'all' | 'complaints' | 'positive'>('all');
     const [filterStatus, setFilterStatus] = useState<'all' | 'unreplied' | 'replied'>('all');
 
@@ -50,39 +52,34 @@ export default function GoogleReviews() {
     const handleParseUrl = () => {
         if (!helperUrl.trim()) return;
 
-        if (helperUrl.includes('Pawon+Salam') || helperUrl.includes('0x2e68dd612d0f5c99:0x9f13c4b77ce33cf')) {
-            setPlaceId('ChIJmVwPLWHdaC4RzzPOd0s88Qk');
-            setHelperMessage('Sukses mengekstrak Place ID untuk Pawon Salam Resto!');
+        // Ekstrak Place ID asli dari URL Maps (format hex 0x...:0x...).
+        // TIDAK memalsukan jadi 'ChIJ...' — itu sebabkan sync "berhasil" tapi data palsu.
+        const hexMatch = helperUrl.match(/1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);
+        if (hexMatch) {
+            const realPlaceId = hexMatch[1];
+            setPlaceId(realPlaceId);
+            setHelperMessage(`Tautan terdeteksi. Place ID asli diekstrak: ${realPlaceId}`);
             return;
         }
 
-        const match = helperUrl.match(/1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);
-        if (match) {
-            const hash = match[1].split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0);
-            const generated = 'ChIJ' + Math.abs(hash).toString(36).toUpperCase() + 'MAPS';
-            setPlaceId(generated);
-            setHelperMessage(`Tautan terdeteksi. Place ID berhasil diekstrak: ${generated}`);
-        } else {
-            setHelperMessage('Tautan tidak valid. Pastikan tautan disalin langsung dari alamat browser Google Maps.');
+        // Place ID kanonik ChIJ (jika user tempel langsung, bukan dari URL).
+        const chijMatch = helperUrl.match(/ChIJ[A-Za-z0-9_-]+/);
+        if (chijMatch) {
+            setPlaceId(chijMatch[0]);
+            setHelperMessage(`Place ID ditemukan: ${chijMatch[0]}`);
+            return;
         }
+
+        setHelperMessage('Tautan tidak valid. Tempel tautan Google Maps lengkap (berisi 1s0x...).');
     };
 
     const handleSearchName = () => {
         if (!helperSearch.trim()) return;
 
-        const query = helperSearch.toLowerCase();
-        if (query.includes('pawon') || query.includes('salam')) {
-            setPlaceId('ChIJmVwPLWHdaC4RzzPOd0s88Qk');
-            setHelperMessage('Ditemukan: Pawon Salam Resto (Bandung) -> Place ID: ChIJmVwPLWHdaC4RzzPOd0s88Qk');
-        } else if (query.includes('kenangan') || query.includes('senopati')) {
-            setPlaceId('ChIJrTLr-GzsaS4R350O6vCqzw4');
-            setHelperMessage('Ditemukan: Kopi Kenangan Sudirman -> Place ID: ChIJrTLr-GzsaS4R350O6vCqzw4');
-        } else {
-            const hash = Math.abs(query.split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0));
-            const generated = 'ChIJ' + hash.toString(36).toUpperCase() + 'RESTO';
-            setPlaceId(generated);
-            setHelperMessage(`Ditemukan: "${helperSearch}" -> Place ID: ${generated}`);
-        }
+        // Nama → butuh resolve via Google (Place ID / location GBP). Tidak tebak ChIJ.
+        setHelperMessage(
+            'Pencarian nama butuh koneksi Google Business Profile. Klik "Hubungkan GBP" lalu pilih lokasi dari daftar — Place ID akan otomatis terisi.',
+        );
     };
 
     // Reply states
@@ -100,8 +97,10 @@ export default function GoogleReviews() {
             const data = await res.json();
             if (data.status === 'success') {
                 setReviews(data.reviews);
+                setConnected(!!data.connected);
             } else {
                 setError(data.message || 'Gagal memuat ulasan Google.');
+                setConnected(!!data.connected);
             }
         } catch (err) {
             setError('Tidak dapat terhubung ke server. Periksa koneksi Anda.');
@@ -126,12 +125,19 @@ export default function GoogleReviews() {
             const data = await res.json();
             if (data.status === 'success') {
                 setReviews(data.reviews);
+                setConnected(!!data.connected);
                 // Setelah sinkron, langsung fokus ke ulasan yang belum dibalas
                 // supaya owner langsung melihat commentary yang butuh tanggapan.
                 const unreplied = (data.reviews as Review[]).filter((r) => !r.reply_text).length;
                 setFilterStatus(unreplied > 0 ? 'unreplied' : 'all');
+            } else if (data.status === 'demo') {
+                // Transparan: data contoh, belum terhubung GBP.
+                setReviews(data.reviews);
+                setConnected(false);
+                setError(data.message || 'Menampilkan data contoh (belum terhubung GBP).');
             } else {
                 setError(data.message || 'Sinkronisasi gagal. Coba lagi.');
+                setConnected(!!data.connected);
             }
         } catch (err) {
             setError('Sinkronisasi gagal. Periksa koneksi Anda.');
@@ -268,6 +274,19 @@ export default function GoogleReviews() {
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
+                            {connected ? (
+                                <span className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+                                    <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                                    Terhubung GBP
+                                </span>
+                            ) : (
+                                <a
+                                    href="/owner/google-reviews/connect"
+                                    className="bg-blue-500/15 hover:bg-blue-500/25 text-blue-200 border border-blue-500/30 rounded-xl px-4 py-2.5 text-xs font-semibold flex items-center gap-2 transition-all"
+                                >
+                                    <StoreIcon className="size-3.5" /> Hubungkan GBP
+                                </a>
+                            )}
                             <button
                                 onClick={() => setShowSettings(true)}
                                 className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl px-4 py-2.5 text-xs font-semibold flex items-center gap-2 transition-all"

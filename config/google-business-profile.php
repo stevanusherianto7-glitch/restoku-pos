@@ -1,0 +1,49 @@
+<?php
+
+return [
+
+    /*
+     * Google Business Profile API (ulasan resto sungguhan).
+     * OAuth memakai Socialite driver 'google' (config/services.php) — scope ditambah
+     * di runtime (business.manage + offline). Client ID/Secret reuse .env GOOGLE_*.
+     */
+    'scopes' => [
+        'openid',
+        'profile',
+        'email',
+        'https://www.googleapis.com/auth/business.manage',
+    ],
+
+    // Endpoint Business Profile API (v1).
+    'api_base' => 'https://businessprofile.googleapis.com/v1',
+
+    /*
+     * Override accountId GBP (resource name: accounts/{id}).
+     * DARI SCREENSHOT GBP PAWON SALAM: "ID Profil Bisnis" = 11440950457431200377.
+     * Ini adalah ACCOUNT id, BUKAN location id. Dipakai agar resolveAccount deterministik
+     * (hindari auto-discovery yang ambigu bila akun punya banyak profile).
+     * Kosongkan ('') untuk auto-discover via GET /accounts.
+     */
+    'account_id' => env('GOOGLE_BP_ACCOUNT_ID', '11440950457431200377'),
+
+    /*
+     * Override locationId GBP (resource: accounts/{account}/locations/{id}).
+     * Kosongkan ('') → owner pilih via dropdown setelah OAuth (bpLocations).
+     * Isi bila Anda yakin angka ini juga location id (jarang sama dengan account id).
+     */
+    'location_id' => env('GOOGLE_BP_LOCATION_ID', ''),
+
+    // Redirect setelah owner mengizinkan akses GBP.
+    'redirect_uri' => env('GOOGLE_REDIRECT_URI', 'http://localhost:8000/oauth/google/callback'),
+    'bp_redirect_uri' => env('GOOGLE_BP_REDIRECT_URI', 'http://localhost:8000/owner/google-reviews/callback'),
+
+    /*
+     * Mode fallback saat tenant BELUM terhubung GBP (tidak ada GoogleBpToken).
+     * 'demo' = seeding mock (UI tidak kosong, transparan status:'demo').
+     * 'off'  = langsung error transparan (tidak ada data palsu).
+     */
+    'fallback_mode' => env('GOOGLE_BP_FALLBACK', 'demo'),
+
+    // TTL cache ulasan (detik) — cukup untuk polling 30 detik.
+    'cache_ttl' => 60,
+];
