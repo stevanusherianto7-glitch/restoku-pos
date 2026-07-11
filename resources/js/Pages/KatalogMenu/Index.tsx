@@ -4,7 +4,7 @@ import { router } from '@inertiajs/react';
 
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, formatRupiah } from '../../Components/Shared';
-import { ChefHat, Plus, Upload, Pencil, Trash2, X } from 'lucide-react';
+import { BowlIcon, PlusIcon, UploadIcon, PencilIcon, TrashIcon, XIcon } from '../../Components/icons';
 import { ProductImage } from '../../Components/ProductImage';
 
 type Category = { id: number; name: string };
@@ -161,8 +161,8 @@ export default function KatalogMenu({
                     <Glass className="w-full max-w-5xl p-6 flex flex-col h-[calc(100vh-120px)]">
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
-                                    <ChefHat className="size-5 text-emerald-400" />
+                                <div className="p-2 bg-[var(--color-primary-soft)] border border-[var(--color-primary)]/25 rounded-xl">
+                                    <BowlIcon className="size-5 text-[var(--color-primary)]" />
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-white tracking-tight">
@@ -173,9 +173,9 @@ export default function KatalogMenu({
                             </div>
                             <button
                                 onClick={openAdd}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-semibold shadow-md shadow-blue-500/20 hover:bg-blue-600 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-semibold shadow-md shadow-[var(--color-primary)]/20 hover:bg-[var(--color-primary-hover)] transition-colors"
                             >
-                                <Plus className="size-4" /> Tambah Menu
+                                <PlusIcon className="size-4" /> Tambah Menu
                             </button>
                         </div>
 
@@ -234,22 +234,22 @@ export default function KatalogMenu({
                                                 <h3 className="text-sm font-semibold text-slate-200 mb-1 leading-tight">
                                                     {item.name}
                                                 </h3>
-                                                <p className="text-xs font-mono font-medium text-emerald-400">
+                                                <p className="text-xs font-mono font-medium text-[var(--color-accent)]">
                                                     {formatRupiah(item.price)}
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/5 opacity-80 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => openEdit(item)}
-                                                    className="flex-1 flex justify-center items-center gap-1.5 py-1.5 rounded-lg bg-white/5 hover:bg-blue-500/20 hover:text-blue-400 text-slate-300 text-xs font-medium transition-colors border border-transparent hover:border-blue-500/30"
+                                                    className="flex-1 flex justify-center items-center gap-1.5 py-1.5 rounded-lg bg-white/5 hover:bg-[var(--color-primary)]/20 hover:text-[var(--color-primary)] text-slate-300 text-xs font-medium transition-colors border border-transparent hover:border-[var(--color-primary)]/30"
                                                 >
-                                                    <Pencil className="size-3" /> Edit
+                                                    <PencilIcon className="size-3" /> Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(item.id)}
                                                     className="flex-1 flex justify-center items-center gap-1.5 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-slate-300 text-xs font-medium transition-colors border border-transparent hover:border-red-500/30"
                                                 >
-                                                    <Trash2 className="size-3" /> Hapus
+                                                    <TrashIcon className="size-3" /> Hapus
                                                 </button>
                                             </div>
                                         </div>
@@ -261,7 +261,7 @@ export default function KatalogMenu({
                                 className="mt-6 w-full flex items-center justify-center gap-2 py-4 rounded-2xl border border-dashed border-white/10 bg-white/[0.01] cursor-pointer hover:bg-white/[0.03] hover:border-white/20 transition-all text-slate-500 hover:text-white group"
                             >
                                 <div className="size-10 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Plus className="size-5" />
+                                    <PlusIcon className="size-5" />
                                 </div>
                                 <span className="text-sm font-medium">Tambah Menu Baru</span>
                             </div>
@@ -277,7 +277,7 @@ export default function KatalogMenu({
                                     {editing ? 'Edit Menu' : 'Tambah Menu'}
                                 </h3>
                                 <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-white">
-                                    <X className="size-5" />
+                                    <XIcon className="size-5" />
                                 </button>
                             </div>
                             <div className="space-y-3">
@@ -344,7 +344,7 @@ export default function KatalogMenu({
                                 </label>
                                 <div className="flex items-center gap-3">
                                     <label className="flex-1 cursor-pointer flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-slate-300">
-                                        <Upload className="size-4" /> Upload Foto
+                                        <UploadIcon className="size-4" /> Upload Foto
                                         <input
                                             type="file"
                                             accept="image/*"
@@ -373,7 +373,7 @@ export default function KatalogMenu({
                                 <button
                                     onClick={submit}
                                     disabled={processing}
-                                    className="flex-1 py-2 rounded-lg bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 disabled:opacity-50"
+                                    className="flex-1 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-semibold hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
                                 >
                                     {processing ? 'Menyimpan...' : 'Simpan'}
                                 </button>

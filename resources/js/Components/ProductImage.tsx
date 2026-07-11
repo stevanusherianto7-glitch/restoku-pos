@@ -1,5 +1,25 @@
-import { useState } from 'react';
-import { Utensils } from 'lucide-react';
+import { useState, type SVGProps } from 'react';
+
+type P = SVGProps<SVGSVGElement> & { size?: number };
+
+function UtensilsIcon({ size = 24, ...p }: P) {
+    return (
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            {...p}
+        >
+            <path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2M5 2v20M19 2v7c0 1.1-.9 2-2 2h0a2 2 0 0 1-2-2V2M17 2v20" />
+            <path d="M18 22a3 3 0 0 0-3-3h-1v-2h4v5Z" />
+        </svg>
+    );
+}
 
 type Variant = 'small' | 'medium' | 'large' | 'full';
 
@@ -28,7 +48,7 @@ export function ProductImage({ src, alt, variant = 'medium', className = '' }: P
                 data-testid="fallback-icon"
                 aria-label={alt}
             >
-                <Utensils className="size-6 text-slate-600" />
+                <UtensilsIcon className="size-6 text-slate-600" />
             </div>
         );
     }
