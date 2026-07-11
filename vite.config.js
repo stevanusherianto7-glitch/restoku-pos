@@ -76,12 +76,12 @@ export default defineConfig({
                 'node_modules/**',
             ],
             thresholds: {
-                // Baseline transparan: angka riil terukur (batch 5 naik ke 49%).
+                // Baseline transparan: angka riil terukur (batch 5-6 hardening).
                 // NAIKKAN bertahap tiap batch Page di-test (target akhir 100%).
-                lines: 49,
-                branches: 46,
-                functions: 42,
-                statements: 49,
+                lines: 50,
+                branches: 47,
+                functions: 43,
+                statements: 50,
             },
         },
     },

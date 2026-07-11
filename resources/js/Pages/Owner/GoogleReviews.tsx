@@ -32,6 +32,7 @@ export default function GoogleReviews() {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(false);
     const [syncing, setSyncing] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [filterRating, setFilterRating] = useState<'all' | 'complaints' | 'positive'>('all');
     const [filterStatus, setFilterStatus] = useState<'all' | 'unreplied' | 'replied'>('all');
 
@@ -88,16 +89,22 @@ export default function GoogleReviews() {
     const [replyingToId, setReplyingToId] = useState<number | null>(null);
     const [replyText, setReplyText] = useState('');
     const [generatingAi, setGeneratingAi] = useState(false);
+    const [aiError, setAiError] = useState<string | null>(null);
+    const [replyError, setReplyError] = useState<string | null>(null);
 
     const fetchReviews = async () => {
         setLoading(true);
+        setError(null);
         try {
             const res = await fetch('/api/google-reviews');
             const data = await res.json();
             if (data.status === 'success') {
                 setReviews(data.reviews);
+            } else {
+                setError(data.message || 'Gagal memuat ulasan Google.');
             }
         } catch (err) {
+            setError('Tidak dapat terhubung ke server. Periksa koneksi Anda.');
             console.error(err);
         } finally {
             setLoading(false);
@@ -106,6 +113,7 @@ export default function GoogleReviews() {
 
     const handleSync = async () => {
         setSyncing(true);
+        setError(null);
         try {
             const res = await fetch('/api/google-reviews/sync', {
                 method: 'POST',
@@ -122,8 +130,11 @@ export default function GoogleReviews() {
                 // supaya owner langsung melihat commentary yang butuh tanggapan.
                 const unreplied = (data.reviews as Review[]).filter((r) => !r.reply_text).length;
                 setFilterStatus(unreplied > 0 ? 'unreplied' : 'all');
+            } else {
+                setError(data.message || 'Sinkronisasi gagal. Coba lagi.');
             }
         } catch (err) {
+            setError('Sinkronisasi gagal. Periksa koneksi Anda.');
             console.error(err);
         } finally {
             setSyncing(false);
@@ -132,6 +143,7 @@ export default function GoogleReviews() {
 
     const handleReplySubmit = async (reviewId: number) => {
         if (!replyText.trim()) return;
+        setReplyError(null);
         try {
             const res = await fetch(`/api/google-reviews/${reviewId}/reply`, {
                 method: 'POST',
@@ -147,14 +159,18 @@ export default function GoogleReviews() {
                 setReviews((prev) => prev.map((r) => (r.id === reviewId ? data.review : r)));
                 setReplyingToId(null);
                 setReplyText('');
+            } else {
+                setReplyError(data.message || 'Gagal mengirim balasan.');
             }
         } catch (err) {
+            setReplyError('Gagal mengirim balasan. Periksa koneksi Anda.');
             console.error(err);
         }
     };
 
     const handleAiReplyGenerate = async (reviewId: number) => {
         setGeneratingAi(true);
+        setAiError(null);
         try {
             const res = await fetch(`/api/google-reviews/${reviewId}/generate-ai-reply`, {
                 method: 'POST',
@@ -167,8 +183,12 @@ export default function GoogleReviews() {
             const data = await res.json();
             if (data.status === 'success') {
                 setReplyText(data.reply);
+            } else {
+                // TRANSPARAN: jangan silent fallback. Laporkan kegagalan AI.
+                setAiError(data.message || 'AI gagal membuat balasan. Tulis manual.');
             }
         } catch (err) {
+            setAiError('Layanan AI tidak tersedia saat ini. Tulis balasan manual.');
             console.error(err);
         } finally {
             setGeneratingAi(false);
@@ -197,6 +217,10 @@ export default function GoogleReviews() {
 
     useEffect(() => {
         fetchReviews();
+        // Real-time: poll ulang tiap 30 detik agar ulasan & balasan tetap segar
+        // tanpa intervensi owner (banner "real-time" jadi nyata, bukan klaim).
+        const id = setInterval(fetchReviews, 30000);
+        return () => clearInterval(id);
     }, []);
 
     const filteredReviews = reviews.filter((r) => {
@@ -264,6 +288,20 @@ export default function GoogleReviews() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Error banner — transparan saat fetch/sync gagal */}
+                    {error && (
+                        <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-200">
+                            <AlertCircleIcon className="size-5 shrink-0 text-red-400" />
+                            <span className="text-xs font-medium flex-1">{error}</span>
+                            <button
+                                onClick={fetchReviews}
+                                className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-100 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            >
+                                Coba Lagi
+                            </button>
+                        </div>
+                    )}
 
                     {/* Filters Bar */}
                     <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-black/40 border border-white/5 rounded-xl">
@@ -467,6 +505,14 @@ export default function GoogleReviews() {
                                                             className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                                                         />
 
+                                                        {/* AI error — transparan (tidak silent fallback) */}
+                                                        {aiError && (
+                                                            <div className="flex items-center gap-2 text-[11px] text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                                                <AlertCircleIcon className="size-3.5 shrink-0" />
+                                                                {aiError}
+                                                            </div>
+                                                        )}
+
                                                         <div className="flex justify-end gap-2 text-xs">
                                                             <button
                                                                 onClick={() => {
@@ -485,6 +531,14 @@ export default function GoogleReviews() {
                                                                 <SendIcon className="size-3" /> Kirim Balasan
                                                             </button>
                                                         </div>
+
+                                                        {/* Reply error — transparan saat submit gagal */}
+                                                        {replyError && (
+                                                            <div className="flex items-center gap-2 text-[11px] text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                                                <AlertCircleIcon className="size-3.5 shrink-0" />
+                                                                {replyError}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <div className="flex gap-2">
