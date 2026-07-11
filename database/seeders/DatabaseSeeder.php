@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Create Tenant
         $tenant = Tenant::create([
-            'name' => 'Kedai Nusantara Group',
-            'brand_name' => 'Kedai Nusantara',
-            'email' => 'admin@kedainusantara.com',
+            'name' => 'Pawon Salam',
+            'brand_name' => 'Pawon Salam',
+            'email' => 'admin@pawonsalam.com',
             'phone' => '081234567890',
         ]);
 
@@ -27,17 +27,17 @@ class DatabaseSeeder extends Seeder
         $outlets = [
             Outlet::create([
                 'tenant_id' => $tenant->id,
-                'name' => 'Kedai Nusantara - Sudirman',
-                'address' => 'Jl. Jend. Sudirman No. 1, Jakarta',
+                'name' => 'Pawon Salam - Bandung',
+                'address' => 'Jl. Braga No. 1, Bandung',
             ]),
             Outlet::create([
                 'tenant_id' => $tenant->id,
-                'name' => 'Kedai Nusantara - Kemang',
+                'name' => 'Pawon Salam - Kemang',
                 'address' => 'Jl. Kemang Raya No. 2, Jakarta',
             ]),
             Outlet::create([
                 'tenant_id' => $tenant->id,
-                'name' => 'Kedai Nusantara - PIK',
+                'name' => 'Pawon Salam - PIK',
                 'address' => 'Pantai Indah Kapuk, Jakarta',
             ])
         ];
