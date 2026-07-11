@@ -102,7 +102,13 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 ### 7.3 Modul Tamu / Buku Menu Digital (`BukuMenuDigital/CustomerView`)
 - **Read-only**, tanpa auth.
 - Akses via `/m/{slug}?t={meja}` (slug outlet, label meja bebas).
-- Data nyata dari `/api/menu/{slug}` (Fase 1 — `MOCK_ITEMS` dicabut, fallback graceful bila 0 item).
+- Data nyata dari `/api/menu/{slug}` (`OrderController::getPublicMenu`) — `MOCK_ITEMS`
+  dicabut; fallback graceful ke `FALLBACK_ITEMS` bila 0 item.
+- **Foto menu**: `photo_url` dari `MenuItem` (Cloudinary `secure_url` saat `CLOUDINARY_URL`
+  terisi, atau asset publik akun `demo` saat dev tanpa akun). Tidak ada path mock
+  lokal `/images/*.webp` di produksi.
+- **Seeder**: `MenuSeeder` mengisi 8 menu contoh (Makanan/Minuman/Dessert) + 3 kategori
+  agar e-Menu tidak kosong saat pertama deploy.
 
 ### 7.4 Modul QR Generator (`QRCodeMeja/Index`)
 - Owner pilih outlet → isi **label meja bebas** (1 per baris: `A1`, `01`,
@@ -110,6 +116,20 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 - Generate **QR asli** (`qrcode.react`) per meja → URL `buildMenuUrl(origin,
   slug, label)`.
 - Tombol cetak stiker (A5/A6).
+
+### 7.5 Modul Upload Foto Menu (Owner) — Fase 1
+- Halaman **Katalog Menu** (`KatalogMenu/Index`, auth owner) — data riil dari backend
+  (`MenuController::index` kirim `menuItems` + `outlets` + `categories`), form CRUD
+  (Inertia `router.post/put/delete`) dengan upload foto WebP.
+- **Upload backend signed** (`CloudinaryService::uploadMenuPhoto`):
+  - Secret di server (`.env` `CLOUDINARY_URL`), signature SHA1 manual (raw HTTP, tanpa SDK).
+  - Folder `restoku/{tenant_id}/menu` (isolasi multi-tenant), return `url`+`public_id`.
+  - Optimasi: `f_auto,q_auto` + `eager` thumbnail `c_fill,w_500,h_500`.
+  - Ganti foto → foto lama di-`destroy` (`deleteMenuPhoto`) agar tidak orphan.
+  - Tanpa `CLOUDINARY_URL` → fallback `null` (dev lokal jalan, `ProductImage` placeholder).
+- **Model**: `MenuItem` (`image_path`, `image_public_id`, `photo_url` accessor) +
+  `MenuCategory` (`tenant_id`, `name`, `sort_order`).
+- **Frontend e-Menu**: render `photo_url` via `ProductImage` (Cloudinary `secure_url`).
 
 ---
 
@@ -171,6 +191,8 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 | `reservations` | `tenant_id`, `outlet_id`, … | guest, CSRF-exempt + throttle |
 | `google_reviews` | `tenant_id`, `outlet_id`, `reviewer_photo` | dari API Google |
 | `outlet_settings` | per-outlet config (printer, struk) | `resolveSettings()` fallback |
+| `menu_categories` | `tenant_id`, `name`, `sort_order` | kategori menu (Makanan/Minuman/...) |
+| `menu_items` | `tenant_id`, `outlet_id` (nullable=global), `menu_category_id`, `name`, `price`, `image_path` (Cloudinary `secure_url`), `image_public_id`, `is_available`, `is_popular`, `sort_order` | foto via Cloudinary; `photo_url` accessor |
 
 ---
 
@@ -179,7 +201,7 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 | Fase | Isi | Status |
 |------|-----|--------|
 | **Fase 0** | `+slug` outlets + backfill, auto-outlet-default, redis config, real QR generator, `buildMenuUrl` | ✅ **DONE** (`8013133`) |
-| **Fase 1** | Integrasi data menu nyata (cabut `MOCK_ITEMS`), cache buku menu (Redis), modul upload foto → **Cloudinary**, bulk-create outlet | ✅ **DONE** (`5a05df8`) |
+| **Fase 1** | Integrasi data menu nyata (cabut `MOCK_ITEMS`), cache buku menu (Redis), **modul upload foto → Cloudinary** (`CloudinaryService` signed upload + `MenuItem`/`MenuCategory` + `KatalogMenu` CRUD), **seeder menu contoh** (`MenuSeeder`) agar e-Menu tidak kosong | ✅ **DONE** (`e332650` modul upload + `925b72d` seeder) |
 | **Fase 2** | **Schema-per-tenant** (`TenantConnection` + `UsesTenantConnection` trait 11 model), Redis cache aktif, read replica (`TenantReadConnection`), partisi `orders` by date | ✅ **DONE** (`4e9f9ad`) |
 | **Fase 3** | Daily/monthly rollup owner (`SalesRollupService`, `sales:rollup` scheduler 01:00) — dashboard O(1), bukan query raw 25jt | ✅ **DONE** (`e7ad243`) |
 | **Fase 4** | Cold archive orders >6 bulan (`orders_archive`, `OrderArchiveService`, `orders:archive` scheduler 1/02:00) — partisi aktif tetap kecil | ✅ **DONE** (`de39047`) |
@@ -213,13 +235,20 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 
 - **Platform**: ALL web/PWA, tidak ada native Android.
 - **Deploy**: VPS sewaan (Forge opsional, Vercel tidak relevan).
-- **Foto menu**: Cloudinary wajib.
+- **Foto menu**: Cloudinary wajib. Upload **backend signed** (secret di VPS, signature
+  SHA1 di `CloudinaryService`) — sesuai invarian "foto route ke Cloudinary, secret tidak
+  ke client". Tanpa `CLOUDINARY_URL` → fallback placeholder (dev lokal jalan).
 - **Peran**: Principal SE + Security Architect + QA Lead mengambil alih keputusan teknis.
 - **Status refactor skala 5.000×ratusan**: **READY secara arsitektural** — Fase 0–4 selesai
   (schema-per-tenant + partisi + rollup + cold archive). Prasyarat produksi: VPS dengan
-  Postgres (`DB_SHARDING_ENABLED=true`), Redis jalan, Cloudinary API key terisi.
+  Postgres (`DB_SHARDING_ENABLED=true`), Redis jalan, **`CLOUDINARY_URL` terisi**.
+- **CI**: `CI — Restoku Quality Gate` (ci.yml) = 8/8 GREEN (Secret Scan, PHPUnit, Vitest,
+  Vite Build, Playwright x4). `CodeQL Static Security Analysis` (codeql.yml) **failure by
+  design** — GitHub blokir code scanning di repo **private free** (butuh Pro/public);
+  bukan bug kode, diabaikan.
 
 ---
 
 *PRD disusun berbasis fakta kode per commit `8013133` (Fase 0). Diperbarui pasca
-Fase 1–4 (`5a05df8` / `4e9f9ad` / `e7ad243` / `de39047`) — semua fase skalabilitas SELESAI.*
+Fase 1–4 — modul Cloudinary + seeder menu (`e332650` / `925b72d`), skalabilitas
+(`4e9f9ad` / `e7ad243` / `de39047`) SELESAI.*
