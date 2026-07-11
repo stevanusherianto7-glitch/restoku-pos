@@ -54,7 +54,8 @@ function BukuMenuDigitalInner() {
     const [copied, setCopied] = useState(false);
 
     const selectedOutlet = outlets.find((o) => o.id === selectedOutletId) ?? outlets[0];
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    // Base URL untuk QR/link: env MENU_BASE_URL (dev/LAN/ngrok) → fallback origin browser.
+    const baseUrl = (props.menu_base_url as string) || (typeof window !== 'undefined' ? window.location.origin : '');
     const menuUrl = selectedOutlet ? buildMenuUrl(baseUrl, selectedOutlet.slug) : '';
 
     const tables = useMemo(

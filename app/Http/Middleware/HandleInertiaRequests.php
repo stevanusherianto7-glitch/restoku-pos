@@ -101,6 +101,13 @@ class HandleInertiaRequests extends Middleware
                 ->get()
                 ->toArray() : [],
 
+            // ── Menu Base URL (QR generator) ──────────────────────────────────
+            // Base URL untuk QR buku menu tamu. Kosong → frontend pakai
+            // window.location.origin (benar di produksi/VPS).
+            // Di dev, isi MENU_BASE_URL=http://<IP-LAN>:8000 atau ngrok agar
+            // HP bisa scan QR (localhost tidak reachable dari HP).
+            'menu_base_url' => env('MENU_BASE_URL', ''),
+
             // ── Outlet Settings (Tax Config) ──────────────────────────────────
             // Menggantikan localStorage.getItem("outlet_tax_rate") di POS/Index.tsx
             // Format: { is_tax_active, tax_type, tax_rate, service_charge }

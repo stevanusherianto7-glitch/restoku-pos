@@ -21,6 +21,9 @@ function QRCodeMejaInner() {
 
     const selectedOutlet = outlets.find((o) => o.id === selectedOutletId) ?? outlets[0];
 
+    // Base URL untuk QR: env MENU_BASE_URL (dev/LAN/ngrok) → fallback origin browser.
+    const baseUrl = (props.menu_base_url as string) || (typeof window !== 'undefined' ? window.location.origin : '');
+
     const tables = useMemo(() => {
         return tableInput
             .split('\n')
@@ -28,8 +31,6 @@ function QRCodeMejaInner() {
             .filter(Boolean)
             .slice(0, 200); // batas wajar per cetak
     }, [tableInput]);
-
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
     const tableUrl = (label: string) => (selectedOutlet ? buildMenuUrl(baseUrl, selectedOutlet.slug, label) : '');
 
