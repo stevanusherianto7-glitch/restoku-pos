@@ -110,6 +110,8 @@ export default function CustomerView() {
     const { tenantName, renderLogo, tenantLayout, screenMode } = useTenantSettings();
     const isNanoBanana = screenMode === 'nano-banana' || tenantLayout === 'nano-banana';
     const [tableNumber, setTableNumber] = useState<string | null>(null);
+    // Nama outlet riil dari API /api/menu/{slug} (bukan mock tenantName).
+    const [outletName, setOutletName] = useState<string>(tenantName || 'Outlet');
     const [activeCategory, setActiveCategory] = useState('Makanan');
     const [searchQuery, setSearchQuery] = useState('');
     const [cart, setCart] = useState<Record<number, number>>({});
@@ -132,6 +134,9 @@ export default function CustomerView() {
                     ...m,
                     image: m.photo_url ?? undefined, // map Cloudinary URL ke field `image`
                 }));
+                if (data?.outlet?.name) {
+                    setOutletName(data.outlet.name);
+                }
                 setMenuItems(items.length ? items : FALLBACK_ITEMS);
             })
             .catch(() => setMenuItems(FALLBACK_ITEMS))
@@ -495,7 +500,7 @@ export default function CustomerView() {
 
     return (
         <div className={activeTheme.outer}>
-            <Head title={`E-Menu Premium - ${tenantName}`} />
+            <Head title={`E-Menu Premium - ${outletName}`} />
 
             {/* Operating Hours Alert Banner */}
             {!isOutletOpen && (
@@ -523,7 +528,7 @@ export default function CustomerView() {
                         {renderLogo('size-5 stroke-[2.5] text-slate-950')}
                     </div>
                     <div>
-                        <h1 className="text-sm font-black tracking-tight text-white uppercase">{tenantName}</h1>
+                        <h1 className="text-sm font-black tracking-tight text-white uppercase">{outletName}</h1>
                         <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
                             <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
                             {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
@@ -1256,7 +1261,7 @@ export default function CustomerView() {
             {detailItem && (
                 <MenuDetailSheet
                     item={detailItem}
-                    outletName={tenantName || 'Outlet'}
+                    outletName={outletName}
                     onClose={() => setDetailItem(null)}
                     onAdd={addToCart}
                 />

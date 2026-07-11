@@ -36,13 +36,17 @@ class MenuSeeder extends Seeder
         if (! $tenant) {
             return;
         }
-        $outlet = \App\Models\Outlet::where('tenant_id', $tenant->id)->first();
-        $outletId = $outlet?->id;
+
+        // Seed ke SEMUA outlet aktif (multi-tenant benar): tiap outlet punya
+        // menu sendiri agar e-Menu per-slug tidak kosong saat di-scan tamu.
+        $outlets = \App\Models\Outlet::where('tenant_id', $tenant->id)
+            ->where('is_active', 1)
+            ->get();
 
         $cloudinary = new CloudinaryService;
         $hasConfig = config('services.cloudinary.url');
 
-        // Kategori
+        // Kategori per-tenant (dipakai bersama semua outlet tenant ini).
         $catMakanan = MenuCategory::firstOrCreate(
             ['tenant_id' => $tenant->id, 'name' => 'Makanan'],
             ['sort_order' => 1]
@@ -56,7 +60,7 @@ class MenuSeeder extends Seeder
             ['sort_order' => 3]
         );
 
-        $this->command?->info('Seeding contoh menu...');
+        $this->command?->info('Seeding contoh menu ke '.count($outlets).' outlet aktif...');
 
         $items = [
             ['Nasi Goreng Spesial', 'Nasi goreng dengan telur, ayam, dan sayuran segar.', 28000, $catMakanan->id, 'food', true, true],
@@ -69,28 +73,32 @@ class MenuSeeder extends Seeder
             ['Pudding Cappuccino', 'Pudding lembut rasa cappuccino.', 16000, $catDessert->id, 'cake', true, false],
         ];
 
-        foreach ($items as [$name, $desc, $price, $catId, $demoKey, $available, $popular]) {
-            $imagePath = $hasConfig
-                ? ($this->uploadDemo($cloudinary, $tenant->id, $demoKey, $name) ?? self::DEMO_IMAGES[$demoKey])
-                : self::DEMO_IMAGES[$demoKey];
+        $seeded = 0;
+        foreach ($outlets as $outlet) {
+            foreach ($items as [$name, $desc, $price, $catId, $demoKey, $available, $popular]) {
+                $imagePath = $hasConfig
+                    ? ($this->uploadDemo($cloudinary, $tenant->id, $demoKey, $name) ?? self::DEMO_IMAGES[$demoKey])
+                    : self::DEMO_IMAGES[$demoKey];
 
-            MenuItem::firstOrCreate(
-                ['tenant_id' => $tenant->id, 'name' => $name, 'menu_category_id' => $catId],
-                [
-                    'outlet_id' => $outletId,
-                    'description' => $desc,
-                    'price' => $price,
-                    'image_path' => $imagePath,
-                    'is_available' => $available,
-                    'is_popular' => $popular,
-                    'sort_order' => 0,
-                ]
-            );
+                // Idempoten per outlet: firstOrCreate key outlet_id + name + kategori.
+                MenuItem::firstOrCreate(
+                    ['tenant_id' => $tenant->id, 'outlet_id' => $outlet->id, 'name' => $name, 'menu_category_id' => $catId],
+                    [
+                        'description' => $desc,
+                        'price' => $price,
+                        'image_path' => $imagePath,
+                        'is_available' => $available,
+                        'is_popular' => $popular,
+                        'sort_order' => 0,
+                    ]
+                );
+                $seeded++;
+            }
         }
 
         // Invalidate menu cache agar seeded menu langsung tampil
         Cache::flush();
-        $this->command?->info('Menu contoh selesai di-seed ('.(count($items)).' item).');
+        $this->command?->info('Menu contoh selesai di-seed ('.$seeded.' item di '.count($outlets).' outlet).');
     }
 
     /**
