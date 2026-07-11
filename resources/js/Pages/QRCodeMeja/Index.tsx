@@ -146,7 +146,11 @@ function QRCodeMejaInner() {
 
 export default function QRCodeMeja() {
     return (
-        <RoleGuard allow={['owner', 'manager', 'admin']}>
+        <RoleGuard
+            allowedRoles={['owner', 'manager', 'admin']}
+            pageName="QR Code Meja"
+            allowedRoleLabel="Owner, Manager"
+        >
             <QRCodeMejaInner />
         </RoleGuard>
     );
