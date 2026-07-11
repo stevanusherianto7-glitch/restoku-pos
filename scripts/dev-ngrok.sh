@@ -27,7 +27,17 @@ PORT=8000
 NGROK_API="http://127.0.0.1:4040/api/tunnels"
 ENV_FILE=".env"
 
-# 1. Pastikan php artisan serve jalan di background
+# 0. Bersihkan instance lama (cegah ERR_NGROK_334: dua tunnel ke port sama)
+echo "▶ Membersihkan instance ngrok/serve lama..."
+pkill -f "ngrok http $PORT" 2>/dev/null || true
+for p in $(tasklist.exe 2>/dev/null | grep -i ngrok | awk '{print $2}'); do
+  taskkill.exe /PID "$p" /F >/dev/null 2>&1 || true
+done
+for pid in $(netstat -ano 2>/dev/null | grep ":$PORT.*LISTENING" | awk '{print $5}'); do
+  taskkill.exe /PID "$pid" /F >/dev/null 2>&1 || true
+done
+sleep 2
+set +e  # matikan errexit untuk sisa (ngrok/serve bisa exit non-zero saat di-kill)
 if ! curl -s -o /dev/null "http://127.0.0.1:$PORT"; then
   echo "▶ Memulai php artisan serve (port $PORT)..."
   php artisan serve --host=127.0.0.1 --port="$PORT" >/tmp/restoku_serve.log 2>&1 &
