@@ -15,6 +15,10 @@
 /auth.json
 /node_modules
 /public/build
+
+# Local dev tunnel binary (downloaded, not source)
+/cloudflared.exe
+/cloudflared
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
