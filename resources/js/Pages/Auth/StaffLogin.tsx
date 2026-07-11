@@ -32,7 +32,9 @@ export default function StaffLogin() {
                 const valid = filterValid(parsed);
                 if (valid.length > 0) return valid;
             }
-        } catch {}
+        } catch {
+            // ignore invalid blob storage
+        }
         return [];
     });
 

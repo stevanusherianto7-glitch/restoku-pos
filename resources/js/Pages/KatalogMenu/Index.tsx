@@ -58,7 +58,7 @@ export default function KatalogMenu({
     outlets: Outlet[];
     categories: Category[];
 }) {
-    const [items, setItems] = useState<MenuItemType[]>(menuItems);
+    const [items] = useState<MenuItemType[]>(menuItems);
     const [activeFilter, setActiveFilter] = useState('all');
     const [editing, setEditing] = useState<MenuItemType | null>(null);
     const [showForm, setShowForm] = useState(false);

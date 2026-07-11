@@ -11,7 +11,7 @@ import {
 } from '../icons';
 
 export function ShiftManager() {
-    const [selectedWeek, setSelectedWeek] = useState('06 Jul - 12 Jul 2026');
+    const [selectedWeek] = useState('06 Jul - 12 Jul 2026');
 
     const days = ['Senin 6', 'Selasa 7', 'Rabu 8', 'Kamis 9', 'Jumat 10', 'Sabtu 11', 'Minggu 12'];
 

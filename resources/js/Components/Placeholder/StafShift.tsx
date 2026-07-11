@@ -65,7 +65,9 @@ const loadEmployeesFromStorage = (): Employee[] => {
                         avatar: e.name.slice(0, 2).toUpperCase(),
                     }));
                 }
-            } catch {}
+            } catch {
+                // ignore invalid stored value
+            }
         }
     }
     return [
@@ -130,8 +132,7 @@ const WEEK_DAYS = [
 
 export function StafShift() {
     const [viewType, setViewType] = useState<'monthly' | 'weekly'>('monthly');
-    const [activeTab, setActiveTab] = useState<'shift' | 'karyawan'>('shift');
-    const [selectedMonth, setSelectedMonth] = useState('Juli 2026');
+    const [selectedMonth] = useState('Juli 2026');
     const [effectiveDate, setEffectiveDate] = useState('2026-07-01');
     const [savedSuccess, setSavedSuccess] = useState(false);
     const [activeRole, setActiveRole] = useState<string>('cashier');
@@ -159,7 +160,7 @@ export function StafShift() {
             initial[emp.id] = {};
             MONTH_DAYS.forEach((day) => {
                 // Mock default patterns
-                let shift: ShiftType = 'P';
+                let shift: ShiftType;
                 if (day.isWeekend) {
                     shift = 'O';
                 } else if (emp.role === 'Waiter') {

@@ -118,7 +118,7 @@ export default function CustomerView() {
 
     // Fase 1: menu nyata dari API (graceful fallback ke FALLBACK_ITEMS saat kosong/belum load)
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    const [menuLoading, setMenuLoading] = useState(true);
+    const [, setMenuLoading] = useState(true);
 
     useEffect(() => {
         const outletSlug = (window.location.pathname.split('/m/')[1] ?? '').split('?')[0] ?? '';
@@ -223,7 +223,9 @@ export default function CustomerView() {
                     if (raw) {
                         try {
                             evaluateSchedule(JSON.parse(raw));
-                        } catch {}
+                        } catch {
+                            // ignore malformed schedule payload
+                        }
                     }
                 }
             })
@@ -233,7 +235,9 @@ export default function CustomerView() {
                 if (raw) {
                     try {
                         evaluateSchedule(JSON.parse(raw));
-                    } catch {}
+                    } catch {
+                        // ignore malformed schedule payload
+                    }
                 }
             });
     }, []);

@@ -306,7 +306,7 @@ export function GalleryManager({ onPreviewCustomer }: { onPreviewCustomer?: () =
 }
 
 function GalleryForm({ onBack }: { onBack: () => void }) {
-    const [photos, setPhotos] = useState(MOCK_GALLERY_EVENTS[0].photos); // Dummy photos for demo
+    const [photos] = useState(MOCK_GALLERY_EVENTS[0].photos); // Dummy photos for demo
 
     return (
         <Screen title="Form Event Baru">

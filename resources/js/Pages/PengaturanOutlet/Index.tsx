@@ -204,7 +204,9 @@ function PengaturanOutletInner() {
             if (sJam) {
                 try {
                     setJamOperasional(JSON.parse(sJam));
-                } catch {}
+                } catch {
+                    // ignore malformed jam operasional
+                }
             }
         }
 
@@ -231,7 +233,9 @@ function PengaturanOutletInner() {
                 if (cfg.headerText) setStrukHeader(cfg.headerText);
                 if (cfg.footerText) setStrukFooter(cfg.footerText);
                 if (cfg.paperWidth) setStrukPaperWidth(cfg.paperWidth);
-            } catch {}
+            } catch {
+                // ignore malformed printer config
+            }
         }
     }, [tenant, outlet, dbEmployees, tenantName, tenantLogo, tenantImage, staffOwner, employees]);
 

@@ -14,7 +14,7 @@ interface Table {
 }
 
 export default function TableManagement() {
-    const [tables, setTables] = useState<Table[]>([
+    const [tables] = useState<Table[]>([
         { id: 't1', name: 'Meja 1', capacity: 2, status: 'available' },
         { id: 't2', name: 'Meja 2', capacity: 2, status: 'occupied' },
         { id: 't3', name: 'Meja 3', capacity: 4, status: 'available' },

@@ -146,9 +146,8 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
     const [open, setOpen] = useState(['Utama']);
     const { screenMode } = useTenantSettings();
     const { isLocked: checkLocked, featureLocks } = useSubscription();
-    const { outlet, auth } = usePage<SharedProps>().props;
+    const { auth } = usePage<SharedProps>().props;
     const user = auth?.user;
-    const outletName = outlet?.name ?? 'Pawon Salam';
 
     const isLight = screenMode === 'terang';
     const isGlass = screenMode === 'glassmorphic';

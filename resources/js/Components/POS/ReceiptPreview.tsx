@@ -30,13 +30,6 @@ export function ReceiptPreview({ isOpen, onClose, orderData }: ReceiptPreviewPro
 
     const { tenantName } = useTenantSettings();
 
-    const padRight = (str: string, len: number) => {
-        return str.length >= len ? str.substring(0, len) : str.padEnd(len, ' ');
-    };
-    const padLeft = (str: string, len: number) => {
-        return str.length >= len ? str.substring(0, len) : str.padStart(len, ' ');
-    };
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <Glass className="p-0 w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">

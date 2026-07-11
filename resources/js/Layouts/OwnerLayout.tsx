@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     BarChartIcon,
     UsersIcon,
@@ -13,7 +13,6 @@ import {
 import { PlanBadge, useTenantSettings, TenantBrandLockup } from '../Components/Shared';
 import GeminiCopilotWidget from '../Components/POS/GeminiCopilotWidget';
 import { useSubscription } from '../Hooks/useSubscription';
-import type { SharedProps } from '../Types';
 
 type OwnerNavItem = { name: string; href: string; Icon: React.ElementType };
 
@@ -33,9 +32,7 @@ const ownerNav: OwnerNavItem[] = [
  */
 export default function OwnerLayout({ children }: { children: ReactNode }) {
     const { plan } = useSubscription();
-    const { outlet } = usePage<SharedProps>().props;
     const { screenMode } = useTenantSettings();
-    const outletName = outlet?.name ?? 'Pawon Salam';
 
     const isNanoBanana = screenMode === 'nano-banana';
 

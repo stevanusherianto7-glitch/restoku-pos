@@ -49,7 +49,9 @@ export function PrinterConfig() {
                     paperWidth:
                         cfg.paperWidth === '58mm' || cfg.paperWidth === '80mm' ? cfg.paperWidth : prev.paperWidth,
                 }));
-            } catch {}
+            } catch {
+                // ignore invalid stored config
+            }
         }
 
         fetch('/api/receipt-config')

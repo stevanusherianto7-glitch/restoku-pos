@@ -469,7 +469,7 @@ function RevenueChart({
 
     const pts = data.map((d, i) => `${xPositions[i]},${d.y}`).join(' ');
 
-    let grids: Array<{ y: number; label: string }> = [];
+    let grids: Array<{ y: number; label: string }>;
     if (mode === 'global') {
         if (timeframe === 'today') {
             grids = [
@@ -775,18 +775,18 @@ export default function Dashboard() {
 
     const isGlobal = selectedOutlet === 'Semua Outlet (Global)';
 
-    // Dynamic values based on timeframe and mode
-    let revenueValue = 184500000;
-    let revenueSub = '100 Cabang Aktif (Mtd)';
-    let revenueDelta = '+14.8%';
+    // Dynamic values based on timeframe and mode (assigned in all branches below)
+    let revenueValue: number;
+    let revenueSub: string;
+    let revenueDelta: string;
 
-    let occupancyValue = '3.240 / 4.100';
-    let occupancySub = '79% Kapasitas Terisi Global';
-    let occupancyDelta = '42 mnt/meja';
+    let occupancyValue: string;
+    let occupancySub: string;
+    let occupancyDelta: string;
 
-    let foodCostValue = '28.2%';
-    let foodCostSub = 'Target Ideal < 30.0%';
-    let foodCostDelta = '-0.8% YoY';
+    let foodCostValue: string;
+    let foodCostSub: string;
+    let foodCostDelta: string;
 
     let healthValue = '98 / 100';
     let healthSub = '2 Butuh Audit & Perhatian';
