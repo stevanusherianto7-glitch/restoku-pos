@@ -26,8 +26,8 @@ class FeatureRegistry
      * Plan hierarchy — semakin tinggi angka semakin banyak fitur.
      */
     public const PLAN_HIERARCHY = [
-        'basic'      => 1,
-        'pro'        => 2,
+        'basic' => 1,
+        'pro' => 2,
         'enterprise' => 3,
     ];
 
@@ -38,31 +38,31 @@ class FeatureRegistry
      * Naming convention: snake_case, match dengan route names & sidebar keys.
      */
     public const FEATURE_LOCKS = [
-        // ── Enterprise-only ──────────────────────────────────────────────────
-        'kds'               => 'enterprise',
-        'white_label'       => 'enterprise',
-        'priority_support'  => 'enterprise',
-        'unlimited_outlet'  => 'enterprise',
+        // ── Pro features (operational core) ───────────────────────────────
+        'kds' => 'pro',
+        'white_label' => 'enterprise',
+        'priority_support' => 'enterprise',
+        'unlimited_outlet' => 'enterprise',
 
         // ── Pro features ──────────────────────────────────────────────────────
-        'multi_outlet'         => 'pro',
-        'wa_notif'             => 'pro',
-        'laporan_excel'        => 'pro',
-        'perbandingan_outlet'  => 'pro',
-        'arus_kas'             => 'pro',
-        'auto_print'           => 'pro',
-        'ppn_tax'              => 'pro',
-        'service_charge'       => 'pro',
-        'gofood_sync'          => 'pro',
-        'grab_sync'            => 'pro',
-        'shopeefood_sync'      => 'pro',
-        'staf_shift'           => 'pro',
-        'stok_opname'          => 'pro',
-        'pembelian_vendor'     => 'pro',
-        'dashboard_inventory'  => 'pro',
-        'inventory'            => 'pro',
-        'cashier_session'      => 'pro',
-        'refund_void'          => 'pro',
+        'multi_outlet' => 'pro',
+        'wa_notif' => 'pro',
+        'laporan_excel' => 'pro',
+        'perbandingan_outlet' => 'pro',
+        'arus_kas' => 'pro',
+        'auto_print' => 'pro',
+        'ppn_tax' => 'pro',
+        'service_charge' => 'pro',
+        'gofood_sync' => 'pro',
+        'grab_sync' => 'pro',
+        'shopeefood_sync' => 'pro',
+        'staf_shift' => 'pro',
+        'stok_opname' => 'pro',
+        'pembelian_vendor' => 'pro',
+        'dashboard_inventory' => 'pro',
+        'inventory' => 'pro',
+        'cashier_session' => 'pro',
+        'refund_void' => 'pro',
     ];
 
     /**
@@ -84,6 +84,7 @@ class FeatureRegistry
             'perbandingan_outlet', 'arus_kas', 'staf_shift',
             'stok_opname', 'pembelian_vendor', 'dashboard_inventory',
             'inventory', 'cashier_session', 'refund_void',
+            'kds',
         ],
         'enterprise' => [
             // Semua fitur pro
@@ -109,6 +110,7 @@ class FeatureRegistry
     public static function planHasFeature(string $plan, string $feature): bool
     {
         $features = self::PLAN_FEATURES[$plan] ?? [];
+
         return in_array($feature, $features, strict: true);
     }
 
@@ -134,8 +136,9 @@ class FeatureRegistry
      */
     public static function planMeetsRequirement(string $userPlan, string $requiredPlan): bool
     {
-        $userLevel     = self::PLAN_HIERARCHY[$userPlan]     ?? 0;
+        $userLevel = self::PLAN_HIERARCHY[$userPlan] ?? 0;
         $requiredLevel = self::PLAN_HIERARCHY[$requiredPlan] ?? 999;
+
         return $userLevel >= $requiredLevel;
     }
 

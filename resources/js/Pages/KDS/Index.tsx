@@ -1,18 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, cardToneMap, type Tone } from '../../Components/Shared';
-import { Clock3, CheckCheck, Volume2, VolumeX, ChefHat, Utensils, Flame, ShieldAlert } from 'lucide-react';
+import {
+    ClockIcon,
+    CheckCheckIcon,
+    VolumeIcon,
+    VolumeMuteIcon,
+    ChefHatIcon,
+    UtensilsIcon,
+    FlameIcon,
+    ShieldAlertIcon,
+} from '../../Components/icons';
 
 type KdsOrder = { id: string; table: string; status: string; tone: Tone; time: number; items: string[] };
 
 const AUTHORIZED_ROLES = ['kitchen', 'waiter', 'manager', 'owner'];
 
 export default function KDS() {
+    const { auth } = usePage<{ auth: { user: { role: string } } }>().props;
     const [roleChecked, setRoleChecked] = useState(false);
     const [authorized, setAuthorized] = useState(false);
 
     useEffect(() => {
+        // Owner selalu diizinkan (lihat dashboard KDS dari Owner View).
+        if (auth?.user?.role === 'owner') {
+            setAuthorized(true);
+            setRoleChecked(true);
+            return;
+        }
         const raw = localStorage.getItem('activeKaryawan');
         if (raw) {
             try {
@@ -35,7 +51,7 @@ export default function KDS() {
                 <Head title="Akses Ditolak — KDS" />
                 <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
                     <div className="p-5 rounded-full bg-red-500/10 border border-red-500/20">
-                        <ShieldAlert className="size-12 text-red-400" />
+                        <ShieldAlertIcon className="size-12 text-red-400" />
                     </div>
                     <div className="space-y-2">
                         <h1 className="text-2xl font-bold text-white">Akses Ditolak</h1>
@@ -151,11 +167,11 @@ function KDSContent() {
                         onClick={() => setIsTtsEnabled(!isTtsEnabled)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${
                             isTtsEnabled
-                                ? 'bg-blue-500/20 text-blue-300 border-blue-500/30 hover:bg-blue-500/30'
+                                ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/30'
                                 : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-200'
                         }`}
                     >
-                        {isTtsEnabled ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
+                        {isTtsEnabled ? <VolumeIcon className="size-5" /> : <VolumeMuteIcon className="size-5" />}
                         <span className="text-sm font-medium pr-1">Suara Pesanan (TTS)</span>
                     </button>
                 }
@@ -165,7 +181,7 @@ function KDSContent() {
                     <div className="mb-6 bg-slate-950/40 border border-white/5 rounded-3xl p-5 flex items-center justify-between font-mono">
                         <div className="flex items-center gap-3">
                             <div className="size-10 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
-                                <Flame className="size-5 animate-pulse" />
+                                <FlameIcon className="size-5 animate-pulse" />
                             </div>
                             <div>
                                 <h3 className="text-sm font-black text-slate-200 uppercase tracking-wider">
@@ -217,14 +233,14 @@ function KDSContent() {
                                                                 </span>
                                                             </span>
                                                         ) : (
-                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-black uppercase tracking-wider">
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 text-[var(--color-primary)] text-xs font-black uppercase tracking-wider">
                                                                 🍽️ DINE IN
                                                             </span>
                                                         )}
                                                     </div>
                                                 </div>
                                                 <span className="font-mono text-4xl opacity-90 flex items-center gap-2 font-bold bg-black/20 px-3 py-2 rounded-xl">
-                                                    <Clock3 className="size-8" />
+                                                    <ClockIcon className="size-8" />
                                                     {o.time}'
                                                 </span>
                                             </div>
@@ -250,23 +266,23 @@ function KDSContent() {
                                                     onClick={() => updateStatus(o.id, nextStatus)}
                                                     className="mt-6 w-full rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 py-4 text-2xl font-bold text-emerald-200 transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
                                                 >
-                                                    <CheckCheck className="size-6" /> KONFIRMASI SAJIKAN
+                                                    <CheckCheckIcon className="size-6" /> KONFIRMASI SAJIKAN
                                                 </button>
                                             )}
                                             {tone === 'blue' && (
                                                 <button
                                                     onClick={() => updateStatus(o.id, nextStatus)}
-                                                    className="mt-6 w-full rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 py-4 text-2xl font-bold text-blue-200 transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
+                                                    className="mt-6 w-full rounded-xl bg-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/30 border border-[var(--color-primary)]/30 py-4 text-2xl font-bold text-[var(--color-primary)] transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
                                                 >
-                                                    <Utensils className="size-6" /> SELESAI MASAK
+                                                    <UtensilsIcon className="size-6" /> SELESAI MASAK
                                                 </button>
                                             )}
                                             {tone === 'amber' && (
                                                 <button
                                                     onClick={() => updateStatus(o.id, nextStatus)}
-                                                    className="mt-6 w-full rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 py-4 text-2xl font-bold text-blue-200 transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
+                                                    className="mt-6 w-full rounded-xl bg-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/30 border border-[var(--color-primary)]/30 py-4 text-2xl font-bold text-[var(--color-primary)] transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
                                                 >
-                                                    <ChefHat className="size-6" /> MULAI MASAK
+                                                    <ChefHatIcon className="size-6" /> MULAI MASAK
                                                 </button>
                                             )}
                                         </div>
