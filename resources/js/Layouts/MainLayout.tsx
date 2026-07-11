@@ -148,7 +148,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
     const { isLocked: checkLocked, featureLocks } = useSubscription();
     const { outlet, auth } = usePage<SharedProps>().props;
     const user = auth?.user;
-    const outletName = outlet?.name ?? 'Senopati';
+    const outletName = outlet?.name ?? 'Pawon Salam';
 
     const isLight = screenMode === 'terang';
     const isGlass = screenMode === 'glassmorphic';

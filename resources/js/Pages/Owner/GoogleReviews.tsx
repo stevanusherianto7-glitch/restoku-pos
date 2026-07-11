@@ -77,7 +77,7 @@ export default function GoogleReviews() {
             setHelperMessage('Ditemukan: Pawon Salam Resto (Bandung) -> Place ID: ChIJmVwPLWHdaC4RzzPOd0s88Qk');
         } else if (query.includes('kenangan') || query.includes('senopati')) {
             setPlaceId('ChIJrTLr-GzsaS4R350O6vCqzw4');
-            setHelperMessage('Ditemukan: Kopi Kenangan Senopati -> Place ID: ChIJrTLr-GzsaS4R350O6vCqzw4');
+            setHelperMessage('Ditemukan: Kopi Kenangan Sudirman -> Place ID: ChIJrTLr-GzsaS4R350O6vCqzw4');
         } else {
             const hash = Math.abs(query.split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0));
             const generated = 'ChIJ' + hash.toString(36).toUpperCase() + 'RESTO';

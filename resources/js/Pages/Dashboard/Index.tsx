@@ -987,7 +987,7 @@ export default function Dashboard() {
         },
         {
             rank: 2,
-            name: 'Kedai Nusantara - Senopati',
+            name: 'Pawon Salam - Bandung',
             city: 'Jakarta Selatan',
             rev:
                 timeframe === 'today'

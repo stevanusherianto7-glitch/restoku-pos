@@ -6,7 +6,7 @@ import type { Plan } from '../Types';
 
 // ─── Session Mock (replace with real auth/session later) ──────────────────────
 export const MOCK_PLAN: Plan = 'pro';
-export const MOCK_OUTLET = 'Senopati';
+export const MOCK_OUTLET = 'Pawon Salam';
 export const MOCK_OUTLET_ID = 'outlet-01';
 export const MOCK_TRIAL_DAYS_LEFT = 0; // 0 = already paid/subscribed
 

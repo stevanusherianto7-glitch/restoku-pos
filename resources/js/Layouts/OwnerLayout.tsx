@@ -26,7 +26,7 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
     const { plan } = useSubscription();
     const { outlet } = usePage<SharedProps>().props;
     const { screenMode } = useTenantSettings();
-    const outletName = outlet?.name ?? 'Senopati';
+    const outletName = outlet?.name ?? 'Pawon Salam';
 
     const isNanoBanana = screenMode === 'nano-banana';
 

@@ -76,13 +76,13 @@ function PengaturanOutletInner() {
     const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
 
     // Address and geolocation states
-    const [alamatInput, setAlamatInput] = useState('Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan 12190');
+    const [alamatInput, setAlamatInput] = useState('Jl. Braga No. 1, Bandung');
     const [latitudeInput, setLatitudeInput] = useState('-6.223847');
     const [longitudeInput, setLongitudeInput] = useState('106.808162');
     const [isFetchingGeo, setIsFetchingGeo] = useState(false);
 
     // ─── NEW: Outlet Profile States ───────────────────────────────────────────
-    const [namaOutletInput, setNamaOutletInput] = useState('Restoku Senopati');
+    const [namaOutletInput, setNamaOutletInput] = useState('Pawon Salam - Bandung');
     const [teleponInput, setTeleponInput] = useState('021-1234-5678');
     const [npwpInput, setNpwpInput] = useState('01.234.567.8-012.000');
     const [nibInput, setNibInput] = useState('9120123456789');
@@ -642,7 +642,7 @@ function PengaturanOutletInner() {
                                                 <input
                                                     value={namaOutletInput}
                                                     onChange={(e) => setNamaOutletInput(e.target.value)}
-                                                    placeholder="e.g. Senopati / Cabang Senopati"
+                                                    placeholder="e.g. Bandung / Cabang Utama"
                                                     className={inputClass}
                                                 />
                                             </div>
@@ -917,7 +917,7 @@ function PengaturanOutletInner() {
                                         <input
                                             value={namaOutletInput}
                                             onChange={(e) => setNamaOutletInput(e.target.value)}
-                                            placeholder="e.g. Senopati / Cabang Senopati"
+                                            placeholder="e.g. Bandung / Cabang Utama"
                                             className={inputClass}
                                         />
                                     </div>

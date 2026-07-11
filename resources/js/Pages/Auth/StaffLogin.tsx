@@ -122,7 +122,7 @@ export default function StaffLogin() {
                         <RestokuWordmark className="h-9 w-auto brightness-110" />
                         <div>
                             <div className="text-xl font-bold text-white tracking-tight">{tenantName} OS</div>
-                            <div className="text-xs text-slate-500 uppercase tracking-wider">Cabang Senopati</div>
+                            <div className="text-xs text-slate-500 uppercase tracking-wider">Cabang Pawon Salam</div>
                         </div>
                     </div>
 

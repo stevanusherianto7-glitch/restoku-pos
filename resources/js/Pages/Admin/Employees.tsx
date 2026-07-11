@@ -79,7 +79,7 @@ export default function AdminEmployeesPage() {
                         JADWAL SHIFT
                     </Link>
                 </div>
-                <div className="text-xs text-slate-400">Cabang Senopati</div>
+                <div className="text-xs text-slate-400">Cabang Pawon Salam</div>
             </div>
 
             <EmployeeMaster />

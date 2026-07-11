@@ -35,7 +35,7 @@ export function Screen({
 }: ScreenProps) {
     const { screenMode } = useTenantSettings();
     const { outlet } = usePage<SharedProps>().props;
-    const outletName = outlet?.name ?? 'Senopati';
+    const outletName = outlet?.name ?? 'Pawon Salam';
     const isLight = screenMode === 'terang';
 
     return (
