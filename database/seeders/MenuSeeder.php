@@ -21,13 +21,13 @@ use Illuminate\Support\Facades\Cache;
 class MenuSeeder extends Seeder
 {
     // Public sample images dari akun Cloudinary "demo" (terbuka, tidak butuh auth).
+    // HANYA key yang terverifikasi live (HTTP 200) — key lain (food/burger/breakfast/
+    // cake/salad/dll) 404 di demo cloud dan memicu fallback ikon di e-Menu.
     private const DEMO_IMAGES = [
         'sample' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/sample.jpg',
-        'food' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/food.jpg',
         'coffee' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/coffee.jpg',
-        'breakfast' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/breakfast.jpg',
-        'cake' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/cake.jpg',
-        'burger' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/burger.jpg',
+        'pizza' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/pizza.jpg',
+        'fruit' => 'https://res.cloudinary.com/demo/image/upload/c_fill,w_500,h_500,f_auto,q_auto/fruit.jpg',
     ];
 
     public function run(): void
@@ -63,14 +63,14 @@ class MenuSeeder extends Seeder
         $this->command?->info('Seeding contoh menu ke '.count($outlets).' outlet aktif...');
 
         $items = [
-            ['Nasi Goreng Spesial', 'Nasi goreng dengan telur, ayam, dan sayuran segar.', 28000, $catMakanan->id, 'food', true, true],
-            ['Ayam Penyet', 'Ayam goreng penyet dengan sambal pedas khas.', 32000, $catMakanan->id, 'burger', true, false],
-            ['Soto Ayam Lamongan', 'Soto ayam kuning dengan kuah bening dan koya.', 25000, $catMakanan->id, 'breakfast', true, false],
+            ['Nasi Goreng Spesial', 'Nasi goreng dengan telur, ayam, dan sayuran segar.', 28000, $catMakanan->id, 'pizza', true, true],
+            ['Ayam Penyet', 'Ayam goreng penyet dengan sambal pedas khas.', 32000, $catMakanan->id, 'pizza', true, false],
+            ['Soto Ayam Lamongan', 'Soto ayam kuning dengan kuah bening dan koya.', 25000, $catMakanan->id, 'sample', true, false],
             ['Es Teh Manis', 'Teh manis dingin segar.', 8000, $catMinuman->id, 'coffee', true, true],
             ['Kopi Susu Gula Aren', 'Kopi susu dengan gula aren cair.', 18000, $catMinuman->id, 'coffee', true, false],
-            ['Jus Alpukat', 'Jus alpukat segar dengan sedikit susu.', 15000, $catMinuman->id, 'food', true, false],
-            ['Brownies Lava', 'Brownies hangat dengan lelehan cokelat.', 22000, $catDessert->id, 'cake', true, false],
-            ['Pudding Cappuccino', 'Pudding lembut rasa cappuccino.', 16000, $catDessert->id, 'cake', true, false],
+            ['Jus Alpukat', 'Jus alpukat segar dengan sedikit susu.', 15000, $catMinuman->id, 'fruit', true, false],
+            ['Brownies Lava', 'Brownies hangat dengan lelehan cokelat.', 22000, $catDessert->id, 'fruit', true, false],
+            ['Pudding Cappuccino', 'Pudding lembut rasa cappuccino.', 16000, $catDessert->id, 'fruit', true, false],
         ];
 
         $seeded = 0;

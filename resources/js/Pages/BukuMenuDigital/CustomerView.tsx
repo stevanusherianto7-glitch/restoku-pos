@@ -128,6 +128,8 @@ export default function CustomerView() {
             .then((data) => {
                 const items: MenuItem[] = (data?.menu ?? []).map((m: any) => ({
                     ...m,
+                    // API returns category as {id,name}; UI filter expects string name.
+                    category: m.category?.name ?? m.category ?? '',
                     image: m.photo_url ?? undefined, // map Cloudinary URL ke field `image`
                 }));
                 if (data?.outlet?.name) {
