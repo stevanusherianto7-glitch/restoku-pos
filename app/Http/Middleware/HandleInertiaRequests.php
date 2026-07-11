@@ -88,10 +88,16 @@ class HandleInertiaRequests extends Middleware
             ] : null,
 
             // ── Outlet ────────────────────────────────────────────────────────
-            'outlet' => $user ? [
-                'id' => $user->outlet_id,
-                'name' => $user->outlet?->name,
-            ] : null,
+            // Fallback ke outlet pertama tenant kalau user belum di-bind ke outlet
+            // (agar header "· Outlet ..." ikut brand, bukan mock 'Senopati').
+            'outlet' => $user ? (function () use ($user, $ctx) {
+                $outlet = $user->outlet;
+                if (! $outlet && $ctx) {
+                    $outlet = Outlet::where('tenant_id', $ctx->tenantId())->first();
+                }
+
+                return $outlet ? ['id' => $outlet->id, 'name' => $outlet->name] : null;
+            })() : null,
 
             // ── Outlets (untuk QR generator) ──────────────────────────────────
             // Daftar outlet milik tenant (TenantScope aktif → hanya outlet tenant ini).

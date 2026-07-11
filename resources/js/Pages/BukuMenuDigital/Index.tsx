@@ -251,7 +251,7 @@ function BukuMenuDigitalInner() {
                                     </label>
                                     <textarea
                                         className="w-full h-20 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none focus:border-white/20 transition-colors resize-none"
-                                        defaultValue="Selamat datang di Restoku Senopati. Silakan pesan langsung melalui e-menu ini."
+                                        defaultValue={`Selamat datang di ${selectedOutlet?.name ?? 'Restoku'}. Silakan pesan langsung melalui e-menu ini.`}
                                     />
                                 </div>
                             </div>
@@ -276,9 +276,11 @@ function BukuMenuDigitalInner() {
                                 </div>
                             </div>
                             <div className="pt-8 px-5 pb-4 bg-white shadow-sm relative z-10">
-                                <h3 className="text-lg font-bold text-slate-900 tracking-tight">Restoku Senopati</h3>
+                                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                                    {selectedOutlet?.name ?? 'Restoku'}
+                                </h3>
                                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                                    Selamat datang di Restoku Senopati.
+                                    Selamat datang di {selectedOutlet?.name ?? 'Restoku'}.
                                 </p>
                             </div>
                             <div className="flex gap-2 overflow-x-auto px-5 py-3 border-b border-slate-100 bg-[#f8fafc]">
