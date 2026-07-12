@@ -119,6 +119,22 @@ class HandleInertiaRequests extends Middleware
             // Format: { is_tax_active, tax_type, tax_rate, service_charge }
             'outlet_settings' => $taxConfig,
 
+            // ── Outlet Geo (untuk verifikasi geolokasi kasir di POS) ──────────
+            // Koordinat + radius outlet aktif (sudah ada di model Outlet).
+            // Dipakai widget GeoPinVerify di pojok kanan atas dashboard kasir.
+            'outlet_geo' => $user ? (function () use ($user, $ctx) {
+                $outlet = $user->outlet;
+                if (! $outlet && $ctx) {
+                    $outlet = Outlet::where('tenant_id', $ctx->id())->first();
+                }
+
+                return $outlet ? [
+                    'latitude' => $outlet->latitude ? (float) $outlet->latitude : null,
+                    'longitude' => $outlet->longitude ? (float) $outlet->longitude : null,
+                    'geo_radius_meters' => (int) ($outlet->geo_radius_meters ?? 50),
+                ] : null;
+            })() : null,
+
             // ── Login Employees ───────────────────────────────────────────────
             // Tersedia di halaman /login untuk StaffLogin PIN verification.
             // Hanya share pada halaman login — null di halaman lain (efisiensi).

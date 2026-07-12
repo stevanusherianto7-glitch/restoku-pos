@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CashierGeoVerifyController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\GeminiAiController;
@@ -169,3 +170,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::post('/api/google-reviews/{id}/generate-ai-reply', [GoogleReviewController::class, 'generateAiReply']);
     Route::post('/api/google-reviews/settings',      [GoogleReviewController::class, 'saveSettings']);
 });
+
+// ── Kasir: Verifikasi Geolokasi (PIN harian + GPS) ───────────────────────────
+Route::get('/owner/outlet/daily-pin',        [CashierGeoVerifyController::class, 'dailyPin']);
+Route::post('/api/cashier/verify-location',  [CashierGeoVerifyController::class, 'verify'])
+    ->middleware('throttle:10,1');
