@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mockup — Buku Menu Digital (format screenshot, brand Restoku)</title>
+<style>
+  :root{
+    --cabe:#FF5B35; --cabe-dk:#E04E2B; --gold:#F59E0B; --gold-dk:#D97706;
+    --cream:#FAF5EE; --cream2:#FFF3EC; --choco:#2A1E16; --ink:#1A1410;
+    --line:rgba(26,20,16,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+  body{background:#EDE7DF;color:var(--ink);padding:28px;display:flex;flex-direction:column;gap:34px;align-items:center}
+  .note{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a7d70;font-weight:700}
+  .suite{display:flex;flex-wrap:wrap;gap:26px;justify-content:center;align-items:flex-start}
+  .phone{width:380px;height:760px;background:var(--cream);border-radius:34px;overflow:hidden;position:relative;box-shadow:0 18px 50px rgba(0,0,0,.22);border:1px solid var(--line)}
+  .phone .scr{position:absolute;inset:0;overflow:hidden;display:flex;flex-direction:column}
+  .label{position:absolute;top:-22px;left:8px;font-size:11px;font-weight:700;color:#9b8d7e;letter-spacing:.05em}
+
+  /* ---------- Owner QR panel (desktop) ---------- */
+  .owner{width:760px;background:#fff;border-radius:20px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.18);border:1px solid var(--line)}
+  .owner h2{font-size:22px;font-weight:800}
+  .owner .sub{color:#7a6f63;font-size:13px;margin-top:4px}
+  .row{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:12px;flex-wrap:wrap}
+  .btn-cabe{background:var(--cabe);color:#fff;border:none;border-radius:12px;padding:11px 16px;font-weight:700;font-size:13px;display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+  .btn-ghost{background:var(--cream2);color:var(--cabe-dk);border:1px solid #f0d9c8;border-radius:12px;padding:11px 16px;font-weight:700;font-size:13px;display:inline-flex;gap:8px;align-items:center}
+  .sel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px}
+  .info{background:#F3EEF8;border:1px solid #E4D8F2;border-radius:14px;padding:14px;font-size:12.5px;color:#4a3f5e;margin-top:16px;line-height:1.6}
+  .info b{color:#3a2f4e}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+  .card .nm{font-weight:800;font-size:14px;margin-bottom:10px}
+  .qr{width:120px;height:120px;margin:0 auto;background:
+    repeating-conic-gradient(#1A1410 0 25%, #fff 0 50%) 0/14px 14px;
+    border-radius:8px;border:6px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .url{font-size:10.5px;color:#8a7d70;margin-top:10px;word-break:break-all;font-family:ui-monospace,monospace}
+  .acts{display:flex;gap:8px;margin-top:12px}
+  .acts button{flex:1;background:var(--cream2);border:1px solid #f0d9c8;border-radius:10px;padding:8px;font-size:11.5px;font-weight:700;color:var(--cabe-dk);cursor:pointer}
+
+  /* ---------- Customer shared ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:9px}
+  .logo{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--cabe),var(--cabe-dk));display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px}
+  .brand .nm{font-weight:800;font-size:14px;line-height:1}
+  .brand .sm{font-size:10px;color:#8a7d70}
+  .halal{width:30px;height:30px;border-radius:8px;background:#0f8a4d;color:#fff;display:grid;place-items:center;font-size:9px;font-weight:800;text-align:center;line-height:1}
+
+  .offline{background:#FBE7D6;color:#a8521f;font-size:11.5px;font-weight:600;padding:8px 14px;display:flex;gap:8px;align-items:center}
+
+  .tabs{display:flex;gap:6px;padding:10px 14px;background:#fff}
+  .tab{flex:1;text-align:center;padding:9px;border-radius:11px;font-size:12.5px;font-weight:700;color:#9b8d7e}
+  .tab.on{background:var(--cream2);color:var(--cabe-dk)}
+
+  .pills{display:flex;gap:8px;padding:10px 14px;overflow:hidden}
+  .pill{background:#fff;border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:#7a6f63}
+  .pill.on{background:var(--cabe);color:#fff;border-color:var(--cabe)}
+
+  .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 14px;overflow:auto}
+  .mitem{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .thumb{height:96px;background:linear-gradient(135deg,#ffd9a8,#ffb877);display:grid;place-items:center;font-size:34px}
+  .mitem .body{padding:9px 11px}
+  .tag{display:inline-block;background:var(--cabe);color:#fff;font-size:9px;font-weight:800;border-radius:10px;padding:2px 8px;margin-bottom:5px}
+  .mitem .mn{font-weight:800;font-size:12.5px}
+  .mitem .mp{color:var(--gold-dk);font-weight:800;font-size:12.5px;margin-top:3px}
+
+  /* modal */
+  .overlay{position:absolute;inset:0;background:rgba(20,15,11,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5}
+  .modal{width:100%;background:var(--choco);border-radius:22px;padding:22px;color:#fff;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:18px 18px}
+  .modal .ey{font-size:10px;letter-spacing:.22em;color:var(--gold);font-weight:700;text-transform:uppercase}
+  .modal h3{font-family:Georgia,serif;font-size:24px;margin-top:8px;line-height:1.15}
+  .modal h3 .it{color:var(--gold);font-style:italic}
+  .modal .rule{height:1px;background:var(--gold);opacity:.5;margin:14px 0}
+  .modal p{font-size:12.5px;color:#e9dfd3;line-height:1.6}
+  .feat{display:flex;gap:10px;margin-top:14px}
+  .feat .ic{width:34px;height:34px;border-radius:9px;border:1px solid rgba(245,158,11,.5);display:grid;place-items:center;color:var(--gold);font-size:16px;flex:none}
+  .feat .ft{font-weight:800;font-size:12.5px}
+  .feat .fd{font-size:11px;color:#cbbcae}
+  .cta{margin-top:18px;width:100%;background:var(--gold);color:var(--choco);border:none;border-radius:13px;padding:13px;font-weight:800;font-size:13px;display:flex;justify-content:center;gap:8px;align-items:center;cursor:pointer}
+  .cr{text-align:center;font-size:10px;color:#9b8d7e;margin-top:12px}
+
+  /* welcome */
+  .wel{background:#fff;flex:1;display:flex;flex-direction:column;align-items:center;padding:26px 20px;gap:14px;text-align:center}
+  .wlogos{display:flex;align-items:center;gap:12px}
+  .wlogo{width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--cabe),var(--cabe-dk));display:grid;place-items:center;color:#fff;font-weight:800}
+  .wt{font-size:20px;font-weight:800}
+  .wt .o{color:var(--cabe)}
+  .wdesc{font-size:12px;color:#7a6f63;line-height:1.6}
+  .mejabox{width:100%;background:var(--cream2);border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center;text-align:left}
+  .mejabox .lab{font-size:10px;letter-spacing:.1em;color:#a8521f;font-weight:800;display:flex;gap:6px;align-items:center}
+  .mejabox .val{font-size:18px;font-weight:800;margin-top:3px}
+  .mejabox .badge{background:#e6f6ec;color:#0f8a4d;border-radius:20px;padding:5px 10px;font-size:10.5px;font-weight:800;display:flex;gap:5px;align-items:center}
+  .otype{width:100%}
+  .otype .h{font-size:11px;letter-spacing:.12em;color:#8a7d70;font-weight:800;text-align:left;margin-bottom:8px}
+  .obtns{display:flex;gap:12px}
+  .obtn{flex:1;border-radius:16px;padding:18px 12px;color:#fff;text-align:center;font-weight:800;border:3px solid transparent}
+  .obtn.sel{border-color:var(--cabe)}
+  .obtn .os{font-size:11px;font-weight:600;opacity:.9;margin-top:4px}
+  .obtn.dine{background:linear-gradient(135deg,#7c3aed,#FF5B35)}
+  .obtn.take{background:linear-gradient(135deg,#db2777,#f97316)}
+  .wcta{width:100%;background:var(--cabe);color:#fff;border:none;border-radius:14px;padding:15px;font-weight:800;font-size:14px;display:flex;justify-content:center;gap:8px;cursor:pointer}
+
+  /* cara memesan */
+  .cm{background:#fff;flex:1;padding:22px 18px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+  .cm .h{text-align:center;font-size:18px;font-weight:800}
+  .cm .s{text-align:center;font-size:12px;color:#7a6f63;margin-top:2px}
+  .step{border-radius:14px;padding:12px;display:flex;gap:12px;align-items:flex-start}
+  .step .n{width:26px;height:26px;border-radius:50%;color:#fff;font-weight:800;display:grid;place-items:center;font-size:12px;flex:none}
+  .step.p .n{background:#7c3aed}.step.p{background:#F4EEFD}
+  .step.o .n{background:var(--cabe)}.step.o{background:#FFF1E9}
+  .step.g .n{background:#0f8a4d}.step.g{background:#EAF7EF}
+  .step .t{font-weight:800;font-size:13px}
+  .step .d{font-size:11px;color:#7a6f63;margin-top:2px}
+  .otype-row{display:flex;justify-content:space-between;align-items:center;background:var(--cream2);border-radius:12px;padding:12px;font-size:12px}
+  .otype-row a{color:var(--cabe);font-weight:800}
+  .cm .cta{background:linear-gradient(135deg,#7c3aed,#3b82f6);margin-top:auto}
+
+  /* galeri */
+  .gal{padding:16px 14px;overflow:auto}
+  .gal .h{display:flex;gap:8px;align-items:center;font-weight:800;font-size:15px;margin-bottom:4px}
+  .gal .d{font-size:11.5px;color:#7a6f63;margin-bottom:14px;line-height:1.5}
+  .gev{border-radius:16px;overflow:hidden;background:#fff;border:1px solid var(--line);margin-bottom:14px}
+  .gev .ph{height:130px;background:linear-gradient(135deg,#cdb4f0,#ffd9a8);position:relative;display:grid;place-items:center;font-size:30px}
+  .gev .tg{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:800;border-radius:8px;padding:3px 8px;letter-spacing:.08em}
+  .gev .gb{padding:12px}
+  .gev .gt{font-weight:800;font-size:13.5px;display:flex;justify-content:space-between}
+  .gev .gd{font-size:11px;color:#7a6f63;margin-top:5px;line-height:1.5}
+
+  /* reservasi */
+  .res{padding:16px 14px;overflow:auto}
+  .res .h{font-weight:800;font-size:15px;display:flex;gap:8px;align-items:center}
+  .res .d{font-size:11.5px;color:#7a6f63;margin:6px 0 14px;line-height:1.5}
+  .fld{margin-bottom:12px}
+  .fld label{font-size:11px;font-weight:700;color:#5a4f43;display:block;margin-bottom:5px}
+  .fld label .req{color:var(--cabe)}
+  .fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 12px;font-size:13px;background:#fff;font-family:inherit}
+  .fld textarea{resize:none;height:64px}
+  .res .cta{margin-top:6px}
+
+  /* verifikasi dine-in */
+  .dine-modal{width:100%;background:var(--choco);color:#fff;padding:22px;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:18px 18px;align-self:flex-end;min-height:100%}
+  .dm-head{display:flex;gap:12px;align-items:flex-start}
+  .dm-ic{width:40px;height:40px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;font-size:18px;flex:none}
+  .dm-t{font-weight:800;font-size:15px;color:var(--gold);letter-spacing:.04em}
+  .dm-s{font-size:10px;color:#cbbcae;margin-top:2px;letter-spacing:.06em}
+  .dm-x{margin-left:auto;font-size:18px;color:#e9dfd3;cursor:pointer}
+  .dm-sec{margin-top:20px}
+  .dm-pin{font-size:16px;color:var(--gold)}
+  .dm-lbl{font-weight:700;font-size:12.5px;margin:6px 0 10px}
+  .gps-err{background:#7a2a1a;color:#ff9b7a;border-radius:12px;padding:11px;font-size:12px;font-weight:600;line-height:1.4}
+  .redet{margin-top:12px;width:100%;background:transparent;border:1.5px solid var(--cabe);color:var(--cabe);border-radius:12px;padding:12px;font-weight:800;font-size:12.5px;cursor:pointer}
+  .dm-or{text-align:center;font-size:11px;color:#9b8d7e;font-weight:700;margin:20px 0;position:relative}
+  .dm-or::before,.dm-or::after{content:"";position:absolute;top:50%;width:38%;height:1px;background:rgba(255,255,255,.15)}
+  .dm-or::before{left:0}.dm-or::after{right:0}
+  .dm-pin2{font-weight:800;font-size:13px;color:var(--gold);letter-spacing:.04em}
+  .dm-hint{font-size:11px;color:#cbbcae;margin:6px 0 12px;line-height:1.5}
+  .pin-input{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+  .pin-input span{width:48px;height:54px;border-radius:14px;background:#fff;color:var(--ink);display:grid;place-items:center;font-size:22px;font-weight:800}
+  .pin-btn{width:100%;background:linear-gradient(135deg,#8a3a1e,#c9542a);color:#f3d9cc;border:none;border-radius:14px;padding:14px;font-weight:800;font-size:13.5px;cursor:pointer;letter-spacing:.03em}
+
+  /* status pesanan */
+  .ocard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px}
+  .oc-h{display:flex;justify-content:space-between;align-items:center}
+  .prog{display:flex;align-items:center;margin:10px 0}
+  .pst{width:26px;height:26px;border-radius:50%;background:#EFE7DD;color:#9b8d7e;display:grid;place-items:center;font-size:11px;font-weight:800;position:relative;flex:none}
+  .pst:not(:last-child){margin-right:18px}
+  .pst:not(:last-child)::before{content:"";position:absolute;left:30px;top:11px;width:14px;height:2px;background:#EFE7DD}
+  .pst.on{background:var(--cabe);color:#fff}
+  .pst.done{background:#0f8a4d;color:#fff}
+  .pst.done:not(:last-child)::before{background:#0f8a4d}
+  .pst.on:not(:last-child)::before{background:var(--cabe)}
+  .ocf{display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px}
+</style>
+</head>
+<body>
+  <div class="note">Mockup — Buku Menu Digital · format mengikuti screenshot, brand Restoku (cabe/emas/cream)</div>
+
+  <!-- ===================== OWNER: Generator QR ===================== -->
+  <div class="owner">
+    <div class="row">
+      <div>
+        <h2>Buku Menu Digital</h2>
+        <div class="sub">QR Code untuk setiap meja – tamu scan langsung lihat menu &amp; pesan mandiri</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-cabe">▣ GENERATOR QR MEJA</button>
+        <button class="btn-ghost">⌂ KELOLA GALERI ACARA</button>
+      </div>
+    </div>
+    <div class="row">
+      <select class="sel"><option>Semua Meja</option></select>
+      <button class="btn-cabe">🖨 Cetak Semua</button>
+    </div>
+    <div class="info">
+      <b>Cara kerja:</b> Cetak QR stiker untuk setiap meja, tempel di meja. Tamu scan QR → buka menu digital → pilih item → pesan langsung ke dapur.<br>
+      <b>URL dasar:</b> <code>https://restoku.app/m/{slug}?t={meja}</code>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="nm">Meja A1</div><div class="qr"></div><div class="url">restoku.app/m/demo?A1</div><div class="acts"><button>Unduh</button><button>Buka</button></div></div>
+      <div class="card"><div class="nm">Meja A2</div><div class="qr"></div><div class="url">restoku.app/m/demo?A2</div><div class="acts"><button>Unduh</button><button>Buka</button></div></div>
+      <div class="card"><div class="nm">Meja A3</div><div class="qr"></div><div class="url">restoku.app/m/demo?A3</div><div class="acts"><button>Unduh</button><button>Buka</button></div></div>
+      <div class="card"><div class="nm">Meja A4</div><div class="qr"></div><div class="url">restoku.app/m/demo?A4</div><div class="acts"><button>Unduh</button><button>Buka</button></div></div>
+      <div class="card"><div class="nm">Meja A5</div><div class="qr"></div><div class="url">restoku.app/m/demo?A5</div><div class="acts"><button>Unduh</button><button>Buka</button></div></div>
+      <div class="card"><div class="nm">Meja A6</div><div class="qr"></div><div class="url">restoku.app/m/demo?A6</div><div class="acts"><button>Unduh</button><button>Buka</button></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== CUSTOMER SUITE ===================== -->
+  <div class="suite">
+
+    <!-- Landing modal -->
+    <div class="phone"><div class="label">1 · Landing</div><div class="scr">
+      <div class="overlay"><div class="modal">
+        <div class="ey">Sejak 2025 · Nusantara</div>
+        <h3>Cita rasa Jawa,<br><span class="it">disajikan modern.</span></h3>
+        <div class="rule"></div>
+        <p>Platform pemesanan digital terintegrasi — dari pemesanan langsung dari meja, dapur realtime, hingga sajian tersaji hangat di meja Anda.</p>
+        <div class="feat"><div class="ic">▣</div><div><div class="ft">QR Self-Order</div><div class="fd">Tamu pesan langsung dari meja</div></div></div>
+        <div class="feat"><div class="ic">🎩</div><div><div class="ft">Dapur Realtime</div><div class="fd">Antrian pesanan otomatis masuk</div></div></div>
+        <div class="feat"><div class="ic">🍴</div><div><div class="ft">Monitor Pesanan</div><div class="fd">Pantau semua transaksi live</div></div></div>
+        <button class="cta">Masuk ke Menu →</button>
+        <div class="cr">© 2025 Kedai Nusantara</div>
+      </div></div>
+    </div></div>
+
+    <!-- Welcome -->
+    <div class="phone"><div class="label">2 · Welcome / Meja</div><div class="scr">
+      <div class="wel">
+        <div class="wlogos">
+          <div class="wlogo">KN</div>
+          <div class="halal">HALAL</div>
+        </div>
+        <div class="wt">Selamat Datang di<br><span class="o">Kedai Nusantara!</span></div>
+        <div class="wdesc">Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat <b>Halal</b> &amp; tanpa MSG. Selamat menikmati!</div>
+        <div class="mejabox">
+          <div><div class="lab">📍 NOMOR MEJA ANDA</div><div class="val">Meja A3</div></div>
+          <div class="badge">✓ Terverifikasi</div>
+        </div>
+        <div class="otype">
+          <div class="h">PILIH TIPE PESANAN</div>
+          <div class="obtns">
+            <div class="obtn dine sel">🪑<br>Dine In<div class="os">Makan di tempat</div></div>
+            <div class="obtn take">🥡<br>Take Away<div class="os">Dibawa pulang</div></div>
+          </div>
+        </div>
+        <button class="wcta" style="margin-top:auto">Lanjut →</button>
+      </div>
+    </div></div>
+
+    <!-- Cara Memesan -->
+    <div class="phone"><div class="label">3 · Cara Memesan</div><div class="scr">
+      <div class="cm">
+        <div class="h">Cara Memesan</div>
+        <div class="s">Cukup 3 langkah mudah, pesanan langsung masuk dapur!</div>
+        <div class="step p"><div class="n">1</div><div><div class="t">Pilih Menu Favorit</div><div class="d">Tekan menu yang kamu inginkan, lihat foto &amp; harga lengkap</div></div></div>
+        <div class="step o"><div class="n">2</div><div><div class="t">Masuk ke Keranjang</div><div class="d">Tambah qty, tulis catatan khusus untuk chef jika perlu</div></div></div>
+        <div class="step g"><div class="n">3</div><div><div class="t">Kirim Pesanan</div><div class="d">Tekan 'Pesan Sekarang' — pesanan langsung diterima dapur!</div></div></div>
+        <div class="otype-row">🪑 Tipe pesanan dipilih &nbsp; <b>Dine In — Makan di tempat</b> &nbsp; <a>Ubah</a></div>
+        <button class="cta">✨ Mulai Pesan Sekarang!</button>
+        <div class="cr" style="color:#9b8d7e">Meja A3 · Kedai Nusantara · Nusantara</div>
+      </div>
+    </div></div>
+
+    <!-- Menu -->
+    <div class="phone"><div class="label">4 · Menu</div><div class="scr">
+      <div class="topbar">
+        <div class="brand"><div class="logo">KN</div><div><div class="nm">Kedai Nusantara</div><div class="sm">Meja A3 · Scan &amp; Order</div></div></div>
+        <div class="halal">HALAL</div>
+      </div>
+      <div class="offline">⚠ Menampilkan Menu Offline (Koneksi Terputus/Lambat)</div>
+      <div class="tabs"><div class="tab on">MENU</div><div class="tab">GALERI</div><div class="tab">RESERVASI</div></div>
+      <div class="pills"><div class="pill on">Makanan</div><div class="pill">Snack</div><div class="pill">Minuman</div></div>
+      <div class="mgrid">
+        <div class="mitem"><div class="thumb">🍛</div><div class="body"><span class="tag">Favorit</span><div class="mn">Nasi Goreng Jawa</div><div class="mp">Rp 25.000</div></div></div>
+        <div class="mitem"><div class="thumb">🍜</div><div class="body"><div class="mn">Bakmi Goreng Jawa</div><div class="mp">Rp 24.000</div></div></div>
+        <div class="mitem"><div class="thumb">🍲</div><div class="body"><div class="mn">Bakmi Godog Jawa</div><div class="mp">Rp 24.000</div></div></div>
+        <div class="mitem"><div class="thumb">🍲</div><div class="body"><span class="tag">Best Seller</span><div class="mn">Soto Ayam Semarang</div><div class="mp">Rp 28.000</div></div></div>
+        <div class="mitem"><div class="thumb">🍗</div><div class="body"><span class="tag">Spesial</span><div class="mn">Ayam Goreng</div><div class="mp">Rp 26.000</div></div></div>
+        <div class="mitem"><div class="thumb">🍚</div><div class="body"><span class="tag">Best Seller</span><div class="mn">Nasi Box</div><div class="mp">Rp 22.000</div></div></div>
+      </div>
+    </div></div>
+
+    <!-- Galeri -->
+    <div class="phone"><div class="label">5 · Galeri</div><div class="scr">
+      <div class="topbar">
+        <div class="brand"><div class="logo">KN</div><div><div class="nm">Kedai Nusantara</div><div class="sm">Meja A3 · Scan &amp; Order</div></div></div>
+        <div class="halal">HALAL</div>
+      </div>
+      <div class="tabs"><div class="tab">MENU</div><div class="tab on">GALERI</div><div class="tab">RESERVASI</div></div>
+      <div class="gal">
+        <div class="h">⭐ Momen Spesial Kami</div>
+        <div class="d">Dokumentasi berbagai kegiatan dan perayaan berharga yang pernah diselenggarakan di Kedai Nusantara.</div>
+        <div class="gev"><div class="ph">💍<div class="tg">WEDDING</div></div><div class="gb"><div class="gt"><span>Jamuan Pernikahan Premium</span><span style="color:#9b8d7e;font-weight:600">12 Mei 2026</span></div><div class="gd">Merayakan hari bahagia bersama keluarga tercinta dengan konsep prasmanan premium dan dekorasi Jawa modern yang anggun.</div></div></div>
+        <div class="gev"><div class="ph">💼<div class="tg">CORPORATE</div></div><div class="gb"><div class="gt"><span> Gathering Perusahaan</span><span style="color:#9b8d7e;font-weight:600">3 Jun 2026</span></div><div class="gd">Acara gala dinner eksklusif dengan santapan khas dan suasana hangat untuk tim Anda.</div></div></div>
+      </div>
+    </div></div>
+
+    <!-- Reservasi -->
+    <div class="phone"><div class="label">6 · Reservasi</div><div class="scr">
+      <div class="topbar">
+        <div class="brand"><div class="logo">KN</div><div><div class="nm">Kedai Nusantara</div><div class="sm">Meja A3 · Scan &amp; Order</div></div></div>
+        <div class="halal">HALAL</div>
+      </div>
+      <div class="tabs"><div class="tab">MENU</div><div class="tab">GALERI</div><div class="tab on">RESERVASI</div></div>
+      <div class="res">
+        <div class="h">📅 Reservasi Tempat &amp; Acara</div>
+        <div class="d">Pesan tempat untuk makan keluarga, meeting bisnis, ultah, atau pesta di Kedai Nusantara.</div>
+        <div class="fld"><label>Nama Lengkap Pemesan <span class="req">*</span></label><input placeholder="Masukkan nama lengkap Anda"></div>
+        <div class="fld"><label>Nomor Telepon / Whatsapp <span class="req">*</span></label><input placeholder="Contoh: 081234567890"></div>
+        <div class="fld"><label>Jenis Reservasi <span class="req">*</span></label><select><option>Meja Makan Biasa</option><option>Acara Pernikahan</option><option>Corporate / Gala</option></select></div>
+        <div class="fld"><label>Jumlah Tamu <span class="req">*</span></label><input value="2"></div>
+        <div class="fld"><label>Tanggal Booking <span class="req">*</span></label><input placeholder="mm/dd/yyyy"></div>
+        <div class="fld"><label>Jam Mulai <span class="req">*</span></label><input placeholder="--:--"></div>
+        <div class="fld"><label>Catatan Khusus / Permintaan (Opsional)</label><textarea placeholder="Contoh: butuh meja dekat area musik live, menu diet gluten-free, dekorasi ultah, dll."></textarea></div>
+        <button class="cta" style="background:var(--cabe)">📅 Ajukan Reservasi Sekarang</button>
+      </div>
+    </div></div>
+
+    <!-- Verifikasi Dine-In -->
+    <div class="phone"><div class="label">7 · Verifikasi Dine-In</div><div class="scr">
+      <div class="dine-modal">
+        <div class="dm-head">
+          <div class="dm-ic">🛡</div>
+          <div><div class="dm-t">VERIFIKASI DINE-IN</div><div class="dm-s">PASTIKAN ANDA MEMESAN DI LOKASI</div></div>
+          <div class="dm-x">✕</div>
+        </div>
+        <div class="dm-sec">
+          <div class="dm-lbl">📍 Validasi GPS Otomatis</div>
+          <div class="gps-err">Anda berada di luar area restoran (120635m).</div>
+          <button class="redet">⟳ DETEKSI ULANG LOKASI</button>
+        </div>
+        <div class="dm-or">ATAU</div>
+        <div class="dm-sec">
+          <div class="dm-pin2">MASUKKAN PIN VERIFIKASI MEJA</div>
+          <div class="dm-hint">Minta 4-digit PIN harian kepada pelayan kami di kedai.</div>
+          <div class="pin-input"><span>3</span><span>4</span><span>6</span><span>1</span></div>
+          <button class="pin-btn">VERIFIKASI PIN</button>
+        </div>
+      </div>
+    </div></div>
+
+    <!-- Status Pesanan -->
+    <div class="phone"><div class="label">8 · Status Pesanan</div><div class="scr">
+      <div class="offline">⚠ Menampilkan Menu Offline (Koneksi Terputus/Lambat)</div>
+      <div class="topbar">
+        <div class="brand"><div class="logo">KN</div><div><div class="nm">Kedai Nusantara</div><div class="sm">Meja A3 · Scan &amp; Order</div></div></div>
+        <div class="halal">HALAL</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px">
+        <div style="font-weight:800;font-size:16px">‹ Status Pesanan</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="font-size:11px;font-weight:700;color:#0f8a4d;display:flex;gap:5px;align-items:center"><span style="width:7px;height:7px;border-radius:50%;background:#0f8a4d;display:inline-block"></span>Auto Aktif</div>
+          <div style="color:#9b8d7e">⟳</div>
+        </div>
+      </div>
+      <div style="background:var(--cream);flex:1;padding:12px;display:flex;flex-direction:column;gap:12px;overflow:auto">
+        <div class="ocard">
+          <div class="oc-h"><div style="font-weight:800;font-size:12.5px;color:#a8521f">⟳ Menunggu Jaringan (Offline)</div><div style="font-size:10px;color:#9b8d7e;font-weight:700">OFFLINE-MRHAW5LW-E3X8</div></div>
+          <div style="font-size:10px;color:#9b8d7e;font-weight:700;margin-top:2px">DURASI PROSES: 0 MNT</div>
+          <div class="prog"><div class="pst on">1</div><div class="pst">2</div><div class="pst">3</div><div class="pst">4</div></div>
+          <div style="font-size:10px;color:#9b8d7e;font-weight:700;display:flex;justify-content:space-between"><span>Konfirmasi</span><span>Dimasak</span><span>Siap</span><span>Disajikan</span></div>
+          <div class="ocf"><div><div style="font-weight:800;font-size:13px">Soto Ayam Semarang x1</div><div style="font-size:11px;color:#7a6f63">Rp 28.000</div></div><div style="color:#0f8a4d;font-weight:800;font-size:14px">Rp 30.800</div></div>
+        </div>
+        <div class="ocard">
+          <div class="oc-h"><div style="font-weight:800;font-size:12.5px;color:var(--cabe-dk)">🍴 Siap Diantar</div><div style="font-size:10px;color:#9b8d7e;font-weight:700">ORD-MQZOAZPI-EBDG</div></div>
+          <div style="font-size:10px;color:#9b8d7e;font-weight:700;margin-top:2px">DURASI PROSES: 17764 MNT</div>
+          <div class="prog"><div class="pst done">1</div><div class="pst done">2</div><div class="pst on">3</div><div class="pst">4</div></div>
+          <div style="font-size:10px;color:#9b8d7e;font-weight:700;display:flex;justify-content:space-between"><span>Konfirmasi</span><span>Dimasak</span><span>Siap</span><span>Disajikan</span></div>
+          <div class="ocf"><div><div style="font-weight:800;font-size:13px">Soto Ayam Semarang x1</div><div style="font-size:11px;color:#7a6f63">Rp 28.000</div></div><div style="color:#0f8a4d;font-weight:800;font-size:14px">Rp 28.000</div></div>
+        </div>
+      </div>
+    </div></div>
+
+  </div>
+</body>
+</html>

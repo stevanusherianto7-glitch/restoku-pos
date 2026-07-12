@@ -161,6 +161,44 @@ export default function CustomerView() {
     const [orderStatus, setOrderStatus] = useState<string | null>(null);
     const [orderTone, setOrderTone] = useState<string>('amber');
 
+    // ─── Screenshot clone flow (stub FE-first) ───────────────────────────
+    // Stage: landind modal → welcome/meja → cara-memasan → app (tabs).
+    const [appStage, setAppStage] = useState<'landing' | 'welcome' | 'howto' | 'app'>('landing');
+    const [dineVerified, setDineVerified] = useState(false);
+    const [pin, setPin] = useState('');
+    // Stub GPS (BE nyata = Batch 2: outlat lat/lng + radius).
+    const [gpsError, setGpsError] = useState<string | null>('Anda berada di luar area restoran (120635m).');
+    // Stub orders (BE nyata = Batch 2: order-state-machine + polling publik).
+    type OrderStub = {
+        id: string;
+        status: 'offline' | 'ready';
+        label: string;
+        duration: string;
+        items: string;
+        total: number;
+        step: number; // 1=Konfirmasi 2=Dimasak 3=Siap 4=Disajikan
+    };
+    const [orders, setOrders] = useState<OrderStub[]>([
+        {
+            id: 'OFFLINE-MRHAW5LW-E3X8',
+            status: 'offline',
+            label: 'Menunggu Jaringan (Offline)',
+            duration: '0 MNT',
+            items: 'Soto Ayam Semarang x1',
+            total: 30800,
+            step: 1,
+        },
+        {
+            id: 'ORD-MQZOAZPI-EBDG',
+            status: 'ready',
+            label: 'Siap Diantar',
+            duration: '17764 MNT',
+            items: 'Soto Ayam Semarang x1',
+            total: 28000,
+            step: 3,
+        },
+    ]);
+
     // ─── Operating Hours Integration ──────────────────────────────────────────
     const [isOutletOpen, setIsOutletOpen] = useState(true);
     const [outletScheduleMsg, setOutletScheduleMsg] = useState<string | null>(null);
@@ -348,6 +386,34 @@ export default function CustomerView() {
             categoryList:
                 'flex gap-2 overflow-x-auto px-4 py-3 sticky top-[77px] z-30 bg-[#030712]/90 backdrop-blur-xl border-b border-amber-500/10',
         },
+        // ─── ELVERA (Restoku warm brand default) ───────────────────────────────
+        // Cabe #FF5B35 / Emas #F59E0B / Cream #FAF5EE — anti-AI SaaS-blue.
+        elvera: {
+            outer: 'min-h-screen w-full bg-[#FAF5EE] text-[#1A1410] flex flex-col font-sans selection:bg-[#FF5B35]/20 max-w-md mx-auto shadow-2xl relative border-x border-[#E7D9CB]',
+            header: 'sticky top-0 z-40 bg-[#FFF3EC]/95 backdrop-blur-md border-b border-[#E7D9CB] px-5 py-4 flex items-center justify-between shadow-sm',
+            textMuted: 'text-[#7A6F63]',
+            textTitle: 'text-[#1A1410]',
+            textDesc: 'text-[#7A6F63]',
+            card: 'bg-white border border-[#EFE2D4] p-4 rounded-2xl shadow-sm',
+            cardHover:
+                'bg-white border border-[#EFE2D4] p-4 rounded-2xl shadow-sm flex gap-4 transition-all group relative overflow-hidden',
+            input: 'w-full rounded-xl border border-[#E7D9CB] bg-white px-4 py-2.5 text-xs text-[#1A1410] outline-none focus:border-[#FF5B35]/50 focus:ring-1 focus:ring-[#FF5B35]/30 transition-all',
+            inputLarge:
+                'w-full h-20 rounded-xl border border-[#E7D9CB] bg-white px-4 py-2.5 text-xs text-[#1A1410] outline-none focus:border-[#FF5B35]/50 focus:ring-1 focus:ring-[#FF5B35]/30 transition-all resize-none',
+            btnPrimary:
+                'w-full py-3.5 bg-[#FF5B35] hover:bg-[#E04E2B] text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 mt-4 shadow-md disabled:opacity-50',
+            btnSecondary: 'bg-[#FCE3D6] border border-[#F0D9C8] text-[#A8521F] hover:bg-[#FBE7D6]',
+            badge: 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FF5B35]/10 border border-[#FF5B35]/25 text-[8px] font-bold text-[#C9431F] tracking-wider uppercase mb-2',
+            divider: 'h-px bg-[#E7D9CB] my-2',
+            bannerBg:
+                'relative px-5 py-6 bg-gradient-to-r from-[#FFF3EC] via-[#FFE6C0] to-[#FFD99F] border-b border-[#E7D9CB] overflow-hidden',
+            categoryBtn: (active: boolean) =>
+                active
+                    ? 'bg-[#FF5B35] border-[#E04E2B] text-white shadow-md scale-95'
+                    : 'bg-white border-[#E7D9CB] text-[#7A6F63] hover:bg-[#FFF3EC]',
+            categoryList:
+                'flex gap-2 overflow-x-auto px-4 py-3 sticky top-[77px] z-30 bg-[#FAF5EE]/90 backdrop-blur-md border-b border-[#E7D9CB]',
+        },
     };
 
     const activeTheme = isNanoBanana
@@ -356,7 +422,9 @@ export default function CustomerView() {
           ? theme.minimalist
           : tenantLayout === 'warm-cozy'
             ? theme.cozy
-            : theme.premium;
+            : tenantLayout === 'premium' || screenMode === 'premium'
+              ? theme.premium
+              : theme.elvera; // default warm brand (screenshot clone)
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -502,7 +570,7 @@ export default function CustomerView() {
 
     return (
         <div className={activeTheme.outer}>
-            <Head title={`E-Menu Premium - ${outletName}`} />
+            <Head title={`E-Menu - ${outletName}`} />
 
             {/* Operating Hours Alert Banner */}
             {!isOutletOpen && (
@@ -589,8 +657,308 @@ export default function CustomerView() {
                         <ShoppingCartIcon className="size-3" />
                         {cartTotalItems > 0 && <span>{cartTotalItems}</span>}
                     </button>
+                    <button
+                        onClick={() => setActiveTab('status')}
+                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                            activeTab === 'status'
+                                ? isNanoBanana
+                                    ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                    : 'bg-[#FF5B35] text-white shadow'
+                                : 'text-slate-400'
+                        }`}
+                    >
+                        Status
+                    </button>
                 </div>
             </header>
+
+            {/* ─── SCREENSHOT CLONE: FLOW BARU (stub FE-first) ───────────── */}
+            {appStage === 'landing' && (
+                <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
+                    <div
+                        className="w-full rounded-3xl p-7 text-white relative overflow-hidden"
+                        style={{
+                            background: 'linear-gradient(135deg,#2A1E16 0%,#3A2A1E 60%,#43261A 100%)',
+                            backgroundImage:
+                                'linear-gradient(rgba(245,158,11,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,.04) 1px,transparent 1px)',
+                            backgroundSize: '20px 20px',
+                        }}
+                    >
+                        <p className="text-[10px] font-bold tracking-[0.22em] text-[#F59E0B] uppercase">
+                            Sejak 2025 · Nusantara
+                        </p>
+                        <h2 className="font-serif text-3xl mt-3 leading-tight">
+                            Cita rasa Jawa,
+                            <br />
+                            <span className="italic text-[#F59E0B]">disajikan modern.</span>
+                        </h2>
+                        <div className="h-px bg-[#F59E0B]/40 my-5" />
+                        <p className="text-[13px] text-[#E9DFD3] leading-relaxed">
+                            Platform pemesanan digital terintegrasi — dari pemesanan langsung dari meja, dapur realtime,
+                            hingga sajian tersaji hangat di meja Anda.
+                        </p>
+                        <div className="mt-5 space-y-3">
+                            {[
+                                { ic: '▣', t: 'QR Self-Order', d: 'Tamu pesan langsung dari meja' },
+                                { ic: '🍴', t: 'Dapur Realtime', d: 'Antrian pesanan otomatis masuk' },
+                                { ic: '📊', t: 'Monitor Pesanan', d: 'Pantau semua transaksi live' },
+                            ].map((f) => (
+                                <div key={f.t} className="flex items-center gap-3">
+                                    <div className="size-9 rounded-xl border border-[#F59E0B]/40 grid place-items-center text-[#F59E0B] text-base">
+                                        {f.ic}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-[13px]">{f.t}</p>
+                                        <p className="text-[11px] text-[#CBBCAE]">{f.d}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setAppStage('welcome')}
+                            className="mt-7 w-full bg-[#F59E0B] text-[#2A1E16] border-none rounded-xl py-3.5 text-sm font-extrabold flex justify-center gap-2 items-center cursor-pointer"
+                        >
+                            Masuk ke Menu →
+                        </button>
+                        <p className="text-center text-[10px] text-[#9B8D7E] mt-4">© 2025 {outletName}</p>
+                    </div>
+                </div>
+            )}
+
+            {appStage === 'welcome' && (
+                <div className="absolute inset-0 z-40 flex flex-col items-center p-7 gap-4 text-center bg-[#FAF5EE] overflow-y-auto">
+                    <div className="w-full flex items-center justify-center gap-3">
+                        <div className="size-14 rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] grid place-items-center text-white font-extrabold text-lg shadow-lg">
+                            {outletName.slice(0, 2).toUpperCase()}
+                        </div>
+                        <span className="px-2.5 py-1 rounded-lg bg-[#0F8A4D]/10 text-[#0F8A4D] text-[10px] font-extrabold">
+                            HALAL
+                        </span>
+                    </div>
+                    <h2 className="text-2xl font-extrabold text-[#1A1410] mt-1">
+                        Selamat Datang di <span className="text-[#FF5B35]">{outletName}!</span>
+                    </h2>
+                    <p className="text-[12px] text-[#7A6F63] leading-relaxed max-w-[260px]">
+                        Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
+                        MSG. Selamat menikmati!
+                    </p>
+                    <div className="w-full bg-[#FFF3EC] rounded-xl p-3.5 flex items-center justify-between text-left">
+                        <div>
+                            <p className="text-[10px] font-extrabold tracking-wider text-[#A8521F] flex items-center gap-1.5">
+                                📍 NOMOR MEJA ANDA
+                            </p>
+                            <p className="text-lg font-extrabold text-[#1A1410] mt-1">Meja {tableNumber ?? 'A3'}</p>
+                        </div>
+                        <span className="px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 text-[#0F8A4D] text-[10px] font-extrabold flex items-center gap-1">
+                            ✓ Terverifikasi
+                        </span>
+                    </div>
+                    <div className="w-full">
+                        <p className="text-[11px] font-extrabold tracking-wider text-[#8A7D70] text-left mb-2">
+                            PILIH TIPE PESANAN
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setOrderType('dine_in')}
+                                className={`flex-1 rounded-xl py-4 text-white font-extrabold border-[3px] transition-all ${
+                                    orderType === 'dine_in'
+                                        ? 'border-[#FF5B35] bg-gradient-to-br from-[#7C3AED] to-[#FF5B35]'
+                                        : 'border-transparent bg-gradient-to-br from-[#7C3AED] to-[#FF5B35] opacity-70'
+                                }`}
+                            >
+                                🪑
+                                <br />
+                                Dine In
+                                <span className="text-[11px] font-semibold opacity-90 block mt-1">Makan di tempat</span>
+                            </button>
+                            <button
+                                onClick={() => setOrderType('take_away')}
+                                className={`flex-1 rounded-xl py-4 text-white font-extrabold border-[3px] transition-all ${
+                                    orderType === 'take_away'
+                                        ? 'border-[#FF5B35] bg-gradient-to-br from-[#DB2777] to-[#F97316]'
+                                        : 'border-transparent bg-gradient-to-br from-[#DB2777] to-[#F97316] opacity-70'
+                                }`}
+                            >
+                                🥡
+                                <br />
+                                Take Away
+                                <span className="text-[11px] font-semibold opacity-90 block mt-1">Dibawa pulang</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setAppStage('howto')}
+                        className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3.5 text-sm font-extrabold mt-auto cursor-pointer"
+                    >
+                        Lanjut →
+                    </button>
+                </div>
+            )}
+
+            {appStage === 'howto' && (
+                <div className="absolute inset-0 z-40 p-5 flex flex-col gap-3 bg-[#FAF5EE] overflow-y-auto">
+                    <h2 className="text-center text-lg font-extrabold text-[#1A1410]">Cara Memesan</h2>
+                    <p className="text-center text-[12px] text-[#7A6F63] -mt-1">
+                        Cukup 3 langkah mudah, pesanan langsung masuk dapur!
+                    </p>
+                    {[
+                        {
+                            n: 1,
+                            c: 'from-[#7C3AED]',
+                            bg: 'bg-[#F4EEFD]',
+                            t: 'Pilih Menu Favorit',
+                            d: 'Tekan menu yang kamu inginkan, lihat foto & harga lengkap',
+                        },
+                        {
+                            n: 2,
+                            c: 'from-[#FF5B35]',
+                            bg: 'bg-[#FFF1E9]',
+                            t: 'Masuk ke Keranjang',
+                            d: 'Tambah qty, tulis catatan khusus untuk chef jika perlu',
+                        },
+                        {
+                            n: 3,
+                            c: 'from-[#0F8A4D]',
+                            bg: 'bg-[#EAF7EF]',
+                            t: 'Kirim Pesanan',
+                            d: 'Tekan "Pesan Sekarang" — pesanan langsung diterima dapur!',
+                        },
+                    ].map((s) => (
+                        <div key={s.n} className={`rounded-xl p-3 flex gap-3 items-start ${s.bg}`}>
+                            <div
+                                className={`size-6 rounded-full bg-gradient-to-br ${s.c} to-black/20 text-white font-extrabold grid place-items-center text-xs shrink-0`}
+                            >
+                                {s.n}
+                            </div>
+                            <div>
+                                <p className="font-extrabold text-[13px] text-[#1A1410]">{s.t}</p>
+                                <p className="text-[11px] text-[#7A6F63] mt-0.5">{s.d}</p>
+                            </div>
+                        </div>
+                    ))}
+                    <div className="flex items-center justify-between bg-[#FFF3EC] rounded-xl p-3 text-[12px] mt-1">
+                        <span className="text-[#5A4F43]">🪑 Tipe pesanan dipilih</span>
+                        <b className="text-[#1A1410]">
+                            {orderType === 'dine_in' ? 'Dine In — Makan di tempat' : 'Take Away — Dibawa pulang'}
+                        </b>
+                        <span className="text-[#FF5B35] font-extrabold">Ubah</span>
+                    </div>
+                    <button
+                        onClick={() => setAppStage('app')}
+                        className="w-full bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] text-white border-none rounded-xl py-3.5 text-sm font-extrabold mt-auto cursor-pointer flex justify-center gap-2 items-center"
+                    >
+                        ✨ Mulai Pesan Sekarang!
+                    </button>
+                    <p className="text-center text-[10px] text-[#9B8D7E]">
+                        Meja {tableNumber ?? 'A3'} · {outletName}
+                    </p>
+                </div>
+            )}
+
+            {/* Verifikasi Dine-In: overlay saat app & dine_in & belum verified */}
+            {appStage === 'app' && orderType === 'dine_in' && !dineVerified && (
+                <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
+                    <div
+                        className="w-full rounded-3xl p-6 text-white relative overflow-hidden"
+                        style={{
+                            background: 'linear-gradient(135deg,#2A1E16 0%,#3A2A1E 60%,#43261A 100%)',
+                            backgroundImage:
+                                'linear-gradient(rgba(245,158,11,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,.04) 1px,transparent 1px)',
+                            backgroundSize: '20px 20px',
+                        }}
+                    >
+                        <div className="flex items-start gap-3">
+                            <div className="size-10 rounded-full border border-[#F59E0B] grid place-items-center text-lg">
+                                🛡
+                            </div>
+                            <div>
+                                <p className="font-extrabold text-[15px] text-[#F59E0B] tracking-wide">
+                                    VERIFIKASI DINE-IN
+                                </p>
+                                <p className="text-[10px] text-[#CBBCAE] mt-0.5 tracking-wide">
+                                    PASTIKAN ANDA MEMESAN DI LOKASI
+                                </p>
+                            </div>
+                            <span
+                                className="ml-auto text-[#E9DFD3] text-lg cursor-pointer"
+                                onClick={() => setDineVerified(true)}
+                            >
+                                ✕
+                            </span>
+                        </div>
+
+                        <div className="mt-5">
+                            <p className="font-bold text-[12.5px] flex items-center gap-1.5">
+                                📍 Validasi GPS Otomatis
+                            </p>
+                            {gpsError && (
+                                <div className="mt-2 bg-[#7A2A1A] text-[#FF9B7A] rounded-xl p-2.5 text-[12px] font-semibold leading-snug">
+                                    {gpsError}
+                                </div>
+                            )}
+                            <button
+                                onClick={() => setGpsError(null)}
+                                className="mt-3 w-full bg-transparent border-[1.5px] border-[#FF5B35] text-[#FF5B35] rounded-xl py-3 text-[12.5px] font-extrabold cursor-pointer"
+                            >
+                                ⟳ DETEKSI ULANG LOKASI
+                            </button>
+                        </div>
+
+                        <div className="text-center text-[11px] text-[#9B8D7E] font-extrabold my-5 relative">ATAU</div>
+
+                        <div>
+                            <p className="font-extrabold text-[13px] text-[#F59E0B] tracking-wide">
+                                MASUKKAN PIN VERIFIKASI MEJA
+                            </p>
+                            <p className="text-[11px] text-[#CBBCAE] mt-1.5 leading-relaxed">
+                                Minta 4-digit PIN harian kepada pelayan kami di kedai.
+                            </p>
+                            <div className="flex justify-center gap-2.5 my-4">
+                                {[0, 1, 2, 3].map((i) => (
+                                    <span
+                                        key={i}
+                                        className="size-12 rounded-xl bg-white text-[#1A1410] grid place-items-center text-xl font-extrabold"
+                                    >
+                                        {pin[i] ?? ''}
+                                    </span>
+                                ))}
+                            </div>
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={4}
+                                value={pin}
+                                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                placeholder="----"
+                                className="hidden"
+                            />
+                            <div className="grid grid-cols-3 gap-2 mb-3">
+                                {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map((k) => (
+                                    <button
+                                        key={k}
+                                        disabled={!k}
+                                        onClick={() =>
+                                            k === '⌫'
+                                                ? setPin((p) => p.slice(0, -1))
+                                                : k && setPin((p) => (p + k).slice(0, 4))
+                                        }
+                                        className="h-11 rounded-xl bg-white/10 text-white font-bold text-lg disabled:opacity-30 cursor-pointer"
+                                    >
+                                        {k}
+                                    </button>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => pin === '0000' && setDineVerified(true)}
+                                className="w-full rounded-xl py-3.5 text-[13.5px] font-extrabold cursor-pointer border-none"
+                                style={{ background: 'linear-gradient(135deg,#8A3A1E,#C9542A)', color: '#F3D9CC' }}
+                            >
+                                VERIFIKASI PIN
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {activeTab === 'menu' && (
                 <>
@@ -1096,6 +1464,92 @@ export default function CustomerView() {
                             <CalendarIcon className="size-3.5" /> Hubungi & Reservasi Sekarang
                         </button>
                     </div>
+                </main>
+            )}
+
+            {activeTab === 'status' && (
+                <main className="flex-1 p-4 pb-28 flex flex-col gap-3 overflow-y-auto bg-[#FAF5EE]">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-base font-extrabold text-[#1A1410] flex items-center gap-2">
+                            <ArrowLeftIcon className="size-4 text-[#FF5B35]" /> Status Pesanan
+                        </h2>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-bold text-[#0F8A4D] flex items-center gap-1">
+                                <span className="size-1.5 rounded-full bg-[#0F8A4D] inline-block" /> Auto Aktif
+                            </span>
+                            <span
+                                className="text-[#9B8D7E] text-sm cursor-pointer"
+                                onClick={() => setActiveTab('menu')}
+                            >
+                                ⟳
+                            </span>
+                        </div>
+                    </div>
+                    {orders.map((o) => {
+                        const steps = ['Konfirmasi', 'Dimasak', 'Siap', 'Disajikan'];
+                        return (
+                            <div key={o.id} className="bg-white border border-[#EFE2D4] rounded-2xl p-3.5 shadow-sm">
+                                <div className="flex items-center justify-between">
+                                    <p
+                                        className={`text-[12.5px] font-extrabold ${o.status === 'ready' ? 'text-[#C9431F]' : 'text-[#A8521F]'}`}
+                                    >
+                                        {o.status === 'ready' ? '🍴 ' : '⟳ '} {o.label}
+                                    </p>
+                                    <span className="text-[10px] font-bold text-[#9B8D7E]">{o.id}</span>
+                                </div>
+                                <p className="text-[10px] font-bold text-[#9B8D7E] mt-0.5">
+                                    DURASI PROSES: {o.duration}
+                                </p>
+                                <div className="flex items-center gap-1 mt-2.5">
+                                    {steps.map((s, i) => {
+                                        const n = i + 1;
+                                        const cls =
+                                            n < o.step
+                                                ? 'bg-[#0F8A4D] text-white'
+                                                : n === o.step
+                                                  ? 'bg-[#FF5B35] text-white'
+                                                  : 'bg-[#EFE7DD] text-[#9B8D7E]';
+                                        return (
+                                            <div key={s} className="flex items-center">
+                                                <div
+                                                    className={`size-6 rounded-full ${cls} grid place-items-center text-[11px] font-extrabold`}
+                                                >
+                                                    {n}
+                                                </div>
+                                                {n < 4 && (
+                                                    <div
+                                                        className="h-0.5 w-3.5"
+                                                        style={{
+                                                            background:
+                                                                n < o.step
+                                                                    ? '#0F8A4D'
+                                                                    : n === o.step
+                                                                      ? '#FF5B35'
+                                                                      : '#EFE7DD',
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <div className="flex justify-between text-[10px] font-bold text-[#9B8D7E] mt-1">
+                                    {steps.map((s) => (
+                                        <span key={s}>{s}</span>
+                                    ))}
+                                </div>
+                                <div className="flex items-end justify-between mt-2 pt-2 border-t border-[#EFE2D4]">
+                                    <div>
+                                        <p className="text-[13px] font-extrabold text-[#1A1410]">{o.items}</p>
+                                        <p className="text-[11px] text-[#7A6F63]">{formatRupiah(o.total)}</p>
+                                    </div>
+                                    <span className="text-[14px] font-extrabold text-[#0F8A4D]">
+                                        {formatRupiah(o.total)}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </main>
             )}
 
