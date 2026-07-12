@@ -22,7 +22,7 @@ vi.mock('../Hooks/useSubscription', () => ({
 
 import GoogleReviews from '../Pages/Owner/GoogleReviews';
 
-const reviewsFixture = [
+const fixtureUnreplied = [
     {
         id: 1,
         reviewer_name: 'Budi',
@@ -33,12 +33,24 @@ const reviewsFixture = [
         replied_at: null,
         reviewed_at: '2026-01-01',
     },
+];
+const fixtureReplied = [
+    {
+        id: 3,
+        reviewer_name: 'Joko',
+        reviewer_photo: null,
+        rating: 2,
+        comment: 'Lama',
+        reply_text: 'Maaf',
+        replied_at: '2026-01-03',
+        reviewed_at: '2026-01-03',
+    },
     {
         id: 2,
         reviewer_name: 'Sari',
         reviewer_photo: null,
-        rating: 2,
-        comment: 'Lama',
+        rating: 4,
+        comment: 'Oke',
         reply_text: 'Maaf',
         replied_at: '2026-01-02',
         reviewed_at: '2026-01-01',
@@ -46,18 +58,25 @@ const reviewsFixture = [
 ];
 
 // mock fetch factory — tiap test bisa override behaviour
-const makeFetch = (impl: (url: string) => any) =>
-    vi.fn((input: any) => {
+const makeFetch = (impl: (url: string, opts?: any) => any) =>
+    vi.fn((input: any, opts?: any) => {
         const url = String(input);
         if (url.includes('/api/reservations')) {
             return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
         }
-        return impl(url);
+        return impl(url, opts);
     }) as any;
 
-const reviewsSuccess = (reviews: any[] = reviewsFixture) => ({
+const placesSuccess = (unreplied = fixtureUnreplied, replied = fixtureReplied) => ({
     ok: true,
-    json: () => Promise.resolve({ status: 'success', reviews }),
+    json: () =>
+        Promise.resolve({
+            status: 'success',
+            source: 'places',
+            place_id: 'ChIJabc123',
+            unreplied,
+            replied,
+        }),
 });
 
 beforeEach(() => {
@@ -74,128 +93,126 @@ afterEach(() => {
     vi.useRealTimers();
 });
 
-describe('Owner/GoogleReviews — smoke', () => {
-    it('renders and loads reviews', async () => {
+describe('Owner/GoogleReviews — smoke (Places API pivot)', () => {
+    it('renders only unreplied by default, then shows all', async () => {
         vi.stubGlobal(
             'fetch',
-            makeFetch(() => reviewsSuccess()),
+            makeFetch(() => placesSuccess()),
         );
         render(<GoogleReviews />);
         await waitFor(() => expect(screen.getByText('Budi')).toBeInTheDocument());
+        // Default filter = "Belum Dibalas" → yang sudah dibalas (Sari, Joko) disembunyikan.
+        expect(screen.queryByText('Sari')).not.toBeInTheDocument();
+        expect(screen.queryByText('Joko')).not.toBeInTheDocument();
+        // Beralih ke status "Sudah Dibalas" menampilkan Sari & Joko.
+        fireEvent.click(screen.getByText(/Sudah Dibalas/i));
         expect(screen.getByText('Sari')).toBeInTheDocument();
+        expect(screen.getByText('Joko')).toBeInTheDocument();
+        // Kembali ke "Belum Dibalas".
+        fireEvent.click(screen.getByText(/Belum Dibalas/i));
+        expect(screen.queryByText('Sari')).not.toBeInTheDocument();
     });
 
-    it('filters complaints', async () => {
+    it('shows "Real-time • Places API" badge when connected via Places', async () => {
         vi.stubGlobal(
             'fetch',
-            makeFetch(() => reviewsSuccess()),
+            makeFetch(() => placesSuccess()),
         );
         render(<GoogleReviews />);
-        await waitFor(() => expect(screen.getByText('Budi')).toBeInTheDocument());
-        fireEvent.click(screen.getByText(/Komplain/i));
-        expect(screen.queryByText('Budi')).not.toBeInTheDocument();
-        expect(screen.getByText('Sari')).toBeInTheDocument();
+        await waitFor(() => expect(screen.getByText(/Real-time • Places API/i)).toBeInTheDocument());
     });
 
-    it('extracts REAL Place ID (hex) from Maps URL — no fake ChIJ', async () => {
+    it('shows "Belum terhubung" when no place_id (local only)', async () => {
         vi.stubGlobal(
             'fetch',
-            makeFetch(() => reviewsSuccess([])),
+            makeFetch(() =>
+                Promise.resolve({
+                    ok: true,
+                    json: () =>
+                        Promise.resolve({
+                            status: 'none',
+                            source: 'local',
+                            place_id: null,
+                            unreplied: [],
+                            replied: [],
+                        }),
+                }),
+            ),
         );
         render(<GoogleReviews />);
-        fireEvent.click(screen.getByText(/Pengaturan GBP/i));
-        fireEvent.click(screen.getByText(/Tempel Link Maps/i));
-        const urlInput = screen.getByPlaceholderText(/Tempel tautan Google Maps/i);
-        fireEvent.change(urlInput, {
-            target: { value: 'https://maps.google.com/maps/place/x/@1s0x2e68dd612d0f5c99:0x9f13c4b77ce33cf' },
+        await waitFor(() => expect(screen.getByText(/Belum terhubung/i)).toBeInTheDocument());
+    });
+
+    it('opens "Hubungkan Maps" modal with link textarea', async () => {
+        vi.stubGlobal(
+            'fetch',
+            makeFetch(() => placesSuccess([], [])),
+        );
+        render(<GoogleReviews />);
+        await waitFor(() => expect(screen.getByText(/Hubungkan Maps/i)).toBeInTheDocument());
+        fireEvent.click(screen.getByText(/Hubungkan Maps/i));
+        expect(screen.getByPlaceholderText(/google\.com\/maps/i)).toBeInTheDocument();
+    });
+
+    it('saves Maps link (coordinate @lat,lng) → posts google_place_link', async () => {
+        const fetchMock = makeFetch((url: string, opts?: any) => {
+            if (url.includes('/api/google-reviews/settings') && opts?.body) {
+                const body = JSON.parse(opts.body);
+                // BE akan resolve @lat,lng → Place ID. FE cukup kirim link mentah.
+                expect(body.google_place_link).toContain('@-6.2,106.8');
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ status: 'success', place_id: 'ChIJresolved' }),
+                });
+            }
+            return placesSuccess([], []);
         });
-        fireEvent.click(screen.getByText(/Ekstrak Place ID dari Tautan/i));
-        // Kode baru menyimpan hex asli, BUKAN ChIJ palsu (bug lama).
-        const placeInput = await screen.findByDisplayValue(/^0x2e68dd612d0f5c99:0x9f13c4b77ce33cf$/);
-        expect(placeInput).toBeInTheDocument();
-        // Tidak boleh ada nilai ChIJ palsu.
-        expect(screen.queryByDisplayValue(/^ChIJ/i)).not.toBeInTheDocument();
+        vi.stubGlobal('fetch', fetchMock);
+        render(<GoogleReviews />);
+        await waitFor(() => expect(screen.getByText(/Hubungkan Maps/i)).toBeInTheDocument());
+        fireEvent.click(screen.getByText(/Hubungkan Maps/i));
+        const ta = screen.getByPlaceholderText(/google\.com\/maps/i);
+        fireEvent.change(ta, {
+            target: { value: 'https://www.google.com/maps/place/Resto/@-6.2,106.8,17z' },
+        });
+        fireEvent.click(screen.getByText(/Simpan/i));
+        await waitFor(() => expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(2));
     });
 
-    it('shows demo banner when not connected to GBP (transparent, not silent)', async () => {
+    it('shows settings error when link unrecognized', async () => {
         vi.stubGlobal(
             'fetch',
-            makeFetch((url: string) => {
-                if (url.includes('/api/google-reviews/sync')) {
+            makeFetch((url: string, opts?: any) => {
+                if (url.includes('/api/google-reviews/settings')) {
                     return Promise.resolve({
                         ok: true,
-                        json: () =>
-                            Promise.resolve({
-                                status: 'demo',
-                                connected: false,
-                                message:
-                                    'Menampilkan data contoh. Hubungkan Google Business Profile untuk ulasan sungguhan.',
-                                reviews: reviewsFixture,
-                            }),
+                        json: () => Promise.resolve({ status: 'error', message: 'Link tidak dikenali.' }),
                     });
                 }
-                return reviewsSuccess();
+                return placesSuccess([], []);
             }),
         );
         render(<GoogleReviews />);
-        await waitFor(() => expect(screen.getByText('Budi')).toBeInTheDocument());
-        fireEvent.click(screen.getByText(/Sinkronkan Ulasan/i));
-        await waitFor(() =>
-            expect(screen.getByText(/Hubungkan Google Business Profile untuk ulasan sungguhan/i)).toBeInTheDocument(),
-        );
-        // Tombol "Hubungkan GBP" harus tampil (belum connected).
-        expect(screen.getByText(/Hubungkan GBP/i)).toBeInTheDocument();
-    });
-
-    it('shows connected badge after live sync', async () => {
-        vi.stubGlobal(
-            'fetch',
-            makeFetch((url: string) => {
-                if (url.includes('/api/google-reviews/sync')) {
-                    return Promise.resolve({
-                        ok: true,
-                        json: () =>
-                            Promise.resolve({
-                                status: 'success',
-                                connected: true,
-                                message: 'OK',
-                                reviews: reviewsFixture,
-                            }),
-                    });
-                }
-                return reviewsSuccess();
-            }),
-        );
-        render(<GoogleReviews />);
-        await waitFor(() => expect(screen.getByText('Budi')).toBeInTheDocument());
-        fireEvent.click(screen.getByText(/Sinkronkan Ulasan/i));
-        await waitFor(() => expect(screen.getByText(/Terhubung GBP/i)).toBeInTheDocument());
-    });
-
-    it('opens settings panel', () => {
-        vi.stubGlobal(
-            'fetch',
-            makeFetch(() => reviewsSuccess([])),
-        );
-        render(<GoogleReviews />);
-        fireEvent.click(screen.getByText(/Pengaturan GBP/i));
-        expect(screen.getAllByText(/Place ID|API Key|API/i).length).toBeGreaterThan(0);
+        await waitFor(() => expect(screen.getByText(/Hubungkan Maps/i)).toBeInTheDocument());
+        fireEvent.click(screen.getByText(/Hubungkan Maps/i));
+        const ta = screen.getByPlaceholderText(/google\.com\/maps/i);
+        fireEvent.change(ta, { target: { value: 'bukan link' } });
+        fireEvent.click(screen.getByText(/Simpan/i));
+        await waitFor(() => expect(screen.getByText(/Link tidak dikenali/i)).toBeInTheDocument());
     });
 });
 
 describe('Owner/GoogleReviews — robustness (real, not claims)', () => {
     it('polls automatically (real-time) without user action', async () => {
-        const fetchMock = makeFetch(() => reviewsSuccess());
+        const fetchMock = makeFetch(() => placesSuccess());
         vi.stubGlobal('fetch', fetchMock);
         vi.useFakeTimers();
         render(<GoogleReviews />);
-        // mount fetch
         await act(async () => {
             await Promise.resolve();
         });
         const callsAfterMount = fetchMock.mock.calls.length;
         expect(callsAfterMount).toBeGreaterThanOrEqual(1);
-        // advance 30s -> interval harus trigger fetch lagi
         await act(async () => {
             vi.advanceTimersByTime(30000);
             await Promise.resolve();
@@ -229,7 +246,7 @@ describe('Owner/GoogleReviews — robustness (real, not claims)', () => {
                     status: 500,
                     json: () => Promise.resolve({ status: 'error', message: 'Server down' }),
                 });
-            return reviewsSuccess();
+            return placesSuccess();
         });
         vi.stubGlobal('fetch', fetchMock);
         render(<GoogleReviews />);
@@ -248,12 +265,11 @@ describe('Owner/GoogleReviews — robustness (real, not claims)', () => {
                         Promise.resolve({ status: 'error', message: 'AI gagal membuat balasan. Tulis manual.' }),
                 });
             }
-            return reviewsSuccess();
+            return placesSuccess();
         });
         vi.stubGlobal('fetch', fetchMock);
         render(<GoogleReviews />);
         await waitFor(() => expect(screen.getByText('Budi')).toBeInTheDocument());
-        // buka draft balasan untuk Budi (belum dibalas)
         fireEvent.click(screen.getByText(/Balas Manual/i));
         fireEvent.click(screen.getByText(/Auto Balas dengan AI/i));
         await waitFor(() => expect(screen.getByText(/AI gagal membuat balasan\. Tulis manual\./)).toBeInTheDocument());
@@ -264,10 +280,10 @@ describe('Owner/GoogleReviews — robustness (real, not claims)', () => {
             if (url.includes('/reply')) {
                 return Promise.resolve({
                     ok: true,
-                    json: () => Promise.resolve({ status: 'error', message: 'Gagal mengirim balasan.' }),
+                    json: () => Promise.resolve({ status: 'error', message: 'Gagal menyimpan balasan.' }),
                 });
             }
-            return reviewsSuccess();
+            return placesSuccess();
         });
         vi.stubGlobal('fetch', fetchMock);
         render(<GoogleReviews />);
@@ -276,6 +292,20 @@ describe('Owner/GoogleReviews — robustness (real, not claims)', () => {
         const ta = screen.getByPlaceholderText(/Tuliskan pesan balasan/i);
         fireEvent.change(ta, { target: { value: 'Terima kasih!' } });
         fireEvent.click(screen.getByText(/Kirim Balasan/i));
-        await waitFor(() => expect(screen.getByText(/Gagal mengirim balasan\./)).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByText(/Gagal menyimpan balasan\./)).toBeInTheDocument());
+    });
+
+    it('copy reply button does not crash when clipboard unavailable', async () => {
+        const fetchMock = makeFetch(() => placesSuccess());
+        vi.stubGlobal('fetch', fetchMock);
+        render(<GoogleReviews />);
+        await waitFor(() => expect(screen.getByText('Budi')).toBeInTheDocument());
+        fireEvent.click(screen.getByText(/Balas Manual/i));
+        const ta = screen.getByPlaceholderText(/Tuliskan pesan balasan/i);
+        fireEvent.change(ta, { target: { value: 'Terima kasih!' } });
+        // navigator.clipboard mungkin undefined di jsdom → copyReply menangkap error.
+        fireEvent.click(screen.getByText(/Salin Balasan/i));
+        // Tidak boleh throw; draft tetap utuh.
+        expect(screen.getByText(/Salin Balasan/i)).toBeInTheDocument();
     });
 });

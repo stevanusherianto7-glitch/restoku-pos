@@ -10,7 +10,6 @@ import {
     SettingsIcon,
     SparklesIcon,
     AlertCircleIcon,
-    StoreIcon,
     XIcon,
     MessageSquareIcon,
 } from '../../Components/icons';
@@ -30,57 +29,20 @@ export default function GoogleReviews() {
     const { screenMode } = useTenantSettings();
     const isNanoBanana = screenMode === 'nano-banana';
 
-    const [reviews, setReviews] = useState<Review[]>([]);
+    const [unreplied, setUnreplied] = useState<Review[]>([]);
+    const [replied, setReplied] = useState<Review[]>([]);
     const [loading, setLoading] = useState(false);
-    const [syncing, setSyncing] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [connected, setConnected] = useState(false);
+    const [source, setSource] = useState<string>('local');
+    const [placeId, setPlaceId] = useState<string | null>(null);
     const [filterRating, setFilterRating] = useState<'all' | 'complaints' | 'positive'>('all');
-    const [filterStatus, setFilterStatus] = useState<'all' | 'unreplied' | 'replied'>('all');
+    const [filterStatus, setFilterStatus] = useState<'all' | 'unreplied' | 'replied'>('unreplied');
 
-    // SettingsIcon states
+    // Settings: tempel link Google Maps (auto-detect Place ID di BE).
     const [showSettings, setShowSettings] = useState(false);
-    const [placeId, setPlaceId] = useState('ChIJrTLr-GzsaS4R350O6vCqzw4');
-    const [apiKey, setApiKey] = useState('AIzaSyA1234567890-XYZ-restoku-gmaps');
-
-    // Place ID Helper / Generator states
-    const [helperMode, setHelperMode] = useState<'none' | 'url' | 'search'>('none');
-    const [helperUrl, setHelperUrl] = useState('');
-    const [helperSearch, setHelperSearch] = useState('');
-    const [helperMessage, setHelperMessage] = useState('');
-
-    const handleParseUrl = () => {
-        if (!helperUrl.trim()) return;
-
-        // Ekstrak Place ID asli dari URL Maps (format hex 0x...:0x...).
-        // TIDAK memalsukan jadi 'ChIJ...' — itu sebabkan sync "berhasil" tapi data palsu.
-        const hexMatch = helperUrl.match(/1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);
-        if (hexMatch) {
-            const realPlaceId = hexMatch[1];
-            setPlaceId(realPlaceId);
-            setHelperMessage(`Tautan terdeteksi. Place ID asli diekstrak: ${realPlaceId}`);
-            return;
-        }
-
-        // Place ID kanonik ChIJ (jika user tempel langsung, bukan dari URL).
-        const chijMatch = helperUrl.match(/ChIJ[A-Za-z0-9_-]+/);
-        if (chijMatch) {
-            setPlaceId(chijMatch[0]);
-            setHelperMessage(`Place ID ditemukan: ${chijMatch[0]}`);
-            return;
-        }
-
-        setHelperMessage('Tautan tidak valid. Tempel tautan Google Maps lengkap (berisi 1s0x...).');
-    };
-
-    const handleSearchName = () => {
-        if (!helperSearch.trim()) return;
-
-        // Nama → butuh resolve via Google (Place ID / location GBP). Tidak tebak ChIJ.
-        setHelperMessage(
-            'Pencarian nama butuh koneksi Google Business Profile. Klik "Hubungkan GBP" lalu pilih lokasi dari daftar — Place ID akan otomatis terisi.',
-        );
-    };
+    const [placeLink, setPlaceLink] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [settingsError, setSettingsError] = useState<string | null>(null);
 
     // Reply states
     const [replyingToId, setReplyingToId] = useState<number | null>(null);
@@ -89,18 +51,24 @@ export default function GoogleReviews() {
     const [aiError, setAiError] = useState<string | null>(null);
     const [replyError, setReplyError] = useState<string | null>(null);
 
+    const csrf = () => (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+
     const fetchReviews = async () => {
         setLoading(true);
         setError(null);
         try {
             const res = await fetch('/api/google-reviews');
             const data = await res.json();
-            if (data.status === 'success') {
-                setReviews(data.reviews);
-                setConnected(!!data.connected);
-            } else {
+            if (data.status === 'success' || data.status === 'none') {
+                setUnreplied(data.unreplied || []);
+                setReplied(data.replied || []);
+                setSource(data.source);
+                setPlaceId(data.place_id || null);
+                if (data.status === 'error') {
+                    setError(data.message || 'Gagal memuat ulasan Google.');
+                }
+            } else if (data.status === 'error') {
                 setError(data.message || 'Gagal memuat ulasan Google.');
-                setConnected(!!data.connected);
             }
         } catch (err) {
             setError('Tidak dapat terhubung ke server. Periksa koneksi Anda.');
@@ -110,40 +78,29 @@ export default function GoogleReviews() {
         }
     };
 
-    const handleSync = async () => {
-        setSyncing(true);
-        setError(null);
+    const handleSaveSettings = async () => {
+        if (!placeLink.trim()) return;
+        setSaving(true);
+        setSettingsError(null);
         try {
-            const res = await fetch('/api/google-reviews/sync', {
+            const res = await fetch('/api/google-reviews/settings', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'XIcon-CSRF-TOKEN':
-                        (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
-                },
+                headers: { 'Content-Type': 'application/json', 'XIcon-CSRF-TOKEN': csrf() },
+                body: JSON.stringify({ google_place_link: placeLink }),
             });
             const data = await res.json();
             if (data.status === 'success') {
-                setReviews(data.reviews);
-                setConnected(!!data.connected);
-                // Setelah sinkron, langsung fokus ke ulasan yang belum dibalas
-                // supaya owner langsung melihat commentary yang butuh tanggapan.
-                const unreplied = (data.reviews as Review[]).filter((r) => !r.reply_text).length;
-                setFilterStatus(unreplied > 0 ? 'unreplied' : 'all');
-            } else if (data.status === 'demo') {
-                // Transparan: data contoh, belum terhubung GBP.
-                setReviews(data.reviews);
-                setConnected(false);
-                setError(data.message || 'Menampilkan data contoh (belum terhubung GBP).');
+                setShowSettings(false);
+                setPlaceLink('');
+                await fetchReviews();
             } else {
-                setError(data.message || 'Sinkronisasi gagal. Coba lagi.');
-                setConnected(!!data.connected);
+                setSettingsError(data.message || 'Link tidak dikenali.');
             }
         } catch (err) {
-            setError('Sinkronisasi gagal. Periksa koneksi Anda.');
+            setSettingsError('Gagal menyimpan. Periksa koneksi Anda.');
             console.error(err);
         } finally {
-            setSyncing(false);
+            setSaving(false);
         }
     };
 
@@ -153,23 +110,21 @@ export default function GoogleReviews() {
         try {
             const res = await fetch(`/api/google-reviews/${reviewId}/reply`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'XIcon-CSRF-TOKEN':
-                        (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
-                },
+                headers: { 'Content-Type': 'application/json', 'XIcon-CSRF-TOKEN': csrf() },
                 body: JSON.stringify({ reply_text: replyText }),
             });
             const data = await res.json();
             if (data.status === 'success') {
-                setReviews((prev) => prev.map((r) => (r.id === reviewId ? data.review : r)));
+                const updated = data.review as Review;
+                setUnreplied((prev) => prev.filter((r) => r.id !== reviewId));
+                setReplied((prev) => [updated, ...prev]);
                 setReplyingToId(null);
                 setReplyText('');
             } else {
-                setReplyError(data.message || 'Gagal mengirim balasan.');
+                setReplyError(data.message || 'Gagal menyimpan balasan.');
             }
         } catch (err) {
-            setReplyError('Gagal mengirim balasan. Periksa koneksi Anda.');
+            setReplyError('Gagal menyimpan balasan. Periksa koneksi Anda.');
             console.error(err);
         }
     };
@@ -180,11 +135,7 @@ export default function GoogleReviews() {
         try {
             const res = await fetch(`/api/google-reviews/${reviewId}/generate-ai-reply`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'XIcon-CSRF-TOKEN':
-                        (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
-                },
+                headers: { 'Content-Type': 'application/json', 'XIcon-CSRF-TOKEN': csrf() },
             });
             const data = await res.json();
             if (data.status === 'success') {
@@ -201,23 +152,12 @@ export default function GoogleReviews() {
         }
     };
 
-    const handleSaveSettings = async () => {
+    const copyReply = async () => {
+        if (!replyText) return;
         try {
-            const res = await fetch('/api/google-reviews/settings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'XIcon-CSRF-TOKEN':
-                        (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
-                },
-                body: JSON.stringify({ google_place_id: placeId, api_key: apiKey }),
-            });
-            const data = await res.json();
-            if (data.status === 'success') {
-                setShowSettings(false);
-            }
-        } catch (err) {
-            console.error(err);
+            await navigator.clipboard.writeText(replyText);
+        } catch {
+            /* clipboard may be blocked; user can select manually */
         }
     };
 
@@ -229,15 +169,13 @@ export default function GoogleReviews() {
         return () => clearInterval(id);
     }, []);
 
+    // Gabungkan sesuai filter status.
+    const reviews = [...unreplied, ...replied];
     const filteredReviews = reviews.filter((r) => {
-        // Filter Rating
         if (filterRating === 'complaints' && r.rating > 3) return false;
         if (filterRating === 'positive' && r.rating < 4) return false;
-
-        // Filter Status
         if (filterStatus === 'unreplied' && r.reply_text) return false;
         if (filterStatus === 'replied' && !r.reply_text) return false;
-
         return true;
     });
 
@@ -274,36 +212,37 @@ export default function GoogleReviews() {
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            {connected ? (
-                                <span className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
-                                    <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                                    Terhubung GBP
-                                </span>
-                            ) : (
-                                <a
-                                    href="/owner/google-reviews/connect"
-                                    className="bg-blue-500/15 hover:bg-blue-500/25 text-blue-200 border border-blue-500/30 rounded-xl px-4 py-2.5 text-xs font-semibold flex items-center gap-2 transition-all"
-                                >
-                                    <StoreIcon className="size-3.5" /> Hubungkan GBP
-                                </a>
-                            )}
+                            <span
+                                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold ${
+                                    source === 'places'
+                                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                                        : 'bg-white/5 border-white/10 text-slate-400'
+                                }`}
+                            >
+                                <span
+                                    className={`size-2 rounded-full ${
+                                        source === 'places' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
+                                    }`}
+                                />
+                                {source === 'places' ? 'Real-time • Places API' : 'Belum terhubung'}
+                            </span>
                             <button
                                 onClick={() => setShowSettings(true)}
                                 className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl px-4 py-2.5 text-xs font-semibold flex items-center gap-2 transition-all"
                             >
-                                <SettingsIcon className="size-3.5" /> Pengaturan GBP
+                                <SettingsIcon className="size-3.5" /> Hubungkan Maps
                             </button>
                             <button
-                                onClick={handleSync}
-                                disabled={syncing}
+                                onClick={fetchReviews}
+                                disabled={loading}
                                 className={`text-black rounded-xl px-4 py-2.5 text-xs font-semibold flex items-center gap-2 transition-all ${
                                     isNanoBanana
                                         ? 'bg-amber-400 hover:bg-amber-500'
                                         : 'bg-emerald-400 hover:bg-emerald-500'
                                 } disabled:opacity-50`}
                             >
-                                <RefreshCwIcon className={`size-3.5 ${syncing ? 'animate-spin' : ''}`} />
-                                {syncing ? 'Sinkronisasi...' : 'Sinkronkan Ulasan'}
+                                <RefreshCwIcon className={`size-3.5 ${loading ? 'animate-spin' : ''}`} />
+                                {loading ? 'Memuat...' : 'Segarkan'}
                             </button>
                         </div>
                     </div>
@@ -543,6 +482,13 @@ export default function GoogleReviews() {
                                                                 Batal
                                                             </button>
                                                             <button
+                                                                onClick={copyReply}
+                                                                disabled={!replyText.trim()}
+                                                                className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40"
+                                                            >
+                                                                Salin Balasan
+                                                            </button>
+                                                            <button
                                                                 onClick={() => handleReplySubmit(review.id)}
                                                                 disabled={!replyText.trim()}
                                                                 className="bg-emerald-500 hover:bg-emerald-600 text-black px-4 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-all disabled:opacity-50"
@@ -603,122 +549,40 @@ export default function GoogleReviews() {
                                 </button>
                                 <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-2">
                                     <SettingsIcon className="size-5 text-emerald-400" />
-                                    Pengaturan Google Business
+                                    Hubungkan Google Maps
                                 </h3>
                                 <p className="text-xs text-slate-400 mb-5">
-                                    Hubungkan lokasi Google Maps gerai Anda untuk memicu sinkronisasi ulasan otomatis.
+                                    Tempel <strong>link Google Maps</strong> restoran Anda. Restoku otomatis mendeteksi
+                                    Place ID (termasuk dari koordinat @lat,lng). Ulasan akan tampil real-time.
                                 </p>
 
                                 <div className="space-y-4">
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                                            Google Place ID
+                                            Link Google Maps Restoran
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={placeId}
-                                            onChange={(e) => setPlaceId(e.target.value)}
-                                            placeholder="Masukkan Google Place ID gerai Anda"
-                                            className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500"
+                                        <textarea
+                                            value={placeLink}
+                                            onChange={(e) => setPlaceLink(e.target.value)}
+                                            placeholder="https://www.google.com/maps/place/Nama+Resto/@-6.2,106.8,17z"
+                                            rows={3}
+                                            className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500 resize-none"
                                         />
                                     </div>
 
-                                    {/* Place ID Generator Helper Widget */}
-                                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-3 space-y-3">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                                Bantuan Cari Place ID
-                                            </span>
-                                            <div className="flex gap-1">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setHelperMode(helperMode === 'url' ? 'none' : 'url');
-                                                        setHelperMessage('');
-                                                    }}
-                                                    className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${
-                                                        helperMode === 'url'
-                                                            ? 'bg-emerald-500/20 text-emerald-300'
-                                                            : 'bg-white/5 text-slate-400 hover:text-white'
-                                                    }`}
-                                                >
-                                                    Tempel Link Maps
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setHelperMode(helperMode === 'search' ? 'none' : 'search');
-                                                        setHelperMessage('');
-                                                    }}
-                                                    className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${
-                                                        helperMode === 'search'
-                                                            ? 'bg-emerald-500/20 text-emerald-300'
-                                                            : 'bg-white/5 text-slate-400 hover:text-white'
-                                                    }`}
-                                                >
-                                                    Cari Nama Resto
-                                                </button>
-                                            </div>
-                                        </div>
+                                    {settingsError && (
+                                        <p className="text-[10px] text-red-300/90 leading-normal flex items-start gap-1">
+                                            <AlertCircleIcon className="size-3.5 shrink-0 text-red-400 mt-0.5" />
+                                            {settingsError}
+                                        </p>
+                                    )}
 
-                                        {helperMode === 'url' && (
-                                            <div className="space-y-2">
-                                                <input
-                                                    type="text"
-                                                    value={helperUrl}
-                                                    onChange={(e) => setHelperUrl(e.target.value)}
-                                                    placeholder="Tempel tautan Google Maps di sini..."
-                                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={handleParseUrl}
-                                                    className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                                                >
-                                                    Ekstrak Place ID dari Tautan
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {helperMode === 'search' && (
-                                            <div className="space-y-2">
-                                                <input
-                                                    type="text"
-                                                    value={helperSearch}
-                                                    onChange={(e) => setHelperSearch(e.target.value)}
-                                                    placeholder="Masukkan nama restoran Anda..."
-                                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={handleSearchName}
-                                                    className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                                                >
-                                                    Cari ID Otomatis
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {helperMessage && (
-                                            <p className="text-[10px] text-amber-300/90 leading-normal flex items-start gap-1">
-                                                <AlertCircleIcon className="size-3.5 shrink-0 text-amber-400 mt-0.5" />
-                                                {helperMessage}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    <div className="flex flex-col gap-1.5">
-                                        <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                                            Google API Key
-                                        </label>
-                                        <input
-                                            type="password"
-                                            value={apiKey}
-                                            onChange={(e) => setApiKey(e.target.value)}
-                                            placeholder="Masukkan Google Maps API Key"
-                                            className="bg-black/60 border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-emerald-500"
-                                        />
-                                    </div>
+                                    {placeId && (
+                                        <p className="text-[10px] text-emerald-300/90 leading-normal flex items-start gap-1">
+                                            <CheckCircle2Icon className="size-3.5 shrink-0 text-emerald-400 mt-0.5" />
+                                            Terhubung: Place ID <code className="font-mono">{placeId}</code>
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="flex justify-end gap-2.5 mt-6">

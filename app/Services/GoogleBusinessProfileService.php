@@ -195,7 +195,71 @@ class GoogleBusinessProfileService
         return $rows;
     }
 
-    /** Balas ulasan ke Google (live) + simpan lokal. */
+    /**
+     * Ambil ulasan live dari Google Places API (Place Details) by Place ID.
+     * Real-time: memanggil maps.googleapis.com langsung dengan server-key Restoku.
+     *
+     * @return array{rating:?float,user_ratings_total:?int,reviews:array}
+     */
+    public function fetchReviewsFromPlaceId(string $placeId, ?int $outletId = null, ?int $tenantId = null): array
+    {
+        $cacheKey = "gbp_reviews_places_{$placeId}";
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $key = config('google-business-profile.places_api_key');
+        if (! $key) {
+            throw new \RuntimeException('GOOGLE_PLACES_API_KEY belum dikonfigurasi.');
+        }
+
+        $resp = Http::get(config('google-business-profile.places_api_base'), [
+            'place_id' => $placeId,
+            'fields' => 'reviews,rating,user_ratings_total',
+            'key' => $key,
+        ]);
+
+        $body = $resp->json();
+        if (($body['status'] ?? '') !== 'OK') {
+            throw new \RuntimeException('Google Places API: '.($body['error_message'] ?? $body['status'] ?? 'unknown'));
+        }
+
+        $result = $body['result'] ?? [];
+        $rows = [];
+        foreach ($result['reviews'] ?? [] as $r) {
+            $rid = (string) ($r['time'] ?? uniqid('rev_'));
+            $review = GoogleReview::withoutGlobalScope(TenantScope::class)
+                ->updateOrCreate(
+                    ['tenant_id' => $tenantId, 'google_review_id' => $rid],
+                    [
+                        'outlet_id' => $outletId,
+                        'reviewer_name' => $r['author_name'] ?? 'Anonim',
+                        'reviewer_photo' => $r['profile_photo_url'] ?? null,
+                        'rating' => (int) ($r['rating'] ?? 0),
+                        'comment' => $r['text'] ?? '',
+                        'reviewed_at' => isset($r['time'])
+                            ? Carbon::createFromTimestamp((int) $r['time'])
+                            : now(),
+                        'source' => 'places',
+                    ]
+                );
+            $rows[] = $review;
+        }
+
+        $rows = collect($rows)->sortByDesc('reviewed_at')->values()->all();
+
+        $payload = [
+            'rating' => $result['rating'] ?? null,
+            'user_ratings_total' => $result['user_ratings_total'] ?? null,
+            'reviews' => $rows,
+        ];
+
+        Cache::put($cacheKey, $payload, config('google-business-profile.cache_ttl'));
+
+        return $payload;
+    }
+
     public function postReply(User $user, GoogleBpToken $token, string $reviewId, string $text): void
     {
         $token = $this->refreshIfNeeded($token);

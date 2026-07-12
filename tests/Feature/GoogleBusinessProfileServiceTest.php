@@ -135,23 +135,60 @@ class GoogleBusinessProfileServiceTest extends TestCase
         $this->assertNotEquals('rt', $raw->refresh_token);
     }
 
-    public function test_fetch_uses_config_location_id_override_when_token_has_none(): void
+    public function test_fetch_reviews_from_place_id_calls_places_api(): void
     {
-        // Token TIDAK punya location_id → service harus fallback ke config override.
-        $this->token->update(['location_id' => null]);
-
+        config(['google-business-profile.places_api_key' => 'test-key']);
         Http::fake([
-            'mybusinessaccountmanagement.googleapis.com/*' => Http::response(['accounts' => [['name' => 'accounts/11440950457431200377']]]),
-            'businessprofile.googleapis.com/*' => Http::response([
-                'reviews' => [['reviewId' => 'r9', 'reviewer' => ['displayName' => 'Dewi'], 'starRating' => 'FOUR', 'comment' => 'Mantap', 'createTime' => now()->toRfc3339String()]],
+            'maps.googleapis.com/maps/api/place/details/*' => Http::response([
+                'status' => 'OK',
+                'result' => [
+                    'rating' => 4.5,
+                    'user_ratings_total' => 120,
+                    'reviews' => [
+                        [
+                            'author_name' => 'Budi',
+                            'rating' => 5,
+                            'text' => 'Enak!',
+                            'time' => 1700000000,
+                            'profile_photo_url' => 'http://x/y.jpg',
+                        ],
+                        [
+                            'author_name' => 'Siti',
+                            'rating' => 2,
+                            'text' => 'Lambat',
+                            'time' => 1699990000,
+                        ],
+                    ],
+                ],
             ]),
         ]);
 
         $service = new GoogleBusinessProfileService;
-        $reviews = $service->fetchReviews($this->user, $this->token);
+        $payload = $service->fetchReviewsFromPlaceId('ChIJabc123', $this->user->outlet_id, $this->user->tenant_id);
 
-        $this->assertCount(1, $reviews);
-        // Endpoint harus pakai accounts/{account}/locations/{location} dengan angka override.
-        Http::assertSent(fn ($req) => str_contains((string) $req->url(), '/accounts/11440950457431200377/locations/11440950457431200377/reviews'));
+        $this->assertEquals(4.5, $payload['rating']);
+        $this->assertEquals(120, $payload['user_ratings_total']);
+        $this->assertCount(2, $payload['reviews']);
+        // sorted desc by time → Budi (1700000000) duluan.
+        $this->assertEquals('Budi', $payload['reviews'][0]->reviewer_name);
+        $this->assertDatabaseHas('google_reviews', ['google_review_id' => '1700000000', 'rating' => 5, 'source' => 'places']);
+        Http::assertSent(fn ($req) => str_contains((string) $req->url(), 'maps.googleapis.com/maps/api/place/details')
+            && str_contains((string) $req->url(), 'place_id=ChIJabc123')
+            && str_contains((string) $req->url(), 'key=test-key'));
+    }
+
+    public function test_fetch_reviews_from_place_id_throws_on_non_ok(): void
+    {
+        config(['google-business-profile.places_api_key' => 'test-key']);
+        Http::fake([
+            'maps.googleapis.com/maps/api/place/details/*' => Http::response([
+                'status' => 'INVALID_REQUEST',
+                'error_message' => 'bad place',
+            ]),
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $this->expectException(\RuntimeException::class);
+        $service->fetchReviewsFromPlaceId('ChIJbad', null, $this->user->tenant_id);
     }
 }

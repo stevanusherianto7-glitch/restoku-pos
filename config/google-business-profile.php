@@ -14,8 +14,18 @@ return [
         'https://www.googleapis.com/auth/business.manage',
     ],
 
-    // Endpoint Business Profile API (v1).
+    // Endpoint Business Profile API (v1) — TIDAK LAGI DIPAKAI (gated Google).
+    // Dipertahankan untuk referensi, alur ulasan sekarang via Places API (lihat bawah).
     'api_base' => 'https://businessprofile.googleapis.com/v1',
+
+    /*
+     * Google Places API (ulasan real-time by Place ID).
+     * Satu server-key Restoku untuk SEMUA tenant (bukan per-tenant).
+     * Key diisi di .env GOOGLE_PLACES_API_KEY — jangan expose ke FE.
+     */
+    'places_api_key' => env('GOOGLE_PLACES_API_KEY', ''),
+    'places_api_base' => 'https://maps.googleapis.com/maps/api/place/details/json',
+    'geocode_api_base' => 'https://maps.googleapis.com/maps/api/geocode/json',
 
     /*
      * Override accountId GBP (resource name: accounts/{id}).

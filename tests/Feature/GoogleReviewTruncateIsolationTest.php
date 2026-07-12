@@ -6,13 +6,14 @@ use App\Models\GoogleReview;
 use App\Models\Outlet;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\GoogleBusinessProfileService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /**
- * M2 (Security Audit): menangkap regresi C1 — sync review tenant A
- * tidak boleh menghapus review tenant B (truncate() bypass scope).
+ * M2 (Security Audit): fetchReviewsFromPlaceId tidak boleh bocor lintas-tenant.
+ * Review hasil sync tenant A tidak boleh menimpa/mengacak review tenant B.
  */
 class GoogleReviewTruncateIsolationTest extends TestCase
 {
@@ -29,8 +30,8 @@ class GoogleReviewTruncateIsolationTest extends TestCase
         $tenantA = Tenant::create(['name' => 'Tenant A', 'brand_name' => 'A', 'email' => 'a@test.com', 'phone' => '081']);
         $tenantB = Tenant::create(['name' => 'Tenant B', 'brand_name' => 'B', 'email' => 'b@test.com', 'phone' => '082']);
 
-        $outletA = Outlet::create(['tenant_id' => $tenantA->id, 'name' => 'Outlet A', 'address' => 'Jl A']);
-        $outletB = Outlet::create(['tenant_id' => $tenantB->id, 'name' => 'Outlet B', 'address' => 'Jl B']);
+        $outletA = Outlet::create(['tenant_id' => $tenantA->id, 'name' => 'Outlet A', 'address' => 'Jl A', 'google_place_id' => 'ChIJA']);
+        $outletB = Outlet::create(['tenant_id' => $tenantB->id, 'name' => 'Outlet B', 'address' => 'Jl B', 'google_place_id' => 'ChIJB']);
 
         $this->userA = User::create([
             'tenant_id' => $tenantA->id, 'outlet_id' => $outletA->id,
@@ -43,7 +44,7 @@ class GoogleReviewTruncateIsolationTest extends TestCase
             'password' => bcrypt('pw'), 'role' => 'owner',
         ]);
 
-        // Seed review untuk KEDUA tenant
+        // Seed review untuk KEDUA tenant (sudah ada sebelum sync).
         GoogleReview::create([
             'tenant_id' => $tenantA->id, 'outlet_id' => $outletA->id,
             'google_review_id' => 'rev_A', 'reviewer_name' => 'A', 'rating' => 5, 'comment' => 'a',
@@ -58,16 +59,28 @@ class GoogleReviewTruncateIsolationTest extends TestCase
 
     public function test_sync_tenant_a_does_not_delete_tenant_b_reviews(): void
     {
-        // Paksa placeId agar masuk branch truncate() lama (sekarang scoped delete)
-        Session::put('google_place_id', 'ChIJmVwPLWHdaC4RzzPOd0s88Qk');
+        config(['google-business-profile.places_api_key' => 'test-key']);
 
-        $this->actingAs($this->userA)
-            ->postJson('/api/google-reviews/sync')
-            ->assertStatus(200);
+        Http::fake([
+            'maps.googleapis.com/maps/api/place/details/*' => Http::response([
+                'status' => 'OK',
+                'result' => [
+                    'rating' => 5.0,
+                    'user_ratings_total' => 1,
+                    'reviews' => [
+                        ['author_name' => 'Caca', 'rating' => 5, 'text' => 'Mantap', 'time' => 1700000000],
+                    ],
+                ],
+            ]),
+        ]);
 
-        // Review tenant B harus tetap utuh (bukan terhapus oleh truncate lintas-tenant)
-        $this->assertDatabaseHas('google_reviews', ['google_review_id' => 'rev_B']);
-        // Review tenant A dihapus & di-reseed (harusnya ada lagi)
-        $this->assertDatabaseHas('google_reviews', ['tenant_id' => $this->userA->tenant_id]);
+        // Sync tenant A (updateOrCreate scoped by tenant_id → tidak sentuh tenant B).
+        $service = new GoogleBusinessProfileService;
+        $service->fetchReviewsFromPlaceId('ChIJA', $this->userA->outlet_id, $this->userA->tenant_id);
+
+        // Review tenant B tetap utuh (tidak terhapus/tertimpa).
+        $this->assertDatabaseHas('google_reviews', ['google_review_id' => 'rev_B', 'tenant_id' => $this->userB->tenant_id]);
+        // Review tenant A hasil sync ada (rev_A tetap + rev baru dari Places).
+        $this->assertDatabaseHas('google_reviews', ['tenant_id' => $this->userA->tenant_id, 'source' => 'places']);
     }
 }

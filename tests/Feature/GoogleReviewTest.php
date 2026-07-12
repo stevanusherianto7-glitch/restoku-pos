@@ -14,8 +14,11 @@ class GoogleReviewTest extends TestCase
     use RefreshDatabase;
 
     private User $userA;
+
     private User $userB;
+
     private GoogleReview $reviewA;
+
     private GoogleReview $reviewB;
 
     protected function setUp(): void
@@ -71,10 +74,13 @@ class GoogleReviewTest extends TestCase
     {
         $response = $this->actingAs($this->userA)->getJson('/api/google-reviews');
         $response->assertStatus(200);
-        
-        $reviews = $response->json('reviews');
-        $this->assertCount(1, $reviews);
-        $this->assertEquals('g_rev_a', $reviews[0]['google_review_id']);
+
+        // Controller baru: pisah unreplied/replied (bukan key 'reviews').
+        $unreplied = $response->json('unreplied');
+        $replied = $response->json('replied');
+        $all = array_merge($unreplied, $replied);
+        $this->assertCount(1, $all);
+        $this->assertEquals('g_rev_a', $all[0]['google_review_id']);
     }
 
     public function test_user_a_cannot_reply_to_review_from_tenant_b(): void
@@ -83,7 +89,7 @@ class GoogleReviewTest extends TestCase
             ->postJson("/api/google-reviews/{$this->reviewB->id}/reply", [
                 'reply_text' => 'Terima kasih atas masukannya',
             ]);
-            
+
         $response->assertStatus(404);
     }
 
@@ -93,7 +99,7 @@ class GoogleReviewTest extends TestCase
             ->postJson("/api/google-reviews/{$this->reviewA->id}/reply", [
                 'reply_text' => 'Terima kasih, kami akan perbaiki segera.',
             ]);
-            
+
         $response->assertStatus(200);
         $this->assertDatabaseHas('google_reviews', [
             'id' => $this->reviewA->id,
