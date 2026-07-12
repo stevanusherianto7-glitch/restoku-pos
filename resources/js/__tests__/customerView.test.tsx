@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 const mockUseTenantSettings = vi.hoisted(() => vi.fn());
 vi.mock('@inertiajs/react', async (importOriginal) => {
@@ -83,6 +83,58 @@ describe('BukuMenuDigital/CustomerView', () => {
         await new Promise((r) => setTimeout(r, 50));
         fireEvent.click(screen.getByText('Nasi Goreng'));
         // keranjang muncul (Pesan / cart badge)
+        expect(screen.getAllByText(/Pesan|Keranjang|Cart/i).length).toBeGreaterThan(0);
+    });
+
+    it('walks landing -> welcome -> howto flow', async () => {
+        render(<CustomerView />);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 50));
+        });
+        // landing modal
+        expect(screen.getByText(/Cita rasa Jawa/i)).toBeInTheDocument();
+        await act(async () => {
+            fireEvent.click(screen.getByText(/Masuk ke Menu/i));
+        });
+        // welcome screen
+        expect(screen.getByText(/Selamat Datang/i)).toBeInTheDocument();
+        expect(screen.getByText(/Meja A3/)).toBeInTheDocument();
+        await act(async () => {
+            fireEvent.click(screen.getByText(/Lanjut/i));
+        });
+        // howto screen
+        expect(screen.getByText(/Cara Memesan/i)).toBeInTheDocument();
+        expect(screen.getByText(/Kirim Pesanan/i)).toBeInTheDocument();
+    });
+
+    it('verifies dine-in with dev PIN 0000', async () => {
+        render(<CustomerView />);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 50));
+        });
+        await act(async () => {
+            fireEvent.click(screen.getByText(/Masuk ke Menu/i));
+        });
+        await act(async () => {
+            fireEvent.click(screen.getByText(/Lanjut/i));
+        });
+        await act(async () => {
+            fireEvent.click(screen.getByText(/Mulai Pesan/i));
+        });
+        // dine-in verify modal
+        expect(screen.getByText(/Verifikasi Dine-In/i)).toBeInTheDocument();
+        const pinInput = document.querySelector('input[maxlength="4"]') as HTMLInputElement;
+        expect(pinInput).toBeTruthy();
+        await act(async () => {
+            fireEvent.change(pinInput, { target: { value: '0000' } });
+        });
+        await act(async () => {
+            fireEvent.click(screen.getByText(/Verifikasi PIN/i));
+        });
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 50));
+        });
+        // setelah verify, masuk ke menu app (tombol Pesan muncul)
         expect(screen.getAllByText(/Pesan|Keranjang|Cart/i).length).toBeGreaterThan(0);
     });
 });
