@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mockup — Generator QR Meja (Restoku)</title>
+<style>
+  :root{
+    --cabe:#FF5B35; --emas:#F59E0B; --krem:#FAF5EE; --cokelat:#7C4A2D;
+    --ink:#1c1917; --muted:#78716c;
+  }
+  *{box-sizing:border-box;font-family:'Inter',system-ui,sans-serif;margin:0;padding:0}
+  body{background:#efe7dc;color:var(--ink);padding:28px}
+  .wrap{max-width:1120px;margin:0 auto}
+  /* top action bar */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+  .bar-left{display:flex;align-items:center;gap:10px;background:var(--cabe);color:#fff;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:14px;letter-spacing:.03em}
+  .bar-left svg{width:18px;height:18px}
+  .bar-right{display:flex;align-items:center;gap:8px;color:var(--cabe);font-weight:600;font-size:13px;
+    background:#fff;padding:11px 16px;border-radius:12px;border:1px solid rgba(255,91,53,.25)}
+  /* title */
+  h1{font-size:30px;font-weight:800;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px;max-width:620px}
+  /* info box */
+  .info{margin:20px 0;background:#fff;border:1px solid #e7ddd0;border-radius:14px;padding:16px 18px;
+    font-size:13px;color:#57534e;line-height:1.6}
+  .info b{color:var(--ink)}
+  .info .url{margin-top:8px;font-family:ui-monospace,monospace;font-size:12px;color:var(--cokelat);
+    background:#faf3ea;padding:6px 10px;border-radius:8px;display:inline-block}
+  /* controls */
+  .controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+  select{appearance:none;background:#fff;border:1px solid #e0d5c6;border-radius:10px;padding:10px 14px;
+    font-size:14px;color:var(--ink);min-width:180px;font-weight:600}
+  .btn-print{background:var(--cabe);color:#fff;border:none;border-radius:10px;padding:10px 18px;
+    font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;cursor:pointer}
+  .btn-print svg{width:16px;height:16px}
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  .card{background:#fff;border:1px solid #ece3d6;border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center}
+  .card h3{font-size:14px;font-weight:700;margin-bottom:12px;align-self:flex-start}
+  .qr{width:130px;height:130px;background:#fff;border:1px solid #eee;border-radius:12px;padding:8px}
+  .qr svg{width:100%;height:100%}
+  .card .url{font-family:ui-monospace,monospace;font-size:10px;color:var(--muted);margin:10px 0;text-align:center;word-break:break-all}
+  .card .acts{display:flex;gap:8px;width:100%}
+  .card .acts button{flex:1;border-radius:9px;padding:8px 0;font-size:12px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:5px}
+  .acts .dl{background:#f5ede2;color:var(--cokelat);border:1px solid #e6d9c8}
+  .acts .op{background:var(--cabe);color:#fff;border:none}
+  .acts svg{width:13px;height:13px}
+
+  /* ── PRINT CARD (image 3 style) ── */
+  .print-section{margin-top:40px}
+  .print-section h2{font-size:18px;font-weight:800;margin-bottom:14px}
+  .print-card{width:340px;background:#fffdf8;border:2px dashed #d9b25a;border-radius:20px;padding:26px 22px;
+    text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+  .print-card .pt{font-weight:800;font-size:18px}
+  .print-card .ps{font-size:11px;letter-spacing:.18em;color:#a8a29e;text-transform:uppercase;margin-top:2px}
+  .print-card .pqr{width:180px;height:180px;margin:18px auto;background:#fff;border-radius:14px;padding:10px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+  .print-card .pqr svg{width:100%;height:100%}
+  .brand{width:74px;height:74px;border-radius:50%;margin:0 auto 10px;
+    background:radial-gradient(circle at 50% 40%, #FF7A4D, #C9431F);display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;flex-direction:column;line-height:1}
+  .brand .bn{font-size:15px;letter-spacing:.02em}
+  .brand .by{font-size:10px;opacity:.85;margin-top:2px}
+  .print-card .lbl{font-size:10px;letter-spacing:.2em;color:#a8a29e;text-transform:uppercase;margin-top:6px}
+  .print-card .tnum{font-size:22px;font-weight:800;color:var(--ink);margin-top:2px}
+  .print-card .scan{font-size:11px;color:#a8a29e;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP ACTION BAR -->
+  <div class="bar">
+    <div class="bar-left">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      GENERATOR QR MEJA
+    </div>
+    <div class="bar-right">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5L9 20"/></svg>
+      KELOLA GALERI ACARA
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <h1>Buku Menu Digital</h1>
+  <p class="sub">QR Code untuk setiap meja — tamu scan langsung lihat menu &amp; pesan mandiri.</p>
+
+  <!-- INFO BOX -->
+  <div class="info">
+    <b>Cara kerja:</b> Cetak QR stiker untuk setiap meja, tempel di meja. Tamu scan QR → buka menu digital → pilih item → pesan langsung ke dapur.
+    <div class="url">http://localhost:8000/m/pawon-salam-bandung</div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <select>
+      <option>Semua Meja</option>
+      <option>Meja A1</option><option>Meja A2</option><option>Meja A3</option>
+    </select>
+    <button class="btn-print">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+      Cetak Semua
+    </button>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid" id="grid"></div>
+
+  <!-- PRINT CARD PREVIEW -->
+  <div class="print-section">
+    <h2>Preview Cetak (per meja)</h2>
+    <div class="print-card">
+      <div class="pt">Buku Menu Digital</div>
+      <div class="ps">Pawon Salam · Bandung</div>
+      <div class="pqr" data-qr></div>
+      <div class="brand"><span class="bn">Restoku</span><span class="by">57</span></div>
+      <div class="lbl">Nomor Meja</div>
+      <div class="tnum">Meja A1</div>
+      <div class="scan">Scan QR untuk pesan menu favorit Anda</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // inline fake-QR svg generator (deterministic blocks)
+  function fakeQR(seed){
+    let s=0; for(const c of seed) s=(s*31+c.charCodeAt(0))>>>0;
+    const n=21, cell=100/n; let rects='';
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+      s=(s*1103515245+12345)&0x7fffffff;
+      if((s>>8)&1) rects+=`<rect x="${(x*cell).toFixed(2)}" y="${(y*cell).toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}"/>`;
+    }
+    return `<svg viewBox="0 0 100 100" fill="#111"><rect width="100" height="100" fill="#fff"/>${rects}</svg>`;
+  }
+  const labels=['Meja A1','Meja A2','Meja A3','Meja A4','Meja A5','Meja A6','Meja A7','Meja A8','Meja A9','Meja A10'];
+  const grid=document.getElementById('grid');
+  const base='http://localhost:8000/m/pawon-salam-bandung?t=';
+  labels.forEach(l=>{
+    const t=l.replace('Meja ','');
+    const url=base+t;
+    grid.insertAdjacentHTML('beforeend',`
+      <div class="card">
+        <h3>${l}</h3>
+        <div class="qr" data-qr="${url}"></div>
+        <div class="url">${url}</div>
+        <div class="acts">
+          <button class="dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>Unduh</button>
+          <button class="op"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M21 3l-9 9M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></svg>Buka</button>
+        </div>
+      </div>`);
+  });
+  document.querySelectorAll('[data-qr]').forEach(el=>{
+    const v=el.getAttribute('data-qr')||'Meja A1';
+    el.innerHTML=fakeQR(v);
+  });
+</script>
+</body>
+</html>
