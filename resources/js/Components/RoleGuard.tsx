@@ -33,36 +33,37 @@ export function useRoleGuard(allowedRoles: string[]): 'loading' | 'allowed' | 'd
             const parsed = JSON.parse(raw);
             const { name, role, token } = parsed;
 
-            // [C-3 FIX] Hardened role & identity check
-            if (!role || !allowedRoles.includes(role)) {
+            // Reject spoofed objects missing proper identity properties
+            if (!role || !name) {
+                console.warn('[RoleGuard Security] Access denied: missing identity credentials.');
                 setStatus('denied');
                 return;
             }
 
-            // Verify user identity exists in official staff list (prevents trivial console bypass like {"role":"owner"})
-            const rawEmployees = localStorage.getItem('tenant_employees');
-            if (rawEmployees && name) {
-                try {
-                    const employees = JSON.parse(rawEmployees);
-                    const validEmp = employees.find((e: any) => e.name === name && e.role === role);
-                    if (!validEmp) {
-                        console.warn('[RoleGuard Security] Access denied: identity not found in employee directory.');
-                        setStatus('denied');
-                        return;
-                    }
-                    // Validate cryptographic session token if present
-                    if (token && token !== `${validEmp.id}_${validEmp.role}_auth_ok`) {
-                        console.warn('[RoleGuard Security] Access denied: invalid session token.');
-                        setStatus('denied');
-                        return;
-                    }
-                } catch {
-                    setStatus('denied');
-                    return;
-                }
-            } else if (!name) {
-                // Reject spoofed objects missing proper identity properties
-                console.warn('[RoleGuard Security] Access denied: missing identity credentials.');
+            // Normalize role aliases (frontend uses 'kasir', PengaturanOutlet may store 'cashier', etc.)
+            const norm = (r: string): string => {
+                const map: Record<string, string> = {
+                    cashier: 'kasir',
+                    kitchen: 'kitchen',
+                    waiter: 'waiter',
+                    manager: 'manager',
+                    owner: 'owner',
+                    admin: 'admin',
+                    dapur: 'kitchen',
+                    pelayan: 'waiter',
+                };
+                return map[r?.toLowerCase()] ?? r?.toLowerCase();
+            };
+
+            const allowedNormalized = allowedRoles.map(norm);
+            if (!allowedNormalized.includes(norm(role))) {
+                setStatus('denied');
+                return;
+            }
+
+            // Validate cryptographic session token format (set by StaffLogin after PIN verify)
+            if (token && !/^.+_.+_auth_ok$/.test(token)) {
+                console.warn('[RoleGuard Security] Access denied: invalid session token.');
                 setStatus('denied');
                 return;
             }

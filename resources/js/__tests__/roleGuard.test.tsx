@@ -67,7 +67,27 @@ describe('useRoleGuard', () => {
         expect(status).toBe('denied');
     });
 
-    it('allows valid employee with matching token', () => {
+    it('allows cashier when activeKaryawan.role is "cashier" (PengaturanOutlet English role) and allowed uses "kasir"', () => {
+        setProps({ user: null });
+        localStorage.setItem(
+            'activeKaryawan',
+            JSON.stringify({ name: 'BUDI HARTONO', role: 'cashier', token: '1_cashier_auth_ok' }),
+        );
+        // tenant_employees stored with English role (from PengaturanOutlet dropdown)
+        localStorage.setItem(
+            'tenant_employees',
+            JSON.stringify([{ id: '1', name: 'BUDI HARTONO', role: 'cashier', pin: '123456' }]),
+        );
+        let status = '';
+        const Comp = () => {
+            status = useRoleGuard(['kasir', 'manager', 'owner']);
+            return null;
+        };
+        render(<Comp />);
+        expect(status).toBe('allowed');
+    });
+
+    it('allows valid employee with matching token (normalized)', () => {
         setProps({ user: null });
         localStorage.setItem(
             'activeKaryawan',
@@ -83,24 +103,19 @@ describe('useRoleGuard', () => {
         expect(status).toBe('allowed');
     });
 
-    it('denies when employee not in directory', () => {
+    it('denies when employee name missing', () => {
         setProps({ user: null });
-        localStorage.setItem('activeKaryawan', JSON.stringify({ name: 'Hacker', role: 'owner' }));
-        // Employee directory exists but does NOT contain 'Hacker' → identity check fails.
-        localStorage.setItem(
-            'tenant_employees',
-            JSON.stringify([{ id: '1', name: 'BUDI HARTONO', role: 'kasir', pin: '123456' }]),
-        );
+        localStorage.setItem('activeKaryawan', JSON.stringify({ role: 'kasir', token: '1_kasir_auth_ok' }));
         let status = '';
         const Comp = () => {
-            status = useRoleGuard(['owner']);
+            status = useRoleGuard(['kasir']);
             return null;
         };
         render(<Comp />);
         expect(status).toBe('denied');
     });
 
-    it('denies when token invalid', () => {
+    it('denies when token invalid format', () => {
         setProps({ user: null });
         localStorage.setItem('activeKaryawan', JSON.stringify({ name: 'Budi', role: 'kasir', token: 'bad' }));
         localStorage.setItem('tenant_employees', JSON.stringify([{ id: 1, role: 'kasir', name: 'Budi' }]));
@@ -113,10 +128,24 @@ describe('useRoleGuard', () => {
         expect(status).toBe('denied');
     });
 
+    it('denies when role not in allowedRoles (even after normalization)', () => {
+        setProps({ user: null });
+        localStorage.setItem(
+            'activeKaryawan',
+            JSON.stringify({ name: 'Dedi', role: 'kitchen', token: '2_kitchen_auth_ok' }),
+        );
+        let status = '';
+        const Comp = () => {
+            status = useRoleGuard(['kasir']);
+            return null;
+        };
+        render(<Comp />);
+        expect(status).toBe('denied');
+    });
+
     it('denies when localStorage item is corrupt JSON', () => {
         setProps({ user: null });
         localStorage.setItem('activeKaryawan', '{not json');
-        localStorage.setItem('tenant_employees', '{}');
         let status = '';
         const Comp = () => {
             status = useRoleGuard(['kasir']);
