@@ -3,6 +3,7 @@
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashierGeoVerifyController;
 use App\Http\Controllers\GuestVerifyController;
+use App\Http\Controllers\OutletTableController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\GeminiAiController;
@@ -94,9 +95,11 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/owner/inventory/alerts', fn () => Inertia::render('Owner/InventoryAlerts'))->name('owner.inventory.alerts');
     Route::get('/admin/employees',    fn () => Inertia::render('Admin/Employees'))->name('admin.employees');
 
+    // ── Meja outlet (PIN untuk display owner/waiter) ────────────────────────
+    Route::get('/api/outlet-tables/{outlet}', [OutletTableController::class, 'index'])->middleware('throttle:60,1');
+
     // ── POS & Operasional (semua plan) ──────────────────────────────────────
     Route::get('/pos',               fn () => Inertia::render('POS/Index'));
-    Route::get('/produk',            fn () => Inertia::render('ProdukMenu/Index'));
     Route::get('/katalog-menu',      fn () => Inertia::render('KatalogMenu/Index'));
     Route::get('/manajemen-meja',    fn () => Inertia::render('ManajemenMeja/Index'));
     Route::get('/buku-menu-digital', fn () => Inertia::render('BukuMenuDigital/Index'));

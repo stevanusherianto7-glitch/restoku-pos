@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 
@@ -18,6 +18,28 @@ function QRCodeMejaInner() {
     const [selectedOutletId, setSelectedOutletId] = useState<number>(outlets[0]?.id ?? 0);
     // Label meja bebas owner (A1, 01, Meja 7, ...), 1 per baris.
     const [tableInput, setTableInput] = useState<string>('A1\nA2\nB1\nB2\nC1');
+
+    // PIN meja per label (untuk display ke owner/waiter — tamu dapat PIN dari waiter)
+    const [tablePins, setTablePins] = useState<Record<string, string>>({});
+    const [pinsLoading, setPinsLoading] = useState(false);
+
+    useEffect(() => {
+        if (!selectedOutletId) return;
+        setPinsLoading(true);
+        fetch(`/api/outlet-tables/${selectedOutletId}`, { headers: { Accept: 'application/json' } })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data) => {
+                if (data?.tables) {
+                    const map: Record<string, string> = {};
+                    data.tables.forEach((t: any) => {
+                        map[t.label] = t.pin;
+                    });
+                    setTablePins(map);
+                }
+            })
+            .catch(() => setTablePins({}))
+            .finally(() => setPinsLoading(false));
+    }, [selectedOutletId]);
 
     const selectedOutlet = outlets.find((o) => o.id === selectedOutletId) ?? outlets[0];
 
@@ -99,6 +121,9 @@ function QRCodeMejaInner() {
                                         <QRCodeSVG value={tableUrl(t)} size={84} level="M" />
                                     </div>
                                     <p className="text-xs font-semibold text-slate-300 mt-2">{t}</p>
+                                    <span className="mt-1 inline-block rounded-md bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 text-[10px] font-bold text-amber-300 tracking-wider">
+                                        PIN {tablePins[t] ?? '····'}
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -118,6 +143,14 @@ function QRCodeMejaInner() {
                             <p className="text-xs text-slate-400 text-center break-all px-2 mb-4">
                                 {selectedOutlet && tables[0] ? tableUrl(tables[0]) : 'Pilih outlet & isi meja'}
                             </p>
+                            {selectedOutlet && tables[0] && (
+                                <div className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2">
+                                    <span className="text-[11px] font-medium text-amber-300/70">PIN Meja</span>
+                                    <span className="text-sm font-extrabold text-amber-200 tracking-[0.3em]">
+                                        {tablePins[tables[0]] ?? '····'}
+                                    </span>
+                                </div>
+                            )}
                             <button
                                 onClick={() => window.print()}
                                 className="w-full rounded-lg bg-slate-100 hover:bg-white text-slate-900 py-2.5 text-sm font-medium transition-colors flex items-center justify-center gap-2"

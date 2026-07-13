@@ -17,9 +17,20 @@ class OutletTable extends Model
         'longitude' => 'float',
     ];
 
+    protected $appends = ['pin'];
+
     public function outlet(): BelongsTo
     {
         return $this->belongsTo(Outlet::class);
+    }
+
+    /**
+     * Plain-text PIN untuk display ke owner/waiter (generate ulang dari seed deterministik).
+     * Tidak disimpan sebagai plaintext di DB.
+     */
+    public function getPinAttribute(): string
+    {
+        return self::derivePin($this->outlet_id, $this->label);
     }
 
     /**
