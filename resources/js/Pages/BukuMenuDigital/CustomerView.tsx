@@ -19,6 +19,7 @@ import {
 import { formatRupiah } from '../../lib/formatters';
 import { ProductImage } from '../../Components/ProductImage';
 import { useTenantSettings } from '../../Components/Shared';
+import { GuestVerifyGate } from '../../Components/GuestVerifyGate';
 
 interface MenuItem {
     id: number;
@@ -106,6 +107,16 @@ export default function CustomerView() {
     const { tenantName, renderLogo, tenantLayout, screenMode } = useTenantSettings();
     const isNanoBanana = screenMode === 'nano-banana' || tenantLayout === 'nano-banana';
     const [tableNumber, setTableNumber] = useState<string | null>(null);
+    // Verifikasi kehadiran tamu (anti-fraud)
+    const [guestVerified, setGuestVerified] = useState(false);
+    const [verifyToken, setVerifyToken] = useState('');
+    const [outletGeo, setOutletGeo] = useState<{
+        latitude: number | null;
+        longitude: number | null;
+        geo_radius_meters: number;
+    } | null>(null);
+    // Slug outlet dari path /m/{slug}
+    const outletSlug = (window.location.pathname.split('/m/')[1] ?? '').split('?')[0] ?? '';
     // Nama outlet riil dari API /api/menu/{slug} (bukan mock tenantName).
     const [outletName, setOutletName] = useState<string>(tenantName || 'Outlet');
     const [activeCategory, setActiveCategory] = useState('Makanan');
@@ -134,6 +145,13 @@ export default function CustomerView() {
                 }));
                 if (data?.outlet?.name) {
                     setOutletName(data.outlet.name);
+                }
+                if (data?.outlet) {
+                    setOutletGeo({
+                        latitude: data.outlet.latitude ?? null,
+                        longitude: data.outlet.longitude ?? null,
+                        geo_radius_meters: data.outlet.geo_radius_meters ?? 50,
+                    });
                 }
                 setMenuItems(items.length ? items : FALLBACK_ITEMS);
             })
@@ -495,6 +513,11 @@ export default function CustomerView() {
             alert(`Mohon maaf, pemesanan saat ini ditutup. ${outletScheduleMsg || ''}`);
             return;
         }
+        // Anti-fraud: tamu wajib verifikasi kehadiran dulu
+        if (!guestVerified || !verifyToken) {
+            alert('Silakan verifikasi kehadiran (GPS + PIN) terlebih dahulu sebelum mengirim pesanan.');
+            return;
+        }
 
         // Generate formatted items list for KDS
         const itemsList = Object.entries(cart).map(([idStr, qty]) => {
@@ -521,6 +544,7 @@ export default function CustomerView() {
                 body: JSON.stringify({
                     table: displayTable,
                     items: itemsList,
+                    verify_token: verifyToken,
                 }),
             });
             if (response.ok) {
@@ -529,6 +553,11 @@ export default function CustomerView() {
                 setOrderStatus(data.order.status);
                 setOrderTone(data.order.tone);
                 setOrderSuccess(true);
+            } else if (response.status === 422) {
+                // Token expired / invalid → minta verify ulang
+                setGuestVerified(false);
+                setVerifyToken('');
+                alert('Verifikasi kehadiran kedaluwarsa. Silakan verifikasi ulang.');
             }
         } catch (err) {
             console.error('Gagal melakukan checkout pesanan', err);
@@ -1107,6 +1136,17 @@ export default function CustomerView() {
                             <ShoppingBagIcon className="size-5 text-emerald-400" /> Ringkasan Pesanan
                         </h2>
 
+                        {/* Anti-fraud: verifikasi kehadiran tamu (GPS + PIN) */}
+                        <GuestVerifyGate
+                            slug={outletSlug}
+                            tableLabel={tableNumber}
+                            geo={outletGeo}
+                            onVerified={(token: string) => {
+                                setVerifyToken(token);
+                                setGuestVerified(true);
+                            }}
+                        />
+
                         {cartTotalItems > 0 ? (
                             <div className="space-y-3 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
                                 {/* Dine In / Take Away Segmented Selector */}
@@ -1583,12 +1623,19 @@ export default function CustomerView() {
                 <div className="absolute bottom-5 inset-x-4 z-40">
                     <button
                         onClick={handleCheckout}
-                        className="w-full rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 py-4 px-5 text-sm font-extrabold text-slate-950 shadow-2xl shadow-emerald-950/50 flex justify-between items-center transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        disabled={!guestVerified}
+                        className={`w-full rounded-2xl py-4 px-5 text-sm font-extrabold flex justify-between items-center transition-all ${
+                            guestVerified
+                                ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 shadow-2xl shadow-emerald-950/50 hover:scale-[1.02] active:scale-[0.98]'
+                                : 'bg-white/10 text-white/40 cursor-not-allowed'
+                        }`}
                     >
-                        <span className="bg-slate-950/20 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider text-slate-900">
+                        <span
+                            className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${guestVerified ? 'bg-slate-950/20 text-slate-900' : 'bg-black/20 text-white/40'}`}
+                        >
                             {cartTotalItems} Item
                         </span>
-                        <span>Kirim Pesanan Ke Dapur</span>
+                        <span>{guestVerified ? 'Kirim Pesanan Ke Dapur' : '🔒 Verifikasi Dulu'}</span>
                         <span className="font-mono">{formatRupiah(cartTotalPrice * 1.1)}</span>
                     </button>
                 </div>

@@ -93,5 +93,8 @@ class DatabaseSeeder extends Seeder
 
         // 6. Seed contoh menu + kategori (e-Menu tidak kosong)
         $this->call(MenuSeeder::class);
+
+        // 7. Backfill meja per outlet (untuk verifikasi kehadiran tamu)
+        $this->call(OutletTableSeeder::class);
     }
 }

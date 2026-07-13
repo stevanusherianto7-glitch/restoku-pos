@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class OutletTable extends Model
+{
+    protected $fillable = [
+        'tenant_id', 'outlet_id', 'label', 'pin_hash',
+        'latitude', 'longitude',
+    ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
+
+    public function outlet(): BelongsTo
+    {
+        return $this->belongsTo(Outlet::class);
+    }
+
+    /**
+     * Derive PIN 4-digit stabil per (outlet, label) tanpa simpan plaintext.
+     * Mirror DailyPinService::derivePlain.
+     */
+    public static function derivePin(int $outletId, string $label): string
+    {
+        $seed = hash('sha256', "restoku:tablepin:{$outletId}:{$label}");
+        $digits = substr(preg_replace('/\D/', '', $seed), -4);
+
+        return str_pad($digits, 4, '0', STR_PAD_LEFT);
+    }
+}

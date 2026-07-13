@@ -14,6 +14,7 @@ use App\Services\TenantReadConnection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -61,7 +62,14 @@ class PublicOrderController extends Controller
         );
 
         return response()->json([
-            'outlet' => ['id' => $outlet->id, 'name' => $outlet->name, 'slug' => $outlet->slug],
+            'outlet' => [
+                'id' => $outlet->id,
+                'name' => $outlet->name,
+                'slug' => $outlet->slug,
+                'latitude' => $outlet->latitude,
+                'longitude' => $outlet->longitude,
+                'geo_radius_meters' => $outlet->geo_radius_meters ?? 50,
+            ],
             'menu' => $menu,
         ]);
     }
@@ -78,7 +86,27 @@ class PublicOrderController extends Controller
             'items.*.menu_item_id' => 'required|integer',
             'items.*.quantity' => 'required|integer|min:1|max:99',
             'items.*.notes' => 'nullable|string|max:255',
+            'verify_token' => 'required|string',
         ]);
+
+        // Anti-fraud: tamu wajib bawa signed token dari /api/guest/verify
+        try {
+            $payload = json_decode(Crypt::decryptString($validated['verify_token']), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Verifikasi kehadiran diperlukan atau sudah kedaluwarsa. Silakan verifikasi ulang.',
+            ], 422);
+        }
+
+        if (! isset($payload['outlet_id'], $payload['table'], $payload['exp'])
+            || (int) $payload['outlet_id'] !== (int) $validated['outlet_id']
+            || $payload['exp'] < now()->timestamp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token verifikasi tidak valid atau kedaluwarsa. Silakan verifikasi ulang.',
+            ], 422);
+        }
 
         $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->select('id', 'tenant_id')

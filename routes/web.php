@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashierGeoVerifyController;
+use App\Http\Controllers\GuestVerifyController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\GeminiAiController;
@@ -57,6 +58,9 @@ Route::get('/api/reservations',   [PublicOrderController::class, 'getReservation
 Route::post('/api/reservations',  [PublicOrderController::class, 'submitReservation'])->middleware('throttle:30,1');
 // Jam operasional outlet — publik untuk CustomerView (tidak butuh auth)
 Route::get('/api/outlet-operating-hours', [PublicOrderController::class, 'getOutletOperatingHours']);
+
+// Verifikasi kehadiran tamu (anti-fraud): GPS + PIN meja + PIN harian -> signed token
+Route::post('/api/guest/verify', [GuestVerifyController::class, 'verify'])->middleware('throttle:30,1');
 
 
 /*

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RestoKu — Verifikasi Tamu v2 (Mockup)</title>
+<style>
+  :root{
+    --cabe:#FF5B35; --cabe-d:#E04E2B; --emas:#F59E0B;
+    --cream:#FFF3EC; --cream2:#FCE3D6; --card:#FFFFFF;
+    --ink:#3A2A1E; --mut:#9A8676; --line:#EFE2D6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',system-ui,sans-serif}
+  body{background:var(--cream);color:var(--ink);padding:24px;display:flex;justify-content:center}
+  .phone{width:430px;background:var(--cream);border-radius:26px;box-shadow:0 10px 36px rgba(120,60,30,.12);overflow:hidden;border:1px solid var(--line)}
+  .head{padding:18px 20px 14px;background:var(--cream2)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:var(--cabe)}
+  .brand .dot{width:28px;height:28px;border-radius:50%;background:var(--cabe);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+  .sub{margin-top:6px;font-size:12.5px;color:var(--mut)}
+  .meja{display:inline-block;margin-top:9px;background:#fff;border:1px solid var(--cream2);color:var(--cabe);padding:4px 11px;border-radius:20px;font-size:12px;font-weight:700}
+  .body{padding:16px 18px 22px}
+  .sec-title{font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 10px}
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .item .n{font-weight:700;font-size:13.5px}
+  .item .p{color:var(--cabe);font-weight:800;font-size:13px;margin-top:4px}
+  .cart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:14px}
+  .cart .row{display:flex;justify-content:space-between;font-size:13.5px;margin:4px 0}
+  .cart .tot{font-weight:800;border-top:1px dashed var(--line);margin-top:8px;padding-top:8px}
+  .cart .tot b{color:var(--cabe)}
+  /* Verify gate — prominent but soft (Elvera "PIN MEJA" style) */
+  .gate{background:#FFF7F2;border:1.5px solid var(--cabe);border-radius:16px;padding:15px;margin-bottom:14px;position:relative}
+  .gate .tag{position:absolute;top:-10px;left:14px;background:var(--cabe);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:8px}
+  .gt{font-weight:800;color:var(--cabe);font-size:14.5px;margin:4px 0 5px}
+  .gd{font-size:12px;color:var(--mut);margin-bottom:11px;line-height:1.5}
+  .gps{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+  .gps .ic{width:30px;height:30px;border-radius:8px;background:#EAF7F0;color:#1FA971;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .gps .t{font-size:13px;font-weight:600}
+  .gps .s{font-size:11.5px;color:#1FA971;font-weight:700}
+  .pin{display:flex;flex-direction:column;gap:6px}
+  .pin label{font-size:12px;font-weight:700;color:var(--ink)}
+  .pin input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;letter-spacing:6px;text-align:center;font-weight:700;color:var(--ink)}
+  .pin input:focus{outline:none;border-color:var(--cabe)}
+  .verify{width:100%;margin-top:12px;background:var(--cabe);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:14px;cursor:pointer}
+  .locked{width:100%;margin-top:8px;background:#EADFD3;color:#B7A594;border:none;border-radius:12px;padding:14px;font-weight:800;font-size:14px}
+  .hint{font-size:11px;color:var(--mut);text-align:center;margin-top:9px;line-height:1.5}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="head">
+      <div class="brand"><span class="dot">R</span> RestoKu</div>
+      <div class="sub">Pawon Salam · Bandung</div>
+      <div class="meja">📍 Meja A1 · Scan QR</div>
+    </div>
+    <div class="body">
+      <div class="sec-title">Pesan Makanan</div>
+      <div class="menu">
+        <div class="item"><div class="n">Nasi Goreng Spesial</div><div class="p">Rp 25.000</div></div>
+        <div class="item"><div class="n">Es Teh Manis</div><div class="p">Rp 5.000</div></div>
+        <div class="item"><div class="n">Sate Ayam Madura</div><div class="p">Rp 35.000</div></div>
+        <div class="item"><div class="n">Kopi Susu Aren</div><div class="p">Rp 18.000</div></div>
+      </div>
+      <div class="cart">
+        <div class="row"><span>Nasi Goreng Spesial</span><span>Rp 25.000</span></div>
+        <div class="row"><span>Es Teh Manis</span><span>Rp 5.000</span></div>
+        <div class="row tot"><span>Total</span><b>Rp 30.000</b></div>
+      </div>
+
+      <div class="gate">
+        <span class="tag">VERIFIKASI KEHADIRAN</span>
+        <div class="gt">🔐 Pastikan Anda di Restoran</div>
+        <div class="gd">GPS memverifikasi Anda berada di area restoran. PIN mencegah pesanan bodong dari luar lokasi.</div>
+        <div class="gps">
+          <div class="ic">✓</div>
+          <div><div class="t">Lokasi terdeteksi</div><div class="s">Dalam radius restoran</div></div>
+        </div>
+        <div class="pin">
+          <label>PIN Harian Restoran</label>
+          <input value="• • • •" readonly>
+        </div>
+        <button class="verify">Verifikasi & Kirim Pesanan</button>
+      </div>
+
+      <button class="locked">🔒 Kirim Pesanan (terkunci)</button>
+      <div class="hint">Hanya pesanan dari tamu yang berada di lokasi yang diverifikasi yang diproses.</div>
+    </div>
+  </div>
+</body>
+</html>

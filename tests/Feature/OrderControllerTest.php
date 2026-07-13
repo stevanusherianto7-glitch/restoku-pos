@@ -5,9 +5,11 @@ namespace Tests\Feature;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\Outlet;
+use App\Models\Reservation;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Crypt;
 use Tests\TestCase;
 
 /**
@@ -19,12 +21,30 @@ class OrderControllerTest extends TestCase
     use RefreshDatabase;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
+
     private Outlet $outletA;
+
     private Outlet $outletB;
-    private User   $staffA;
-    private User   $ownerA;
+
+    private User $staffA;
+
+    private User $ownerA;
+
     private MenuItem $menuItemA;
+
+    /**
+     * Signed verify_token valid (anti-fraud guest verification).
+     */
+    private function validToken(int $outletId, string $table = '5'): string
+    {
+        return Crypt::encryptString(json_encode([
+            'outlet_id' => $outletId,
+            'table' => $table,
+            'exp' => now()->addMinutes(15)->timestamp,
+        ]));
+    }
 
     protected function setUp(): void
     {
@@ -32,54 +52,54 @@ class OrderControllerTest extends TestCase
 
         // Tenant A
         $this->tenantA = Tenant::create([
-            'name'       => 'Resto A',
+            'name' => 'Resto A',
             'brand_name' => 'Resto A',
-            'email'      => 'a@test.com',
-            'phone'      => '0811111111',
+            'email' => 'a@test.com',
+            'phone' => '0811111111',
         ]);
 
         $this->outletA = Outlet::create([
             'tenant_id' => $this->tenantA->id,
-            'name'      => 'Outlet A',
-            'address'   => 'Jl. Test A',
+            'name' => 'Outlet A',
+            'address' => 'Jl. Test A',
         ]);
 
         $this->staffA = User::create([
             'tenant_id' => $this->tenantA->id,
             'outlet_id' => $this->outletA->id,
-            'name'      => 'Kasir A',
-            'email'     => 'kasir@a.com',
-            'password'  => bcrypt('password'),
-            'role'      => 'cashier',
+            'name' => 'Kasir A',
+            'email' => 'kasir@a.com',
+            'password' => bcrypt('password'),
+            'role' => 'cashier',
         ]);
 
         $this->ownerA = User::create([
             'tenant_id' => $this->tenantA->id,
-            'name'      => 'Owner A',
-            'email'     => 'owner@a.com',
-            'password'  => bcrypt('password'),
-            'role'      => 'owner',
+            'name' => 'Owner A',
+            'email' => 'owner@a.com',
+            'password' => bcrypt('password'),
+            'role' => 'owner',
         ]);
 
         $this->menuItemA = MenuItem::withoutGlobalScopes()->create([
-            'tenant_id'    => $this->tenantA->id,
-            'name'         => 'Nasi Goreng',
-            'price'        => 30000,
+            'tenant_id' => $this->tenantA->id,
+            'name' => 'Nasi Goreng',
+            'price' => 30000,
             'is_available' => true,
         ]);
 
         // Tenant B (untuk cross-tenant test)
         $this->tenantB = Tenant::create([
-            'name'       => 'Resto B',
+            'name' => 'Resto B',
             'brand_name' => 'Resto B',
-            'email'      => 'b@test.com',
-            'phone'      => '0822222222',
+            'email' => 'b@test.com',
+            'phone' => '0822222222',
         ]);
 
         $this->outletB = Outlet::create([
             'tenant_id' => $this->tenantB->id,
-            'name'      => 'Outlet B',
-            'address'   => 'Jl. Test B',
+            'name' => 'Outlet B',
+            'address' => 'Jl. Test B',
         ]);
     }
 
@@ -93,15 +113,16 @@ class OrderControllerTest extends TestCase
     {
         $response = $this->postJson('/api/orders', [
             'outlet_id' => $this->outletA->id,
-            'table'     => '5',
-            'items'     => [
+            'table' => '5',
+            'items' => [
                 ['menu_item_id' => $this->menuItemA->id, 'quantity' => 2],
             ],
+            'verify_token' => $this->validToken($this->outletA->id, '5'),
             // Tidak ada tenant_id di sini — harus diambil dari outlet
         ]);
 
         $response->assertStatus(200)
-                 ->assertJson(['success' => true]);
+            ->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('orders', [
             'tenant_id' => $this->tenantA->id,
@@ -118,11 +139,12 @@ class OrderControllerTest extends TestCase
         // Kirim order ke outletB tapi dengan menu dari tenantA
         $response = $this->postJson('/api/orders', [
             'outlet_id' => $this->outletB->id,
-            'table'     => '1',
-            'items'     => [
+            'table' => '1',
+            'items' => [
                 // menu_item_id dari tenant A — tidak boleh bisa dipesan via outlet B
                 ['menu_item_id' => $this->menuItemA->id, 'quantity' => 1],
             ],
+            'verify_token' => $this->validToken($this->outletB->id, '1'),
         ]);
 
         // Harus 422 karena menu item tidak ditemukan untuk tenant B
@@ -135,18 +157,19 @@ class OrderControllerTest extends TestCase
     public function test_submit_order_rejects_unavailable_menu_item(): void
     {
         $unavailableItem = MenuItem::withoutGlobalScopes()->create([
-            'tenant_id'    => $this->tenantA->id,
-            'name'         => 'Menu Habis',
-            'price'        => 20000,
+            'tenant_id' => $this->tenantA->id,
+            'name' => 'Menu Habis',
+            'price' => 20000,
             'is_available' => false,
         ]);
 
         $response = $this->postJson('/api/orders', [
             'outlet_id' => $this->outletA->id,
-            'table'     => '3',
-            'items'     => [
+            'table' => '3',
+            'items' => [
                 ['menu_item_id' => $unavailableItem->id, 'quantity' => 1],
             ],
+            'verify_token' => $this->validToken($this->outletA->id, '3'),
         ]);
 
         $response->assertStatus(422);
@@ -161,15 +184,15 @@ class OrderControllerTest extends TestCase
     {
         // Buat order untuk tenant B
         Order::withoutGlobalScopes()->create([
-            'tenant_id'    => $this->tenantB->id,
-            'order_code'   => 'ORD-0708-01',
+            'tenant_id' => $this->tenantB->id,
+            'order_code' => 'ORD-0708-01',
             'table_number' => 'Meja 1',
-            'source'       => 'guest_qr',
-            'status'       => Order::STATUS_ANTRIAN_MASUK,
+            'source' => 'guest_qr',
+            'status' => Order::STATUS_ANTRIAN_MASUK,
         ]);
 
         $response = $this->actingAs($this->staffA)
-                         ->getJson('/api/orders');
+            ->getJson('/api/orders');
 
         $response->assertStatus(200);
 
@@ -185,22 +208,22 @@ class OrderControllerTest extends TestCase
      */
     public function test_update_reservation_status_rejects_invalid_status(): void
     {
-        $reservation = \App\Models\Reservation::withoutGlobalScopes()->create([
-            'tenant_id'        => $this->tenantA->id,
+        $reservation = Reservation::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenantA->id,
             'reservation_code' => 'RSV-001',
-            'name'             => 'Test Tamu',
-            'phone'            => '08111',
-            'date'             => now()->addDay()->toDateString(),
-            'time'             => '18:00',
-            'guests'           => 4,
-            'type'             => 'meja',
-            'status'           => 'pending',
+            'name' => 'Test Tamu',
+            'phone' => '08111',
+            'date' => now()->addDay()->toDateString(),
+            'time' => '18:00',
+            'guests' => 4,
+            'type' => 'meja',
+            'status' => 'pending',
         ]);
 
         $response = $this->actingAs($this->staffA)
-                         ->putJson("/api/reservations/{$reservation->reservation_code}/status", [
-                             'status' => 'hacked_status', // nilai tidak valid
-                         ]);
+            ->putJson("/api/reservations/{$reservation->reservation_code}/status", [
+                'status' => 'hacked_status', // nilai tidak valid
+            ]);
 
         $response->assertStatus(422);
     }
@@ -211,23 +234,23 @@ class OrderControllerTest extends TestCase
     public function test_update_reservation_status_enforces_tenant_ownership(): void
     {
         // Reservasi milik tenant B
-        $reservationB = \App\Models\Reservation::withoutGlobalScopes()->create([
-            'tenant_id'        => $this->tenantB->id,
+        $reservationB = Reservation::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenantB->id,
             'reservation_code' => 'RSV-B01',
-            'name'             => 'Tamu B',
-            'phone'            => '082222',
-            'date'             => now()->addDay()->toDateString(),
-            'time'             => '19:00',
-            'guests'           => 2,
-            'type'             => 'meja',
-            'status'           => 'pending',
+            'name' => 'Tamu B',
+            'phone' => '082222',
+            'date' => now()->addDay()->toDateString(),
+            'time' => '19:00',
+            'guests' => 2,
+            'type' => 'meja',
+            'status' => 'pending',
         ]);
 
         // Staff dari tenant A mencoba update
         $response = $this->actingAs($this->staffA)
-                         ->putJson("/api/reservations/{$reservationB->reservation_code}/status", [
-                             'status' => 'confirmed',
-                         ]);
+            ->putJson("/api/reservations/{$reservationB->reservation_code}/status", [
+                'status' => 'confirmed',
+            ]);
 
         // Harus 404 (TenantScope menyembunyikan reservasi tenant lain) atau 403
         $response->assertStatus(404);
@@ -238,27 +261,27 @@ class OrderControllerTest extends TestCase
      */
     public function test_update_reservation_status_success(): void
     {
-        $reservation = \App\Models\Reservation::withoutGlobalScopes()->create([
-            'tenant_id'        => $this->tenantA->id,
+        $reservation = Reservation::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenantA->id,
             'reservation_code' => 'RSV-A01',
-            'name'             => 'Tamu A',
-            'phone'            => '08111',
-            'date'             => now()->addDay()->toDateString(),
-            'time'             => '18:00',
-            'guests'           => 2,
-            'type'             => 'meja',
-            'status'           => 'pending',
+            'name' => 'Tamu A',
+            'phone' => '08111',
+            'date' => now()->addDay()->toDateString(),
+            'time' => '18:00',
+            'guests' => 2,
+            'type' => 'meja',
+            'status' => 'pending',
         ]);
 
         $response = $this->actingAs($this->staffA)
-                         ->putJson("/api/reservations/{$reservation->reservation_code}/status", [
-                             'status' => 'confirmed',
-                         ]);
+            ->putJson("/api/reservations/{$reservation->reservation_code}/status", [
+                'status' => 'confirmed',
+            ]);
 
         $response->assertStatus(200)->assertJson(['success' => true]);
         $this->assertDatabaseHas('reservations', [
             'reservation_code' => 'RSV-A01',
-            'status'           => 'confirmed',
+            'status' => 'confirmed',
         ]);
     }
 

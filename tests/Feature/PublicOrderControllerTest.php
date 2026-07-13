@@ -9,6 +9,7 @@ use App\Models\Reservation;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Crypt;
 use Tests\TestCase;
 
 class PublicOrderControllerTest extends TestCase
@@ -20,6 +21,18 @@ class PublicOrderControllerTest extends TestCase
     private Outlet $outlet;
 
     private MenuItem $menuItem;
+
+    /**
+     * Signed verify_token valid (anti-fraud guest verification).
+     */
+    private function validToken(int $outletId, string $table = 'A1'): string
+    {
+        return Crypt::encryptString(json_encode([
+            'outlet_id' => $outletId,
+            'table' => $table,
+            'exp' => now()->addMinutes(15)->timestamp,
+        ]));
+    }
 
     protected function setUp(): void
     {
@@ -74,6 +87,7 @@ class PublicOrderControllerTest extends TestCase
             'items' => [
                 ['menu_item_id' => $this->menuItem->id, 'quantity' => 2],
             ],
+            'verify_token' => $this->validToken($this->outlet->id, '5'),
         ]);
 
         $response->assertStatus(200)
@@ -93,6 +107,7 @@ class PublicOrderControllerTest extends TestCase
             'items' => [
                 ['menu_item_id' => $this->menuItem->id, 'quantity' => 1],
             ],
+            'verify_token' => $this->validToken(99999, '1'),
         ]);
 
         $response->assertStatus(422);
@@ -113,6 +128,7 @@ class PublicOrderControllerTest extends TestCase
             'items' => [
                 ['menu_item_id' => $unavailable->id, 'quantity' => 1],
             ],
+            'verify_token' => $this->validToken($this->outlet->id, '1'),
         ]);
 
         $response->assertStatus(422);
@@ -276,6 +292,7 @@ class PublicOrderControllerTest extends TestCase
             'items' => [
                 ['menu_item_id' => $this->menuItem->id, 'quantity' => 1],
             ],
+            'verify_token' => $this->validToken($this->outlet->id, '7'),
         ]);
 
         $response->assertStatus(200);
@@ -294,6 +311,7 @@ class PublicOrderControllerTest extends TestCase
             'items' => [
                 ['menu_item_id' => $this->menuItem->id, 'quantity' => 1],
             ],
+            'verify_token' => $this->validToken($this->outlet->id, 'Meja VIP'),
         ]);
 
         $response->assertStatus(200);
