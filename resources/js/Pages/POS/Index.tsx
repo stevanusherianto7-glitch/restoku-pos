@@ -23,7 +23,6 @@ import {
 } from '../../Components/icons';
 import { ReceiptPreview } from '../../Components/POS/ReceiptPreview';
 import { RoleGuard } from '../../Components/RoleGuard';
-import { GeoPinVerify } from '../../Components/POS/GeoPinVerify';
 
 // ─── Menu Catalog ─────────────────────────────────────────────────────────────
 // Foto menu diarahkan ke Cloudinary (sesuai konvensi Restoku: jangan hardcode
@@ -366,13 +365,12 @@ function POSInner() {
         <MainLayout noScroll>
             <Head title="Kasir (POS)" />
             <Screen title="Kasir (POS)" noScroll>
-                {/* ── Header: judul kiri, verifikasi geolokasi kanan atas ── */}
+                {/* ── Header ── */}
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
                         <h1 className="text-xl font-bold font-display text-white">Kasir (POS)</h1>
-                        <p className="text-xs text-slate-400">Dashboard kasir — verifikasi lokasi wajib untuk audit.</p>
+                        <p className="text-xs text-slate-400">Dashboard kasir.</p>
                     </div>
-                    <GeoPinVerify geo={usePage<any>().props.outlet_geo ?? null} />
                 </div>
                 {isPrintingBt && (
                     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl bg-emerald-500 text-slate-950 font-bold px-5 py-4 shadow-2xl animate-bounce border border-emerald-400">
