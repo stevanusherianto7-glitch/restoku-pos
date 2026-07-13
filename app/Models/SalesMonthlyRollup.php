@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\UsesTenantConnection;
+use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,6 +14,11 @@ class SalesMonthlyRollup extends Model
 {
     use HasFactory;
     use UsesTenantConnection;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new TenantScope);
+    }
 
     protected $guarded = ['id'];
 

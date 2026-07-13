@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Restoku'),
 
     /*
     |--------------------------------------------------------------------------
@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
@@ -78,11 +78,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'id'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'id'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'id_ID'),
 
     /*
     |--------------------------------------------------------------------------
@@ -122,5 +122,27 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings Cache TTL (detik)
+    |--------------------------------------------------------------------------
+    |
+    | TTL untuk cache settings di SettingsService. Override via env
+    | SETTINGS_CACHE_TTL jika diperlukan.
+    |
+    */
+    'settings_cache_ttl' => (int) env('SETTINGS_CACHE_TTL', 3600),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redis Alert Thresholds (persen)
+    |--------------------------------------------------------------------------
+    |
+    | Threshold untuk Redis health alerting di RedisHealthService.
+    |
+    */
+    'redis_alert_mem_percent' => (float) env('REDIS_ALERT_MEM_PERCENT', 80),
+    'redis_alert_conn_percent' => (float) env('REDIS_ALERT_CONN_PERCENT', 80),
 
 ];

@@ -48,6 +48,7 @@ class Reservation extends Model
     {
         $count = static::withoutGlobalScope(TenantScope::class)
             ->where('tenant_id', $tenantId)
+            ->lockForUpdate()
             ->count();
 
         return 'RSV-'.str_pad((string) ($count + 1), 3, '0', STR_PAD_LEFT);

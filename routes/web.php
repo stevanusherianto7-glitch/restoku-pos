@@ -1,14 +1,17 @@
 <?php
 
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CashierGeoVerifyController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\GeminiAiController;
+use App\Http\Controllers\KdsController;
 use App\Http\Controllers\MenuController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OutletSettingsController;
 use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\GoogleReviewController;
+use App\Http\Controllers\PrintController;
+use App\Http\Controllers\PublicOrderController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -44,16 +47,16 @@ Route::get('/order',         fn () => Inertia::render('BukuMenuDigital/CustomerV
 // Fase 1: URL buku menu tamu pakai slug outlet dinamis (bukan hardcode 'senopati')
 Route::get('/m/{slug}',       fn (string $slug) => Inertia::render('BukuMenuDigital/CustomerView', ['slug' => $slug]));
 // API buku menu publik (read-only, by slug outlet) — untuk CustomerView
-Route::get('/api/menu/{slug}', [OrderController::class, 'getPublicMenu']);
+Route::get('/api/menu/{slug}', [PublicOrderController::class, 'getPublicMenu']);
 
 // Guest order endpoints (BUG-006 FIX: tenant diidentifikasi via outlet_id, bukan req body)
 // C2 (Security Audit): throttle wajib — endpoint publik CSRF-exempt rentan spam/DoS.
-Route::post('/api/orders',        [OrderController::class, 'submitOrder'])->middleware('throttle:30,1');
-Route::get('/api/orders/{id}',    [OrderController::class, 'getOrderStatus']);
-Route::get('/api/reservations',   [OrderController::class, 'getReservations']);
-Route::post('/api/reservations',  [OrderController::class, 'submitReservation'])->middleware('throttle:30,1');
+Route::post('/api/orders',        [PublicOrderController::class, 'submitOrder'])->middleware('throttle:30,1');
+Route::get('/api/orders/{id}',    [PublicOrderController::class, 'getOrderStatus']);
+Route::get('/api/reservations',   [PublicOrderController::class, 'getReservations']);
+Route::post('/api/reservations',  [PublicOrderController::class, 'submitReservation'])->middleware('throttle:30,1');
 // Jam operasional outlet — publik untuk CustomerView (tidak butuh auth)
-Route::get('/api/outlet-operating-hours', [OrderController::class, 'getOutletOperatingHours']);
+Route::get('/api/outlet-operating-hours', [PublicOrderController::class, 'getOutletOperatingHours']);
 
 
 /*
@@ -145,20 +148,27 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::post('/bulk-outlets',    [OutletSettingsController::class, 'bulkCreateOutlets'])->middleware('throttle:30,1');
     });
 
-    // ── Order / KDS API ─────────────────────────────────────────────────────
-    Route::get('/api/orders',                        [OrderController::class, 'getKdsOrders']);
-    Route::put('/api/orders/{id}/status',            [OrderController::class, 'updateOrderStatus']);
-    Route::get('/api/print-jobs',                    [OrderController::class, 'getPrintJobs']);
-    Route::get('/api/cashier-queue',                 [OrderController::class, 'getCashierQueue']);
-    Route::delete('/api/cashier-queue/{id}',         [OrderController::class, 'clearCashierQueueItem']);
-    Route::post('/api/print-receipt',                [OrderController::class, 'printReceipt']);
-    Route::get('/api/receipt-config',                [OrderController::class, 'getReceiptConfig']);
-    Route::post('/api/receipt-config',               [OrderController::class, 'updateReceiptConfig']);
-    Route::put('/api/reservations/{id}/status',      [OrderController::class, 'updateReservationStatus']);
+    // ── KDS API ─────────────────────────────────────────────────────────────
+    Route::get('/api/orders',                        [KdsController::class, 'getKdsOrders']);
+    Route::put('/api/orders/{id}/status',            [KdsController::class, 'updateOrderStatus']);
+
+    // ── Cashier API ────────────────────────────────────────────────────────
+    Route::get('/api/cashier-queue',                 [CashierController::class, 'getCashierQueue']);
+    Route::delete('/api/cashier-queue/{id}',         [CashierController::class, 'clearCashierQueueItem']);
+
+    // ── Print & Receipt API ────────────────────────────────────────────────
+    Route::get('/api/print-jobs',                    [PrintController::class, 'getPrintJobs']);
+    Route::post('/api/print-receipt',                [PrintController::class, 'printReceipt']);
+    Route::get('/api/receipt-config',                [PrintController::class, 'getReceiptConfig']);
+    Route::post('/api/receipt-config',               [PrintController::class, 'updateReceiptConfig']);
+
+    // ── Reservation Status Update ──────────────────────────────────────────
+    Route::put('/api/reservations/{id}/status',      [PublicOrderController::class, 'updateReservationStatus']);
+
+    // ── AI Chat ────────────────────────────────────────────────────────────
     Route::post('/api/ai/chat',                      [GeminiAiController::class, 'chat'])->middleware('throttle:20,1');
 
     // ── Menu Management (Fase 1) ──────────────────────────────────────────────
-    Route::get('/katalog-menu',                 [MenuController::class, 'index']);
     Route::post('/api/menu',                    [MenuController::class, 'store'])->middleware('throttle:30,1');
     Route::put('/api/menu/{id}',                [MenuController::class, 'update'])->middleware('throttle:30,1');
     Route::delete('/api/menu/{id}',             [MenuController::class, 'destroy'])->middleware('throttle:30,1');
@@ -169,9 +179,10 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::post('/api/google-reviews/{id}/reply',    [GoogleReviewController::class, 'reply']);
     Route::post('/api/google-reviews/{id}/generate-ai-reply', [GoogleReviewController::class, 'generateAiReply']);
     Route::post('/api/google-reviews/settings',      [GoogleReviewController::class, 'saveSettings']);
-});
 
-// ── Kasir: Verifikasi Geolokasi (PIN harian + GPS) ───────────────────────────
-Route::get('/owner/outlet/daily-pin',        [CashierGeoVerifyController::class, 'dailyPin']);
-Route::post('/api/cashier/verify-location',  [CashierGeoVerifyController::class, 'verify'])
-    ->middleware('throttle:10,1');
+    // ── Kasir: Verifikasi Geolokasi (PIN harian + GPS) ───────────────────────
+    // SECURITY FIX: Pindahkan ke dalam auth+tenant group agar tidak bisa diakses anonim.
+    Route::get('/owner/outlet/daily-pin',        [CashierGeoVerifyController::class, 'dailyPin']);
+    Route::post('/api/cashier/verify-location',  [CashierGeoVerifyController::class, 'verify'])
+        ->middleware('throttle:10,1');
+});

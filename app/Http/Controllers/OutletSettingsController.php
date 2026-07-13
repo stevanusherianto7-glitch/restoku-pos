@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -53,7 +54,7 @@ class OutletSettingsController extends Controller
         // TenantScope aktif — outlet sudah otomatis difilter per tenant
         // Tidak perlu withoutGlobalScope lagi
         $outlet = Outlet::when($user->outlet_id, fn ($q) => $q->orderByRaw(
-            "CASE WHEN id = {$user->outlet_id} THEN 0 ELSE 1 END"
+            'CASE WHEN id = ? THEN 0 ELSE 1 END', [$user->outlet_id]
         ))->first();
 
         $outlets = Outlet::select('id', 'name', 'is_active')->get();
@@ -222,84 +223,86 @@ class OutletSettingsController extends Controller
     {
         $tenantId = $this->ctx->id();
 
-        // 1. Profil Tenant
-        if ($request->has('profil')) {
-            $validatedProfil = $request->validate([
-                'profil.name' => 'required|string|max:150',
-                'profil.brand_name' => 'required|string|max:100',
-                'profil.email' => ['required', 'email', 'max:150', Rule::unique('tenants', 'email')->ignore($tenantId)],
-                'profil.phone' => 'nullable|string|max:20',
-                'profil.npwp' => 'nullable|string|max:30',
-                'profil.nib' => 'nullable|string|max:30',
-                'profil.address' => 'nullable|string|max:500',
-            ])['profil'];
-            Tenant::where('id', $tenantId)->update($validatedProfil);
-        }
-
-        // 2. Outlet (Lokasi & Nama/Alamat cabang)
-        $outletId = $request->input('lokasi.outlet_id') ?? $request->input('outlet_id') ?? Auth::user()?->outlet_id;
-        if ($outletId && $request->has('lokasi')) {
-            $validatedLokasi = $request->validate([
-                'lokasi.outlet_id' => 'required|integer',
-                'lokasi.name' => 'nullable|string|max:150',
-                'lokasi.address' => 'nullable|string|max:500',
-                'lokasi.phone' => 'nullable|string|max:20',
-                'lokasi.latitude' => 'nullable|numeric|between:-90,90',
-                'lokasi.longitude' => 'nullable|numeric|between:-180,180',
-                'lokasi.geo_radius_meters' => 'required|integer|min:10|max:5000',
-            ])['lokasi'];
-
-            $outletData = [
-                'latitude' => $validatedLokasi['latitude'] ?? null,
-                'longitude' => $validatedLokasi['longitude'] ?? null,
-                'geo_radius_meters' => $validatedLokasi['geo_radius_meters'],
-            ];
-            if (! empty($validatedLokasi['name'])) {
-                $outletData['name'] = $validatedLokasi['name'];
-            }
-            if (isset($validatedLokasi['address'])) {
-                $outletData['address'] = $validatedLokasi['address'];
-            }
-            if (isset($validatedLokasi['phone'])) {
-                $outletData['phone'] = $validatedLokasi['phone'];
+        DB::transaction(function () use ($request, $tenantId) {
+            // 1. Profil Tenant
+            if ($request->has('profil')) {
+                $validatedProfil = $request->validate([
+                    'profil.name' => 'required|string|max:150',
+                    'profil.brand_name' => 'required|string|max:100',
+                    'profil.email' => ['required', 'email', 'max:150', Rule::unique('tenants', 'email')->ignore($tenantId)],
+                    'profil.phone' => 'nullable|string|max:20',
+                    'profil.npwp' => 'nullable|string|max:30',
+                    'profil.nib' => 'nullable|string|max:30',
+                    'profil.address' => 'nullable|string|max:500',
+                ])['profil'];
+                Tenant::where('id', $tenantId)->update($validatedProfil);
             }
 
-            $this->findOutletForTenant($validatedLokasi['outlet_id'])->update($outletData);
-        }
+            // 2. Outlet (Lokasi & Nama/Alamat cabang)
+            $outletId = $request->input('lokasi.outlet_id') ?? $request->input('outlet_id') ?? Auth::user()?->outlet_id;
+            if ($outletId && $request->has('lokasi')) {
+                $validatedLokasi = $request->validate([
+                    'lokasi.outlet_id' => 'required|integer',
+                    'lokasi.name' => 'nullable|string|max:150',
+                    'lokasi.address' => 'nullable|string|max:500',
+                    'lokasi.phone' => 'nullable|string|max:20',
+                    'lokasi.latitude' => 'nullable|numeric|between:-90,90',
+                    'lokasi.longitude' => 'nullable|numeric|between:-180,180',
+                    'lokasi.geo_radius_meters' => 'required|integer|min:10|max:5000',
+                ])['lokasi'];
 
-        // 3. Pajak
-        if ($request->has('pajak')) {
-            $validatedPajak = $request->validate([
-                'pajak.tax_type' => 'required|in:pbjt,ppn',
-                'pajak.pbjt_rate' => 'required|numeric|min:0|max:10',
-                'pajak.ppn_rate' => 'required|numeric|min:0|max:12',
-                'pajak.service_charge_rate' => 'required|numeric|min:0|max:10',
-            ])['pajak'];
-
-            $this->settings->saveTenantSettings($tenantId, $validatedPajak);
-            Tenant::where('id', $tenantId)->update($validatedPajak);
-        }
-
-        // 4. Jam Operasional
-        if ($outletId && $request->has('jam.operating_hours')) {
-            $validatedJam = $request->validate([
-                'jam.operating_hours' => 'required|array',
-            ])['jam'];
-
-            $hours = [];
-            foreach (self::DAYS as $day) {
-                $dayData = $validatedJam['operating_hours'][$day] ?? [];
-                $hours[$day] = [
-                    'open' => preg_match('/^\d{2}:\d{2}$/', $dayData['open'] ?? '') ? $dayData['open'] : '08:00',
-                    'close' => preg_match('/^\d{2}:\d{2}$/', $dayData['close'] ?? '') ? $dayData['close'] : '22:00',
-                    'closed' => (bool) ($dayData['closed'] ?? false),
+                $outletData = [
+                    'latitude' => $validatedLokasi['latitude'] ?? null,
+                    'longitude' => $validatedLokasi['longitude'] ?? null,
+                    'geo_radius_meters' => $validatedLokasi['geo_radius_meters'],
                 ];
+                if (! empty($validatedLokasi['name'])) {
+                    $outletData['name'] = $validatedLokasi['name'];
+                }
+                if (isset($validatedLokasi['address'])) {
+                    $outletData['address'] = $validatedLokasi['address'];
+                }
+                if (isset($validatedLokasi['phone'])) {
+                    $outletData['phone'] = $validatedLokasi['phone'];
+                }
+
+                $this->findOutletForTenant($validatedLokasi['outlet_id'])->update($outletData);
             }
 
-            $outlet = $this->findOutletForTenant($outletId);
-            $this->settings->saveOutletSettings($outlet->id, ['operating_hours' => $hours]);
-            $outlet->update(['operating_hours' => $hours]);
-        }
+            // 3. Pajak
+            if ($request->has('pajak')) {
+                $validatedPajak = $request->validate([
+                    'pajak.tax_type' => 'required|in:pbjt,ppn',
+                    'pajak.pbjt_rate' => 'required|numeric|min:0|max:10',
+                    'pajak.ppn_rate' => 'required|numeric|min:0|max:12',
+                    'pajak.service_charge_rate' => 'required|numeric|min:0|max:10',
+                ])['pajak'];
+
+                $this->settings->saveTenantSettings($tenantId, $validatedPajak);
+                Tenant::where('id', $tenantId)->update($validatedPajak);
+            }
+
+            // 4. Jam Operasional
+            if ($outletId && $request->has('jam.operating_hours')) {
+                $validatedJam = $request->validate([
+                    'jam.operating_hours' => 'required|array',
+                ])['jam'];
+
+                $hours = [];
+                foreach (self::DAYS as $day) {
+                    $dayData = $validatedJam['operating_hours'][$day] ?? [];
+                    $hours[$day] = [
+                        'open' => preg_match('/^\d{2}:\d{2}$/', $dayData['open'] ?? '') ? $dayData['open'] : '08:00',
+                        'close' => preg_match('/^\d{2}:\d{2}$/', $dayData['close'] ?? '') ? $dayData['close'] : '22:00',
+                        'closed' => (bool) ($dayData['closed'] ?? false),
+                    ];
+                }
+
+                $outlet = $this->findOutletForTenant($outletId);
+                $this->settings->saveOutletSettings($outlet->id, ['operating_hours' => $hours]);
+                $outlet->update(['operating_hours' => $hours]);
+            }
+        });
 
         return back()->with('success', 'Semua pengaturan outlet berhasil disimpan ke database.');
     }
@@ -324,7 +327,7 @@ class OutletSettingsController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:4|max:20',
+            'password' => 'required|string|min:8|max:20',
             'role' => ['required', Rule::in(self::ALLOWED_ROLES)],
             'outlet_id' => ['nullable', 'integer',
                 Rule::exists('outlets', 'id')->where('tenant_id', $tenantId)],
@@ -352,7 +355,7 @@ class OutletSettingsController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
-            'password' => 'nullable|string|min:4|max:20',
+            'password' => 'nullable|string|min:8|max:20',
             'role' => ['required', Rule::in(self::ALLOWED_ROLES)],
             'outlet_id' => ['nullable', 'integer',
                 Rule::exists('outlets', 'id')->where('tenant_id', $tenantId)],

@@ -102,4 +102,22 @@ class OrderArchiveTest extends TestCase
         $service = app(OrderArchiveService::class);
         $this->assertEquals(2, $service->pendingCount(6, $t->id));
     }
+
+    public function test_archive_dry_mode_returns_count_without_moving(): void
+    {
+        $t = Tenant::create(['name' => 'T4', 'brand_name' => 'T4', 'email' => 't4@x.com', 'phone' => '6']);
+        $o = Outlet::create(['tenant_id' => $t->id, 'name' => 'O4', 'address' => 'a']);
+        app(TenantContext::class)->setTenantId($t->id);
+
+        $old = $this->makeOrder($t, $o, now()->subYears(2)->toDateString(), Order::STATUS_SELESAI);
+
+        $service = app(OrderArchiveService::class);
+        $result = $service->archive(6, $t->id, null, true);
+
+        $this->assertTrue($result['dry']);
+        $this->assertEquals(1, $result['count']);
+        // Order should still be in hot storage
+        $this->assertDatabaseHas('orders', ['id' => $old->id]);
+        $this->assertDatabaseMissing('orders_archive', ['id' => $old->id]);
+    }
 }

@@ -44,9 +44,9 @@ final class RedisHealthService
         $cliPct = $maxClients > 0 ? round($clients / $maxClients * 100, 1) : null;
 
         $alert = null;
-        if ($memPct !== null && $memPct >= (float) env('REDIS_ALERT_MEM_PERCENT', 80)) {
+        if ($memPct !== null && $memPct >= (float) config('app.redis_alert_mem_percent', 80)) {
             $alert = 'REDIS_MEM_HIGH';
-        } elseif ($cliPct !== null && $cliPct >= (float) env('REDIS_ALERT_CONN_PERCENT', 80)) {
+        } elseif ($cliPct !== null && $cliPct >= (float) config('app.redis_alert_conn_percent', 80)) {
             $alert = 'REDIS_CONN_HIGH';
         }
 

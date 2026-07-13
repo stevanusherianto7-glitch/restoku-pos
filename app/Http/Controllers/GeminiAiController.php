@@ -28,6 +28,11 @@ class GeminiAiController extends Controller
                 'user_id' => auth()->id(),
                 'snippet' => mb_substr($raw, 0, 200),
             ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pesan ditolak karena pola yang tidak aman.',
+            ], 422);
         }
         $message = $this->sanitizer->sanitize($raw);
 

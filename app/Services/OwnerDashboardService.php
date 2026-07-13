@@ -62,8 +62,9 @@ class OwnerDashboardService
                 'id' => $outlet->id,
                 'name' => $outlet->name,
                 'revenue' => $revenue,
-                'profit' => $profit,
+                'profit_estimate' => $profit,
                 'food_cost_percentage' => 35,
+                'is_estimate' => true,
             ];
         }
 
@@ -131,11 +132,13 @@ class OwnerDashboardService
 
         return [
             'gross_profit' => $grossProfit,
-            'cogs' => $cogs,
-            'operational_expenses' => $operationalExpenses,
-            'net_profit' => $netProfit,
+            'cogs_estimate' => $cogs,
+            'operational_expenses_estimate' => $operationalExpenses,
+            'net_profit_estimate' => $netProfit,
             'cash_in' => $grossProfit,
             'cash_out' => $cogs + $operationalExpenses,
+            'is_estimate' => true,
+            'note' => 'COGS dan OpEx menggunakan benchmark standar industri (35%/20%).',
         ];
     }
 }

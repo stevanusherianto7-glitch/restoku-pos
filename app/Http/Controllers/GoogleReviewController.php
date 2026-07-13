@@ -68,7 +68,7 @@ class GoogleReviewController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'source' => 'places',
-                    'message' => 'Gagal mengambil ulasan dari Google: '.$e->getMessage(),
+                    'message' => 'Gagal mengambil ulasan dari Google. Silakan coba lagi.',
                 ], 502);
             }
         }
@@ -137,6 +137,14 @@ class GoogleReviewController extends Controller
     {
         $review = GoogleReview::findOrFail($id);
 
+        // SECURITY FIX: Pastikan review milik tenant yang sedang login.
+        if ($review->tenant_id !== auth()->user()->tenant_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ulasan tidak ditemukan.',
+            ], 404);
+        }
+
         $prompt = sprintf(
             "Bertindaklah sebagai Owner/Manager Restoran yang ramah, rendah hati, dan sangat peduli dengan masukan pelanggan. Tulis satu tanggapan ulasan Google Review yang sangat manusiawi, tidak kaku, relevan dengan isi komplain/ulasan, dan sama sekali TIDAK terlihat seperti ditulis oleh template AI.\n\n".
             "PANDUAN PENULISAN JAWABAN:\n".
@@ -157,7 +165,7 @@ class GoogleReviewController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal membuat balasan AI: '.$e->getMessage(),
+                'message' => 'Gagal membuat balasan AI. Silakan coba lagi.',
             ], 502);
         }
     }
@@ -173,6 +181,15 @@ class GoogleReviewController extends Controller
         ]);
 
         $review = GoogleReview::findOrFail($id);
+
+        // SECURITY FIX: Pastikan review milik tenant yang sedang login.
+        if ($review->tenant_id !== auth()->user()->tenant_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ulasan tidak ditemukan.',
+            ], 404);
+        }
+
         $review->update([
             'reply_text' => $request->input('reply_text'),
             'replied_at' => now(),

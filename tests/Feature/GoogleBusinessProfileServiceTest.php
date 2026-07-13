@@ -191,4 +191,135 @@ class GoogleBusinessProfileServiceTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $service->fetchReviewsFromPlaceId('ChIJbad', null, $this->user->tenant_id);
     }
+
+    public function test_authorize_url_contains_required_oauth_params(): void
+    {
+        config([
+            'services.google.client_id' => 'test-client-id',
+            'google-business-profile.bp_redirect_uri' => 'https://example.com/callback',
+            'google-business-profile.scopes' => ['business.manage'],
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $url = $service->authorizeUrl($this->user);
+
+        $this->assertStringContainsString('accounts.google.com/o/oauth2/v2/auth', $url);
+        $this->assertStringContainsString('client_id=test-client-id', $url);
+        $this->assertStringContainsString('response_type=code', $url);
+        $this->assertStringContainsString('scope=business.manage', $url);
+        $this->assertStringContainsString('access_type=offline', $url);
+        $this->assertStringContainsString('prompt=consent', $url);
+        $this->assertStringContainsString('state=', $url);
+    }
+
+    public function test_refresh_if_needed_skips_when_not_expired(): void
+    {
+        $this->token->update(['expires_at' => now()->addHour()]);
+
+        $service = new GoogleBusinessProfileService;
+        $result = $service->refreshIfNeeded($this->token);
+
+        $this->assertEquals($this->token->id, $result->id);
+        Http::assertNothingSent();
+    }
+
+    public function test_refresh_if_needed_refreshes_when_expired(): void
+    {
+        $this->token->update(['expires_at' => now()->subHour()]);
+
+        Http::fake([
+            'oauth2.googleapis.com/token' => Http::response([
+                'access_token' => 'new_access_token',
+                'expires_in' => 3600,
+            ]),
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $result = $service->refreshIfNeeded($this->token);
+
+        $this->assertNotEquals('enc_dummy', $result->fresh()->access_token);
+        Http::assertSent(fn ($req) => str_contains((string) $req->url(), 'oauth2.googleapis.com/token')
+            && $req->method() === 'POST');
+    }
+
+    public function test_refresh_if_needed_returns_original_on_failure(): void
+    {
+        $this->token->update(['expires_at' => now()->subHour()]);
+
+        Http::fake([
+            'oauth2.googleapis.com/token' => Http::response(['error' => 'invalid_grant'], 400),
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $result = $service->refreshIfNeeded($this->token);
+
+        $this->assertEquals($this->token->id, $result->id);
+    }
+
+    public function test_list_locations_returns_mapped_array(): void
+    {
+        Http::fake([
+            'mybusinessaccountmanagement.googleapis.com/*' => Http::response(['accounts' => [['name' => 'accounts/999']]]),
+            'businessprofile.googleapis.com/*' => Http::response([
+                'locations' => [
+                    [
+                        'name' => 'accounts/999/locations/loc1',
+                        'title' => 'Resto Cabang Utama',
+                        'storefrontAddress' => ['addressLines' => ['Jl. Merdeka No. 1']],
+                    ],
+                    [
+                        'name' => 'accounts/999/locations/loc2',
+                        'storeCode' => 'RC2',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $locations = $service->listLocations($this->token);
+
+        $this->assertCount(2, $locations);
+        $this->assertEquals('loc1', $locations[0]['location_id']);
+        $this->assertEquals('Resto Cabang Utama', $locations[0]['name']);
+        $this->assertEquals('Jl. Merdeka No. 1', $locations[0]['address']);
+        $this->assertEquals('loc2', $locations[1]['location_id']);
+        $this->assertEquals('RC2', $locations[1]['name']);
+    }
+
+    public function test_list_locations_returns_empty_on_failure(): void
+    {
+        Http::fake([
+            'mybusinessaccountmanagement.googleapis.com/*' => Http::response(['accounts' => [['name' => 'accounts/999']]]),
+            'businessprofile.googleapis.com/*' => Http::response(['error' => 'unauthorized'], 403),
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $locations = $service->listLocations($this->token);
+
+        $this->assertEmpty($locations);
+    }
+
+    public function test_list_locations_returns_empty_when_no_account(): void
+    {
+        Http::fake([
+            'mybusinessaccountmanagement.googleapis.com/*' => Http::response(['accounts' => []]),
+        ]);
+
+        $service = new GoogleBusinessProfileService;
+        $locations = $service->listLocations($this->token);
+
+        $this->assertEmpty($locations);
+    }
+
+    public function test_resolve_account_uses_config_override(): void
+    {
+        config(['google-business-profile.account_id' => 'override-account-123']);
+
+        $service = new GoogleBusinessProfileService;
+        $locations = $service->listLocations($this->token);
+
+        // When config override is set, resolveAccount returns 'accounts/override-account-123'
+        // and should NOT call the accounts API
+        Http::assertNotSent(fn ($req) => str_contains((string) $req->url(), 'mybusinessaccountmanagement'));
+    }
 }

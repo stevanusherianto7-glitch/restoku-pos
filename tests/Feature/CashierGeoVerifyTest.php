@@ -4,6 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Outlet;
 use App\Models\OutletDailyPin;
+use App\Models\Subscription;
+use App\Models\Tenant;
+use App\Models\User;
 use App\Services\DailyPinService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -126,5 +129,61 @@ class CashierGeoVerifyTest extends TestCase
         // ~10m utara
         $this->assertGreaterThan(5, $dist);
         $this->assertLessThan(20, $dist);
+    }
+
+    public function test_daily_pin_returns_404_when_no_outlet_in_tenant(): void
+    {
+        // Create a staff user with no outlet and a tenant with no outlets
+        $emptyTenant = Tenant::create([
+            'name' => 'Empty Tenant',
+            'brand_name' => 'Empty',
+            'email' => 'empty@test.com',
+            'phone' => '000',
+        ]);
+
+        // Delete the auto-created default outlet
+        Outlet::withoutGlobalScopes()->where('tenant_id', $emptyTenant->id)->delete();
+
+        $staffNoOutlet = User::create([
+            'tenant_id' => $emptyTenant->id,
+            'name' => 'No Outlet Staff',
+            'email' => 'nooutlet@test.com',
+            'role' => 'cashier',
+            'password' => bcrypt('password'),
+        ]);
+
+        Subscription::create([
+            'tenant_id' => $emptyTenant->id,
+            'plan' => 'pro',
+            'status' => 'active',
+        ]);
+
+        $resp = $this->actingAs($staffNoOutlet)->getJson('/owner/outlet/daily-pin');
+        $resp->assertStatus(404);
+    }
+
+    public function test_distance_to_outlet_returns_null_when_no_coordinates(): void
+    {
+        $outlet = Outlet::withoutGlobalScopes()->create([
+            'tenant_id' => $this->testTenant->id,
+            'name' => 'No Coords Outlet',
+            'address' => 'Jl. No Coords',
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+
+        $service = new DailyPinService;
+        $dist = $service->distanceToOutlet($outlet, -6.20, 106.82);
+
+        $this->assertNull($dist);
+    }
+
+    public function test_is_within_radius_with_accuracy_tolerance(): void
+    {
+        $service = new DailyPinService;
+        // Outlet di (-6.20, 106.82), radius 50m
+        $result = $service->isWithinRadius($this->testOutlet, -6.19991, 106.82, 25.0);
+
+        $this->assertTrue($result);
     }
 }

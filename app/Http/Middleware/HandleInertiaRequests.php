@@ -142,8 +142,9 @@ class HandleInertiaRequests extends Middleware
             'login_employees' => fn () => $request->routeIs('login')
                 ? User::whereNotNull('tenant_id')
                     ->where('role', '!=', 'owner')
-                    ->select('id', 'name', 'role', 'pin')
+                    ->select('id', 'name', 'role')
                     ->get()
+                    ->map(fn ($u) => ['id' => $u->id, 'name' => $u->name, 'role' => $u->role, 'pin' => null])
                     ->toArray()
                 : null,
 

@@ -32,10 +32,12 @@ class AuthenticatedSessionController extends Controller
             // SECURITY (C-1): never trust a raw role param to bypass PIN verification.
             // Only match by hashed PIN; plaintext fallback removed. Load is scoped by
             // role (owner excluded) — tenant scoping happens post-login via TenantContext.
+            // SECURITY FIX: Use cursor() to avoid loading all users into memory (OOM risk at scale).
+            $matchedUser = null;
             $users = User::where('role', '!=', 'owner')
                 ->whereNotNull('password')
-                ->get();
-            $matchedUser = null;
+                ->select('id', 'password', 'role', 'tenant_id', 'outlet_id', 'name')
+                ->cursor();
             foreach ($users as $u) {
                 if (Hash::check($pin, $u->password)) {
                     $matchedUser = $u;

@@ -41,6 +41,7 @@ class PrintJob extends Model
     {
         $count = static::withoutGlobalScope(TenantScope::class)
             ->where('tenant_id', $tenantId)
+            ->lockForUpdate()
             ->count();
 
         return 'PRJ-'.str_pad((string) ($count + 1), 4, '0', STR_PAD_LEFT);

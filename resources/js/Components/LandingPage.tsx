@@ -286,7 +286,7 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                     </div>
 
                     <div className="w-full overflow-hidden relative select-none">
-                        <div className="flex w-max animate-marquee items-center gap-12 px-6">
+                        <div className="flex w-max animate-marquee items-center gap-10 px-6">
                             {[
                                 { src: '/images/landing/brands/waroeng.png', alt: 'Waroeng Steak' },
                                 { src: '/images/landing/brands/kopi_kenangan.png', alt: 'Kopi Kenangan' },
@@ -305,7 +305,7 @@ export function LandingPage({ onEnter, onEnterOwner }: { onEnter: () => void; on
                                     key={i}
                                     src={brand.src}
                                     alt={brand.alt}
-                                    className="h-[60px] w-auto object-contain opacity-90 brightness-110 saturate-110"
+                                    className="h-[40px] w-auto object-contain opacity-90 brightness-110 saturate-110"
                                     loading="lazy"
                                 />
                             ))}

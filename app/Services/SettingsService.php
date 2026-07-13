@@ -29,7 +29,7 @@ class SettingsService
 
     public function __construct()
     {
-        $this->ttl = (int) env('SETTINGS_CACHE_TTL', 3600); // 60 menit
+        $this->ttl = (int) config('app.settings_cache_ttl', 3600); // 60 menit
     }
 
     // ─── Read ─────────────────────────────────────────────────────────────────
@@ -90,7 +90,7 @@ class SettingsService
     /**
      * Simpan tenant settings dan invalidasi cache.
      *
-     * @param array<string,mixed> $data
+     * @param  array<string,mixed>  $data
      */
     public function saveTenantSettings(int $tenantId, array $data): TenantSetting
     {
@@ -107,7 +107,7 @@ class SettingsService
     /**
      * Simpan outlet settings dan invalidasi cache.
      *
-     * @param array<string,mixed> $data
+     * @param  array<string,mixed>  $data
      */
     public function saveOutletSettings(int $outletId, array $data): OutletSetting
     {

@@ -213,7 +213,7 @@ class OutletSettingsControllerTest extends TestCase
         $response = $this->actingAs($this->owner)->post('/api/outlet-settings/karyawan', [
             'name' => 'Staf Baru',
             'email' => 'stafbaru@test.com',
-            'password' => '1234',
+            'password' => 'password',
             'role' => 'kitchen',
             'outlet_id' => $this->outlet->id,
         ]);
@@ -232,7 +232,7 @@ class OutletSettingsControllerTest extends TestCase
             ->postJson('/api/outlet-settings/karyawan', [
                 'name' => 'Hacker',
                 'email' => 'hacker@test.com',
-                'password' => '1234',
+                'password' => 'password',
                 'role' => 'owner',
             ]);
         $response->assertStatus(422)

@@ -31,13 +31,21 @@ class AuthenticatedMutationTest extends TestCase
     use RefreshDatabase;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
+
     private Outlet $outletA;
+
     private Outlet $outletB;
-    private User   $staffA;
-    private User   $ownerA;
-    private User   $staffB;
-    private Order  $orderA;
+
+    private User $staffA;
+
+    private User $ownerA;
+
+    private User $staffB;
+
+    private Order $orderA;
+
     private MenuItem $menuItemA;
 
     protected function setUp(): void
@@ -46,67 +54,67 @@ class AuthenticatedMutationTest extends TestCase
 
         // ── Tenant A ──────────────────────────────────────────────────────
         $this->tenantA = Tenant::create([
-            'name'       => 'Resto Alpha',
+            'name' => 'Resto Alpha',
             'brand_name' => 'Alpha',
-            'email'      => 'alpha@test.com',
-            'phone'      => '0811111111',
+            'email' => 'alpha@test.com',
+            'phone' => '0811111111',
         ]);
         $this->outletA = Outlet::create([
             'tenant_id' => $this->tenantA->id,
-            'name'      => 'Outlet Alpha',
-            'address'   => 'Jl. Alpha',
+            'name' => 'Outlet Alpha',
+            'address' => 'Jl. Alpha',
         ]);
         $this->staffA = User::create([
             'tenant_id' => $this->tenantA->id,
             'outlet_id' => $this->outletA->id,
-            'name'      => 'Kasir Alpha',
-            'email'     => 'kasir@alpha.com',
-            'password'  => bcrypt('pw'),
-            'role'      => 'kasir',
+            'name' => 'Kasir Alpha',
+            'email' => 'kasir@alpha.com',
+            'password' => bcrypt('pw'),
+            'role' => 'kasir',
         ]);
         $this->ownerA = User::create([
             'tenant_id' => $this->tenantA->id,
             'outlet_id' => $this->outletA->id,
-            'name'      => 'Owner Alpha',
-            'email'     => 'owner@alpha.com',
-            'password'  => bcrypt('pw'),
-            'role'      => 'owner',
+            'name' => 'Owner Alpha',
+            'email' => 'owner@alpha.com',
+            'password' => bcrypt('pw'),
+            'role' => 'owner',
         ]);
         $this->menuItemA = MenuItem::withoutGlobalScopes()->create([
-            'tenant_id'    => $this->tenantA->id,
-            'name'         => 'Soto Ayam',
-            'price'        => 25000,
+            'tenant_id' => $this->tenantA->id,
+            'name' => 'Soto Ayam',
+            'price' => 25000,
             'is_available' => true,
         ]);
         // Buat order untuk Tenant A
         $this->orderA = Order::withoutGlobalScopes()->create([
-            'tenant_id'    => $this->tenantA->id,
-            'outlet_id'    => $this->outletA->id,
-            'order_code'   => 'ORD-ALPHA-001',
+            'tenant_id' => $this->tenantA->id,
+            'outlet_id' => $this->outletA->id,
+            'order_code' => 'ORD-ALPHA-001',
             'table_number' => 'Meja 3',
-            'source'       => 'pos',
-            'status'       => Order::STATUS_ANTRIAN_MASUK,
+            'source' => 'pos',
+            'status' => Order::STATUS_ANTRIAN_MASUK,
         ]);
 
         // ── Tenant B (untuk cross-tenant isolation tests) ─────────────────
         $this->tenantB = Tenant::create([
-            'name'       => 'Resto Beta',
+            'name' => 'Resto Beta',
             'brand_name' => 'Beta',
-            'email'      => 'beta@test.com',
-            'phone'      => '0822222222',
+            'email' => 'beta@test.com',
+            'phone' => '0822222222',
         ]);
         $this->outletB = Outlet::create([
             'tenant_id' => $this->tenantB->id,
-            'name'      => 'Outlet Beta',
-            'address'   => 'Jl. Beta',
+            'name' => 'Outlet Beta',
+            'address' => 'Jl. Beta',
         ]);
         $this->staffB = User::create([
             'tenant_id' => $this->tenantB->id,
             'outlet_id' => $this->outletB->id,
-            'name'      => 'Kasir Beta',
-            'email'     => 'kasir@beta.com',
-            'password'  => bcrypt('pw'),
-            'role'      => 'kasir',
+            'name' => 'Kasir Beta',
+            'email' => 'kasir@beta.com',
+            'password' => bcrypt('pw'),
+            'role' => 'kasir',
         ]);
     }
 
@@ -122,10 +130,10 @@ class AuthenticatedMutationTest extends TestCase
             ]);
 
         $response->assertStatus(200)
-                 ->assertJson(['success' => true]);
+            ->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('orders', [
-            'id'     => $this->orderA->id,
+            'id' => $this->orderA->id,
             'status' => Order::STATUS_SIAP_BAYAR,
         ]);
     }
@@ -156,16 +164,16 @@ class AuthenticatedMutationTest extends TestCase
     public function test_authenticated_staff_can_update_reservation_status(): void
     {
         $reservation = Reservation::withoutGlobalScopes()->create([
-            'tenant_id'        => $this->tenantA->id,
-            'outlet_id'        => $this->outletA->id,
+            'tenant_id' => $this->tenantA->id,
+            'outlet_id' => $this->outletA->id,
             'reservation_code' => 'RSV-A-001',
-            'name'             => 'Andi Setiawan',
-            'phone'            => '08123456789',
-            'date'             => now()->addDays(2)->toDateString(),
-            'time'             => '19:00',
-            'guests'           => 4,
-            'type'             => 'meja',
-            'status'           => 'pending',
+            'name' => 'Andi Setiawan',
+            'phone' => '08123456789',
+            'date' => now()->addDays(2)->toDateString(),
+            'time' => '19:00',
+            'guests' => 4,
+            'type' => 'meja',
+            'status' => 'pending',
         ]);
 
         $response = $this->actingAs($this->staffA)
@@ -176,7 +184,7 @@ class AuthenticatedMutationTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('reservations', [
-            'id'     => $reservation->id,
+            'id' => $reservation->id,
             'status' => 'confirmed',
         ]);
     }
@@ -184,16 +192,16 @@ class AuthenticatedMutationTest extends TestCase
     public function test_unauthenticated_cannot_update_reservation_status(): void
     {
         $reservation = Reservation::withoutGlobalScopes()->create([
-            'tenant_id'        => $this->tenantA->id,
-            'outlet_id'        => $this->outletA->id,
+            'tenant_id' => $this->tenantA->id,
+            'outlet_id' => $this->outletA->id,
             'reservation_code' => 'RSV-A-002',
-            'name'             => 'Budi',
-            'phone'            => '08111',
-            'date'             => now()->addDay()->toDateString(),
-            'time'             => '18:00',
-            'guests'           => 2,
-            'type'             => 'meja',
-            'status'           => 'pending',
+            'name' => 'Budi',
+            'phone' => '08111',
+            'date' => now()->addDay()->toDateString(),
+            'time' => '18:00',
+            'guests' => 2,
+            'type' => 'meja',
+            'status' => 'pending',
         ]);
 
         $response = $this->putJson("/api/reservations/{$reservation->reservation_code}/status", [
@@ -205,16 +213,16 @@ class AuthenticatedMutationTest extends TestCase
     public function test_staff_b_cannot_update_reservation_from_tenant_a(): void
     {
         $reservation = Reservation::withoutGlobalScopes()->create([
-            'tenant_id'        => $this->tenantA->id,
-            'outlet_id'        => $this->outletA->id,
+            'tenant_id' => $this->tenantA->id,
+            'outlet_id' => $this->outletA->id,
             'reservation_code' => 'RSV-A-003',
-            'name'             => 'Citra',
-            'phone'            => '08222',
-            'date'             => now()->addDays(3)->toDateString(),
-            'time'             => '20:00',
-            'guests'           => 3,
-            'type'             => 'meja',
-            'status'           => 'pending',
+            'name' => 'Citra',
+            'phone' => '08222',
+            'date' => now()->addDays(3)->toDateString(),
+            'time' => '20:00',
+            'guests' => 3,
+            'type' => 'meja',
+            'status' => 'pending',
         ]);
 
         $response = $this->actingAs($this->staffB)
@@ -233,16 +241,16 @@ class AuthenticatedMutationTest extends TestCase
     {
         $response = $this->actingAs($this->ownerA)
             ->post('/api/outlet-settings/karyawan', [
-                'name'     => 'Dewi Rahayu',
-                'role'     => 'waiter',
-                'password' => '1234',
-                'email'    => 'dewi@alpha.com',
+                'name' => 'Dewi Rahayu',
+                'role' => 'waiter',
+                'password' => 'password',
+                'email' => 'dewi@alpha.com',
             ]);
 
         $response->assertStatus(302);
 
         $this->assertDatabaseHas('users', [
-            'name'      => 'Dewi Rahayu',
+            'name' => 'Dewi Rahayu',
             'tenant_id' => $this->tenantA->id,
         ]);
     }
@@ -250,10 +258,10 @@ class AuthenticatedMutationTest extends TestCase
     public function test_unauthenticated_cannot_create_employee(): void
     {
         $response = $this->postJson('/api/outlet-settings/karyawan', [
-            'name'     => 'Ghost User',
-            'role'     => 'kasir',
+            'name' => 'Ghost User',
+            'role' => 'kasir',
             'password' => '1234',
-            'email'    => 'ghost@alpha.com',
+            'email' => 'ghost@alpha.com',
         ]);
         $response->assertStatus(401);
     }
