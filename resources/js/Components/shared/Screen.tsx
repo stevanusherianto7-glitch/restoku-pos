@@ -40,7 +40,7 @@ export function Screen({
 
     return (
         <div
-            className={`animate-in fade-in duration-500 max-w-[1280px] mx-auto w-full ${noScroll ? 'flex-1 min-h-0 flex flex-col h-full overflow-hidden' : ''}`}
+            className={`animate-in fade-in duration-500 max-w-[1280px] mx-auto w-full ${noScroll ? 'flex-1 min-h-0 flex flex-col h-full overflow-hidden pl-12' : ''}`}
         >
             {/* Page Header */}
             <div className={`${noScroll ? 'mb-3 shrink-0' : 'mb-8'} flex items-start justify-between gap-4`}>

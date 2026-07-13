@@ -364,14 +364,7 @@ function POSInner() {
     return (
         <MainLayout noScroll>
             <Head title="Kasir (POS)" />
-            <Screen title="Kasir (POS)" noScroll>
-                {/* ── Header ── */}
-                <div className="flex items-start justify-between gap-4 mb-4">
-                    <div>
-                        <h1 className="text-xl font-bold font-display text-white">Kasir (POS)</h1>
-                        <p className="text-xs text-slate-400">Dashboard kasir.</p>
-                    </div>
-                </div>
+            <Screen title="Kasir (POS)" subtitle="Dashboard kasir." noScroll>
                 {isPrintingBt && (
                     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl bg-emerald-500 text-slate-950 font-bold px-5 py-4 shadow-2xl animate-bounce border border-emerald-400">
                         <span className="size-2 bg-slate-950 rounded-full animate-ping" />
@@ -380,7 +373,7 @@ function POSInner() {
                 )}
                 <div className="grid grid-cols-[1fr_400px] gap-5 items-stretch flex-1 min-h-0 h-full overflow-hidden">
                     {/* ── Menu Grid ── */}
-                    <Glass className="p-4 flex flex-col h-full overflow-hidden min-h-0">
+                    <Glass className="p-4 flex flex-col h-full max-h-full overflow-y-auto min-h-0">
                         {/* Served Orders Payment Queue */}
                         {servedQueue.length > 0 && (
                             <div className="mb-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4">
@@ -520,7 +513,7 @@ function POSInner() {
                     </Glass>
 
                     {/* ── Cart Panel ── */}
-                    <Glass className="p-4 flex flex-col h-full overflow-hidden min-h-0">
+                    <Glass className="p-4 flex flex-col h-full max-h-full overflow-y-auto min-h-0">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-base font-bold text-slate-200 truncate">
                                 {activeOrderId ? `Pesanan: ${orderTableName}` : 'Transaksi Baru'}
@@ -697,6 +690,9 @@ function POSInner() {
                                     <span className="font-mono">-{formatRupiah(cart.discountAmount)}</span>
                                 </div>
                             )}
+                        </div>
+
+                        <div className="shrink-0 mt-3 pt-3 border-t border-white/5 space-y-2">
                             {cart.discountAmount === 0 && (
                                 <div className="flex justify-between text-sm text-slate-400">
                                     <button
@@ -758,7 +754,7 @@ function POSInner() {
                                 </div>
                             </div>
 
-                            <div className="flex gap-2 mt-2">
+                            <div className="flex gap-2 mt-2 sticky bottom-0 bg-[#0c0c0e] pt-2 -mx-4 px-4 pb-1">
                                 <button
                                     type="button"
                                     onClick={() => setIsSplitBillModalOpen(true)}
