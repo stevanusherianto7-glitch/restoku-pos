@@ -355,7 +355,7 @@ export default function MainLayout({ children, noScroll = false }: { children: R
         >
             <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
             <main
-                className={`flex-1 ${noScroll ? 'overflow-hidden p-4 md:p-5 flex flex-col min-h-0' : 'overflow-y-auto p-6 md:p-8'} relative`}
+                className={`flex-1 ${noScroll ? 'overflow-hidden p-4 md:p-5 pl-16 md:pl-20 flex flex-col min-h-0' : 'overflow-y-auto p-6 md:p-8 pl-16 md:pl-20'} relative`}
             >
                 {/* Floating burger toggle — permanent di top-left main content */}
                 <button
