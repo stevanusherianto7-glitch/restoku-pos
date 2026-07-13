@@ -24,6 +24,13 @@ final class RedisHealthService
             $pong = Redis::ping(); // bool|string
             $info = Redis::command('INFO', ['memory']);
             $infoClients = Redis::command('INFO', ['clients']);
+            // PhpRedis returns an associative array for a single section; Predis returns a string.
+            if (is_array($info)) {
+                $info = $this->infoArrayToString($info);
+            }
+            if (is_array($infoClients)) {
+                $infoClients = $this->infoArrayToString($infoClients);
+            }
         } catch (\Throwable $e) {
             return [
                 'ok' => false,
@@ -66,10 +73,24 @@ final class RedisHealthService
 
     private function parseInfo(string $raw, string $key): ?int
     {
-        if (preg_match('/^'.preg_quote($key, '/').':(\d+)/m', $raw, $m)) {
+        if (preg_match('/^'.preg_quote($key, '/').':(\\d+)/m', $raw, $m)) {
             return (int) $m[1];
         }
 
         return null;
+    }
+
+    /**
+     * Convert a PhpRedis INFO associative array (single section) into the
+     * "key:value" newline string format that parseInfo() expects.
+     */
+    private function infoArrayToString(array $info): string
+    {
+        $lines = [];
+        foreach ($info as $k => $v) {
+            $lines[] = $k.':'.($v ?? '');
+        }
+
+        return implode("\n", $lines);
     }
 }
