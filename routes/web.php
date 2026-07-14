@@ -153,8 +153,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         ->middleware('plan:wa_notif');
 
     // ── Fitur Enterprise ────────────────────────────────────────────────────
-    // KDS (Dapur) adalah fitur operasional inti untuk kitchen staff — tidak di-lock plan.
-    Route::get('/kds', fn () => Inertia::render('KDS/Index'));
+    Route::get('/kds', fn () => Inertia::render('KDS/Index'))
+        ->middleware('plan:kds');
 
     // ── Pengaturan Outlet (DB-backed) ───────────────────────────────────────
     Route::get('/pengaturan-outlet', [OutletSettingsController::class, 'index']);
