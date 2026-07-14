@@ -80,16 +80,9 @@ jobs:
       - name: Run Psalm (SAST) and emit SARIF
         run: |
           php vendor/bin/psalm --config=psalm.xml --no-cache --no-progress --output-format=sarif --report=psalm.sarif
-        # tapi SARIF tetap ter-upload & alert muncul di Security tab.
+        # Job tidak fail CI walau ada security finding; SARIF tetap ter-upload
+        # & alert muncul di Security tab.
         continue-on-error: true
-        run: |
-          php psalm.phar \
-            --config=psalm.xml \
-            --no-cache \
-            --no-progress \
-            --output-format=sarif \
-            --report=psalm.sarif \
-            || true
 
       - name: Upload Psalm SARIF to code scanning
         uses: github/codeql-action/upload-sarif@v4
