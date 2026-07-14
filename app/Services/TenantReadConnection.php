@@ -39,7 +39,7 @@ class TenantReadConnection
             // Postgres: database sama, schema beda via search_path.
             // Pastikan key 'database' ada (clone dari env utama bila kosong).
             if (empty($template['database'])) {
-                $template['database'] = env('DB_DATABASE', Config::get('database.connections.tenant_template.database', 'forge'));
+                $template['database'] = config('database.connections.tenant_template.database', Config::get('database.connections.tenant_template.database', 'forge'));
             }
             $template['search_path'] = 'tenant_'.$tenantId;
             Config::set("database.connections.{$schema}", $template);

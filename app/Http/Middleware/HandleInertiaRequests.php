@@ -112,7 +112,7 @@ class HandleInertiaRequests extends Middleware
             // window.location.origin (benar di produksi/VPS).
             // Di dev, isi MENU_BASE_URL=http://<IP-LAN>:8000 atau ngrok agar
             // HP bisa scan QR (localhost tidak reachable dari HP).
-            'menu_base_url' => env('MENU_BASE_URL', ''),
+            'menu_base_url' => config('app.menu_base_url', ''),
 
             // ── Outlet Settings (Tax Config) ──────────────────────────────────
             // Menggantikan localStorage.getItem("outlet_tax_rate") di POS/Index.tsx

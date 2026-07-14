@@ -58,7 +58,7 @@ class Outlet extends Model
     /**
      * Auto-slug saat nama diisi & slug kosong (memudahkan auto-outlet-default).
      */
-    public function setNameAttribute($value): void
+    protected function setNameAttribute($value): void
     {
         $this->attributes['name'] = $value;
         if (empty($this->attributes['slug'])) {

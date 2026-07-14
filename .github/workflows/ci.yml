@@ -77,14 +77,9 @@ jobs:
         # Psalm butuh autoloader + classmap app/ lengkap.
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Download Psalm phar
+      - name: Run Psalm (SAST) and emit SARIF
         run: |
-          curl -sL https://phar.phpunit.de/psalm.phar -o psalm.phar
-          php psalm.phar --version
-
-      - name: Run Psalm (emit SARIF)
-        # errorLevel di psalm.xml = 1 (kritis). Jika ada finding, Psalml 
-        # exit 2 -> kita continue-on-error supaya PR tidak di-blokir total,
+          php vendor/bin/psalm --config=psalm.xml --no-cache --no-progress --output-format=sarif --report=psalm.sarif
         # tapi SARIF tetap ter-upload & alert muncul di Security tab.
         continue-on-error: true
         run: |

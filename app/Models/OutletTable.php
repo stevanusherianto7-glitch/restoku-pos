@@ -28,7 +28,7 @@ class OutletTable extends Model
      * Plain-text PIN untuk display ke owner/waiter (generate ulang dari seed deterministik).
      * Tidak disimpan sebagai plaintext di DB.
      */
-    public function getPinAttribute(): string
+    protected function getPinAttribute(): string
     {
         return self::derivePin($this->outlet_id, $this->label);
     }

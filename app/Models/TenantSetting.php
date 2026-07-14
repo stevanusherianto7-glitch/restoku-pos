@@ -11,14 +11,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Menggunakan pola "getOrCreate" via SettingsService sehingga controller
  * tidak pernah menemukan null settings — selalu ada row dengan nilai default.
  *
- * @property int    $tenant_id
+ * @property int $tenant_id
  * @property string $tax_type
- * @property float  $pbjt_rate
- * @property float  $ppn_rate
- * @property float  $service_charge_rate
- * @property bool   $wa_notif_enabled
+ * @property float $pbjt_rate
+ * @property float $ppn_rate
+ * @property float $service_charge_rate
+ * @property bool $wa_notif_enabled
  * @property ?string $wa_phone_number
- * @property bool   $email_notif_enabled
+ * @property bool $email_notif_enabled
  */
 class TenantSetting extends Model
 {
@@ -42,10 +42,10 @@ class TenantSetting extends Model
     ];
 
     protected $casts = [
-        'pbjt_rate'           => 'float',
-        'ppn_rate'            => 'float',
+        'pbjt_rate' => 'float',
+        'ppn_rate' => 'float',
         'service_charge_rate' => 'float',
-        'wa_notif_enabled'    => 'boolean',
+        'wa_notif_enabled' => 'boolean',
         'email_notif_enabled' => 'boolean',
     ];
 
@@ -58,19 +58,19 @@ class TenantSetting extends Model
     public static function defaults(): array
     {
         return [
-            'tax_type'            => 'pbjt',
-            'pbjt_rate'           => 10.00,
-            'ppn_rate'            => 11.00,
+            'tax_type' => 'pbjt',
+            'pbjt_rate' => 10.00,
+            'ppn_rate' => 11.00,
             'service_charge_rate' => 0.00,
-            'wa_notif_enabled'    => false,
-            'wa_phone_number'     => null,
+            'wa_notif_enabled' => false,
+            'wa_phone_number' => null,
             'email_notif_enabled' => true,
-            'gofood_merchant_id'  => null,
-            'grab_merchant_id'    => null,
+            'gofood_merchant_id' => null,
+            'grab_merchant_id' => null,
             'shopeefood_merchant_id' => null,
-            'logo_path'           => null,
-            'primary_color'       => null,
-            'brand_display_name'  => null,
+            'logo_path' => null,
+            'primary_color' => null,
+            'brand_display_name' => null,
         ];
     }
 
@@ -84,7 +84,7 @@ class TenantSetting extends Model
     // ─── Accessors ────────────────────────────────────────────────────────────
 
     /** Tarif pajak aktif berdasarkan tax_type yang dipilih. */
-    public function getActiveTaxRateAttribute(): float
+    protected function getActiveTaxRateAttribute(): float
     {
         return $this->tax_type === 'ppn' ? $this->ppn_rate : $this->pbjt_rate;
     }
@@ -96,11 +96,12 @@ class TenantSetting extends Model
     public function toTaxShareableArray(): array
     {
         $isActive = $this->tax_type !== 'none';
+
         return [
-            'is_tax_active'  => $isActive,
-            'tax_type'       => $this->tax_type ?? 'pbjt',
-            'tax_rate'       => $isActive ? (float)($this->active_tax_rate ?? 10) : 0,
-            'service_charge' => $isActive ? (float)($this->service_charge_rate ?? 0) : 0,
+            'is_tax_active' => $isActive,
+            'tax_type' => $this->tax_type ?? 'pbjt',
+            'tax_rate' => $isActive ? (float) ($this->active_tax_rate ?? 10) : 0,
+            'service_charge' => $isActive ? (float) ($this->service_charge_rate ?? 0) : 0,
         ];
     }
 }

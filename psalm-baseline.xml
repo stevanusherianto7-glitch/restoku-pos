@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="6.16.1@f1f5de594dc76faf8784e02d3dc4716c91c6f6ac">
+  <file src="app/Ai/Tools/MonthlyProfitSummaryTool.php">
+    <InvalidFalsableReturnType>
+      <code><![CDATA[Stringable|string]]></code>
+    </InvalidFalsableReturnType>
+  </file>
+  <file src="app/Ai/Tools/OutletOperatingHoursTool.php">
+    <InvalidFalsableReturnType>
+      <code><![CDATA[Stringable|string]]></code>
+    </InvalidFalsableReturnType>
+  </file>
+  <file src="app/Ai/Tools/TenantTaxConfigTool.php">
+    <InvalidFalsableReturnType>
+      <code><![CDATA[Stringable|string]]></code>
+    </InvalidFalsableReturnType>
+  </file>
+  <file src="app/Console/Commands/OrderArchiveCommand.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$this->option('tenant')]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Console/Commands/SalesRollupCommand.php">
+    <PossiblyNullReference>
+      <code><![CDATA[greaterThan]]></code>
+    </PossiblyNullReference>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$t]]></code>
+      <code><![CDATA[$this->option('date')]]></code>
+      <code><![CDATA[$this->option('seed-months')]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Console/Commands/TenantBackfillCommand.php">
+    <InvalidStringClass>
+      <code><![CDATA[new $modelClass]]></code>
+    </InvalidStringClass>
+    <MissingClosureParamType>
+      <code><![CDATA[$q]]></code>
+      <code><![CDATA[$t]]></code>
+    </MissingClosureParamType>
+    <MissingClosureReturnType>
+      <code><![CDATA[fn ($q, $t) => $q->where('id', $t)]]></code>
+    </MissingClosureReturnType>
+  </file>
+  <file src="app/Console/Commands/TenantMigrateCommand.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$this->option('tenant')]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[TenantConnection]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="app/Http/Controllers/Auth/AuthenticatedSessionController.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $user->tenant_id]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[AuthenticatedSessionController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/Auth/OAuthController.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $email]]></code>
+      <code><![CDATA[! $user->google_id]]></code>
+      <code><![CDATA[! $user->tenant_id]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[OAuthController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/CashierController.php">
+    <MissingParamType>
+      <code><![CDATA[$id]]></code>
+    </MissingParamType>
+    <MissingReturnType>
+      <code><![CDATA[clearCashierQueueItem]]></code>
+      <code><![CDATA[getCashierQueue]]></code>
+    </MissingReturnType>
+    <PossiblyNullArgument>
+      <code><![CDATA[auth()->user()->tenant_id]]></code>
+    </PossiblyNullArgument>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$order->created_at]]></code>
+      <code><![CDATA[$order->order_code]]></code>
+      <code><![CDATA[$order->table_number]]></code>
+    </UndefinedMagicPropertyFetch>
+    <UnusedClass>
+      <code><![CDATA[CashierController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/CashierGeoVerifyController.php">
+    <InvalidScalarArgument>
+      <code><![CDATA[$validated['accuracy'] ?? null]]></code>
+    </InvalidScalarArgument>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$outlet->latitude]]></code>
+      <code><![CDATA[$outlet->longitude]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[CashierGeoVerifyController]]></code>
+    </UnusedClass>
+    <UnusedParam>
+      <code><![CDATA[$request]]></code>
+    </UnusedParam>
+  </file>
+  <file src="app/Http/Controllers/GeminiAiController.php">
+    <MissingReturnType>
+      <code><![CDATA[chat]]></code>
+    </MissingReturnType>
+    <PossiblyUndefinedVariable>
+      <code><![CDATA[$prompt]]></code>
+    </PossiblyUndefinedVariable>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[auth()->id()]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[GeminiAiController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/GoogleReviewController.php">
+    <MissingParamType>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+    </MissingParamType>
+    <MissingReturnType>
+      <code><![CDATA[generateAiReply]]></code>
+      <code><![CDATA[index]]></code>
+      <code><![CDATA[reply]]></code>
+      <code><![CDATA[saveSettings]]></code>
+      <code><![CDATA[viewPanel]]></code>
+    </MissingReturnType>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $placeId]]></code>
+      <code><![CDATA[$placeId]]></code>
+      <code><![CDATA[$placeId]]></code>
+      <code><![CDATA[$user->outlet_id]]></code>
+      <code><![CDATA[$user->outlet_id]]></code>
+      <code><![CDATA[empty($r->reply_text)]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[GoogleReviewController]]></code>
+    </UnusedClass>
+    <UnusedVariable>
+      <code><![CDATA[$source]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="app/Http/Controllers/GuestVerifyController.php">
+    <UnusedClass>
+      <code><![CDATA[GuestVerifyController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/KdsController.php">
+    <MissingClassConstType>
+      <code><![CDATA[KDS_STATUS_LABELS = [
+        Order::STATUS_ANTRIAN_MASUK => 'Antrian Masuk',
+        Order::STATUS_SEDANG_DIMASAK => 'Sedang Dimasak',
+        Order::STATUS_SIAP_SAJIKAN => 'Siap Sajikan',
+    ]]]></code>
+    </MissingClassConstType>
+    <MissingParamType>
+      <code><![CDATA[$id]]></code>
+    </MissingParamType>
+    <MissingReturnType>
+      <code><![CDATA[getKdsOrders]]></code>
+      <code><![CDATA[updateOrderStatus]]></code>
+    </MissingReturnType>
+    <PossiblyNullArgument>
+      <code><![CDATA[auth()->user()->tenant_id]]></code>
+    </PossiblyNullArgument>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$item->notes]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$order->created_at]]></code>
+      <code><![CDATA[$order->order_code]]></code>
+      <code><![CDATA[$order->status]]></code>
+      <code><![CDATA[$order->table_number]]></code>
+    </UndefinedMagicPropertyFetch>
+    <UnusedClass>
+      <code><![CDATA[KdsController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/MenuController.php">
+    <InvalidScalarArgument>
+      <code><![CDATA[$validated['outlet_id'] ?? null]]></code>
+    </InvalidScalarArgument>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$item->image_public_id]]></code>
+      <code><![CDATA[$item->image_public_id]]></code>
+      <code><![CDATA[$uploaded]]></code>
+      <code><![CDATA[$uploaded]]></code>
+      <code><![CDATA[empty($validated['photo'])]]></code>
+      <code><![CDATA[empty($validated['photo'])]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[MenuController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/OrderController.php">
+    <InvalidMethodCall>
+      <code><![CDATA[diffForHumans]]></code>
+    </InvalidMethodCall>
+    <InvalidOperand>
+      <code><![CDATA[$menuItem->price]]></code>
+      <code><![CDATA[$subtotal += $lineSubtotal]]></code>
+    </InvalidOperand>
+    <MissingClassConstType>
+      <code><![CDATA[KDS_STATUS_LABELS = [
+        Order::STATUS_ANTRIAN_MASUK => 'Antrian Masuk',
+        Order::STATUS_SEDANG_DIMASAK => 'Sedang Dimasak',
+        Order::STATUS_SIAP_SAJIKAN => 'Siap Sajikan',
+    ]]]></code>
+      <code><![CDATA[RESERVATION_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed']]]></code>
+    </MissingClassConstType>
+    <MissingClosureReturnType>
+      <code><![CDATA[fn () => $this->readConn->read(fn () => MenuItem::withoutGlobalScope(TenantScope::class)]]></code>
+    </MissingClosureReturnType>
+    <MissingParamType>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+    </MissingParamType>
+    <MissingReturnType>
+      <code><![CDATA[clearCashierQueueItem]]></code>
+      <code><![CDATA[getCashierQueue]]></code>
+      <code><![CDATA[getKdsOrders]]></code>
+      <code><![CDATA[getOrderStatus]]></code>
+      <code><![CDATA[getPrintJobs]]></code>
+      <code><![CDATA[getPublicMenu]]></code>
+      <code><![CDATA[getReceiptConfig]]></code>
+      <code><![CDATA[getReservations]]></code>
+      <code><![CDATA[printReceipt]]></code>
+      <code><![CDATA[submitOrder]]></code>
+      <code><![CDATA[submitReservation]]></code>
+      <code><![CDATA[updateOrderStatus]]></code>
+      <code><![CDATA[updateReceiptConfig]]></code>
+      <code><![CDATA[updateReservationStatus]]></code>
+    </MissingReturnType>
+    <PossiblyNullArgument>
+      <code><![CDATA[auth()->user()->tenant_id]]></code>
+      <code><![CDATA[auth()->user()->tenant_id]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullReference>
+      <code><![CDATA[diffForHumans]]></code>
+      <code><![CDATA[toArray]]></code>
+    </PossiblyNullReference>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+      <code><![CDATA[$request]]></code>
+      <code><![CDATA[$request]]></code>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$item->notes]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$order->created_at]]></code>
+      <code><![CDATA[$order->created_at]]></code>
+      <code><![CDATA[$order->id]]></code>
+      <code><![CDATA[$order->order_code]]></code>
+      <code><![CDATA[$order->order_code]]></code>
+      <code><![CDATA[$order->status]]></code>
+      <code><![CDATA[$order->status]]></code>
+      <code><![CDATA[$order->table_number]]></code>
+      <code><![CDATA[$order->table_number]]></code>
+    </UndefinedMagicPropertyFetch>
+    <UnusedClass>
+      <code><![CDATA[OrderController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/OutletSettingsController.php">
+    <InvalidScalarArgument>
+      <code><![CDATA[$validatedLokasi['outlet_id']]]></code>
+      <code><![CDATA[$validated['outlet_id']]]></code>
+      <code><![CDATA[$validated['outlet_id']]]></code>
+    </InvalidScalarArgument>
+    <MissingClassConstType>
+      <code><![CDATA[ALLOWED_ROLES = ['cashier', 'admin', 'kitchen', 'waiter', 'manager']]]></code>
+      <code><![CDATA[DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']]]></code>
+    </MissingClassConstType>
+    <MissingClosureParamType>
+      <code><![CDATA[$q]]></code>
+    </MissingClosureParamType>
+    <MissingClosureReturnType>
+      <code><![CDATA[fn ($q) => $q->orderByRaw(]]></code>
+    </MissingClosureReturnType>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$outlet->latitude]]></code>
+      <code><![CDATA[$outlet->longitude]]></code>
+      <code><![CDATA[$outletId]]></code>
+      <code><![CDATA[$outletId]]></code>
+      <code><![CDATA[empty($validatedLokasi['name'])]]></code>
+      <code><![CDATA[empty($validated['password'])]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[OutletSettingsController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/OutletTableController.php">
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <UnusedClass>
+      <code><![CDATA[OutletTableController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/OwnerDashboardController.php">
+    <MissingReturnType>
+      <code><![CDATA[archivedOrders]]></code>
+      <code><![CDATA[index]]></code>
+      <code><![CDATA[redisHealth]]></code>
+      <code><![CDATA[reports]]></code>
+      <code><![CDATA[salesSummary]]></code>
+    </MissingReturnType>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <UnusedClass>
+      <code><![CDATA[OwnerDashboardController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/PrintController.php">
+    <InvalidMethodCall>
+      <code><![CDATA[diffForHumans]]></code>
+    </InvalidMethodCall>
+    <MissingReturnType>
+      <code><![CDATA[getPrintJobs]]></code>
+      <code><![CDATA[getReceiptConfig]]></code>
+      <code><![CDATA[printReceipt]]></code>
+      <code><![CDATA[updateReceiptConfig]]></code>
+    </MissingReturnType>
+    <PossiblyNullReference>
+      <code><![CDATA[diffForHumans]]></code>
+      <code><![CDATA[toArray]]></code>
+    </PossiblyNullReference>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <UnusedClass>
+      <code><![CDATA[PrintController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/PublicOrderController.php">
+    <InvalidOperand>
+      <code><![CDATA[$menuItem->price]]></code>
+      <code><![CDATA[$subtotal += $lineSubtotal]]></code>
+    </InvalidOperand>
+    <MissingClassConstType>
+      <code><![CDATA[KDS_STATUS_LABELS = [
+        Order::STATUS_ANTRIAN_MASUK => 'Antrian Masuk',
+        Order::STATUS_SEDANG_DIMASAK => 'Sedang Dimasak',
+        Order::STATUS_SIAP_SAJIKAN => 'Siap Sajikan',
+    ]]]></code>
+      <code><![CDATA[RESERVATION_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed']]]></code>
+    </MissingClassConstType>
+    <MissingClosureReturnType>
+      <code><![CDATA[fn () => $this->readConn->read(fn () => MenuItem::withoutGlobalScope(TenantScope::class)]]></code>
+    </MissingClosureReturnType>
+    <MissingParamType>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+    </MissingParamType>
+    <MissingReturnType>
+      <code><![CDATA[getOrderStatus]]></code>
+      <code><![CDATA[getPublicMenu]]></code>
+      <code><![CDATA[getReservations]]></code>
+      <code><![CDATA[submitOrder]]></code>
+      <code><![CDATA[submitReservation]]></code>
+      <code><![CDATA[updateReservationStatus]]></code>
+    </MissingReturnType>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$order->id]]></code>
+      <code><![CDATA[$order->status]]></code>
+    </UndefinedMagicPropertyFetch>
+    <UnusedClass>
+      <code><![CDATA[PublicOrderController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Controllers/SubscriptionController.php">
+    <MissingReturnType>
+      <code><![CDATA[show]]></code>
+    </MissingReturnType>
+    <UnusedClass>
+      <code><![CDATA[SubscriptionController]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Middleware/EnsureTenantContext.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $user->tenant_id]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[EnsureTenantContext]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Middleware/HandleInertiaRequests.php">
+    <MissingClosureReturnType>
+      <code><![CDATA[fn () => $request->session()->get('error')]]></code>
+      <code><![CDATA[fn () => $request->session()->get('success')]]></code>
+    </MissingClosureReturnType>
+    <NoEnvOutsideConfig>
+      <code><![CDATA[env]]></code>
+    </NoEnvOutsideConfig>
+    <PossiblyNullArgument>
+      <code><![CDATA[$user]]></code>
+    </PossiblyNullArgument>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$host]]></code>
+      <code><![CDATA[$outlet->latitude]]></code>
+      <code><![CDATA[$outlet->longitude]]></code>
+      <code><![CDATA[$user?->tenant_id]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[HandleInertiaRequests]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Http/Middleware/RequiresPlan.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$request->header('X-Inertia')]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnusedClass>
+      <code><![CDATA[RequiresPlan]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Models/AuditLog.php">
+    <MissingReturnType>
+      <code><![CDATA[tenant]]></code>
+      <code><![CDATA[user]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/Concerns/UsesTenantConnection.php">
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[TenantConnection]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="app/Models/GoogleBpToken.php">
+    <MissingReturnType>
+      <code><![CDATA[tenant]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/GoogleReview.php">
+    <MissingReturnType>
+      <code><![CDATA[outlet]]></code>
+      <code><![CDATA[tenant]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/MenuItem.php">
+    <PublicModelAccessor>
+      <code><![CDATA[getPhotoUrlAttribute]]></code>
+    </PublicModelAccessor>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$outletId]]></code>
+      <code><![CDATA[$this->image_path]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Models/Order.php">
+    <MissingClassConstType>
+      <code><![CDATA[STATUS_ANTRIAN_MASUK = 'antrian_masuk']]></code>
+      <code><![CDATA[STATUS_DIBATALKAN = 'dibatalkan']]></code>
+      <code><![CDATA[STATUS_SEDANG_DIMASAK = 'sedang_dimasak']]></code>
+      <code><![CDATA[STATUS_SELESAI = 'selesai']]></code>
+      <code><![CDATA[STATUS_SIAP_BAYAR = 'siap_bayar']]></code>
+      <code><![CDATA[STATUS_SIAP_SAJIKAN = 'siap_sajikan']]></code>
+    </MissingClassConstType>
+    <MissingParamType>
+      <code><![CDATA[$query]]></code>
+    </MissingParamType>
+    <MissingReturnType>
+      <code><![CDATA[byTenant]]></code>
+      <code><![CDATA[creator]]></code>
+      <code><![CDATA[forOutlet]]></code>
+      <code><![CDATA[items]]></code>
+      <code><![CDATA[outlet]]></code>
+      <code><![CDATA[scopeArchivable]]></code>
+      <code><![CDATA[tenant]]></code>
+    </MissingReturnType>
+    <UndefinedMagicPropertyAssignment>
+      <code><![CDATA[$order->tenant_id]]></code>
+    </UndefinedMagicPropertyAssignment>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$order->tenant_id]]></code>
+    </UndefinedMagicPropertyFetch>
+  </file>
+  <file src="app/Models/OrderItem.php">
+    <MissingReturnType>
+      <code><![CDATA[menuItem]]></code>
+      <code><![CDATA[order]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/Outlet.php">
+    <MissingParamType>
+      <code><![CDATA[$value]]></code>
+    </MissingParamType>
+    <PublicModelAccessor>
+      <code><![CDATA[setNameAttribute]]></code>
+    </PublicModelAccessor>
+  </file>
+  <file src="app/Models/OutletSetting.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $day]]></code>
+      <code><![CDATA[! $hours]]></code>
+      <code><![CDATA[$day['closed'] ?? false]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Models/OutletTable.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[preg_replace('/\D/', '', $seed)]]></code>
+    </PossiblyNullArgument>
+    <PublicModelAccessor>
+      <code><![CDATA[getPinAttribute]]></code>
+    </PublicModelAccessor>
+  </file>
+  <file src="app/Models/PrintJob.php">
+    <MissingReturnType>
+      <code><![CDATA[tenant]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/ReceiptConfig.php">
+    <MissingReturnType>
+      <code><![CDATA[tenant]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/Reservation.php">
+    <MissingReturnType>
+      <code><![CDATA[outlet]]></code>
+      <code><![CDATA[tenant]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/Scopes/TenantScope.php">
+    <MissingClosureReturnType>
+      <code><![CDATA[fn () => $currentId]]></code>
+    </MissingClosureReturnType>
+  </file>
+  <file src="app/Models/Subscription.php">
+    <MissingClassConstType>
+      <code><![CDATA[PLANS = ['basic', 'pro', 'enterprise']]]></code>
+    </MissingClassConstType>
+    <MissingClosureParamType>
+      <code><![CDATA[$q]]></code>
+      <code><![CDATA[$q]]></code>
+      <code><![CDATA[$q2]]></code>
+    </MissingClosureParamType>
+    <MissingParamType>
+      <code><![CDATA[$query]]></code>
+      <code><![CDATA[$query]]></code>
+      <code><![CDATA[$query]]></code>
+    </MissingParamType>
+    <MissingReturnType>
+      <code><![CDATA[scopeActive]]></code>
+      <code><![CDATA[scopeExpired]]></code>
+      <code><![CDATA[scopeForPlan]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Models/Tenant.php">
+    <PublicModelAccessor>
+      <code><![CDATA[getPlanAttribute]]></code>
+    </PublicModelAccessor>
+  </file>
+  <file src="app/Models/TenantSetting.php">
+    <PublicModelAccessor>
+      <code><![CDATA[getActiveTaxRateAttribute]]></code>
+    </PublicModelAccessor>
+  </file>
+  <file src="app/Models/User.php">
+    <MissingReturnType>
+      <code><![CDATA[outlet]]></code>
+      <code><![CDATA[tenant]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Policies/OrderPolicy.php">
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$order->tenant_id]]></code>
+      <code><![CDATA[$order->tenant_id]]></code>
+    </UndefinedMagicPropertyFetch>
+    <UnusedClass>
+      <code><![CDATA[OrderPolicy]]></code>
+    </UnusedClass>
+  </file>
+  <file src="app/Services/CloudinaryService.php">
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[bool]]></code>
+    </PossiblyUnusedReturnValue>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $config]]></code>
+      <code><![CDATA[! $config]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Services/DailyPinService.php">
+    <InvalidOperand>
+      <code><![CDATA[$R * $c]]></code>
+      <code><![CDATA[$radius * 1.5]]></code>
+      <code><![CDATA[1 - $a]]></code>
+      <code><![CDATA[2 * atan2(sqrt($a), sqrt(1 - $a))]]></code>
+      <code><![CDATA[sin($dLat / 2) ** 2]]></code>
+      <code><![CDATA[sin($dLng / 2) ** 2]]></code>
+    </InvalidOperand>
+    <MissingClosureParamType>
+      <code><![CDATA[$x]]></code>
+    </MissingClosureParamType>
+    <MissingClosureReturnType>
+      <code><![CDATA[fn ($x) => ($x * M_PI) / 180]]></code>
+    </MissingClosureReturnType>
+    <PossiblyNullArgument>
+      <code><![CDATA[preg_replace('/\D/', '', $seed)]]></code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="app/Services/FeatureRegistry.php">
+    <MissingClassConstType>
+      <code><![CDATA[FEATURE_LOCKS = [
+        // ── Enterprise features (exclusive) ───────────────────────────────
+        'kds' => 'enterprise',
+        'white_label' => 'enterprise',
+        'priority_support' => 'enterprise',
+        'unlimited_outlet' => 'enterprise',
+
+        // ── Pro features ──────────────────────────────────────────────────────
+        'multi_outlet' => 'pro',
+        'wa_notif' => 'pro',
+        'laporan_excel' => 'pro',
+        'perbandingan_outlet' => 'pro',
+        'arus_kas' => 'pro',
+        'auto_print' => 'pro',
+        'ppn_tax' => 'pro',
+        'service_charge' => 'pro',
+        'gofood_sync' => 'pro',
+        'grab_sync' => 'pro',
+        'shopeefood_sync' => 'pro',
+        'staf_shift' => 'pro',
+        'stok_opname' => 'pro',
+        'pembelian_vendor' => 'pro',
+        'dashboard_inventory' => 'pro',
+        'inventory' => 'pro',
+        'cashier_session' => 'pro',
+        'refund_void' => 'pro',
+    ]]]></code>
+      <code><![CDATA[PLAN_FEATURES = [
+        'basic' => [
+            'pbjt_tax', 'qris', 'gopay', 'bank_transfer',
+            'qrcode_order', 'thermal_print', 'email_notif',
+        ],
+        'pro' => [
+            'pbjt_tax', 'ppn_tax', 'service_charge',
+            'qris', 'gopay', 'ovo', 'dana', 'bank_transfer', 'credit_card',
+            'qrcode_order', 'thermal_print', 'auto_print',
+            'email_notif', 'wa_notif',
+            'gofood_sync', 'grab_sync', 'shopeefood_sync',
+            'multi_outlet', 'catatan_pesanan', 'laporan_excel',
+            'perbandingan_outlet', 'arus_kas', 'staf_shift',
+            'stok_opname', 'pembelian_vendor', 'dashboard_inventory',
+            'inventory', 'cashier_session', 'refund_void',
+        ],
+        'enterprise' => [
+            // Semua fitur pro
+            'pbjt_tax', 'ppn_tax', 'service_charge',
+            'qris', 'gopay', 'ovo', 'dana', 'bank_transfer', 'credit_card',
+            'qrcode_order', 'thermal_print', 'auto_print',
+            'email_notif', 'wa_notif',
+            'gofood_sync', 'grab_sync', 'shopeefood_sync',
+            'multi_outlet', 'catatan_pesanan', 'laporan_excel',
+            'perbandingan_outlet', 'arus_kas', 'staf_shift',
+            'stok_opname', 'pembelian_vendor', 'dashboard_inventory',
+            'inventory', 'cashier_session', 'refund_void',
+            // Enterprise-exclusive
+            'unlimited_outlet', 'kds', 'white_label', 'priority_support',
+        ],
+    ]]]></code>
+      <code><![CDATA[PLAN_HIERARCHY = [
+        'basic' => 1,
+        'pro' => 2,
+        'enterprise' => 3,
+    ]]]></code>
+    </MissingClassConstType>
+  </file>
+  <file src="app/Services/GoogleBusinessProfileService.php">
+    <InvalidNullableReturnType>
+      <code><![CDATA[GoogleBpToken]]></code>
+    </InvalidNullableReturnType>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $account]]></code>
+      <code><![CDATA[! $token->refresh_token]]></code>
+      <code><![CDATA[$account]]></code>
+      <code><![CDATA[$account]]></code>
+      <code><![CDATA[empty($accounts)]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Services/OrderArchiveService.php">
+    <MissingClosureParamType>
+      <code><![CDATA[$orders]]></code>
+    </MissingClosureParamType>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$before]]></code>
+      <code><![CDATA[$tenantId]]></code>
+      <code><![CDATA[$tenantId]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Services/OutletSlug.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$tenantId]]></code>
+      <code><![CDATA[$tenantId]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Services/OwnerDashboardService.php">
+    <MissingClosureParamType>
+      <code><![CDATA[$q]]></code>
+    </MissingClosureParamType>
+    <MissingReturnType>
+      <code><![CDATA[getAggregateMetrics]]></code>
+      <code><![CDATA[getFinancialReport]]></code>
+      <code><![CDATA[getMenuPerformance]]></code>
+      <code><![CDATA[getOutletLeaderboard]]></code>
+    </MissingReturnType>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$item->total_qty]]></code>
+      <code><![CDATA[$item->total_qty]]></code>
+      <code><![CDATA[$item->total_revenue]]></code>
+      <code><![CDATA[$item->total_revenue]]></code>
+    </UndefinedMagicPropertyFetch>
+  </file>
+  <file src="app/Services/PlaceIdResolver.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[empty($results)]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="app/Services/RedisHealthService.php">
+    <InvalidArrayOffset>
+      <code><![CDATA[config('database.redis.options')['maxclients']]]></code>
+    </InvalidArrayOffset>
+    <InvalidOperand>
+      <code><![CDATA[$clients / $maxClients * 100]]></code>
+      <code><![CDATA[$memUsed / $memMax * 100]]></code>
+    </InvalidOperand>
+  </file>
+  <file src="app/Services/SalesRollupService.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$outletId]]></code>
+      <code><![CDATA[$outletId]]></code>
+      <code><![CDATA[$tenantId]]></code>
+      <code><![CDATA[$tenantId]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UndefinedMagicPropertyFetch>
+      <code><![CDATA[$r->discount]]></code>
+      <code><![CDATA[$r->discount]]></code>
+      <code><![CDATA[$r->gross]]></code>
+      <code><![CDATA[$r->gross]]></code>
+      <code><![CDATA[$r->net]]></code>
+      <code><![CDATA[$r->net]]></code>
+      <code><![CDATA[$r->net]]></code>
+      <code><![CDATA[$r->net]]></code>
+      <code><![CDATA[$r->order_count]]></code>
+      <code><![CDATA[$r->outlet_id]]></code>
+      <code><![CDATA[$r->service]]></code>
+      <code><![CDATA[$r->service]]></code>
+      <code><![CDATA[$r->tax]]></code>
+      <code><![CDATA[$r->tax]]></code>
+      <code><![CDATA[$r->tenant_id]]></code>
+    </UndefinedMagicPropertyFetch>
+  </file>
+  <file src="app/Services/SettingsService.php">
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[OutletSetting]]></code>
+      <code><![CDATA[TenantSetting]]></code>
+    </PossiblyUnusedReturnValue>
+  </file>
+  <file src="app/Services/TenantConnection.php">
+    <MissingClassConstType>
+      <code><![CDATA[SYS_CONNECTION = 'sys']]></code>
+    </MissingClassConstType>
+    <MissingReturnType>
+      <code><![CDATA[usingTenant]]></code>
+    </MissingReturnType>
+  </file>
+  <file src="app/Services/TenantContext.php">
+    <UndefinedMagicMethod>
+      <code><![CDATA[App::offsetUnset('tenant.id')]]></code>
+    </UndefinedMagicMethod>
+  </file>
+  <file src="app/Services/TenantReadConnection.php">
+    <InvalidArrayOffset>
+      <code><![CDATA[$template['database']]]></code>
+    </InvalidArrayOffset>
+    <MissingReturnType>
+      <code><![CDATA[read]]></code>
+    </MissingReturnType>
+    <NoEnvOutsideConfig>
+      <code><![CDATA[env]]></code>
+    </NoEnvOutsideConfig>
+  </file>
+</files>

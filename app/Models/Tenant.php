@@ -79,7 +79,7 @@ class Tenant extends Model
      * Resolve plan dari subscription aktif.
      * Fallback ke 'basic' jika tidak ada subscription.
      */
-    public function getPlanAttribute(): string
+    protected function getPlanAttribute(): string
     {
         return $this->subscription?->plan ?? 'basic';
     }

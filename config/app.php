@@ -15,6 +15,10 @@ return [
 
     'name' => env('APP_NAME', 'Restoku'),
 
+    // Base URL untuk QR buku menu tamu (dari env MENU_BASE_URL).
+    // Kosong → frontend pakai window.location.origin.
+    'menu_base_url' => env('MENU_BASE_URL', ''),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

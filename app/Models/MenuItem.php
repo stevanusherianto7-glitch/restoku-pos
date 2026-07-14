@@ -67,7 +67,7 @@ class MenuItem extends Model
     /**
      * URL foto aman (Cloudinary). Map dari image_path -> photo_url.
      */
-    public function getPhotoUrlAttribute(): ?string
+    protected function getPhotoUrlAttribute(): ?string
     {
         return $this->image_path ?: null;
     }
