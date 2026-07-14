@@ -758,7 +758,10 @@ export default function CustomerView() {
             )}
 
             {appStage === 'welcome' && (
-                <div className="absolute inset-0 z-40 flex h-full flex-col items-center gap-4 overflow-y-auto bg-[#FAF5EE] p-7 text-center">
+                <div
+                    className="absolute inset-0 z-40 flex h-full flex-col items-center gap-4 overflow-y-auto bg-[#FAF5EE] p-7 pb-24 text-center"
+                    style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+                >
                     <div className="flex w-full items-center justify-between gap-3">
                         <div className="grid size-14 place-items-center overflow-hidden rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-lg">
                             {renderLogo('size-8 text-white')}
@@ -832,7 +835,10 @@ export default function CustomerView() {
             )}
 
             {appStage === 'howto' && (
-                <div className="absolute inset-0 z-40 flex h-full flex-col gap-3 overflow-y-auto bg-[#FAF5EE] p-5">
+                <div
+                    className="absolute inset-0 z-40 flex h-full flex-col gap-3 overflow-y-auto bg-[#FAF5EE] p-5 pb-24"
+                    style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+                >
                     <h2 className="text-center text-lg font-extrabold text-[#1A1410]">Cara Memesan</h2>
                     <p className="text-center text-[12px] text-[#7A6F63] -mt-1">
                         Cukup 3 langkah mudah, pesanan langsung masuk dapur!
