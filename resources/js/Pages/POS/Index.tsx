@@ -32,7 +32,7 @@ import DailyPinBadge from '../../Components/DailyPinBadge';
 // penuh; ProductImage menangani fallback bila gambar gagal dimuat.
 // Cloud name milik Restoku (publik, aman di client). Multi-tenant dynamic cloud
 // bisa di-override via shared prop di masa depan, tapi default tetap ini.
-const CLOUDINARY_BASE = 'https://res.cloudinary.com/dwddaydzsh/image/upload';
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/dwdaydzsh/image/upload';
 const MENU_CATALOG = [
     {
         id: 1,
