@@ -39,6 +39,8 @@ import POSPage from '../Pages/POS/Index';
 
 beforeEach(() => {
     localStorage.clear();
+    // POS gating: butuh sesi kasir buka supaya menu tampil (lihat CashierSession).
+    localStorage.setItem('kasir_shift_open', 'true');
     vi.clearAllMocks();
     mockCart.items = [];
     mockCart.addItem.mockImplementation((it: any) => mockCart.items.push(it));

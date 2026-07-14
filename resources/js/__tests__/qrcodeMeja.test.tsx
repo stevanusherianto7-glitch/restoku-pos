@@ -43,9 +43,10 @@ beforeEach(() => {
 describe('QRCodeMeja/Index', () => {
     it('renders QR grid for default table labels', () => {
         render(<QRCodeMeja />);
-        expect(screen.getByText('QR Code Meja')).toBeInTheDocument();
-        expect(screen.getByText('A1')).toBeInTheDocument();
-        expect(screen.getByText('C1')).toBeInTheDocument();
+        // Default tableInput = A1,A2,B1,B2,C1 → grid generate URL per meja.
+        // (Label "Meja A1" ada di print-area yang hidden di screen; cek preview URL sebagai bukti.)
+        expect(screen.getByText('https://restoku.test/m/cabang-a?t=A1')).toBeInTheDocument();
+        expect(screen.getByText('https://restoku.test/m/cabang-a?t=C1')).toBeInTheDocument();
     });
 
     it('shows preview URL built from selected outlet slug', () => {
