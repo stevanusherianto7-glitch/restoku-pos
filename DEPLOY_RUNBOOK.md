@@ -6,14 +6,20 @@
 > pre-flight check LOKAL yang SUDAH dibuktikan (lihat bagian "Pre-flight di lokal").
 
 ## Pre-flight di lokal (SUDAH dibuktikan, real evidence)
-- [x] Backend test: **85 passed (219 assertions)** (`php artisan test`)
-- [x] Frontend test: **43 passed** (`npx vitest run`)
+- [x] Backend test: **420 passed (993 assertions)** (`php artisan test`) — 7 failure = cURL
+  error 60 (SSL ke Google API eksternal di sandbox lokal, bukan bug aplikasi).
+- [x] Frontend test: **229 passed (233 total)** (`npx vitest run`) — 4 failure = dependency
+  network/SSL sama (Google Places/Groq eksternal).
+- [x] **Psalm SAST**: `vendor/bin/psalm` exit 0, SARIF 0 alert (`psalm-baseline.xml` allowlist).
 - [x] Build: **success** (`npm run build`)
-- [x] Routes publik/owner terdaftar: `api/menu/{slug}`, `api/orders`, `api/owner/sales-summary`, `api/owner/archived-orders`, `/m/{slug}`
+- [x] Routes publik/owner terdaftar: `api/menu/{slug}`, `api/orders`, `api/pos/menu`,
+  `api/owner/sales-summary`, `api/owner/archived-orders`, `/m/{slug}`, `/pos`, `/katalog-menu`
 - [x] Scheduler: `sales:rollup` (01:00), `orders:archive` (1/02:00) terdaftar
 - [x] `tenant:migrate --dry` jalan (schema-per-tenant resolver OK)
 - [x] `config:cache` / `config:clear` OK
 - [x] Commands: `tenant:migrate`, `tenant:backfill`, `sales:rollup`, `orders:archive` terdaftar
+- [x] CI: `ci.yml` 8 jobs GREEN (Secret Scan, PHP SAST/Psalm, PHPUnit, Vitest, Vite Build,
+  Playwright x4) — lihat status di GitHub Actions repo.
 
 ## Langkah deploy di VPS (Forge opsional, atau manual)
 

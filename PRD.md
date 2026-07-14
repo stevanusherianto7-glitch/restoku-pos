@@ -100,6 +100,14 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 - Operasional order (role `cashier`/manajerial).
 - PIN login (hash bcrypt, di-share ke `login_employees` di halaman login).
 - Tenant-scoped via `TenantScope`.
+- **Kasir (POS) UI** (`POS/Index`, route `/pos`):
+  - Data menu di-render dari backend via `PosController::menuView` (Inertia props `posMenu`)
+    → query `MenuItem::with('category')` (tenant-scoped, Tanpa hardcode di FE).
+  - Endpoint JSON: `GET /api/pos/menu` (`PosController::menu`) untuk reload dinamis.
+  - Foto item pakai `photo_url` (Cloudinary `secure_url`) via `ProductImage` — konsisten
+    dengan e-Menu tamu (tidak ada path lokal mock).
+  - Regression guard: `PosKatalogVerifyTest` assert `/pos` + `/katalog-menu` 200 dan
+    **tidak ada duplikat foto** (public_id Cloudinary unik per item).
 
 ### 7.3 Modul Tamu / Buku Menu Digital (`BukuMenuDigital/CustomerView`)
 - **Read-only**, tanpa auth.
@@ -109,8 +117,11 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
 - **Foto menu**: `photo_url` dari `MenuItem` (Cloudinary `secure_url` saat `CLOUDINARY_URL`
   terisi, atau asset publik akun `demo` saat dev tanpa akun). Tidak ada path mock
   lokal `/images/*.webp` di produksi.
-- **Seeder**: `MenuSeeder` mengisi 8 menu contoh (Makanan/Minuman/Dessert) + 3 kategori
-  agar e-Menu tidak kosong saat pertama deploy.
+- **Seeder**: `MenuSeeder` mengisi **32 menu asli** (Makanan/Minuman/Camilan) per tenant
+  (`outlet_id=null` = menu global tenant, **di-seed 1×, BUKAN loop per-outlet** → tidak ada
+  duplikat antar-outlet) + kategori agar e-Menu tidak kosong saat pertama deploy.
+  Foto tiap item = Cloudinary `public_id` (akun `dwdaydzsh`), `photo_url` accessor derive
+  `secure_url`. Regression: `PosKatalogVerifyTest` jamin duplikat foto = 0.
 - **Design System (UI Refactor P2–P6, `ff7b162`/`957edbe`/`1cc4793`/`aa8e173`)**: e-Menu &
   seluruh halaman admin/staff direfactor ke **Halo-adapted tokens** (`system.css` + `DESIGN.md`),
   5 screen-mode (`terang`/`gelap`/`glassmorphic`/`nano-banana`/`krem`), tanpa lucide-react
@@ -199,7 +210,8 @@ beban tulis estimasi ~25 juta order/hari pada skala penuh.
   `php artisan test --coverage` terukur **61.6% baseline** (121 test hijau). `kds`
   dikunci `enterprise` (bukan `pro`) — selaras `config/subscription.php`.
 - **CI**: coverage di-enforce di GitHub Actions (`ci.yml`) — playground/setup tidak boleh
-  drop threshold.
+  drop threshold. Job tambahan: **`php-sast`** (Psalm 6.x via `vendor/bin/psalm`, SARIF
+  diunggah ke Security tab; `psalm-baseline.xml` allowlist known-issues).
 
 ---
 

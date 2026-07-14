@@ -106,16 +106,18 @@ app/
       RequiresPlan.php              ← feature gate
     Controllers/
       OrderController.php           ← KDS/order/reservasi (publik+auth)
+      PosController.php             ← Kasir (POS): menuView + /api/pos/menu
+      MenuController.php            ← Katalog Menu (CRUD) + e-Menu tamu
       OutletSettingsController.php  ← pengaturan outlet (DB-backed)
       GoogleReviewController.php    ← review + AI reply
       GeminiAiController.php        ← copilot AI
   Ai/Agents/RestokuAiAssistant.php
 routes/web.php                      ← route tunggal (web + api terkelompok)
 resources/js/
-  Pages/        (Inertia pages per route)
-  Components/   (UI, termasuk LandingPage, BukuMenuDigital)
+  Pages/        (Inertia pages per route: POS/Index, KatalogMenu/Index, BukuMenuDigital/CustomerView, ...)
+  Components/   (UI, termasuk LandingPage, BukuMenuDigital, ProductImage)
   lib/menuUrl.ts (helper buildMenuUrl)
-tests/Feature/  (TenantIsolationTest, OrderControllerTest, ...)
+tests/Feature/  (TenantIsolationTest, OrderControllerTest, PosKatalogVerifyTest, ...)
 ```
 
 ---
@@ -141,10 +143,13 @@ di-exempt CSRF **dengan sengaja** (tamu tak miliki token) namun dibatasi `thrott
 
 - **Backend:** PHPUnit 12 — `php artisan test`. Termasuk `TenantIsolationTest` (jaminan
   cross-tenant aman), `OrderControllerTest`, `GoogleReview*Test`, `OutletSettings*Test`,
-  `SubscriptionFeatureGateTest`.
+  `PosKatalogVerifyTest` (POS + Katalog Menu render foto Cloudinary unik), `SubscriptionFeatureGateTest`.
 - **Frontend:** Vitest — `npm run test`.
+- **SAST:** **Psalm** (phpstatic analysis) — `vendor/bin/psalm --no-progress`, dienforce di
+  CI (`ci.yml` job `php-sast`) dengan `psalm.xml` (errorLevel=1 + plugin Laravel) + `psalm-baseline.xml`
+  (known-issues ter-allowlist). SARIF diunggah ke Security tab GitHub.
 - **CI:** GitHub Actions menjalankan PHPUnit (coverage via `pcov`), Vitest, PHPStan,
-  dan Vite build. Artifact coverage diunggah tiap run.
+  Psalm SAST, dan Vite build. Artifact coverage diunggah tiap run.
 
 ### 6.1 Catatan keamanan (hasil audit)
 - `GoogleReview::truncate()` diganti `where('tenant_id', ...)->delete()` untuk cegah
