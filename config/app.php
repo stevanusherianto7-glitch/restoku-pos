@@ -4,6 +4,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Batas Skala (Scale Guards)
+    |--------------------------------------------------------------------------
+    |
+    | Q22: kuota foto menu per tenant agar 1 akun Cloudinary (dwdaydzsh)
+    | tidak meledak oleh 5000 tenant. Override via .env bila perlu.
+    */
+    'max_menu_photos_per_tenant' => (int) env('MAX_MENU_PHOTOS_PER_TENANT', 500),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Name
     |--------------------------------------------------------------------------
     |

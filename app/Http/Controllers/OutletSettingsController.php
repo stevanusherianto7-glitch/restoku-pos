@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\DeleteCloudinaryPhoto;
 use App\Models\Models\Scopes\TenantScope;
 use App\Models\Outlet;
 use App\Models\OutletSetting;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\CloudinaryService;
 use App\Services\SettingsService;
 use App\Services\TenantContext;
 use Illuminate\Http\JsonResponse;
@@ -39,6 +41,7 @@ class OutletSettingsController extends Controller
     public function __construct(
         private TenantContext $ctx,
         private SettingsService $settings,
+        private CloudinaryService $cloudinary,
     ) {}
 
     // =========================================================================
@@ -125,7 +128,26 @@ class OutletSettingsController extends Controller
             'npwp' => 'nullable|string|max:30',
             'nib' => 'nullable|string|max:30',
             'address' => 'nullable|string|max:500',
+            // Q75: logo tenant di-unggah ke Cloudinary (bukan file lokal).
+            'logo' => ['nullable', 'string', 'max:'.(5 * 1024 * 1024)],
         ]);
+
+        // Q75: upload logo ke Cloudinary bila ada, hapus lama (async) bila ganti.
+        if (! empty($validated['logo']) && $validated['logo'] !== $request->input('logo_current')) {
+            $uploaded = $this->cloudinary->uploadMenuPhoto($validated['logo'], $tenantId, 'logo');
+            if ($uploaded) {
+                $outlet = Outlet::where('tenant_id', $tenantId)->orderBy('id')->first();
+                if ($outlet?->logo_public_id) {
+                    DeleteCloudinaryPhoto::dispatch($outlet->logo_public_id);
+                }
+                if ($outlet) {
+                    $outlet->update([
+                        'logo_path' => $uploaded['url'],
+                        'logo_public_id' => $uploaded['public_id'],
+                    ]);
+                }
+            }
+        }
 
         // Update identitas di tenants (name, brand_name, email, dll.)
         Tenant::where('id', $tenantId)->update($validated);
@@ -305,6 +327,26 @@ class OutletSettingsController extends Controller
         });
 
         return back()->with('success', 'Semua pengaturan outlet berhasil disimpan ke database.');
+    }
+
+    /**
+     * Q97: simpan tema layar (screen_mode) ke DB per-outlet.
+     * FE useTenantSettings sync ke sini agar tema tetap saat ganti device.
+     */
+    public function updateScreenMode(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'outlet_id' => ['required', 'integer',
+                Rule::exists('outlets', 'id')->where('tenant_id', $this->ctx->id())],
+            'screen_mode' => ['required', 'string', 'in:light,dark,glassmorphic,nano-banana,krem'],
+        ]);
+
+        $this->settings->saveOutletSettings(
+            $validated['outlet_id'],
+            ['screen_mode' => $validated['screen_mode']]
+        );
+
+        return response()->json(['success' => true, 'screen_mode' => $validated['screen_mode']]);
     }
 
     // =========================================================================

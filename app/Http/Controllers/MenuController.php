@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\DeleteCloudinaryPhoto;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Models\Outlet;
@@ -30,14 +31,36 @@ class MenuController extends Controller
 
     // ─── Halaman kelola menu (owner) ──────────────────────────────────────────
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $items = MenuItem::with('category:id,name')
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get(['id', 'outlet_id', 'menu_category_id', 'name', 'description', 'price', 'image_path', 'is_available', 'is_popular', 'sort_order']);
+        // Q5/Q20/Q34: paginasi + server-side filter — jangan kirim 5000 item sekaligus.
+        $perPage = min((int) $request->input('per_page', 100), 500);
 
-        $outlets = Outlet::select('id', 'name')->get();
+        $itemQuery = MenuItem::with('category:id,name')
+            ->orderBy('sort_order')
+            ->orderBy('name');
+
+        // Filter per-outlet (FE dropdown): default semua (global + per-outlet tenant ini).
+        $outletFilter = $request->input('outlet_id');
+        if (is_numeric($outletFilter)) {
+            $itemQuery->where(function ($q) use ($outletFilter) {
+                $q->whereNull('outlet_id')->orWhere('outlet_id', (int) $outletFilter);
+            });
+        }
+        if ($request->filled('search')) {
+            $itemQuery->where('name', 'like', '%'.$request->input('search').'%');
+        }
+
+        $items = $itemQuery->paginate($perPage, [
+            'id', 'outlet_id', 'menu_category_id', 'name', 'description',
+            'price', 'image_path', 'is_available', 'is_popular', 'sort_order',
+        ]);
+
+        // Q5/Q20/Q34: outlet juga dipaginasi (300 outlet/tenant skala besar).
+        $outletPage = min((int) $request->input('outlet_page', 1), 1000);
+        $outlets = Outlet::select('id', 'name')
+            ->orderBy('name')
+            ->paginate(50, ['id', 'name'], 'outlet_page', $outletPage);
         $categories = MenuCategory::where('tenant_id', $this->ctx->id())
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -67,7 +90,23 @@ class MenuController extends Controller
             'is_popular' => 'boolean',
             'is_available' => 'boolean',
             'sort_order' => 'integer|min:0',
-            'photo' => 'nullable|string', // data URL base64 dari frontend
+            // Q22: batasi ukuran (base64 ≈ 1.37× bytes) & jumlah foto per tenant.
+            'photo' => [
+                'nullable',
+                'string',
+                'max:'.(5 * 1024 * 1024), // ~5MB setelah decode base64
+                function ($attribute, $value, $fail) {
+                    // Cegah abuse quota Cloudinary di 5000 tenant.
+                    $used = MenuItem::where('tenant_id', $this->ctx->id())
+                        ->whereNotNull('image_path')
+                        ->where('image_path', 'not like', 'https://res.cloudinary.com/%')
+                        ->count();
+                    $maxPhotos = (int) config('app.max_menu_photos_per_tenant', 500);
+                    if ($used >= $maxPhotos) {
+                        $fail("Kuota foto menu tenant penuh ({$maxPhotos}). Hapus foto lama dulu.");
+                    }
+                },
+            ],
         ]);
 
         $photoUrl = null;
@@ -130,9 +169,9 @@ class MenuController extends Controller
                 $validated['photo'], $this->ctx->id()
             );
             if ($uploaded) {
-                // Hapus foto lama di Cloudinary (cegah orphan) bila ada.
+                // Q23: hapus foto lama async (queue) — jangan block request.
                 if ($item->image_public_id) {
-                    $this->cloudinary->deleteMenuPhoto($item->image_public_id);
+                    DeleteCloudinaryPhoto::dispatch($item->image_public_id);
                 }
                 $photoUrl = $uploaded['url'];
                 $photoPublicId = $uploaded['public_id'];
@@ -162,9 +201,9 @@ class MenuController extends Controller
         $item = MenuItem::findOrFail($id);
         $outletId = $item->outlet_id;
 
-        // Hapus foto di Cloudinary (cegah orphan) bila ada.
+        // Q23: hapus foto di Cloudinary async (queue) — jangan block request.
         if ($item->image_public_id) {
-            $this->cloudinary->deleteMenuPhoto($item->image_public_id);
+            DeleteCloudinaryPhoto::dispatch($item->image_public_id);
         }
 
         $item->delete();

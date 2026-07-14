@@ -124,7 +124,31 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/waiter-bar', fn () => Inertia::render('WaiterBar/Index'));
     Route::get('/monitor-reservasi', fn () => Inertia::render('MonitorReservasi/Index'));
     Route::get('/diskon-pajak', fn () => Inertia::render('DiskonPajak/Index'));
+    // Q11: endpoint polling ringan KDS (filter outlet_id) — FE panggil tiap N detik.
+    // (Pengganti SSE/WebSocket: tanpa upgrade infra, scale-safe via outlet_id.)
+    Route::get('/api/kds/stream', [KdsController::class, 'stream']);
+
     Route::get('/qrcode-meja', fn () => Inertia::render('QRCodeMeja/Index'));
+
+    // Q87: daftar outlet terpaginasikan untuk cetak QR skala besar (300×50=15000).
+    // FE render per-batch (mis. 50/print-page) alih-alih 15000 node sekaligus.
+    Route::get('/api/outlets/paginated', function (\Illuminate\Http\Request $request) {
+        $perPage = min((int) $request->input('per_page', 50), 200);
+        return \App\Models\Outlet::select('id', 'name', 'slug')
+            ->orderBy('id')
+            ->paginate($perPage, ['*'], 'page', (int) $request->input('page', 1));
+    });
+    // Q97: persist tema layar per-outlet ke DB (bukan hanya localStorage).
+    Route::put('/api/outlet-settings/screen-mode', [OutletSettingsController::class, 'updateScreenMode']);
+
+    // Q87: trigger export QR per-batch (queue) untuk skala 15000 QR.
+    Route::post('/api/qr-codes/export', function (\Illuminate\Http\Request $request) {
+        $page = (int) $request->input('page', 1);
+        $perPage = min((int) $request->input('per_page', 50), 200);
+        \App\Jobs\ExportQrPdf::dispatch(auth()->id() ?? 1, $page, $perPage);
+        return response()->json(['success' => true, 'queued' => true]);
+    });
+
     Route::get('/printer-config', fn () => Inertia::render('PrinterConfig/Index'));
     Route::get('/print-job-monitor', fn () => Inertia::render('PrintJobMonitor/Index'));
     Route::get('/tts-settings', fn () => Inertia::render('TTSSettings/Index'));

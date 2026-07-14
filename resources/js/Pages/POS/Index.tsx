@@ -41,13 +41,15 @@ type PosMenuItem = {
     is_popular?: boolean;
 };
 
-function POSInner({ posMenu = [] }: { posMenu: PosMenuItem[] }) {
+function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenuItem[] } }) {
     const { screenMode } = useTenantSettings();
     const isNanoBanana = screenMode === 'nano-banana';
     const cart = useCart();
 
-    // Menu dari DB (Cloudinary URLs via field `image`). Fallback aman bila prop kosong.
-    const [catalog] = useState<PosMenuItem[]>(posMenu ?? []);
+    // Menu dari DB (Cloudinary URLs via field `image`). Q5/Q20/Q34: posMenu kini
+    // bisa berupa object paginasi {data,...} atau array (backward-compat).
+    const catalogData = Array.isArray(posMenu) ? posMenu : (posMenu?.data ?? []);
+    const [catalog] = useState<PosMenuItem[]>(catalogData);
 
     // ── Tax Config dari Inertia Shared Props ──────────────────────────────────
     // MIGRASI dari localStorage ke usePage().props.outlet_settings
@@ -1049,7 +1051,7 @@ function POSInner({ posMenu = [] }: { posMenu: PosMenuItem[] }) {
 }
 
 // --- Role Guard Wrapper -------------------------------------------------------
-export default function POS({ posMenu = [] }: { posMenu?: PosMenuItem[] }) {
+export default function POS({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenuItem[] } }) {
     // Gate: kasir harus buka shift dulu sebelum bisa transaksi.
     // localStorage.kasir_shift_open diset 'true' oleh CashierSession saat "Buka Sesi".
     const shiftOpen = typeof window !== 'undefined' && localStorage.getItem('kasir_shift_open') === 'true';

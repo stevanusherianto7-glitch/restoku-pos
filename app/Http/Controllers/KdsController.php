@@ -18,14 +18,43 @@ class KdsController extends Controller
     ];
 
     /**
-     * Ambil semua order aktif milik tenant, dikelompokkan untuk KDS.
+     * Ambil order aktif milik tenant, dikelompokkan untuk KDS.
+     * Optional ?outlet_id=N untuk filter 1 outlet (scale: 300 outlet jangan dibebankan
+     * ke 1 layar KDS tunggal). Tanpa param = semua outlet tenant (default, kompatibel).
      */
     public function getKdsOrders(Request $request)
     {
-        $orders = Order::whereIn('status', array_keys(self::KDS_STATUS_LABELS))
-            ->with('items')
-            ->orderBy('created_at')
-            ->get();
+        return response()->json(['grouped' => $this->buildKdsGroups($request)]);
+    }
+
+    /**
+     * Q11: endpoint polling ringan untuk KDS realtime (FE fetch tiap N detik).
+     * Send no-cache headers agar browser selalu ambil data terbaru.
+     */
+    public function stream(Request $request)
+    {
+        $grouped = $this->buildKdsGroups($request);
+
+        return response()->json([
+            'grouped' => $grouped,
+            'server_time' => now()->timestamp,
+        ])->withHeaders([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate',
+            'Pragma' => 'no-cache',
+        ]);
+    }
+
+    private function buildKdsGroups(Request $request): array
+    {
+        $query = Order::whereIn('status', array_keys(self::KDS_STATUS_LABELS))
+            ->with('items');
+
+        // Q7/Q10: filter per-outlet (scope tenant sudah aktif via TenantScope).
+        if ($request->filled('outlet_id')) {
+            $query->where('outlet_id', (int) $request->input('outlet_id'));
+        }
+
+        $orders = $query->orderBy('created_at')->get();
 
         $grouped = array_fill_keys(self::KDS_STATUS_LABELS, []);
 
@@ -45,9 +74,7 @@ class KdsController extends Controller
             ];
         }
 
-        return response()->json([
-            'grouped' => $grouped,
-        ]);
+        return $grouped;
     }
 
     /**

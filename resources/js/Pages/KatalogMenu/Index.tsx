@@ -54,11 +54,15 @@ export default function KatalogMenu({
     outlets = [],
     categories = [],
 }: {
-    menuItems: MenuItemType[];
-    outlets: Outlet[];
+    // Q5/Q20/Q34: prop kini bisa berupa paginator object {data,...} atau array.
+    menuItems?: MenuItemType[] | { data?: MenuItemType[] };
+    outlets?: Outlet[] | { data?: Outlet[] };
     categories: Category[];
 }) {
-    const [items] = useState<MenuItemType[]>(menuItems);
+    const menuData = Array.isArray(menuItems) ? menuItems : (menuItems?.data ?? []);
+    const outletData = Array.isArray(outlets) ? outlets : (outlets?.data ?? []);
+    const [items] = useState<MenuItemType[]>(menuData);
+    const [outletList] = useState<Outlet[]>(outletData);
     const [activeFilter, setActiveFilter] = useState('all');
     const [editing, setEditing] = useState<MenuItemType | null>(null);
     const [showForm, setShowForm] = useState(false);

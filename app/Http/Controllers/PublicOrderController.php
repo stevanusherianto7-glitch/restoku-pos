@@ -42,7 +42,18 @@ class PublicOrderController extends Controller
         $outlet = Outlet::withoutGlobalScope(TenantScope::class)
             ->where('slug', $slug)
             ->first();
+
+        // Q29/Q84: bila slug lama diakses (QR tercetak), redirect 301 ke slug baru.
         if (! $outlet) {
+            $outlet = Outlet::withoutGlobalScope(TenantScope::class)
+                ->where('old_slug', $slug)
+                ->first();
+            if ($outlet) {
+                return redirect()
+                    ->to("/m/{$outlet->slug}", 301)
+                    ->header('Cache-Control', 'public, max-age=86400');
+            }
+
             return response()->json(['error' => 'Outlet tidak ditemukan.'], 404);
         }
 

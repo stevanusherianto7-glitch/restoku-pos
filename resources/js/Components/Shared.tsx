@@ -280,6 +280,38 @@ export function useTenantSettings() {
         window.dispatchEvent(new Event('storage'));
     };
 
+    /**
+     * Q97: simpan tema layar ke localStorage (cepat) + sync ke backend
+     * (/api/outlet-settings/screen-mode) agar persist lintas-device.
+     */
+    const persistScreenMode = (mode: string, outletId?: number) => {
+        localStorage.setItem('outlet_screen_mode', mode);
+        setScreenMode(mode as any);
+        document.documentElement.setAttribute('data-screen-mode', mode);
+        if (mode === 'nano-banana') {
+            document.documentElement.classList.add('nano-banana', 'dark');
+            document.documentElement.classList.remove('light');
+        } else if (mode === 'terang' || mode === 'krem') {
+            document.documentElement.classList.add('light');
+            document.documentElement.classList.remove('dark', 'nano-banana');
+        } else {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light', 'nano-banana');
+        }
+        // Sync ke DB bila outlet_id tersedia (gagal silently — localStorage tetap jalan).
+        if (outletId) {
+            fetch('/api/outlet-settings/screen-mode', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN':
+                        (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
+                },
+                body: JSON.stringify({ outlet_id: outletId, screen_mode: mode }),
+            }).catch(() => {});
+        }
+    };
+
     const renderLogo = (className = 'size-5 text-slate-200') => {
         if (tenantImage) {
             return <img src={tenantImage} alt={tenantName} className="size-full object-cover" />;
@@ -310,6 +342,7 @@ export function useTenantSettings() {
         saveSettings,
         saveEmployees,
         saveLayout,
+        persistScreenMode,
         renderLogo,
     };
 }

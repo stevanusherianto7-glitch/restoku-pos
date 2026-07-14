@@ -46,6 +46,7 @@ function PengaturanOutletInner() {
         staffOwner,
         employees,
         saveEmployees,
+        persistScreenMode,
     } = useTenantSettings();
     const { tenant, outlet, employees: dbEmployees } = usePage<any>().props;
     const [nameInput, setNameInput] = useState(tenantName);
@@ -268,8 +269,8 @@ function PengaturanOutletInner() {
     };
 
     const handleScreenModeChange = (mode: ScreenMode) => {
-        setScreenMode(mode);
-        localStorage.setItem('outlet_screen_mode', mode);
+        // Q97: persist ke localStorage + sinkron ke DB (lintas-device).
+        persistScreenMode(mode, outlet?.id);
         applyScreenMode(mode, document.documentElement);
         window.dispatchEvent(new Event('storage'));
     };
@@ -395,6 +396,8 @@ function PengaturanOutletInner() {
         localStorage.setItem('outlet_latitude', latitudeInput);
         localStorage.setItem('outlet_longitude', longitudeInput);
         localStorage.setItem('outlet_screen_mode', screenMode);
+        // Q97: sinkron ke DB juga (lintas-device).
+        persistScreenMode(screenMode, outlet?.id);
         localStorage.setItem('outlet_tax_active', String(isTaxActive));
         localStorage.setItem('outlet_tax_type', taxType);
         localStorage.setItem('outlet_tax_rate', taxRateInput.toString());

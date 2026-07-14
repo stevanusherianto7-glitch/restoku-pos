@@ -60,11 +60,14 @@ class Outlet extends Model
      */
     protected function setNameAttribute($value): void
     {
+        $oldSlug = $this->attributes['slug'] ?? null;
         $this->attributes['name'] = $value;
         if (empty($this->attributes['slug'])) {
             // Slug global-unique (route /m/{slug} bersifat publik global).
-            // tenant_id mungkin belum terikat saat ini → fallback random aman.
             $this->attributes['slug'] = OutletSlug::unique($value, $this->tenant_id ?? null);
+        } elseif ($oldSlug && $oldSlug !== $this->attributes['slug']) {
+            // Q29/Q84: simpan slug lama agar QR tercetak tetap valid (redirect 301).
+            $this->attributes['old_slug'] = $oldSlug;
         }
     }
 

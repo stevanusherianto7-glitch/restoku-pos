@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\GoogleBpToken;
 use App\Models\GoogleReview;
 use App\Models\Scopes\TenantScope;
+use App\Models\TenantSetting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -203,10 +204,13 @@ class GoogleBusinessProfileService
      */
     public function fetchReviewsFromPlaceId(string $placeId, ?int $outletId = null, ?int $tenantId = null): array
     {
-        $cacheKey = "gbp_reviews_places_{$placeId}";
+        // SECURITY (Q95): key HARUS tenant+outlet+place — tanpa ini dua tenant
+        // yg kebetulan share Place ID sama akan baca cache review tenant lain (cross-tenant leak).
+        $cacheKey = "gbp_reviews_places_{$tenantId}_{$outletId}_{$placeId}";
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
-            $reviews = collect($cached['reviews'] ?? [])->map(fn($attrs) => (new GoogleReview)->forceFill($attrs))->all();
+            $reviews = collect($cached['reviews'] ?? [])->map(fn ($attrs) => (new GoogleReview)->forceFill($attrs))->all();
+
             return [
                 'rating' => $cached['rating'] ?? null,
                 'user_ratings_total' => $cached['user_ratings_total'] ?? null,
@@ -214,8 +218,8 @@ class GoogleBusinessProfileService
             ];
         }
 
-        $serpKey = config('google-business-profile.serpapi_key');
-        $isSerpKeyValid = ($serpKey && !str_contains($serpKey, 'placeholder') && $serpKey !== 'test-key');
+        $serpKey = $this->keyForTenant($tenantId, 'serpapi_key', config('google-business-profile.serpapi_key'));
+        $isSerpKeyValid = ($serpKey && ! str_contains($serpKey, 'placeholder') && $serpKey !== 'test-key');
 
         if ($isSerpKeyValid) {
             $resp = Http::get('https://serpapi.com/search.json', [
@@ -224,8 +228,8 @@ class GoogleBusinessProfileService
                 'api_key' => $serpKey,
             ]);
 
-            if (!$resp->successful()) {
-                throw new \RuntimeException('SerpApi: ' . ($resp->json('error') ?? $resp->body()));
+            if (! $resp->successful()) {
+                throw new \RuntimeException('SerpApi: '.($resp->json('error') ?? $resp->body()));
             }
 
             $body = $resp->json();
@@ -249,7 +253,7 @@ class GoogleBusinessProfileService
                 'reviews' => $reviews,
             ];
         } else {
-            $key = config('google-business-profile.places_api_key');
+            $key = $this->keyForTenant($tenantId, 'places_api_key', config('google-business-profile.places_api_key'));
             if (! $key) {
                 throw new \RuntimeException('GOOGLE_PLACES_API_KEY / SERPAPI_KEY belum dikonfigurasi.');
             }
@@ -271,7 +275,7 @@ class GoogleBusinessProfileService
         $rows = [];
         foreach ($result['reviews'] ?? [] as $r) {
             $rid = (string) ($r['review_id'] ?? $r['time'] ?? uniqid('rev_'));
-            
+
             $updateAttrs = [
                 'outlet_id' => $outletId,
                 'reviewer_name' => $r['author_name'] ?? 'Anonim',
@@ -312,7 +316,7 @@ class GoogleBusinessProfileService
         $cachedPayload = [
             'rating' => $result['rating'] ?? null,
             'user_ratings_total' => $result['user_ratings_total'] ?? null,
-            'reviews' => collect($rows)->map(fn($r) => $r->attributesToArray())->all(),
+            'reviews' => collect($rows)->map(fn ($r) => $r->attributesToArray())->all(),
         ];
 
         Cache::put($cacheKey, $cachedPayload, config('google-business-profile.cache_ttl'));
@@ -342,6 +346,25 @@ class GoogleBusinessProfileService
             ->where('tenant_id', $user->tenant_id)
             ->where('google_review_id', $reviewId)
             ->update(['reply_text' => $text, 'replied_at' => now()]);
+    }
+
+    /**
+     * Q99: Ambil API key per-tenant bila tersimpan di TenantSetting,
+     * dengan fallback ke global config (1 key Restoku untuk semua tenant).
+     * Isolasi: tenant yg sudah bayar bisa pakai key sendiri tanpa
+     * membebani quota key global di 5000 tenant.
+     */
+    private function keyForTenant(?int $tenantId, string $field, ?string $globalFallback): ?string
+    {
+        if ($tenantId) {
+            $setting = TenantSetting::where('tenant_id', $tenantId)->first();
+            $val = $setting->{$field} ?? null;
+            if ($val && ! str_contains($val, 'placeholder')) {
+                return $val;
+            }
+        }
+
+        return $globalFallback ?: null;
     }
 
     /** Tentukan account resource name (accounts/{id}). Pakai override config bila ada, else auto-discover. */

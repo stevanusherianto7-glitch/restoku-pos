@@ -21,18 +21,29 @@ class PosController extends Controller
     /**
      * Halaman Kasir (POS) — pass menu dari DB (bukan hardcode MOCK).
      */
-    public function menuView(): Response
+    public function menuView(Request $request): Response
     {
-        $items = MenuItem::with('category:id,name')
+        // Q5/Q20/Q34: paginasi + server-side filter — jangan kirim 5000 item sekaligus.
+        $perPage = min((int) $request->query('per_page', 100), 500);
+        $outletId = $request->query('outlet_id') ? (int) $request->query('outlet_id') : null;
+
+        $query = MenuItem::with('category:id,name')
             ->where('is_available', true)
             ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get([
-                'id', 'outlet_id', 'menu_category_id', 'name',
-                'description', 'price', 'image_path', 'is_popular',
-            ]);
+            ->orderBy('name');
 
-        $menu = $items->map(function (MenuItem $item) {
+        if ($outletId) {
+            $query->where(function ($q) use ($outletId) {
+                $q->whereNull('outlet_id')->orWhere('outlet_id', $outletId);
+            });
+        }
+
+        $items = $query->paginate($perPage, [
+            'id', 'outlet_id', 'menu_category_id', 'name',
+            'description', 'price', 'image_path', 'is_popular',
+        ]);
+
+        $menu = $items->getCollection()->map(function (MenuItem $item) {
             return [
                 'id' => $item->id,
                 'name' => $item->name,
@@ -45,7 +56,13 @@ class PosController extends Controller
         });
 
         return Inertia::render('POS/Index', [
-            'posMenu' => $menu,
+            'posMenu' => [
+                'data' => $menu,
+                'current_page' => $items->currentPage(),
+                'last_page' => $items->lastPage(),
+                'per_page' => $items->perPage(),
+                'total' => $items->total(),
+            ],
         ]);
     }
 
@@ -55,23 +72,26 @@ class PosController extends Controller
             ? (int) $request->query('outlet_id')
             : null;
 
-        $items = MenuItem::withoutGlobalScope(TenantScope::class)
+        $perPage = min((int) $request->query('per_page', 100), 500);
+
+        $query = MenuItem::withoutGlobalScope(TenantScope::class)
             ->with('category:id,name')
             ->where('is_available', true)
-            ->where(function ($q) use ($outletId) {
-                $q->whereNull('outlet_id');
-                if ($outletId) {
-                    $q->orWhere('outlet_id', $outletId);
-                }
-            })
             ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get([
-                'id', 'outlet_id', 'menu_category_id', 'name',
-                'description', 'price', 'image_path', 'is_popular',
-            ]);
+            ->orderBy('name');
 
-        $mapped = $items->map(function (MenuItem $item) {
+        if ($outletId) {
+            $query->where(function ($q) use ($outletId) {
+                $q->whereNull('outlet_id')->orWhere('outlet_id', $outletId);
+            });
+        }
+
+        $items = $query->paginate($perPage, [
+            'id', 'outlet_id', 'menu_category_id', 'name',
+            'description', 'price', 'image_path', 'is_popular',
+        ]);
+
+        $mapped = $items->getCollection()->map(function (MenuItem $item) {
             return [
                 'id' => $item->id,
                 'name' => $item->name,
@@ -83,6 +103,12 @@ class PosController extends Controller
             ];
         });
 
-        return response()->json(['menu' => $mapped]);
+        return response()->json([
+            'menu' => $mapped,
+            'current_page' => $items->currentPage(),
+            'last_page' => $items->lastPage(),
+            'per_page' => $items->perPage(),
+            'total' => $items->total(),
+        ]);
     }
 }
