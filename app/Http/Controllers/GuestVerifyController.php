@@ -88,4 +88,33 @@ class GuestVerifyController extends Controller
             'expires_at' => now()->addMinutes(15)->toIso8601String(),
         ]);
     }
+
+    /**
+     * Publik: ambil PIN harian restoran untuk tamu (verifikasi kehadiran di kedai).
+     * Tidak butuh login — PIN hanya 4-digit kehadiran, bukan secret.
+     * Konsisten dengan PIN di dashboard Kasir/Pelayan (DailyPinService deterministic).
+     */
+    public function dailyPin(Request $request): JsonResponse
+    {
+        $slug = $request->query('slug') ?? '';
+        if (! $slug) {
+            return response()->json(['error' => 'slug required'], 422);
+        }
+
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
+            ->where('slug', $slug)
+            ->first();
+
+        if (! $outlet) {
+            return response()->json(['error' => 'outlet_not_found'], 404);
+        }
+
+        $pin = $this->pins->getOrGenerate($outlet->id, now()->toDateString());
+
+        return response()->json([
+            'outlet_id' => $outlet->id,
+            'date' => now()->toDateString(),
+            'pin' => $pin,
+        ]);
+    }
 }

@@ -47,6 +47,12 @@ beforeEach(() => {
                         }),
                 });
             }
+            if (url.includes('/api/guest/daily-pin')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({ pin: '7264' }),
+                });
+            }
             return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
         }) as any,
     );
@@ -140,6 +146,84 @@ describe('BukuMenuDigital/CustomerView', () => {
             await new Promise((r) => setTimeout(r, 50));
         });
         expect(screen.getByText(/Meja B2/)).toBeInTheDocument();
+        vi.unstubAllGlobals();
+    });
+
+    it('verifies dine-in with correct daily PIN (fetches from BE, not hardcoded)', async () => {
+        vi.stubGlobal('window', {
+            ...window,
+            location: { ...window.location, pathname: '/m/pawon-salam-bandung', search: '' },
+        });
+        render(<CustomerView />);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 150));
+        });
+        // landing -> welcome -> howto -> app
+        fireEvent.click(screen.getByText(/Masuk ke Menu/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        fireEvent.click(screen.getByText(/Lanjut/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        fireEvent.click(screen.getByText(/Mulai Pesan Sekarang/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+
+        // Modal verifikasi dine-in harus muncul
+        expect(screen.getByText(/VERIFIKASI DINE-IN/i)).toBeInTheDocument();
+
+        // Masukkan PIN harian dari BE (7264) via keypad
+        for (const d of ['7', '2', '6', '4']) {
+            fireEvent.click(screen.getByText(d, { selector: 'button' }));
+        }
+        fireEvent.click(screen.getByText(/VERIFIKASI PIN/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+
+        // Modal harus tertutup (verifikasi sukses)
+        expect(screen.queryByText(/VERIFIKASI DINE-IN/i)).not.toBeInTheDocument();
+        vi.unstubAllGlobals();
+    });
+
+    it('rejects wrong daily PIN (modal stays open)', async () => {
+        vi.stubGlobal('window', {
+            ...window,
+            location: { ...window.location, pathname: '/m/pawon-salam-bandung', search: '' },
+        });
+        render(<CustomerView />);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 150));
+        });
+        fireEvent.click(screen.getByText(/Masuk ke Menu/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        fireEvent.click(screen.getByText(/Lanjut/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        fireEvent.click(screen.getByText(/Mulai Pesan Sekarang/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+
+        expect(screen.getByText(/VERIFIKASI DINE-IN/i)).toBeInTheDocument();
+
+        // PIN salah (0000, bukan 7264 dari BE)
+        for (const d of ['0', '0', '0', '0']) {
+            fireEvent.click(screen.getByText(d, { selector: 'button' }));
+        }
+        fireEvent.click(screen.getByText(/VERIFIKASI PIN/i));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+
+        // Modal tetap terbuka
+        expect(screen.getByText(/VERIFIKASI DINE-IN/i)).toBeInTheDocument();
         vi.unstubAllGlobals();
     });
 });

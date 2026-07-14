@@ -161,4 +161,22 @@ class GuestVerifyControllerTest extends TestCase
         // Token valid → BE tidak menolak dengan error validasi verify_token
         $resp->assertJsonMissingValidationErrors(['verify_token']);
     }
+
+    public function test_guest_daily_pin_endpoint_public_and_matches_service(): void
+    {
+        // Endpoint publik (tanpa auth) harus return PIN harian yang sama dengan DailyPinService.
+        $expected = (new DailyPinService)->getOrGenerate($this->testOutlet->id);
+
+        $resp = $this->getJson('/api/guest/daily-pin?slug='.$this->testOutlet->slug);
+
+        $resp->assertOk();
+        $resp->assertJson(['pin' => $expected, 'outlet_id' => $this->testOutlet->id]);
+    }
+
+    public function test_guest_daily_pin_rejects_unknown_slug(): void
+    {
+        $resp = $this->getJson('/api/guest/daily-pin?slug=outlet-tidak-ada-xyz');
+
+        $resp->assertNotFound();
+    }
 }

@@ -157,6 +157,14 @@ export default function CustomerView() {
             })
             .catch(() => setMenuItems(FALLBACK_ITEMS))
             .finally(() => setMenuLoading(false));
+
+        // Ambil PIN harian restoran (publik, by slug) untuk verifikasi dine-in tamu.
+        if (outletSlug) {
+            fetch(`/api/guest/daily-pin?slug=${encodeURIComponent(outletSlug)}`)
+                .then((r) => (r.ok ? r.json() : null))
+                .then((d) => d?.pin && setDailyPin(String(d.pin)))
+                .catch(() => {});
+        }
     }, []);
 
     // Reservation Form States
@@ -184,6 +192,8 @@ export default function CustomerView() {
     const [appStage, setAppStage] = useState<'landing' | 'welcome' | 'howto' | 'app'>('landing');
     const [dineVerified, setDineVerified] = useState(false);
     const [pin, setPin] = useState('');
+    // PIN harian restoran (dari BE, publik per outlet/slug) — untuk verifikasi dine-in tamu.
+    const [dailyPin, setDailyPin] = useState<string | null>(null);
     // Stub GPS (BE nyata = Batch 2: outlat lat/lng + radius).
     const [gpsError, setGpsError] = useState<string | null>('Anda berada di luar area restoran (120635m).');
     // Stub orders (BE nyata = Batch 2: order-state-machine + polling publik).
@@ -991,7 +1001,7 @@ export default function CustomerView() {
                                 ))}
                             </div>
                             <button
-                                onClick={() => pin === '0000' && setDineVerified(true)}
+                                onClick={() => dailyPin && pin === dailyPin && setDineVerified(true)}
                                 className="w-full rounded-xl py-3.5 text-[13.5px] font-extrabold cursor-pointer border-none"
                                 style={{ background: 'linear-gradient(135deg,#8A3A1E,#C9542A)', color: '#F3D9CC' }}
                             >

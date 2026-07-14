@@ -62,6 +62,8 @@ Route::get('/api/outlet-operating-hours', [PublicOrderController::class, 'getOut
 
 // Verifikasi kehadiran tamu (anti-fraud): GPS + PIN meja + PIN harian -> signed token
 Route::post('/api/guest/verify', [GuestVerifyController::class, 'verify'])->middleware('throttle:30,1');
+// Publik: PIN harian restoran untuk tamu (verifikasi kehadiran di kedai, by slug)
+Route::get('/api/guest/daily-pin', [GuestVerifyController::class, 'dailyPin']);
 
 
 /*
