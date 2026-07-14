@@ -454,6 +454,25 @@ export default function CustomerView() {
               ? theme.premium
               : theme.elvera; // default warm brand (screenshot clone)
 
+    const isDarkTheme = isNanoBanana || tenantLayout === 'premium' || screenMode === 'premium';
+    const modalStyle = {
+        bg: isDarkTheme ? (isNanoBanana ? 'bg-[#111827] border-amber-500/25' : 'bg-[#0d2a21] border-[#0F8A4D]/25') : 'bg-[#FAF5EE] border-amber-900/10',
+        textTitle: isDarkTheme ? 'text-white' : 'text-[#1A1410]',
+        textDesc: isDarkTheme ? 'text-slate-300' : 'text-[#7A6F63]',
+        accentText: isDarkTheme ? (isNanoBanana ? 'text-amber-400' : 'text-[#0F8A4D]') : 'text-[#FF5B35]',
+        accentBorder: isDarkTheme ? (isNanoBanana ? 'border-amber-500/20' : 'border-[#0F8A4D]/20') : 'border-[#FF5B35]/15',
+        accentBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500/10' : 'bg-[#0F8A4D]/10') : 'bg-[#FF5B35]/10',
+        cardBg: isDarkTheme ? 'bg-white/5 border-white/5' : 'bg-[#FFF3EC] border-[#FF5B35]/10',
+        divider: isDarkTheme ? 'bg-white/10' : 'bg-amber-900/10',
+        button: isDarkTheme
+            ? isNanoBanana
+                ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/25'
+                : 'bg-[#0F8A4D] hover:bg-[#0c6e3d] text-white shadow-md shadow-[#0F8A4D]/25'
+            : 'bg-[#FF5B35] text-white hover:bg-[#E04E2B] shadow-md shadow-[#FF5B35]/25',
+        pinBox: isDarkTheme ? 'bg-white/5 border border-white/10 text-white' : 'bg-white border border-amber-900/15 text-[#1A1410]',
+        pinKey: isDarkTheme ? 'bg-white/5 border border-white/5 text-white hover:bg-white/10' : 'bg-white border border-amber-900/10 text-[#1A1410] hover:bg-slate-50',
+    };
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         // QR generator (buildMenuUrl) pakai `t`; dukung juga `table` (legacy).
@@ -716,19 +735,19 @@ export default function CustomerView() {
 
             {appStage === 'landing' && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden text-[#1A1410]">
+                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}>
                         <div>
-                            <p className="text-[9px] font-bold tracking-[0.22em] text-[#FF5B35] uppercase">
+                            <p className={`text-[9px] font-bold tracking-[0.22em] ${modalStyle.accentText} uppercase`}>
                                 Sejak 2025 · Nusantara
                             </p>
-                            <h2 className="font-serif text-2xl mt-2 leading-tight font-extrabold text-[#1A1410]">
+                            <h2 className={`font-serif text-2xl mt-2 leading-tight font-extrabold ${modalStyle.textTitle}`}>
                                 Cita rasa Jawa,
                                 <br />
-                                <span className="italic text-[#FF5B35]">disajikan modern.</span>
+                                <span className={`italic ${modalStyle.accentText}`}>disajikan modern.</span>
                             </h2>
                         </div>
-                        <div className="h-px bg-amber-900/10 my-1" />
-                        <p className="text-xs text-[#7A6F63] leading-relaxed">
+                        <div className={`h-px ${modalStyle.divider} my-1`} />
+                        <p className={`text-xs ${modalStyle.textDesc} leading-relaxed`}>
                             Platform pemesanan digital terintegrasi — dari pemesanan langsung dari meja, dapur realtime,
                             hingga sajian tersaji hangat di meja Anda.
                         </p>
@@ -738,31 +757,31 @@ export default function CustomerView() {
                                 { ic: '🍴', t: 'Dapur Realtime', d: 'Antrian pesanan otomatis masuk' },
                                 { ic: '📊', t: 'Monitor Pesanan', d: 'Pantau semua transaksi live' },
                             ].map((f) => (
-                                <div key={f.t} className="flex items-center gap-3 bg-[#FFF3EC] p-2.5 rounded-2xl border border-[#FF5B35]/10">
-                                    <div className="size-8 rounded-lg border border-[#FF5B35]/20 grid place-items-center text-[#FF5B35] text-sm shrink-0">
+                                <div key={f.t} className={`flex items-center gap-3 ${modalStyle.cardBg} p-2.5 rounded-2xl border`}>
+                                    <div className={`size-8 rounded-lg border ${modalStyle.accentBorder} grid place-items-center ${modalStyle.accentText} text-sm shrink-0`}>
                                         {f.ic}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-xs text-[#1A1410]">{f.t}</p>
-                                        <p className="text-[10px] text-[#7A6F63]">{f.d}</p>
+                                        <p className={`font-bold text-xs ${modalStyle.textTitle}`}>{f.t}</p>
+                                        <p className={`text-[10px] ${modalStyle.textDesc}`}>{f.d}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         <button
                             onClick={() => setAppStage('welcome')}
-                            className="mt-2 w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black flex justify-center gap-2 items-center cursor-pointer shadow-md shadow-[#FF5B35]/25"
+                            className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black flex justify-center gap-2 items-center cursor-pointer`}
                         >
                             Masuk ke Menu →
                         </button>
-                        <p className="text-center text-[9px] text-[#9B8D7E]">© 2025 {outletName}</p>
+                        <p className={`text-center text-[9px] ${modalStyle.textDesc}`}>© 2025 {outletName}</p>
                     </div>
                 </div>
             )}
 
             {appStage === 'welcome' && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden">
+                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}>
                         <div className="flex w-full items-center justify-between gap-3">
                             <div className="grid size-12 place-items-center overflow-hidden rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-md">
                                 {renderLogo('size-7 text-white')}
@@ -773,29 +792,29 @@ export default function CustomerView() {
                                 className="h-10 w-auto shrink-0 select-none"
                             />
                         </div>
-                        <h2 className="text-xl font-extrabold leading-tight text-[#1A1410]">
+                        <h2 className={`text-xl font-extrabold leading-tight ${modalStyle.textTitle}`}>
                             Selamat Datang di
                             <br />
-                            <span className="text-[#FF5B35]">{outletName}!</span>
+                            <span className={modalStyle.accentText}>{outletName}!</span>
                         </h2>
-                        <p className="text-[11px] text-[#7A6F63] leading-relaxed">
+                        <p className={`text-[11px] ${modalStyle.textDesc} leading-relaxed`}>
                             Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
                             MSG. Selamat menikmati!
                         </p>
-                        <div className="w-full bg-[#FFF3EC] rounded-2xl p-3 flex items-center justify-between text-left border border-[#FF5B35]/10">
+                        <div className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center justify-between text-left border`}>
                             <div>
-                                <p className="text-[9px] font-extrabold tracking-wider text-[#A8521F]">
+                                <p className={`text-[9px] font-extrabold tracking-wider ${modalStyle.accentText}`}>
                                     📍 NOMOR MEJA ANDA
                                 </p>
-                                <p className="text-base font-extrabold text-[#1A1410] mt-0.5">Meja {tableNumber ?? 'A1'}</p>
+                                <p className={`text-base font-extrabold ${modalStyle.textTitle} mt-0.5`}>Meja {tableNumber ?? 'A1'}</p>
                             </div>
-                            <span className="px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 text-[#0F8A4D] text-[9px] font-extrabold flex items-center gap-1">
+                            <span className={`px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 ${modalStyle.accentText} text-[9px] font-extrabold flex items-center gap-1`}>
                                 ✓ Terverifikasi
                             </span>
                         </div>
-                        <div className="w-full">
-                            <p className="text-[10px] font-extrabold tracking-wider text-[#8A7D70] text-left mb-1.5">
-                                PILH TIPE PESANAN
+                        <div className="w-full text-left">
+                            <p className={`text-[10px] font-extrabold tracking-wider ${modalStyle.textDesc} text-left mb-1.5`}>
+                                PILIH TIPE PESANAN
                             </p>
                             <div className="flex gap-3">
                                 <button
@@ -826,7 +845,7 @@ export default function CustomerView() {
                         </div>
                         <button
                             onClick={() => setAppStage('howto')}
-                            className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25"
+                            className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black cursor-pointer`}
                         >
                             Lanjut →
                         </button>
@@ -836,53 +855,53 @@ export default function CustomerView() {
 
             {appStage === 'howto' && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden text-[#1A1410]">
-                        <h2 className="text-xl font-extrabold text-[#1A1410]">Cara Memesan</h2>
-                        <p className="text-[11px] text-[#7A6F63] -mt-2">
+                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden text-[#1A1410]`}>
+                        <h2 className={`text-xl font-extrabold ${modalStyle.textTitle}`}>Cara Memesan</h2>
+                        <p className={`text-[11px] ${modalStyle.textDesc} -mt-2`}>
                             Cukup 3 langkah mudah, pesanan langsung masuk dapur!
                         </p>
                         <div className="flex flex-col gap-2.5">
                             {[
                                 {
                                     n: 1,
-                                    bg: 'bg-[#F4EEFD] border-[#7C3AED]/10 text-[#7C3AED]',
+                                    bg: isDarkTheme ? 'bg-white/5 border-white/5 text-slate-300' : 'bg-[#F4EEFD] border-[#7C3AED]/10 text-[#7C3AED]',
                                     t: 'Pilih Menu Favorit',
                                     d: 'Tekan menu yang kamu inginkan, lihat foto & harga lengkap',
                                 },
                                 {
                                     n: 2,
-                                    bg: 'bg-[#FFF1E9] border-[#FF5B35]/10 text-[#FF5B35]',
+                                    bg: isDarkTheme ? 'bg-white/5 border-white/5 text-slate-300' : 'bg-[#FFF1E9] border-[#FF5B35]/10 text-[#FF5B35]',
                                     t: 'Masuk ke Keranjang',
                                     d: 'Tambah qty, tulis catatan khusus untuk chef jika perlu',
                                 },
                                 {
                                     n: 3,
-                                    bg: 'bg-[#EAF7EF] border-[#0F8A4D]/10 text-[#0F8A4D]',
+                                    bg: isDarkTheme ? 'bg-white/5 border-white/5 text-slate-300' : 'bg-[#EAF7EF] border-[#0F8A4D]/10 text-[#0F8A4D]',
                                     t: 'Kirim Pesanan',
                                     d: 'Tekan "Pesan Sekarang" — pesanan langsung diterima dapur!',
                                 },
                             ].map((s) => (
                                 <div key={s.n} className={`rounded-2xl p-3 flex gap-3 items-start border text-left ${s.bg}`}>
-                                    <div className="size-5 rounded-full bg-current text-white font-extrabold grid place-items-center text-[10px] shrink-0">
-                                        <span className="text-slate-900 font-bold">{s.n}</span>
+                                    <div className={`size-5 rounded-full ${isDarkTheme ? 'bg-emerald-500 text-slate-950' : 'bg-current text-white'} font-extrabold grid place-items-center text-[10px] shrink-0`}>
+                                        <span className={isDarkTheme ? 'text-slate-900 font-bold' : 'text-white font-bold'}>{s.n}</span>
                                     </div>
                                     <div>
-                                        <p className="font-extrabold text-[12px] text-[#1A1410]">{s.t}</p>
-                                        <p className="text-[10px] text-[#7A6F63] mt-0.5">{s.d}</p>
+                                        <p className={`font-extrabold text-[12px] ${modalStyle.textTitle}`}>{s.t}</p>
+                                        <p className={`text-[10px] ${modalStyle.textDesc} mt-0.5`}>{s.d}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <div className="flex items-center justify-between bg-[#FFF3EC] border border-[#FF5B35]/10 rounded-2xl p-3 text-[11px] mt-1">
-                            <span className="text-[#7A6F63]">🪑 Tipe pesanan</span>
-                            <b className="text-[#1A1410]">
+                        <div className={`flex items-center justify-between ${modalStyle.cardBg} border rounded-2xl p-3 text-[11px] mt-1`}>
+                            <span className={modalStyle.textDesc}>🪑 Tipe pesanan</span>
+                            <b className={modalStyle.textTitle}>
                                 {orderType === 'dine_in' ? 'Dine In' : 'Take Away'}
                             </b>
-                            <span className="text-[#FF5B35] font-extrabold cursor-pointer" onClick={() => setAppStage('welcome')}>Ubah</span>
+                            <span className={`${modalStyle.accentText} font-extrabold cursor-pointer`} onClick={() => setAppStage('welcome')}>Ubah</span>
                         </div>
                         <button
                             onClick={() => setAppStage('app')}
-                            className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25 flex justify-center gap-2 items-center"
+                            className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black cursor-pointer flex justify-center gap-2 items-center`}
                         >
                             ✨ Mulai Pesan Sekarang!
                         </button>
@@ -893,60 +912,60 @@ export default function CustomerView() {
             {/* Verifikasi Dine-In: overlay saat app & dine_in & belum verified */}
             {appStage === 'app' && orderType === 'dine_in' && !dineVerified && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden text-[#1A1410]">
+                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}>
                         <div className="flex items-start gap-3 text-left">
-                            <div className="size-10 rounded-full border border-[#FF5B35] grid place-items-center text-lg text-[#FF5B35]">
+                            <div className={`size-10 rounded-full border ${modalStyle.accentBorder} grid place-items-center text-lg ${modalStyle.accentText}`}>
                                 🛡
                             </div>
                             <div>
-                                <p className="font-extrabold text-[15px] text-[#FF5B35] tracking-wide">
+                                <p className={`font-extrabold text-[15px] ${modalStyle.accentText} tracking-wide`}>
                                     VERIFIKASI DINE-IN
                                 </p>
-                                <p className="text-[9px] text-[#7A6F63] mt-0.5 tracking-wide uppercase font-bold">
+                                <p className={`text-[9px] ${modalStyle.textDesc} mt-0.5 tracking-wide uppercase font-bold`}>
                                     PASTIKAN ANDA MEMESAN DI LOKASI
                                 </p>
                             </div>
                             <span
-                                className="ml-auto text-[#7A6F63] text-lg cursor-pointer hover:text-[#1A1410]"
+                                className={`ml-auto ${modalStyle.textDesc} text-lg cursor-pointer hover:${modalStyle.textTitle}`}
                                 onClick={() => setDineVerified(true)}
                             >
                                 ✕
                             </span>
                         </div>
 
-                        <div className="text-left bg-[#FFF3EC] border border-[#FF5B35]/10 p-3.5 rounded-2xl">
-                            <p className="font-bold text-[12.5px] text-[#1A1410] flex items-center gap-1.5">
+                        <div className={`text-left ${modalStyle.cardBg} border p-3.5 rounded-2xl`}>
+                            <p className={`font-bold text-[12.5px] ${modalStyle.textTitle} flex items-center gap-1.5`}>
                                 📍 Validasi GPS Otomatis
                             </p>
                             {gpsError && (
-                                <div className="mt-2 bg-[#FEE2E2] text-[#991B1B] border border-[#FCA5A5]/40 rounded-xl p-2.5 text-[11px] font-semibold leading-snug">
+                                <div className={`mt-2 ${isDarkTheme ? 'bg-[#7A2A1A] text-[#FF9B7A]' : 'bg-[#FEE2E2] text-[#991B1B] border-[#FCA5A5]/40'} rounded-xl p-2.5 text-[11px] font-semibold leading-snug`}>
                                     {gpsError}
                                 </div>
                             )}
                             <button
                                 onClick={() => setGpsError(null)}
-                                className="mt-3 w-full bg-white border border-[#FF5B35]/30 text-[#FF5B35] rounded-xl py-2.5 text-[12px] font-black cursor-pointer shadow-sm hover:bg-[#FFF3EC] transition-all"
+                                className={`mt-3 w-full bg-transparent border-[1.5px] ${modalStyle.accentBorder} ${modalStyle.accentText} rounded-xl py-2 text-[12px] font-black cursor-pointer shadow-sm`}
                             >
                                 ⟳ DETEKSI ULANG LOKASI
                             </button>
                         </div>
 
-                        <div className="text-center text-[10px] text-[#8A7D70] font-extrabold relative my-1">
+                        <div className={`text-center text-[10px] ${modalStyle.textDesc} font-extrabold relative my-1`}>
                             — ATAU —
                         </div>
 
                         <div className="text-left">
-                            <p className="font-extrabold text-[12px] text-[#1A1410] tracking-wide">
+                            <p className={`font-extrabold text-[12px] ${modalStyle.textTitle} tracking-wide`}>
                                 MASUKKAN PIN VERIFIKASI MEJA
                             </p>
-                            <p className="text-[10px] text-[#7A6F63] mt-1 leading-relaxed">
+                            <p className={`text-[10px] ${modalStyle.textDesc} mt-1 leading-relaxed`}>
                                 Minta 4-digit PIN harian kepada pelayan kami di kedai.
                             </p>
                             <div className="flex justify-center gap-2.5 my-3.5">
                                 {[0, 1, 2, 3].map((i) => (
                                     <span
                                         key={i}
-                                        className="size-11 rounded-xl bg-white border border-amber-900/15 text-[#1A1410] grid place-items-center text-lg font-black shadow-sm"
+                                        className={`size-11 rounded-xl ${modalStyle.pinBox} grid place-items-center text-lg font-black shadow-sm`}
                                     >
                                         {pin[i] ?? ''}
                                     </span>
@@ -971,7 +990,7 @@ export default function CustomerView() {
                                                 ? setPin((p) => p.slice(0, -1))
                                                 : k && setPin((p) => (p + k).slice(0, 4))
                                         }
-                                        className="h-10 rounded-xl bg-white border border-amber-900/10 text-[#1A1410] font-bold text-sm disabled:opacity-30 cursor-pointer hover:bg-slate-50 transition-all flex items-center justify-center"
+                                        className={`h-10 rounded-xl ${modalStyle.pinKey} font-bold text-sm disabled:opacity-30 cursor-pointer transition-all flex items-center justify-center`}
                                     >
                                         {k}
                                     </button>
@@ -979,7 +998,7 @@ export default function CustomerView() {
                             </div>
                             <button
                                 onClick={() => dailyPin && pin === dailyPin && setDineVerified(true)}
-                                className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25"
+                                className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black cursor-pointer`}
                             >
                                 VERIFIKASI PIN
                             </button>
@@ -1764,9 +1783,30 @@ function MenuDetailSheet({
     onClose: () => void;
     onAdd: (id: number) => void;
 }) {
+    const { tenantLayout, screenMode } = useTenantSettings();
+    const isNanoBanana = screenMode === 'nano-banana' || tenantLayout === 'nano-banana';
+    const isDarkTheme = isNanoBanana || tenantLayout === 'premium' || screenMode === 'premium';
+
+    const modalStyle = {
+        bg: isDarkTheme ? (isNanoBanana ? 'bg-[#111827] border-amber-500/25' : 'bg-[#0d2a21] border-[#0F8A4D]/25') : 'bg-[#FAF5EE] border-amber-900/10',
+        textTitle: isDarkTheme ? 'text-white' : 'text-[#1A1410]',
+        textDesc: isDarkTheme ? 'text-slate-300' : 'text-[#7A6F63]',
+        textMuted: isDarkTheme ? 'text-slate-400' : 'text-[#5A4F43]',
+        accentText: isDarkTheme ? (isNanoBanana ? 'text-amber-400' : 'text-[#0f9f59]') : 'text-[#FF5B35]',
+        accentBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500' : 'bg-[#0F8A4D]') : 'bg-[#FF5B35]',
+        accentBadgeBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500/15 border-amber-500/30 text-amber-400' : 'bg-[#0F8A4D]/15 border-[#0F8A4D]/30 text-emerald-400') : 'bg-[#FF5B35]/15 border-[#FF5B35]/30 text-[#FF5B35]',
+        accentStepBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500/10 text-amber-400' : 'bg-[#0F8A4D]/10 text-emerald-400') : 'bg-[#FF5B35]/10 text-[#FF5B35]',
+        divider: isDarkTheme ? 'border-white/10' : 'border-amber-900/10',
+        cardBg: isDarkTheme ? 'bg-white/5 border-white/10 p-2.5 rounded-2xl' : 'border border-amber-900/10 p-2.5 rounded-2xl',
+        ctaBg: isDarkTheme ? 'bg-[#0a2019]/60 border-t border-white/5' : 'bg-[#FFF3EC]/50 border-t border-amber-900/10',
+        button: isDarkTheme
+            ? isNanoBanana
+                ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/25'
+                : 'bg-[#0F8A4D] hover:bg-[#0c6e3d] text-white shadow-md shadow-[#0F8A4D]/25'
+            : 'bg-[#FF5B35] text-white hover:bg-[#E04E2B] shadow-md shadow-[#FF5B35]/25',
+    };
+
     const [tab, setTab] = useState<'desc' | 'combo' | 'reviews'>('desc');
-    const accent = 'text-[#FF5B35]';
-    const accentBg = 'bg-[#FF5B35]';
     const steps = item.steps ?? [
         'Bahan segar diproses higienis sesuai standar outlet.',
         'Diolah dengan resep rahasia outlet untuk cita rasa terbaik.',
@@ -1777,7 +1817,7 @@ function MenuDetailSheet({
     return (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto" onClick={onClose}>
             <div
-                className="relative w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] overflow-hidden shadow-2xl border border-amber-900/10 max-h-[85vh] flex flex-col"
+                className={`relative w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} overflow-hidden shadow-2xl border max-h-[85vh] flex flex-col`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Hero */}
@@ -1795,12 +1835,12 @@ function MenuDetailSheet({
                         ✕
                     </button>
                     {item.isPopular && (
-                        <span className="absolute top-3 left-3 bg-[#FF5B35]/15 border border-[#FF5B35]/30 text-[#FF5B35] font-black text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                        <span className={`absolute top-3 left-3 ${modalStyle.accentBadgeBg} font-black text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm`}>
                             🔥 Favorit
                         </span>
                     )}
                     <div
-                        className={`absolute bottom-3 right-3 ${accentBg} text-white font-extrabold text-xs px-3 py-1.5 rounded-full shadow-md`}
+                        className={`absolute bottom-3 right-3 ${modalStyle.accentBg} text-white font-extrabold text-xs px-3 py-1.5 rounded-full shadow-md`}
                     >
                         {formatRupiah(item.price)}
                     </div>
@@ -1808,29 +1848,29 @@ function MenuDetailSheet({
 
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto px-5 py-4 text-left">
-                    <h2 className="text-xl font-extrabold text-[#1A1410] tracking-tight">{item.name}</h2>
-                    <p className="text-[10px] font-bold text-[#FF5B35] uppercase tracking-wide mt-0.5">{outletName}</p>
+                    <h2 className={`text-xl font-extrabold ${modalStyle.textTitle} tracking-tight`}>{item.name}</h2>
+                    <p className={`text-[10px] font-bold ${modalStyle.accentText} uppercase tracking-wide mt-0.5`}>{outletName}</p>
 
-                    <div className="flex items-center gap-3 mt-2 text-[10px] text-[#7A6F63] font-bold">
+                    <div className={`flex items-center gap-3 mt-2 text-[10px] ${modalStyle.textDesc} font-bold`}>
                         <span className="text-[#F59E0B]">
                             {'★'.repeat(Math.round(item.rating ?? 4.9))}{' '}
-                            <span className="text-[#1A1410] font-extrabold">{(item.rating ?? 4.9).toFixed(1)}</span>
+                            <span className={`${modalStyle.textTitle} font-extrabold`}>{(item.rating ?? 4.9).toFixed(1)}</span>
                         </span>
                         {item.cookTime && <span>⏱ {item.cookTime}</span>}
                         {item.servings && <span>🍽 {item.servings}</span>}
                     </div>
 
-                    <p className="text-xs text-[#7A6F63] leading-relaxed mt-2.5">
+                    <p className={`text-xs ${modalStyle.textDesc} leading-relaxed mt-2.5`}>
                         {item.description || 'Hidangan lezat diolah higienis dengan resep rahasia outlet.'}
                     </p>
 
                     {/* Tabs */}
-                    <div className="flex gap-6 mt-4 border-b border-amber-900/10">
+                    <div className={`flex gap-6 mt-4 border-b ${modalStyle.divider}`}>
                         {(['desc', 'combo', 'reviews'] as const).map((t) => (
                             <button
                                 key={t}
                                 onClick={() => setTab(t)}
-                                className={`pb-2 text-xs font-bold transition-colors border-none bg-transparent cursor-pointer ${tab === t ? accent + ' border-b-2 border-[#FF5B35]' : 'text-slate-400'}`}
+                                className={`pb-2 text-xs font-bold transition-colors border-none bg-transparent cursor-pointer ${tab === t ? modalStyle.accentText + ' border-b-2 border-current' : 'text-slate-400'}`}
                             >
                                 {t === 'desc' ? 'Deskripsi' : t === 'combo' ? 'Combo' : 'Ulasan'}
                             </button>
@@ -1843,17 +1883,17 @@ function MenuDetailSheet({
                                 {steps.map((s, i) => (
                                     <div key={i} className="flex gap-3">
                                         <div
-                                            className={`shrink-0 size-5 rounded-full bg-[#FF5B35]/10 text-[#FF5B35] font-extrabold text-[10px] grid place-items-center`}
+                                            className={`shrink-0 size-5 rounded-full ${modalStyle.accentStepBg} font-extrabold text-[10px] grid place-items-center`}
                                         >
                                             {i + 1}
                                         </div>
-                                        <p className="text-xs text-[#5A4F43] leading-snug pt-0.5">{s}</p>
+                                        <p className={`text-xs ${modalStyle.textMuted} leading-snug pt-0.5`}>{s}</p>
                                     </div>
                                 ))}
                             </div>
                         )}
                         {tab === 'combo' && (
-                            <p className="text-xs text-[#7A6F63]">
+                            <p className={`text-xs ${modalStyle.textDesc}`}>
                                 {item.combo ?? 'Belum ada paket combo untuk menu ini.'}
                             </p>
                         )}
@@ -1861,29 +1901,29 @@ function MenuDetailSheet({
                             (reviews.length > 0 ? (
                                 <div className="space-y-2.5">
                                     {reviews.map((r, i) => (
-                                        <div key={i} className="border border-amber-900/10 rounded-2xl p-2.5">
+                                        <div key={i} className={`border ${modalStyle.cardBg}`}>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-xs font-bold text-[#1A1410]">{r.name}</span>
+                                                <span className={`text-xs font-bold ${modalStyle.textTitle}`}>{r.name}</span>
                                                 <span className="text-[#F59E0B] text-[10px]">{'★'.repeat(r.rating)}</span>
                                             </div>
-                                            <p className="text-[10px] text-[#7A6F63] mt-1">{r.text}</p>
+                                            <p className={`text-[10px] ${modalStyle.textDesc} mt-1`}>{r.text}</p>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-xs text-[#7A6F63]">Belum ada ulasan untuk menu ini.</p>
+                                <p className={`text-xs ${modalStyle.textDesc}`}>Belum ada ulasan untuk menu ini.</p>
                             ))}
                     </div>
                 </div>
 
                 {/* CTA */}
-                <div className="shrink-0 p-3.5 bg-[#FFF3EC]/50 border-t border-amber-900/10">
+                <div className={`shrink-0 p-3.5 ${modalStyle.ctaBg}`}>
                     <button
                         onClick={() => {
                             onAdd(item.id);
                             onClose();
                         }}
-                        className={`w-full ${accentBg} text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25 flex items-center justify-center`}
+                        className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black cursor-pointer flex items-center justify-center`}
                     >
                         Tambah ke Pesanan · {formatRupiah(item.price)}
                     </button>
