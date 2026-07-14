@@ -633,7 +633,7 @@ export default function CustomerView() {
 
             {/* Glassmorphism Header — hanya render saat app sudah aktif (welcome/howto/landing = modal screen penuh) */}
             {appStage === 'app' && (
-                <header className={activeTheme.header}>
+                <header className={`${activeTheme.header} !flex-col !items-stretch gap-3 py-3`}>
                     <div className="flex items-center gap-3">
                         <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 overflow-hidden">
                             {renderLogo('size-5 stroke-[2.5] text-slate-950')}
@@ -990,26 +990,7 @@ export default function CustomerView() {
 
             {activeTab === 'menu' && (
                 <>
-                    {/* Banner Promo */}
-                    <section className={activeTheme.bannerBg}>
-                        <div
-                            className={`absolute -top-12 -right-12 size-36 rounded-full blur-3xl ${isNanoBanana ? 'bg-amber-500/20' : 'bg-emerald-500/10'}`}
-                        />
-                        <div className="relative z-10">
-                            <span className={activeTheme.badge}>
-                                <SparklesIcon
-                                    className={`size-3 ${isNanoBanana ? 'text-amber-300' : 'text-emerald-400'}`}
-                                />{' '}
-                                {isNanoBanana ? 'Cyber Gold Executive Dining' : 'Premium Dining Experience'}
-                            </span>
-                            <h2 className="text-xl font-extrabold text-white tracking-tight leading-tight">
-                                Sajian Cita Rasa Terbaik
-                            </h2>
-                            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                                Pesan hidangan otentik langsung ke dapur dari genggaman Anda.
-                            </p>
-                        </div>
-                    </section>
+
 
                     {/* SearchIcon bar */}
                     <div className="px-4 pt-4 pb-1">
