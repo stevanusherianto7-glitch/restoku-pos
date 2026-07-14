@@ -27,33 +27,27 @@ import { RoleGuard } from '../../Components/RoleGuard';
 import DailyPinBadge from '../../Components/DailyPinBadge';
 
 // ─── Menu Catalog ─────────────────────────────────────────────────────────────
-// Foto menu diarahkan ke Cloudinary (sesuai konvensi Restoku: jangan hardcode
-// /images lokal). Saat modul upload owner aktif, path diganti jadi URL Cloudinary
-// penuh; ProductImage menangani fallback bila gambar gagal dimuat.
-// Cloud name milik Restoku (publik, aman di client). Multi-tenant dynamic cloud
-// bisa di-override via shared prop di masa depan, tapi default tetap ini.
-const CLOUDINARY_BASE = 'https://res.cloudinary.com/dwdaydzsh/image/upload';
-const MENU_CATALOG = [
-    {
-        id: 1,
-        name: 'Nasi Goreng Spesial',
-        price: 25000,
-        category: 'Makanan',
-        image: `${CLOUDINARY_BASE}/nasi_goreng.webp`,
-    },
-    { id: 2, name: 'Mie Goreng Jawa', price: 25000, category: 'Makanan' },
-    { id: 3, name: 'Sate Ayam Madura', price: 35000, category: 'Makanan' },
-    { id: 4, name: 'Soto Ayam Lamongan', price: 22000, category: 'Makanan' },
-    { id: 7, name: 'Es Teh Manis', price: 5000, category: 'Minuman', image: `${CLOUDINARY_BASE}/es_teh.webp` },
-    { id: 8, name: 'Es Jeruk Peras', price: 8000, category: 'Minuman' },
-    { id: 9, name: 'Kopi Susu Aren', price: 18000, category: 'Minuman' },
-    { id: 10, name: 'Pisang Goreng Keju', price: 15000, category: 'Pelengkap' },
-] as const;
+// Menu diambil dari DB (prop `posMenu`) — bukan hardcode. Foto menu sudah
+// berupa URL Cloudinary penuh (field `image`), ProductImage menangani fallback
+// bila gambar gagal dimuat. Cloud name milik Restoku (publik, aman di client).
 
-function POSInner() {
+type PosMenuItem = {
+    id: number;
+    name: string;
+    price: number;
+    category: string;
+    image?: string | null;
+    description?: string | null;
+    is_popular?: boolean;
+};
+
+function POSInner({ posMenu = [] }: { posMenu: PosMenuItem[] }) {
     const { screenMode } = useTenantSettings();
     const isNanoBanana = screenMode === 'nano-banana';
     const cart = useCart();
+
+    // Menu dari DB (Cloudinary URLs via field `image`). Fallback aman bila prop kosong.
+    const [catalog] = useState<PosMenuItem[]>(posMenu ?? []);
 
     // ── Tax Config dari Inertia Shared Props ──────────────────────────────────
     // MIGRASI dari localStorage ke usePage().props.outlet_settings
@@ -103,7 +97,7 @@ function POSInner() {
                                     const name = match ? match[2].trim() : itemStr.trim();
 
                                     // Find price in catalog (case insensitive search)
-                                    const catalogItem = MENU_CATALOG.find(
+                                    const catalogItem = catalog.find(
                                         (c) =>
                                             c.name.toLowerCase().replace(/\s+/g, '') ===
                                             name.toLowerCase().replace(/\s+/g, ''),
@@ -197,7 +191,7 @@ function POSInner() {
                 const match = itemStr.match(/^(\d+)x\s+(.+)$/);
                 const qty = match ? parseInt(match[1]) : 1;
                 const name = match ? match[2].trim() : itemStr.trim();
-                const catalogItem = MENU_CATALOG.find(
+                const catalogItem = catalog.find(
                     (c) => c.name.toLowerCase().replace(/\s+/g, '') === name.toLowerCase().replace(/\s+/g, ''),
                 );
                 const price = catalogItem ? catalogItem.price : 20000;
@@ -213,7 +207,7 @@ function POSInner() {
                 const match = itemStr.match(/^(\d+)x\s+(.+)$/);
                 const qty = match ? parseInt(match[1]) : 1;
                 const name = match ? match[2].trim() : itemStr.trim();
-                const catalogItem = MENU_CATALOG.find(
+                const catalogItem = catalog.find(
                     (c) => c.name.toLowerCase().replace(/\s+/g, '') === name.toLowerCase().replace(/\s+/g, ''),
                 );
                 const price = catalogItem ? catalogItem.price : 20000;
@@ -353,7 +347,7 @@ function POSInner() {
         ['cash', 'qris', 'gopay', 'ovo', 'dana', 'bank_transfer'].includes(k),
     );
 
-    const filteredMenu = MENU_CATALOG.filter((p) => {
+    const filteredMenu = catalog.filter((p) => {
         const matchesCat = activeCategory === 'Semua' || p.category === activeCategory;
         const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCat && matchesSearch;
@@ -1055,7 +1049,7 @@ function POSInner() {
 }
 
 // --- Role Guard Wrapper -------------------------------------------------------
-export default function POS() {
+export default function POS({ posMenu = [] }: { posMenu?: PosMenuItem[] }) {
     // Gate: kasir harus buka shift dulu sebelum bisa transaksi.
     // localStorage.kasir_shift_open diset 'true' oleh CashierSession saat "Buka Sesi".
     const shiftOpen = typeof window !== 'undefined' && localStorage.getItem('kasir_shift_open') === 'true';
@@ -1068,7 +1062,7 @@ export default function POS() {
             pageName="POS Kasir"
             allowedRoleLabel="Kasir, Manager, Owner"
         >
-            <POSInner />
+            <POSInner posMenu={posMenu} />
         </RoleGuard>
     );
 }

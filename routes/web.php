@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\CashierController;
-use App\Http\Controllers\CashierGeoVerifyController;
-use App\Http\Controllers\GuestVerifyController;
-use App\Http\Controllers\OutletTableController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\OAuthController;
+use App\Http\Controllers\CashierController;
+use App\Http\Controllers\CashierGeoVerifyController;
 use App\Http\Controllers\GeminiAiController;
+use App\Http\Controllers\GoogleReviewController;
+use App\Http\Controllers\GuestVerifyController;
 use App\Http\Controllers\KdsController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OutletSettingsController;
+use App\Http\Controllers\OutletTableController;
 use App\Http\Controllers\OwnerDashboardController;
-use App\Http\Controllers\GoogleReviewController;
+use App\Http\Controllers\PosController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\PublicOrderController;
 use Illuminate\Support\Facades\Route;
@@ -28,15 +29,15 @@ Route::get('/', fn () => Inertia::render('LandingPage/Index'));
 // Simulasi trial 14 hari (PRD non-goal: no payment gateway bawaan).
 use App\Http\Controllers\SubscriptionController;
 
-Route::get('/subscribe/{plan}',  [SubscriptionController::class, 'show'])
+Route::get('/subscribe/{plan}', [SubscriptionController::class, 'show'])
     ->name('subscribe.show');
 Route::post('/subscribe/{plan}', [SubscriptionController::class, 'store'])
     ->name('subscribe.store')
     ->middleware('throttle:10,1');
 
-Route::get('/login',       fn () => Inertia::render('Auth/StaffLogin'))->name('login');
+Route::get('/login', fn () => Inertia::render('Auth/StaffLogin'))->name('login');
 Route::get('/owner/login', fn () => Inertia::render('Auth/OwnerLogin'))->name('owner.login');
-Route::post('/login',       [AuthenticatedSessionController::class, 'storeStaff'])->middleware('throttle:10,1');
+Route::post('/login', [AuthenticatedSessionController::class, 'storeStaff'])->middleware('throttle:10,1');
 Route::post('/owner/login', [AuthenticatedSessionController::class, 'storeOwner'])->middleware('throttle:10,1');
 
 // ── OAuth "Masuk dengan Google" (khusus owner) ─────────────────────────
@@ -45,18 +46,18 @@ Route::get('/oauth/google', [OAuthController::class, 'redirect'])->name('oauth.g
 Route::get('/oauth/google/callback', [OAuthController::class, 'callback'])->middleware('throttle:10,1')->name('oauth.google.callback');
 
 // Guest-facing digital menu & order (QR code meja)
-Route::get('/order',         fn () => Inertia::render('BukuMenuDigital/CustomerView'));
+Route::get('/order', fn () => Inertia::render('BukuMenuDigital/CustomerView'));
 // Fase 1: URL buku menu tamu pakai slug outlet dinamis (bukan hardcode 'senopati')
-Route::get('/m/{slug}',       fn (string $slug) => Inertia::render('BukuMenuDigital/CustomerView', ['slug' => $slug]));
+Route::get('/m/{slug}', fn (string $slug) => Inertia::render('BukuMenuDigital/CustomerView', ['slug' => $slug]));
 // API buku menu publik (read-only, by slug outlet) — untuk CustomerView
 Route::get('/api/menu/{slug}', [PublicOrderController::class, 'getPublicMenu']);
 
 // Guest order endpoints (BUG-006 FIX: tenant diidentifikasi via outlet_id, bukan req body)
 // C2 (Security Audit): throttle wajib — endpoint publik CSRF-exempt rentan spam/DoS.
-Route::post('/api/orders',        [PublicOrderController::class, 'submitOrder'])->middleware('throttle:30,1');
-Route::get('/api/orders/{id}',    [PublicOrderController::class, 'getOrderStatus']);
-Route::get('/api/reservations',   [PublicOrderController::class, 'getReservations']);
-Route::post('/api/reservations',  [PublicOrderController::class, 'submitReservation'])->middleware('throttle:30,1');
+Route::post('/api/orders', [PublicOrderController::class, 'submitOrder'])->middleware('throttle:30,1');
+Route::get('/api/orders/{id}', [PublicOrderController::class, 'getOrderStatus']);
+Route::get('/api/reservations', [PublicOrderController::class, 'getReservations']);
+Route::post('/api/reservations', [PublicOrderController::class, 'submitReservation'])->middleware('throttle:30,1');
 // Jam operasional outlet — publik untuk CustomerView (tidak butuh auth)
 Route::get('/api/outlet-operating-hours', [PublicOrderController::class, 'getOutletOperatingHours']);
 
@@ -64,7 +65,6 @@ Route::get('/api/outlet-operating-hours', [PublicOrderController::class, 'getOut
 Route::post('/api/guest/verify', [GuestVerifyController::class, 'verify'])->middleware('throttle:30,1');
 // Publik: PIN harian restoran untuk tamu (verifikasi kehadiran di kedai, by slug)
 Route::get('/api/guest/daily-pin', [GuestVerifyController::class, 'dailyPin']);
-
 
 /*
 |--------------------------------------------------------------------------
@@ -90,62 +90,62 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         $role = optional(auth()->user())->role;
 
         return match ($role) {
-            'owner'    => Inertia::render('Dashboard/Index'),
-            'manager'  => redirect('/laporan-penjualan'),
-            'kasir'    => redirect('/pos'),
-            'cashier'  => redirect('/pos'), // seeder DB memakai 'cashier'
-            'waiter'   => redirect('/waiter-bar'),
-            'kitchen'  => redirect('/kds'),
-            default    => redirect('/login'),
+            'owner' => Inertia::render('Dashboard/Index'),
+            'manager' => redirect('/laporan-penjualan'),
+            'kasir' => redirect('/pos'),
+            'cashier' => redirect('/pos'), // seeder DB memakai 'cashier'
+            'waiter' => redirect('/waiter-bar'),
+            'kitchen' => redirect('/kds'),
+            default => redirect('/login'),
         };
     })->name('dashboard');
-    Route::get('/laporan-keuangan',   fn () => Inertia::render('Dashboard/Reports'))->name('reports');
-    Route::get('/owner/dashboard',    [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
+    Route::get('/laporan-keuangan', fn () => Inertia::render('Dashboard/Reports'))->name('reports');
+    Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
     // Fase 3 — API dashboard pakai rollup (bukan scan orders). Query param ?days=30&outlet_id=
     Route::get('/api/owner/sales-summary', [OwnerDashboardController::class, 'salesSummary'])->name('owner.sales-summary');
     // Fase 4 — Baca orders yang sudah diarsip (cold storage, read-only compliance)
     Route::get('/api/owner/archived-orders', [OwnerDashboardController::class, 'archivedOrders'])->name('owner.archived-orders');
     // Fase Audit-Followup — Health Redis untuk owner/monitoring
     Route::get('/api/owner/redis-health', [OwnerDashboardController::class, 'redisHealth'])->name('owner.redis-health');
-    Route::get('/owner/settings',     fn () => Inertia::render('Owner/Settings'))->name('owner.settings');
-    Route::get('/owner/employees',    fn () => Inertia::render('Owner/Employees'))->name('owner.employees');
+    Route::get('/owner/settings', fn () => Inertia::render('Owner/Settings'))->name('owner.settings');
+    Route::get('/owner/employees', fn () => Inertia::render('Owner/Employees'))->name('owner.employees');
     Route::get('/owner/inventory/alerts', fn () => Inertia::render('Owner/InventoryAlerts'))->name('owner.inventory.alerts');
-    Route::get('/admin/employees',    fn () => Inertia::render('Admin/Employees'))->name('admin.employees');
+    Route::get('/admin/employees', fn () => Inertia::render('Admin/Employees'))->name('admin.employees');
 
     // ── Meja outlet (PIN untuk display owner/waiter) ────────────────────────
     Route::get('/api/outlet-tables/{outlet}', [OutletTableController::class, 'index'])->middleware('throttle:60,1');
 
     // ── POS & Operasional (semua plan) ──────────────────────────────────────
-    Route::get('/pos',               fn () => Inertia::render('POS/Index'));
-    Route::get('/katalog-menu',      fn () => Inertia::render('KatalogMenu/Index'));
-    Route::get('/manajemen-meja',    fn () => Inertia::render('ManajemenMeja/Index'));
+    Route::get('/pos', [PosController::class, 'menuView']);
+    Route::get('/katalog-menu', [MenuController::class, 'index']);
+    Route::get('/manajemen-meja', fn () => Inertia::render('ManajemenMeja/Index'));
     Route::get('/buku-menu-digital', fn () => Inertia::render('BukuMenuDigital/Index'));
-    Route::get('/monitor-pesanan',   fn () => Inertia::render('MonitorPesanan/Index'));
-    Route::get('/waiter-bar',        fn () => Inertia::render('WaiterBar/Index'));
+    Route::get('/monitor-pesanan', fn () => Inertia::render('MonitorPesanan/Index'));
+    Route::get('/waiter-bar', fn () => Inertia::render('WaiterBar/Index'));
     Route::get('/monitor-reservasi', fn () => Inertia::render('MonitorReservasi/Index'));
-    Route::get('/diskon-pajak',      fn () => Inertia::render('DiskonPajak/Index'));
-    Route::get('/qrcode-meja',       fn () => Inertia::render('QRCodeMeja/Index'));
-    Route::get('/printer-config',    fn () => Inertia::render('PrinterConfig/Index'));
+    Route::get('/diskon-pajak', fn () => Inertia::render('DiskonPajak/Index'));
+    Route::get('/qrcode-meja', fn () => Inertia::render('QRCodeMeja/Index'));
+    Route::get('/printer-config', fn () => Inertia::render('PrinterConfig/Index'));
     Route::get('/print-job-monitor', fn () => Inertia::render('PrintJobMonitor/Index'));
-    Route::get('/tts-settings',      fn () => Inertia::render('TTSSettings/Index'));
+    Route::get('/tts-settings', fn () => Inertia::render('TTSSettings/Index'));
 
     // ── Fitur Pro ───────────────────────────────────────────────────────────
-    Route::get('/laporan-penjualan',   fn () => Inertia::render('LaporanPenjualan/Index'));
+    Route::get('/laporan-penjualan', fn () => Inertia::render('LaporanPenjualan/Index'));
     Route::get('/perbandingan-outlet', fn () => Inertia::render('PerbandinganOutlet/Index'))
         ->middleware('plan:perbandingan_outlet');
-    Route::get('/arus-kas',            fn () => Inertia::render('ArusKas/Index'))
+    Route::get('/arus-kas', fn () => Inertia::render('ArusKas/Index'))
         ->middleware('plan:arus_kas');
-    Route::get('/staf-shift',          fn () => Inertia::render('StafShift/Index'))
+    Route::get('/staf-shift', fn () => Inertia::render('StafShift/Index'))
         ->middleware('plan:staf_shift');
-    Route::get('/cashier-session',     fn () => Inertia::render('CashierSession/Index'))
+    Route::get('/cashier-session', fn () => Inertia::render('CashierSession/Index'))
         ->middleware('plan:cashier_session');
-    Route::get('/refund-void',         fn () => Inertia::render('RefundVoidManager/Index'))
+    Route::get('/refund-void', fn () => Inertia::render('RefundVoidManager/Index'))
         ->middleware('plan:refund_void');
-    Route::get('/inventory',           fn () => Inertia::render('Inventory/Index'))
+    Route::get('/inventory', fn () => Inertia::render('Inventory/Index'))
         ->middleware('plan:inventory');
-    Route::get('/pembelian-vendor',    fn () => Inertia::render('PembelianVendor/Index'))
+    Route::get('/pembelian-vendor', fn () => Inertia::render('PembelianVendor/Index'))
         ->middleware('plan:pembelian_vendor');
-    Route::get('/stok-opname',         fn () => Inertia::render('StokOpname/Index'))
+    Route::get('/stok-opname', fn () => Inertia::render('StokOpname/Index'))
         ->middleware('plan:stok_opname');
     Route::get('/dashboard-inventory', fn () => Inertia::render('DashboardInventory/Index'))
         ->middleware('plan:dashboard_inventory');
@@ -160,53 +160,54 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/pengaturan-outlet', [OutletSettingsController::class, 'index']);
 
     Route::prefix('api/outlet-settings')->middleware('throttle:60,1')->group(function () {
-        Route::put('/all',    [OutletSettingsController::class, 'updateAll']);
+        Route::put('/all', [OutletSettingsController::class, 'updateAll']);
         Route::put('/profil', [OutletSettingsController::class, 'updateProfil']);
         Route::put('/lokasi', [OutletSettingsController::class, 'updateLokasi']);
-        Route::put('/pajak',  [OutletSettingsController::class, 'updatePajak']);
-        Route::put('/jam',    [OutletSettingsController::class, 'updateJam']);
-        Route::get('/',                 [OutletSettingsController::class, 'listKaryawan'])->name('karyawan.index');
-        Route::post('/karyawan',        [OutletSettingsController::class, 'createKaryawan']);
-        Route::put('/karyawan/{id}',    [OutletSettingsController::class, 'updateKaryawan']);
+        Route::put('/pajak', [OutletSettingsController::class, 'updatePajak']);
+        Route::put('/jam', [OutletSettingsController::class, 'updateJam']);
+        Route::get('/', [OutletSettingsController::class, 'listKaryawan'])->name('karyawan.index');
+        Route::post('/karyawan', [OutletSettingsController::class, 'createKaryawan']);
+        Route::put('/karyawan/{id}', [OutletSettingsController::class, 'updateKaryawan']);
         Route::delete('/karyawan/{id}', [OutletSettingsController::class, 'deleteKaryawan']);
-        Route::post('/bulk-outlets',    [OutletSettingsController::class, 'bulkCreateOutlets'])->middleware('throttle:30,1');
+        Route::post('/bulk-outlets', [OutletSettingsController::class, 'bulkCreateOutlets'])->middleware('throttle:30,1');
     });
 
     // ── KDS API ─────────────────────────────────────────────────────────────
-    Route::get('/api/orders',                        [KdsController::class, 'getKdsOrders']);
-    Route::put('/api/orders/{id}/status',            [KdsController::class, 'updateOrderStatus']);
+    Route::get('/api/orders', [KdsController::class, 'getKdsOrders']);
+    Route::put('/api/orders/{id}/status', [KdsController::class, 'updateOrderStatus']);
 
     // ── Cashier API ────────────────────────────────────────────────────────
-    Route::get('/api/cashier-queue',                 [CashierController::class, 'getCashierQueue']);
-    Route::delete('/api/cashier-queue/{id}',         [CashierController::class, 'clearCashierQueueItem']);
+    Route::get('/api/cashier-queue', [CashierController::class, 'getCashierQueue']);
+    Route::delete('/api/cashier-queue/{id}', [CashierController::class, 'clearCashierQueueItem']);
 
     // ── Print & Receipt API ────────────────────────────────────────────────
-    Route::get('/api/print-jobs',                    [PrintController::class, 'getPrintJobs']);
-    Route::post('/api/print-receipt',                [PrintController::class, 'printReceipt']);
-    Route::get('/api/receipt-config',                [PrintController::class, 'getReceiptConfig']);
-    Route::post('/api/receipt-config',               [PrintController::class, 'updateReceiptConfig']);
+    Route::get('/api/print-jobs', [PrintController::class, 'getPrintJobs']);
+    Route::post('/api/print-receipt', [PrintController::class, 'printReceipt']);
+    Route::get('/api/receipt-config', [PrintController::class, 'getReceiptConfig']);
+    Route::post('/api/receipt-config', [PrintController::class, 'updateReceiptConfig']);
 
     // ── Reservation Status Update ──────────────────────────────────────────
-    Route::put('/api/reservations/{id}/status',      [PublicOrderController::class, 'updateReservationStatus']);
+    Route::put('/api/reservations/{id}/status', [PublicOrderController::class, 'updateReservationStatus']);
 
     // ── AI Chat ────────────────────────────────────────────────────────────
-    Route::post('/api/ai/chat',                      [GeminiAiController::class, 'chat'])->middleware('throttle:20,1');
+    Route::post('/api/ai/chat', [GeminiAiController::class, 'chat'])->middleware('throttle:20,1');
 
     // ── Menu Management (Fase 1) ──────────────────────────────────────────────
-    Route::post('/api/menu',                    [MenuController::class, 'store'])->middleware('throttle:30,1');
-    Route::put('/api/menu/{id}',                [MenuController::class, 'update'])->middleware('throttle:30,1');
-    Route::delete('/api/menu/{id}',             [MenuController::class, 'destroy'])->middleware('throttle:30,1');
+    Route::get('/api/pos/menu', [PosController::class, 'menu']);
+    Route::post('/api/menu', [MenuController::class, 'store'])->middleware('throttle:30,1');
+    Route::put('/api/menu/{id}', [MenuController::class, 'update'])->middleware('throttle:30,1');
+    Route::delete('/api/menu/{id}', [MenuController::class, 'destroy'])->middleware('throttle:30,1');
 
-    Route::get('/owner/google-reviews',              [GoogleReviewController::class, 'viewPanel'])
+    Route::get('/owner/google-reviews', [GoogleReviewController::class, 'viewPanel'])
         ->name('owner.reviews');
-    Route::get('/api/google-reviews',                [GoogleReviewController::class, 'index']);
-    Route::post('/api/google-reviews/{id}/reply',    [GoogleReviewController::class, 'reply']);
+    Route::get('/api/google-reviews', [GoogleReviewController::class, 'index']);
+    Route::post('/api/google-reviews/{id}/reply', [GoogleReviewController::class, 'reply']);
     Route::post('/api/google-reviews/{id}/generate-ai-reply', [GoogleReviewController::class, 'generateAiReply']);
-    Route::post('/api/google-reviews/settings',      [GoogleReviewController::class, 'saveSettings']);
+    Route::post('/api/google-reviews/settings', [GoogleReviewController::class, 'saveSettings']);
 
     // ── Kasir: Verifikasi Geolokasi (PIN harian + GPS) ───────────────────────
     // SECURITY FIX: Pindahkan ke dalam auth+tenant group agar tidak bisa diakses anonim.
-    Route::get('/owner/outlet/daily-pin',        [CashierGeoVerifyController::class, 'dailyPin']);
-    Route::post('/api/cashier/verify-location',  [CashierGeoVerifyController::class, 'verify'])
+    Route::get('/owner/outlet/daily-pin', [CashierGeoVerifyController::class, 'dailyPin']);
+    Route::post('/api/cashier/verify-location', [CashierGeoVerifyController::class, 'verify'])
         ->middleware('throttle:10,1');
 });

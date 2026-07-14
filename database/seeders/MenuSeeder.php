@@ -88,30 +88,28 @@ class MenuSeeder extends Seeder
             )->id;
         }
 
-        $this->command?->info('Seeding '.count(self::ITEMS).' menu asli ke '.count($outlets).' outlet aktif...');
+        $this->command?->info('Seeding '.count(self::ITEMS).' menu asli (global tenant, tanpa duplikat per-outlet)...');
 
         $seeded = 0;
-        foreach ($outlets as $outlet) {
-            foreach (self::ITEMS as [$name, $desc, $price, $catName, $publicId]) {
-                $imagePath = self::CLOUD.'/'.$publicId;
+        foreach (self::ITEMS as [$name, $desc, $price, $catName, $publicId]) {
+            $imagePath = self::CLOUD.'/'.$publicId;
 
-                MenuItem::firstOrCreate(
-                    ['tenant_id' => $tenant->id, 'outlet_id' => $outlet->id, 'name' => $name, 'menu_category_id' => $cats[$catName]],
-                    [
-                        'description' => $desc,
-                        'price' => $price,
-                        'image_path' => $imagePath,
-                        'image_public_id' => $publicId,
-                        'is_available' => true,
-                        'is_popular' => false,
-                        'sort_order' => 0,
-                    ]
-                );
-                $seeded++;
-            }
+            MenuItem::firstOrCreate(
+                ['tenant_id' => $tenant->id, 'outlet_id' => null, 'name' => $name, 'menu_category_id' => $cats[$catName]],
+                [
+                    'description' => $desc,
+                    'price' => $price,
+                    'image_path' => $imagePath,
+                    'image_public_id' => $publicId,
+                    'is_available' => true,
+                    'is_popular' => false,
+                    'sort_order' => 0,
+                ]
+            );
+            $seeded++;
         }
 
         Cache::flush();
-        $this->command?->info('Menu asli selesai di-seed ('.$seeded.' item di '.count($outlets).' outlet).');
+        $this->command?->info('Menu asli selesai di-seed ('.$seeded.' item, unik per tenant).');
     }
 }
