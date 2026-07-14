@@ -22,6 +22,7 @@ import {
     SparklesIcon,
 } from '../../Components/icons';
 import { ReceiptPreview } from '../../Components/POS/ReceiptPreview';
+import { CashierSession } from '../../Components/POS/CashierSession';
 import { RoleGuard } from '../../Components/RoleGuard';
 
 // ─── Menu Catalog ─────────────────────────────────────────────────────────────
@@ -1051,6 +1052,12 @@ function POSInner() {
 
 // --- Role Guard Wrapper -------------------------------------------------------
 export default function POS() {
+    // Gate: kasir harus buka shift dulu sebelum bisa transaksi.
+    // localStorage.kasir_shift_open diset 'true' oleh CashierSession saat "Buka Sesi".
+    const shiftOpen = typeof window !== 'undefined' && localStorage.getItem('kasir_shift_open') === 'true';
+
+    if (!shiftOpen) return <CashierSession />;
+
     return (
         <RoleGuard
             allowedRoles={['kasir', 'manager', 'owner']}

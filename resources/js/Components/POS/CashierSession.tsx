@@ -1,9 +1,12 @@
 import { useState, type ChangeEvent } from 'react';
+import { router } from '@inertiajs/react';
 import { Screen, Glass, Button, Input, Badge, formatRupiah } from '../Shared';
 import { CalculatorIcon, ClockIcon, DollarSignIcon, LogOutIcon, TerminalSquareIcon, AlertTriangleIcon } from '../icons';
 
 export function CashierSession() {
-    const [sessionState, setSessionState] = useState<'closed' | 'open'>('closed');
+    const [sessionState, setSessionState] = useState<'closed' | 'open'>(
+        typeof window !== 'undefined' && localStorage.getItem('kasir_shift_open') === 'true' ? 'open' : 'closed',
+    );
     const [openingBalance, setOpeningBalance] = useState('500000');
 
     const [closingCash, setClosingCash] = useState('3250000');
@@ -95,7 +98,13 @@ export function CashierSession() {
                                 </div>
                             </div>
 
-                            <Button className="w-full h-12 text-base mt-2" onClick={() => setSessionState('open')}>
+                            <Button
+                                className="w-full h-12 text-base mt-2"
+                                onClick={() => {
+                                    localStorage.setItem('kasir_shift_open', 'true');
+                                    router.visit('/pos');
+                                }}
+                            >
                                 Buka Sesi & Mulai Transaksi
                             </Button>
                         </div>
