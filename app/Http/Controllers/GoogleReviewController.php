@@ -31,8 +31,9 @@ class GoogleReviewController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+        $outletId = $user->outlet_id ?: Outlet::where('tenant_id', $user->tenant_id)->orderBy('id')->value('id');
         $outlet = Outlet::withoutGlobalScope(TenantScope::class)
-            ->where('id', $user->outlet_id)
+            ->where('id', $outletId)
             ->first();
 
         $placeId = $outlet?->google_place_id;
@@ -117,8 +118,9 @@ class GoogleReviewController extends Controller
             ], 422);
         }
 
+        $outletId = $user->outlet_id ?: Outlet::where('tenant_id', $user->tenant_id)->orderBy('id')->value('id');
         $outlet = Outlet::withoutGlobalScope(TenantScope::class)
-            ->where('id', $user->outlet_id)
+            ->where('id', $outletId)
             ->firstOrFail();
         $outlet->update(['google_place_id' => $placeId]);
 
@@ -161,13 +163,23 @@ class GoogleReviewController extends Controller
 
             return response()->json(['status' => 'success', 'reply' => trim((string) $response)]);
         } catch (\Exception $e) {
-            Log::error('[AI Review Reply] Error: '.$e->getMessage());
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal membuat balasan AI. Silakan coba lagi.',
-            ], 502);
+            Log::warning('[AI Review Reply] Primary provider failed: '.$e->getMessage().'. Attempting fallback to gemini.');
+            try {
+                // Set default provider to gemini at runtime
+                config(['ai.default' => 'gemini']);
+                
+                $response = RestokuAiAssistant::make()->prompt($prompt);
+                
+                return response()->json(['status' => 'success', 'reply' => trim((string) $response)]);
+            } catch (\Exception $fallbackException) {
+                Log::error('[AI Review Reply] Fallback to gemini also failed: '.$fallbackException->getMessage());
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal membuat balasan AI: ' . $fallbackException->getMessage(),
+                ], 502);
+            }
         }
+
     }
 
     /**

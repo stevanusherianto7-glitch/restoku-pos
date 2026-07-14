@@ -85,7 +85,7 @@ export default function GoogleReviews() {
         try {
             const res = await fetch('/api/google-reviews/settings', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'XIcon-CSRF-TOKEN': csrf() },
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() },
                 body: JSON.stringify({ google_place_link: placeLink }),
             });
             const data = await res.json();
@@ -110,7 +110,7 @@ export default function GoogleReviews() {
         try {
             const res = await fetch(`/api/google-reviews/${reviewId}/reply`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'XIcon-CSRF-TOKEN': csrf() },
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() },
                 body: JSON.stringify({ reply_text: replyText }),
             });
             const data = await res.json();
@@ -135,7 +135,7 @@ export default function GoogleReviews() {
         try {
             const res = await fetch(`/api/google-reviews/${reviewId}/generate-ai-reply`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'XIcon-CSRF-TOKEN': csrf() },
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() },
             });
             const data = await res.json();
             if (data.status === 'success') {

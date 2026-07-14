@@ -56,12 +56,24 @@ class GeminiAiController extends Controller
                 'reply' => (string) $response,
             ]);
         } catch (\Exception $e) {
-            Log::error('[Gemini AI] Error: '.$e->getMessage());
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Maaf, Gemini AI sedang sibuk atau mengalami kendala koneksi.',
-            ], 500);
+            Log::warning('[Gemini AI] Primary provider failed: '.$e->getMessage().'. Attempting fallback to gemini.');
+            try {
+                config(['ai.default' => 'gemini']);
+                
+                $response = RestokuAiAssistant::make()->prompt($prompt);
+                
+                return response()->json([
+                    'status' => 'success',
+                    'reply' => (string) $response,
+                ]);
+            } catch (\Exception $fallbackException) {
+                Log::error('[Gemini AI] Fallback to gemini also failed: '.$fallbackException->getMessage());
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Maaf, Asisten AI sedang sibuk atau mengalami kendala koneksi.',
+                ], 500);
+            }
         }
+
     }
 }

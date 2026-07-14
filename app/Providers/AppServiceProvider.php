@@ -48,5 +48,29 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal()) {
             Http::globalOptions(['verify' => false]);
         }
+
+        // Fallback untuk AI default provider jika Groq/DeepSeek API key tidak valid / placeholder
+        $defaultProvider = config('ai.default');
+        if ($defaultProvider === 'groq') {
+            $groqKey = config('ai.providers.groq.key');
+            if (empty($groqKey) || str_contains($groqKey, 'placeholder') || str_contains($groqKey, 'your-groq-api-key') || str_contains($groqKey, 'your_groq_api_key')) {
+                // Gunakan Gemini sebagai fallback jika key Gemini valid
+                $geminiKey = config('ai.providers.gemini.key');
+                if (!empty($geminiKey) && !str_contains($geminiKey, 'placeholder')) {
+                    config(['ai.default' => 'gemini']);
+                }
+            }
+        } elseif ($defaultProvider === 'deepseek') {
+            $deepseekKey = config('ai.providers.deepseek.key');
+            if (empty($deepseekKey) || str_contains($deepseekKey, 'placeholder') || str_contains($deepseekKey, 'your-deepseek-api-key') || str_contains($deepseekKey, 'your_deepseek_api_key')) {
+                // Gunakan Gemini sebagai fallback jika key Gemini valid
+                $geminiKey = config('ai.providers.gemini.key');
+                if (!empty($geminiKey) && !str_contains($geminiKey, 'placeholder')) {
+                    config(['ai.default' => 'gemini']);
+                }
+            }
+        }
     }
+
+
 }

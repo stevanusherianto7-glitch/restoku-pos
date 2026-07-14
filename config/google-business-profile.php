@@ -26,6 +26,8 @@ return [
     'places_api_key' => env('GOOGLE_PLACES_API_KEY', ''),
     'places_api_base' => 'https://maps.googleapis.com/maps/api/place/details/json',
     'geocode_api_base' => 'https://maps.googleapis.com/maps/api/geocode/json',
+    'serpapi_key' => env('SERPAPI_KEY', ''),
+
 
     /*
      * Override accountId GBP (resource name: accounts/{id}).

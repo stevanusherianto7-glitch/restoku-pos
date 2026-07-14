@@ -28,9 +28,8 @@ class GoogleReviewApiTest extends TestCase
     {
         parent::setUp();
 
-        // Test harus deterministic: paksa provider Groq + fake HTTP agar
-        // tidak bergantung pada AI_DEFAULT_PROVIDER di .env (CI tidak punya .env).
         config(['ai.default' => 'groq']);
+        config(['google-business-profile.serpapi_key' => '']);
 
         $tenant = Tenant::create([
             'name' => 'R', 'brand_name' => 'R', 'email' => 'r@t.com', 'phone' => '1',

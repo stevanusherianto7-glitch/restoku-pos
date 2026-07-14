@@ -206,43 +206,97 @@ class GoogleBusinessProfileService
         $cacheKey = "gbp_reviews_places_{$placeId}";
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
-            return $cached;
+            $reviews = collect($cached['reviews'] ?? [])->map(fn($attrs) => (new GoogleReview)->forceFill($attrs))->all();
+            return [
+                'rating' => $cached['rating'] ?? null,
+                'user_ratings_total' => $cached['user_ratings_total'] ?? null,
+                'reviews' => $reviews,
+            ];
         }
 
-        $key = config('google-business-profile.places_api_key');
-        if (! $key) {
-            throw new \RuntimeException('GOOGLE_PLACES_API_KEY belum dikonfigurasi.');
+        $serpKey = config('google-business-profile.serpapi_key');
+        $isSerpKeyValid = ($serpKey && !str_contains($serpKey, 'placeholder') && $serpKey !== 'test-key');
+
+        if ($isSerpKeyValid) {
+            $resp = Http::get('https://serpapi.com/search.json', [
+                'engine' => 'google_maps_reviews',
+                'place_id' => $placeId,
+                'api_key' => $serpKey,
+            ]);
+
+            if (!$resp->successful()) {
+                throw new \RuntimeException('SerpApi: ' . ($resp->json('error') ?? $resp->body()));
+            }
+
+            $body = $resp->json();
+            $reviews = [];
+            foreach ($body['reviews'] ?? [] as $r) {
+                $reviews[] = [
+                    'author_name' => $r['user']['name'] ?? 'Anonim',
+                    'profile_photo_url' => $r['user']['thumbnail'] ?? null,
+                    'rating' => (int) ($r['rating'] ?? 0),
+                    'text' => $r['snippet'] ?? $r['comment'] ?? '',
+                    'time' => isset($r['iso_date']) ? Carbon::parse($r['iso_date'])->timestamp : time(),
+                    'review_id' => $r['review_id'] ?? null,
+                    'reply_text' => $r['response']['text'] ?? null,
+                    'replied_at' => isset($r['response']['iso_date']) ? Carbon::parse($r['response']['iso_date'])->timestamp : null,
+                ];
+            }
+
+            $result = [
+                'rating' => $body['place_info']['rating'] ?? null,
+                'user_ratings_total' => $body['place_info']['reviews'] ?? null,
+                'reviews' => $reviews,
+            ];
+        } else {
+            $key = config('google-business-profile.places_api_key');
+            if (! $key) {
+                throw new \RuntimeException('GOOGLE_PLACES_API_KEY / SERPAPI_KEY belum dikonfigurasi.');
+            }
+
+            $resp = Http::get(config('google-business-profile.places_api_base'), [
+                'place_id' => $placeId,
+                'fields' => 'reviews,rating,user_ratings_total',
+                'key' => $key,
+            ]);
+
+            $body = $resp->json();
+            if (($body['status'] ?? '') !== 'OK') {
+                throw new \RuntimeException('Google Places API: '.($body['error_message'] ?? $body['status'] ?? 'unknown'));
+            }
+
+            $result = $body['result'] ?? [];
         }
 
-        $resp = Http::get(config('google-business-profile.places_api_base'), [
-            'place_id' => $placeId,
-            'fields' => 'reviews,rating,user_ratings_total',
-            'key' => $key,
-        ]);
-
-        $body = $resp->json();
-        if (($body['status'] ?? '') !== 'OK') {
-            throw new \RuntimeException('Google Places API: '.($body['error_message'] ?? $body['status'] ?? 'unknown'));
-        }
-
-        $result = $body['result'] ?? [];
         $rows = [];
         foreach ($result['reviews'] ?? [] as $r) {
-            $rid = (string) ($r['time'] ?? uniqid('rev_'));
+            $rid = (string) ($r['review_id'] ?? $r['time'] ?? uniqid('rev_'));
+            
+            $updateAttrs = [
+                'outlet_id' => $outletId,
+                'reviewer_name' => $r['author_name'] ?? 'Anonim',
+                'reviewer_photo' => $r['profile_photo_url'] ?? null,
+                'rating' => (int) ($r['rating'] ?? 0),
+                'comment' => $r['text'] ?? '',
+                'reviewed_at' => isset($r['time'])
+                    ? Carbon::createFromTimestamp((int) $r['time'])
+                    : now(),
+                'source' => 'places',
+            ];
+
+            if (array_key_exists('reply_text', $r)) {
+                $updateAttrs['reply_text'] = $r['reply_text'];
+            }
+            if (array_key_exists('replied_at', $r)) {
+                $updateAttrs['replied_at'] = isset($r['replied_at'])
+                    ? Carbon::createFromTimestamp((int) $r['replied_at'])
+                    : null;
+            }
+
             $review = GoogleReview::withoutGlobalScope(TenantScope::class)
                 ->updateOrCreate(
                     ['tenant_id' => $tenantId, 'google_review_id' => $rid],
-                    [
-                        'outlet_id' => $outletId,
-                        'reviewer_name' => $r['author_name'] ?? 'Anonim',
-                        'reviewer_photo' => $r['profile_photo_url'] ?? null,
-                        'rating' => (int) ($r['rating'] ?? 0),
-                        'comment' => $r['text'] ?? '',
-                        'reviewed_at' => isset($r['time'])
-                            ? Carbon::createFromTimestamp((int) $r['time'])
-                            : now(),
-                        'source' => 'places',
-                    ]
+                    $updateAttrs
                 );
             $rows[] = $review;
         }
@@ -255,7 +309,13 @@ class GoogleBusinessProfileService
             'reviews' => $rows,
         ];
 
-        Cache::put($cacheKey, $payload, config('google-business-profile.cache_ttl'));
+        $cachedPayload = [
+            'rating' => $result['rating'] ?? null,
+            'user_ratings_total' => $result['user_ratings_total'] ?? null,
+            'reviews' => collect($rows)->map(fn($r) => $r->attributesToArray())->all(),
+        ];
+
+        Cache::put($cacheKey, $cachedPayload, config('google-business-profile.cache_ttl'));
 
         return $payload;
     }
