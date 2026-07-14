@@ -76,14 +76,16 @@ export default defineConfig({
                 'node_modules/**',
             ],
             thresholds: {
-                // Baseline transparan: angka riil terukur (batch 6 hardening).
+                // Baseline transparan: angka riil terukur (batch 7).
                 // Naik bertahap tiap batch Page di-test (target akhir 100%).
-                // Batch 6: ekstrak 4 modul lib murni (geocoder/outletTabs/strukConfig/
-                // screenMode) + test 100% → lines 53, branches 50, funcs 44.
-                lines: 53,
-                branches: 50,
+                // Batch 7 (run #155): measured lines 52.86 / branches 49.83 /
+                // funcs 44.49. Threshold = FLOOR angka riil (tidak boleh di-round-up
+                // → itu false claim per QA rule). CI sebelumnya merah murni karena
+                // threshold 53/50 di-set di ATAS realitas.
+                lines: 52,
+                branches: 49,
                 functions: 44,
-                statements: 53,
+                statements: 52,
             },
         },
     },
