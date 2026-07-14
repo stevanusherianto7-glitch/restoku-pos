@@ -1623,15 +1623,15 @@ export default function CustomerView() {
 
             {/* Premium Success & Real-Time Tracking Modal */}
             {orderSuccess && (
-                <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-6">
-                    <div className="bg-slate-900/90 border border-white/10 rounded-3xl p-6 w-full max-w-xs flex flex-col items-center text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
+                    <div className="bg-[#FAF5EE] border border-amber-900/10 rounded-3xl p-6 w-[92%] max-w-sm flex flex-col items-center text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-[#1A1410]">
                         <div
-                            className={`size-16 rounded-full flex items-center justify-center mb-4 shadow-lg transition-all ${
+                            className={`size-16 rounded-full flex items-center justify-center mb-4 shadow-md transition-all ${
                                 orderTone === 'amber'
-                                    ? 'bg-amber-500/10 border-amber-500/20 text-amber-400 shadow-amber-500/5'
+                                    ? 'bg-amber-500/10 border-amber-500/20 text-amber-500 shadow-amber-500/5'
                                     : orderTone === 'blue'
-                                      ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 shadow-blue-500/5'
-                                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-emerald-500/5'
+                                      ? 'bg-blue-500/10 border-blue-500/20 text-blue-500 shadow-blue-500/5'
+                                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 shadow-emerald-500/5'
                             }`}
                         >
                             {orderStatus === 'Siap Sajikan' || orderStatus === 'Selesai' ? (
@@ -1640,7 +1640,7 @@ export default function CustomerView() {
                                 <span className="size-6 rounded-full border-4 border-t-transparent animate-spin border-current" />
                             )}
                         </div>
-                        <h3 className="text-base font-extrabold text-white mb-1">
+                        <h3 className="text-base font-extrabold text-[#1A1410] mb-1">
                             {orderStatus === 'Antrian Masuk'
                                 ? 'Menunggu Konfirmasi'
                                 : orderStatus === 'Sedang Dimasak'
@@ -1649,7 +1649,7 @@ export default function CustomerView() {
                                     ? 'Pesanan Siap Sajikan!'
                                     : 'Pesanan Selesai!'}
                         </h3>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                        <p className="text-xs text-[#7A6F63] leading-relaxed mb-4">
                             {orderStatus === 'Antrian Masuk'
                                 ? 'Dapur sedang meninjau pesanan Anda.'
                                 : orderStatus === 'Sedang Dimasak'
@@ -1660,18 +1660,18 @@ export default function CustomerView() {
                         </p>
 
                         {/* Real-time Status Tracker */}
-                        <div className="w-full bg-white/[0.02] border border-white/5 p-4 rounded-2xl mb-4 text-left space-y-3">
+                        <div className="w-full bg-[#FFF3EC] border border-[#FF5B35]/10 p-4 rounded-2xl mb-4 text-left space-y-3">
                             <div className="flex justify-between items-center">
-                                <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">
+                                <span className="text-[9px] uppercase font-bold text-[#7A6F63] tracking-wider">
                                     Status Pesanan
                                 </span>
                                 <span
                                     className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
                                         orderTone === 'amber'
-                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                            ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
                                             : orderTone === 'blue'
-                                              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                              ? 'bg-blue-500/10 text-blue-600 border border-blue-500/20'
+                                              : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
                                     }`}
                                 >
                                     {orderStatus}
@@ -1679,7 +1679,7 @@ export default function CustomerView() {
                             </div>
 
                             {/* Progress Bar Visualizer */}
-                            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden flex">
+                            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
                                 <div
                                     className={`h-full transition-all duration-500 ${
                                         orderStatus === 'Antrian Masuk'
@@ -1691,13 +1691,13 @@ export default function CustomerView() {
                                 />
                             </div>
 
-                            <div className="flex justify-between text-[8px] font-bold text-slate-500 uppercase tracking-wider">
-                                <span className={orderStatus === 'Antrian Masuk' ? 'text-amber-400' : ''}>Antrian</span>
-                                <span className={orderStatus === 'Sedang Dimasak' ? 'text-blue-400' : ''}>Dimasak</span>
+                            <div className="flex justify-between text-[8px] font-bold text-[#8A7D70] uppercase tracking-wider">
+                                <span className={orderStatus === 'Antrian Masuk' ? 'text-amber-600 font-extrabold' : ''}>Antrian</span>
+                                <span className={orderStatus === 'Sedang Dimasak' ? 'text-blue-600 font-extrabold' : ''}>Dimasak</span>
                                 <span
                                     className={
                                         orderStatus === 'Siap Sajikan' || orderStatus === 'Selesai'
-                                            ? 'text-emerald-400'
+                                            ? 'text-emerald-600 font-extrabold'
                                             : ''
                                     }
                                 >
@@ -1706,21 +1706,21 @@ export default function CustomerView() {
                             </div>
                         </div>
 
-                        <div className="w-full bg-white/[0.02] border border-white/5 p-3 rounded-2xl mb-4 text-left">
+                        <div className="w-full bg-white border border-amber-900/10 p-3 rounded-2xl mb-4 text-left">
                             <div className="flex justify-between">
                                 <div>
-                                    <p className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">
+                                    <p className="text-[9px] uppercase font-bold text-[#7A6F63] tracking-wider">
                                         Nomor Meja
                                     </p>
-                                    <p className="text-sm font-extrabold text-emerald-400 mt-0.5">
+                                    <p className="text-sm font-extrabold text-[#FF5B35] mt-0.5">
                                         {tableNumber ? `Meja ${tableNumber}` : 'Meja 1'}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-[9px] uppercase font-bold text-slate-500 tracking-wider text-right">
+                                    <p className="text-[9px] uppercase font-bold text-[#7A6F63] tracking-wider text-right">
                                         Order ID
                                     </p>
-                                    <p className="text-xs font-bold text-slate-300 mt-0.5 text-right">
+                                    <p className="text-xs font-bold text-[#1A1410] mt-0.5 text-right">
                                         {activeOrderId}
                                     </p>
                                 </div>
@@ -1733,7 +1733,7 @@ export default function CustomerView() {
                                 setCart({});
                                 setActiveTab('menu');
                             }}
-                            className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black transition-colors"
+                            className="w-full py-3.5 bg-[#FF5B35] hover:bg-[#E04E2B] text-white rounded-xl text-xs font-black cursor-pointer border-none shadow-md shadow-[#FF5B35]/25"
                         >
                             Pesan Menu Lainnya
                         </button>
@@ -1775,14 +1775,13 @@ function MenuDetailSheet({
     const reviews = item.reviews ?? [];
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={onClose}>
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto" onClick={onClose}>
             <div
-                className="relative w-full max-w-md mx-auto bg-[#1c1917] rounded-t-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+                className="relative w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] overflow-hidden shadow-2xl border border-amber-900/10 max-h-[85vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Hero */}
-                <div className="relative h-56 shrink-0 bg-black">
+                <div className="relative h-44 shrink-0 bg-slate-100">
                     <ProductImage
                         src={item.image}
                         alt={item.name}
@@ -1791,100 +1790,100 @@ function MenuDetailSheet({
                     />
                     <button
                         onClick={onClose}
-                        className="absolute top-3 right-3 size-9 rounded-full bg-black/50 text-white grid place-items-center backdrop-blur"
+                        className="absolute top-3 right-3 size-8 rounded-full bg-black/50 text-white grid place-items-center backdrop-blur hover:bg-black/75 cursor-pointer border-none"
                     >
                         ✕
                     </button>
                     {item.isPopular && (
-                        <span className="absolute top-3 left-3 bg-white/90 text-[#7C4A2D] font-black text-[10px] uppercase tracking-wider px-2 py-1 rounded-full">
+                        <span className="absolute top-3 left-3 bg-[#FF5B35]/15 border border-[#FF5B35]/30 text-[#FF5B35] font-black text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
                             🔥 Favorit
                         </span>
                     )}
                     <div
-                        className={`absolute bottom-3 right-3 ${accentBg} text-white font-extrabold text-sm px-3 py-1.5 rounded-full shadow-lg`}
+                        className={`absolute bottom-3 right-3 ${accentBg} text-white font-extrabold text-xs px-3 py-1.5 rounded-full shadow-md`}
                     >
                         {formatRupiah(item.price)}
                     </div>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto px-5 py-4">
-                    <h2 className="text-2xl font-extrabold text-white tracking-tight">{item.name}</h2>
-                    <p className="text-xs font-semibold text-[#D97706] mt-0.5">{outletName}</p>
+                <div className="flex-1 overflow-y-auto px-5 py-4 text-left">
+                    <h2 className="text-xl font-extrabold text-[#1A1410] tracking-tight">{item.name}</h2>
+                    <p className="text-[10px] font-bold text-[#FF5B35] uppercase tracking-wide mt-0.5">{outletName}</p>
 
-                    <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
+                    <div className="flex items-center gap-3 mt-2 text-[10px] text-[#7A6F63] font-bold">
                         <span className="text-[#F59E0B]">
                             {'★'.repeat(Math.round(item.rating ?? 4.9))}{' '}
-                            <span className="text-slate-300 font-bold">{(item.rating ?? 4.9).toFixed(1)}</span>
+                            <span className="text-[#1A1410] font-extrabold">{(item.rating ?? 4.9).toFixed(1)}</span>
                         </span>
                         {item.cookTime && <span>⏱ {item.cookTime}</span>}
                         {item.servings && <span>🍽 {item.servings}</span>}
                     </div>
 
-                    <p className="text-sm text-slate-300 leading-relaxed mt-3">
+                    <p className="text-xs text-[#7A6F63] leading-relaxed mt-2.5">
                         {item.description || 'Hidangan lezat diolah higienis dengan resep rahasia outlet.'}
                     </p>
 
                     {/* Tabs */}
-                    <div className="flex gap-6 mt-5 border-b border-white/10">
+                    <div className="flex gap-6 mt-4 border-b border-amber-900/10">
                         {(['desc', 'combo', 'reviews'] as const).map((t) => (
                             <button
                                 key={t}
                                 onClick={() => setTab(t)}
-                                className={`pb-2 text-sm font-bold transition-colors ${tab === t ? accent + ' border-b-2 border-[#FF5B35]' : 'text-slate-500'}`}
+                                className={`pb-2 text-xs font-bold transition-colors border-none bg-transparent cursor-pointer ${tab === t ? accent + ' border-b-2 border-[#FF5B35]' : 'text-slate-400'}`}
                             >
                                 {t === 'desc' ? 'Deskripsi' : t === 'combo' ? 'Combo' : 'Ulasan'}
                             </button>
                         ))}
                     </div>
 
-                    <div className="py-4 space-y-3">
+                    <div className="py-3 space-y-3">
                         {tab === 'desc' && (
-                            <div className="space-y-3">
+                            <div className="space-y-2.5">
                                 {steps.map((s, i) => (
                                     <div key={i} className="flex gap-3">
                                         <div
-                                            className={`shrink-0 size-6 rounded-full ${accentBg} text-white font-extrabold text-xs grid place-items-center`}
+                                            className={`shrink-0 size-5 rounded-full bg-[#FF5B35]/10 text-[#FF5B35] font-extrabold text-[10px] grid place-items-center`}
                                         >
                                             {i + 1}
                                         </div>
-                                        <p className="text-sm text-slate-300 leading-snug pt-0.5">{s}</p>
+                                        <p className="text-xs text-[#5A4F43] leading-snug pt-0.5">{s}</p>
                                     </div>
                                 ))}
                             </div>
                         )}
                         {tab === 'combo' && (
-                            <p className="text-sm text-slate-400">
+                            <p className="text-xs text-[#7A6F63]">
                                 {item.combo ?? 'Belum ada paket combo untuk menu ini.'}
                             </p>
                         )}
                         {tab === 'reviews' &&
                             (reviews.length > 0 ? (
-                                <div className="space-y-3">
+                                <div className="space-y-2.5">
                                     {reviews.map((r, i) => (
-                                        <div key={i} className="border border-white/10 rounded-xl p-3">
+                                        <div key={i} className="border border-amber-900/10 rounded-2xl p-2.5">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-sm font-bold text-white">{r.name}</span>
-                                                <span className="text-[#F59E0B] text-xs">{'★'.repeat(r.rating)}</span>
+                                                <span className="text-xs font-bold text-[#1A1410]">{r.name}</span>
+                                                <span className="text-[#F59E0B] text-[10px]">{'★'.repeat(r.rating)}</span>
                                             </div>
-                                            <p className="text-xs text-slate-400 mt-1">{r.text}</p>
+                                            <p className="text-[10px] text-[#7A6F63] mt-1">{r.text}</p>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-sm text-slate-400">Belum ada ulasan untuk menu ini.</p>
+                                <p className="text-xs text-[#7A6F63]">Belum ada ulasan untuk menu ini.</p>
                             ))}
                     </div>
                 </div>
 
                 {/* CTA */}
-                <div className="shrink-0 p-4 bg-[#1c1917] border-t border-white/10">
+                <div className="shrink-0 p-3.5 bg-[#FFF3EC]/50 border-t border-amber-900/10">
                     <button
                         onClick={() => {
                             onAdd(item.id);
                             onClose();
                         }}
-                        className={`w-full ${accentBg} text-white rounded-2xl py-3.5 text-sm font-extrabold shadow-lg shadow-[#FF5B35]/30`}
+                        className={`w-full ${accentBg} text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25 flex items-center justify-center`}
                     >
                         Tambah ke Pesanan · {formatRupiah(item.price)}
                     </button>
