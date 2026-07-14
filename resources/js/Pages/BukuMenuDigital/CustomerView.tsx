@@ -759,16 +759,20 @@ export default function CustomerView() {
 
             {appStage === 'welcome' && (
                 <div className="absolute inset-0 z-40 flex h-full flex-col items-center gap-4 overflow-y-auto bg-[#FAF5EE] p-7 text-center">
-                    <div className="w-full flex items-center justify-center gap-3">
-                        <div className="size-14 rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] grid place-items-center text-white font-extrabold text-lg shadow-lg">
-                            {outletName.slice(0, 2).toUpperCase()}
+                    <div className="flex w-full items-center justify-between gap-3">
+                        <div className="grid size-14 place-items-center overflow-hidden rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-lg">
+                            {renderLogo('size-8 text-white')}
                         </div>
-                        <span className="px-2.5 py-1 rounded-lg bg-[#0F8A4D]/10 text-[#0F8A4D] text-[10px] font-extrabold">
-                            HALAL
-                        </span>
+                        <img
+                            src="/images/halal-indonesia.svg"
+                            alt="Halal Indonesia"
+                            className="h-14 w-auto shrink-0 select-none"
+                        />
                     </div>
-                    <h2 className="text-2xl font-extrabold text-[#1A1410] mt-1">
-                        Selamat Datang di <span className="text-[#FF5B35]">{outletName}!</span>
+                    <h2 className="mt-1 text-2xl font-extrabold leading-tight text-[#1A1410]">
+                        Selamat Datang di
+                        <br />
+                        <span className="text-[#FF5B35]">{outletName}!</span>
                     </h2>
                     <p className="text-[12px] text-[#7A6F63] leading-relaxed max-w-[260px]">
                         Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
