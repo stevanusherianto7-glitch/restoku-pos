@@ -446,7 +446,8 @@ export default function CustomerView() {
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const table = params.get('table');
+        // QR generator (buildMenuUrl) pakai `t`; dukung juga `table` (legacy).
+        const table = params.get('t') ?? params.get('table');
         if (table) {
             setTableNumber(table);
         }

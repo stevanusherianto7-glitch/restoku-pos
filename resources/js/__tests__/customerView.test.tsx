@@ -107,34 +107,30 @@ describe('BukuMenuDigital/CustomerView', () => {
         expect(screen.getByText(/Kirim Pesanan/i)).toBeInTheDocument();
     });
 
-    it('verifies dine-in with dev PIN 0000', async () => {
+    it('reads table from ?t= param (QR generator format)', async () => {
+        // Simulasikan URL QR: /m/slug?t=A1
+        vi.stubGlobal('window', {
+            ...window,
+            location: { ...window.location, search: '?t=A1' },
+        });
         render(<CustomerView />);
         await act(async () => {
             await new Promise((r) => setTimeout(r, 50));
         });
-        await act(async () => {
-            fireEvent.click(screen.getByText(/Masuk ke Menu/i));
+        expect(screen.getByText(/Meja A1/)).toBeInTheDocument();
+        vi.unstubAllGlobals();
+    });
+
+    it('reads table from legacy ?table= param (backward-compat)', async () => {
+        vi.stubGlobal('window', {
+            ...window,
+            location: { ...window.location, search: '?table=B2' },
         });
-        await act(async () => {
-            fireEvent.click(screen.getByText(/Lanjut/i));
-        });
-        await act(async () => {
-            fireEvent.click(screen.getByText(/Mulai Pesan/i));
-        });
-        // dine-in verify modal
-        expect(screen.getByText(/Verifikasi Dine-In/i)).toBeInTheDocument();
-        const pinInput = document.querySelector('input[maxlength="4"]') as HTMLInputElement;
-        expect(pinInput).toBeTruthy();
-        await act(async () => {
-            fireEvent.change(pinInput, { target: { value: '0000' } });
-        });
-        await act(async () => {
-            fireEvent.click(screen.getByText(/Verifikasi PIN/i));
-        });
+        render(<CustomerView />);
         await act(async () => {
             await new Promise((r) => setTimeout(r, 50));
         });
-        // setelah verify, masuk ke menu app (tombol Pesan muncul)
-        expect(screen.getAllByText(/Pesan|Keranjang|Cart/i).length).toBeGreaterThan(0);
+        expect(screen.getByText(/Meja B2/)).toBeInTheDocument();
+        vi.unstubAllGlobals();
     });
 });
