@@ -30,6 +30,13 @@ class OwnerDashboardController extends Controller
             'metrics' => $this->dashboardService->getAggregateMetrics($tenantId, $dateRange),
             'leaderboard' => $this->dashboardService->getOutletLeaderboard($tenantId, $dateRange),
             'menuPerformance' => $this->dashboardService->getMenuPerformance($tenantId, $dateRange),
+            'profitMetrics' => $this->dashboardService->getProfitMetrics($tenantId, $dateRange),
+            'peakHours' => $this->dashboardService->getPeakHours($tenantId, $dateRange),
+            'peakDays' => $this->dashboardService->getPeakDays($tenantId, $dateRange),
+            'topProducts' => $this->dashboardService->getTopProducts($tenantId, $dateRange, 10),
+            'transactionTypes' => $this->dashboardService->getTransactionTypes($tenantId, $dateRange),
+            'stockAlerts' => $this->dashboardService->getStockAlerts($tenantId),
+            'shiftPerformance' => $this->dashboardService->getShiftPerformance($tenantId),
             'filters' => ['date_range' => $dateRange],
         ]);
     }
