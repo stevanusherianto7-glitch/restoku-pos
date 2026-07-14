@@ -714,11 +714,10 @@ export default function CustomerView() {
                 </header>
             )}
 
-            {/* ─── SCREENSHOT CLONE: FLOW BARU (stub FE-first) ───────────── */}
             {appStage === 'landing' && (
-                <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
+                <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
                     <div
-                        className="w-full rounded-3xl p-7 text-white relative overflow-hidden"
+                        className="w-[92%] max-w-sm rounded-3xl p-6 text-white relative overflow-hidden"
                         style={{
                             background: 'linear-gradient(135deg,#2A1E16 0%,#3A2A1E 60%,#43261A 100%)',
                             backgroundImage:
@@ -726,121 +725,118 @@ export default function CustomerView() {
                             backgroundSize: '20px 20px',
                         }}
                     >
-                        <p className="text-[10px] font-bold tracking-[0.22em] text-[#F59E0B] uppercase">
+                        <p className="text-[9px] font-bold tracking-[0.22em] text-[#F59E0B] uppercase">
                             Sejak 2025 · Nusantara
                         </p>
-                        <h2 className="font-serif text-3xl mt-3 leading-tight">
+                        <h2 className="font-serif text-2xl mt-2 leading-tight">
                             Cita rasa Jawa,
                             <br />
                             <span className="italic text-[#F59E0B]">disajikan modern.</span>
                         </h2>
-                        <div className="h-px bg-[#F59E0B]/40 my-5" />
-                        <p className="text-[13px] text-[#E9DFD3] leading-relaxed">
+                        <div className="h-px bg-[#F59E0B]/30 my-4" />
+                        <p className="text-xs text-[#E9DFD3] leading-relaxed">
                             Platform pemesanan digital terintegrasi — dari pemesanan langsung dari meja, dapur realtime,
                             hingga sajian tersaji hangat di meja Anda.
                         </p>
-                        <div className="mt-5 space-y-3">
+                        <div className="mt-4 space-y-2.5">
                             {[
                                 { ic: '▣', t: 'QR Self-Order', d: 'Tamu pesan langsung dari meja' },
                                 { ic: '🍴', t: 'Dapur Realtime', d: 'Antrian pesanan otomatis masuk' },
                                 { ic: '📊', t: 'Monitor Pesanan', d: 'Pantau semua transaksi live' },
                             ].map((f) => (
                                 <div key={f.t} className="flex items-center gap-3">
-                                    <div className="size-9 rounded-xl border border-[#F59E0B]/40 grid place-items-center text-[#F59E0B] text-base">
+                                    <div className="size-8 rounded-lg border border-[#F59E0B]/30 grid place-items-center text-[#F59E0B] text-sm shrink-0">
                                         {f.ic}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-[13px]">{f.t}</p>
-                                        <p className="text-[11px] text-[#CBBCAE]">{f.d}</p>
+                                        <p className="font-bold text-xs">{f.t}</p>
+                                        <p className="text-[10px] text-[#CBBCAE]">{f.d}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         <button
                             onClick={() => setAppStage('welcome')}
-                            className="mt-7 w-full bg-[#F59E0B] text-[#2A1E16] border-none rounded-xl py-3.5 text-sm font-extrabold flex justify-center gap-2 items-center cursor-pointer"
+                            className="mt-5 w-full bg-[#F59E0B] text-[#2A1E16] border-none rounded-xl py-3 text-xs font-black flex justify-center gap-2 items-center cursor-pointer shadow-lg shadow-[#F59E0B]/20"
                         >
                             Masuk ke Menu →
                         </button>
-                        <p className="text-center text-[10px] text-[#9B8D7E] mt-4">© 2025 {outletName}</p>
+                        <p className="text-center text-[9px] text-[#9B8D7E] mt-3">© 2025 {outletName}</p>
                     </div>
                 </div>
             )}
 
             {appStage === 'welcome' && (
-                <div
-                    className="absolute inset-0 z-40 flex h-full flex-col items-center gap-4 overflow-y-auto bg-[#FAF5EE] p-7 pb-24 text-center"
-                    style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
-                >
-                    <div className="flex w-full items-center justify-between gap-3">
-                        <div className="grid size-14 place-items-center overflow-hidden rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-lg">
-                            {renderLogo('size-8 text-white')}
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
+                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden">
+                        <div className="flex w-full items-center justify-between gap-3">
+                            <div className="grid size-12 place-items-center overflow-hidden rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-md">
+                                {renderLogo('size-7 text-white')}
+                            </div>
+                            <img
+                                src="/images/halal-indonesia.svg"
+                                alt="Halal Indonesia"
+                                className="h-10 w-auto shrink-0 select-none"
+                            />
                         </div>
-                        <img
-                            src="/images/halal-indonesia.svg"
-                            alt="Halal Indonesia"
-                            className="h-14 w-auto shrink-0 select-none"
-                        />
-                    </div>
-                    <h2 className="mt-1 text-2xl font-extrabold leading-tight text-[#1A1410]">
-                        Selamat Datang di
-                        <br />
-                        <span className="text-[#FF5B35]">{outletName}!</span>
-                    </h2>
-                    <p className="text-[12px] text-[#7A6F63] leading-relaxed max-w-[260px]">
-                        Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
-                        MSG. Selamat menikmati!
-                    </p>
-                    <div className="w-full bg-[#FFF3EC] rounded-xl p-3.5 flex items-center justify-between text-left">
-                        <div>
-                            <p className="text-[10px] font-extrabold tracking-wider text-[#A8521F] flex items-center gap-1.5">
-                                📍 NOMOR MEJA ANDA
-                            </p>
-                            <p className="text-lg font-extrabold text-[#1A1410] mt-1">Meja {tableNumber ?? 'A3'}</p>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 text-[#0F8A4D] text-[10px] font-extrabold flex items-center gap-1">
-                            ✓ Terverifikasi
-                        </span>
-                    </div>
-                    <div className="w-full">
-                        <p className="text-[11px] font-extrabold tracking-wider text-[#8A7D70] text-left mb-2">
-                            PILIH TIPE PESANAN
+                        <h2 className="text-xl font-extrabold leading-tight text-[#1A1410]">
+                            Selamat Datang di
+                            <br />
+                            <span className="text-[#FF5B35]">{outletName}!</span>
+                        </h2>
+                        <p className="text-[11px] text-[#7A6F63] leading-relaxed">
+                            Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
+                            MSG. Selamat menikmati!
                         </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setOrderType('dine_in')}
-                                className={`flex-1 rounded-xl py-4 text-white font-extrabold border-[3px] transition-all ${
-                                    orderType === 'dine_in'
-                                        ? 'border-[#FF5B35] bg-gradient-to-br from-[#7C3AED] to-[#FF5B35]'
-                                        : 'border-transparent bg-gradient-to-br from-[#7C3AED] to-[#FF5B35] opacity-70'
-                                }`}
-                            >
-                                🪑
-                                <br />
-                                Dine In
-                                <span className="text-[11px] font-semibold opacity-90 block mt-1">Makan di tempat</span>
-                            </button>
-                            <button
-                                onClick={() => setOrderType('take_away')}
-                                className={`flex-1 rounded-xl py-4 text-white font-extrabold border-[3px] transition-all ${
-                                    orderType === 'take_away'
-                                        ? 'border-[#FF5B35] bg-gradient-to-br from-[#DB2777] to-[#F97316]'
-                                        : 'border-transparent bg-gradient-to-br from-[#DB2777] to-[#F97316] opacity-70'
-                                }`}
-                            >
-                                🥡
-                                <br />
-                                Take Away
-                                <span className="text-[11px] font-semibold opacity-90 block mt-1">Dibawa pulang</span>
-                            </button>
+                        <div className="w-full bg-[#FFF3EC] rounded-2xl p-3 flex items-center justify-between text-left border border-[#FF5B35]/10">
+                            <div>
+                                <p className="text-[9px] font-extrabold tracking-wider text-[#A8521F]">
+                                    📍 NOMOR MEJA ANDA
+                                </p>
+                                <p className="text-base font-extrabold text-[#1A1410] mt-0.5">Meja {tableNumber ?? 'A1'}</p>
+                            </div>
+                            <span className="px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 text-[#0F8A4D] text-[9px] font-extrabold flex items-center gap-1">
+                                ✓ Terverifikasi
+                            </span>
                         </div>
+                        <div className="w-full">
+                            <p className="text-[10px] font-extrabold tracking-wider text-[#8A7D70] text-left mb-1.5">
+                                PILH TIPE PESANAN
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setOrderType('dine_in')}
+                                    className={`flex-1 rounded-2xl py-3 text-white font-extrabold border-[3px] transition-all flex flex-col items-center justify-center ${
+                                        orderType === 'dine_in'
+                                            ? 'border-[#FF5B35] bg-gradient-to-br from-[#7C3AED] to-[#FF5B35]'
+                                            : 'border-transparent bg-gradient-to-br from-[#7C3AED] to-[#FF5B35] opacity-60'
+                                    }`}
+                                >
+                                    <span className="text-lg">🪑</span>
+                                    <span className="text-[11px] block mt-0.5">Dine In</span>
+                                    <span className="text-[8px] font-medium opacity-80 block">Makan di tempat</span>
+                                </button>
+                                <button
+                                    onClick={() => setOrderType('take_away')}
+                                    className={`flex-1 rounded-2xl py-3 text-white font-extrabold border-[3px] transition-all flex flex-col items-center justify-center ${
+                                        orderType === 'take_away'
+                                            ? 'border-[#FF5B35] bg-gradient-to-br from-[#DB2777] to-[#F97316]'
+                                            : 'border-transparent bg-gradient-to-br from-[#DB2777] to-[#F97316] opacity-60'
+                                    }`}
+                                >
+                                    <span className="text-lg">🥡</span>
+                                    <span className="text-[11px] block mt-0.5">Take Away</span>
+                                    <span className="text-[8px] font-medium opacity-80 block">Dibawa pulang</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setAppStage('howto')}
+                            className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25"
+                        >
+                            Lanjut →
+                        </button>
                     </div>
-                    <button
-                        onClick={() => setAppStage('howto')}
-                        className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3.5 text-sm font-extrabold mt-auto cursor-pointer"
-                    >
-                        Lanjut →
-                    </button>
                 </div>
             )}
 
