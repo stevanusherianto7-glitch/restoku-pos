@@ -637,147 +637,145 @@ export default function CustomerView() {
             <Head title={`E-Menu - ${outletName}`} />
 
             {/* Dynamic Sticky Header Area */}
-            {appStage === 'app' && (
-                <div className={`sticky top-0 z-40 ${headerBg} ${headerBorder} flex flex-col shrink-0`}>
-                    {/* Operating Hours Alert Banner */}
-                    {!isOutletOpen && (
-                        <div className="bg-rose-500/20 border-b border-rose-500/30 px-4 py-3 flex items-center gap-3 text-rose-300">
-                            <Clock3Icon className="size-5 shrink-0 text-rose-400 animate-pulse" />
-                            <div className="text-xs">
-                                <p className="font-bold">Pemesanan Online Ditutup</p>
-                                <p className="text-[11px] opacity-90">
-                                    {outletScheduleMsg || 'Restoran sedang di luar jam operasional.'}
-                                </p>
-                            </div>
+            <div className={`${appStage === 'app' ? `sticky top-0 z-40 ${headerBg} ${headerBorder}` : 'fixed inset-x-0 top-0 -z-10 opacity-0 pointer-events-none'} flex flex-col shrink-0`}>
+                {/* Operating Hours Alert Banner */}
+                {!isOutletOpen && (
+                    <div className="bg-rose-500/20 border-b border-rose-500/30 px-4 py-3 flex items-center gap-3 text-rose-300">
+                        <Clock3Icon className="size-5 shrink-0 text-rose-400 animate-pulse" />
+                        <div className="text-xs">
+                            <p className="font-bold">Pemesanan Online Ditutup</p>
+                            <p className="text-[11px] opacity-90">
+                                {outletScheduleMsg || 'Restoran sedang di luar jam operasional.'}
+                            </p>
                         </div>
-                    )}
-                    {isOutletOpen && outletScheduleMsg && (
-                        <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-2 flex items-center gap-2 text-emerald-300 text-[11px]">
-                            <Clock3Icon className="size-3.5 shrink-0 text-emerald-400" />
-                            <span>{outletScheduleMsg}</span>
-                        </div>
-                    )}
+                    </div>
+                )}
+                {isOutletOpen && outletScheduleMsg && (
+                    <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-2 flex items-center gap-2 text-emerald-300 text-[11px]">
+                        <Clock3Icon className="size-3.5 shrink-0 text-emerald-400" />
+                        <span>{outletScheduleMsg}</span>
+                    </div>
+                )}
 
-                    {/* Brand Info & Tabs */}
-                    <header className={`${activeTheme.header} !static !bg-transparent !border-b-0 !shadow-none !px-4 !py-3 !flex-col !items-stretch gap-3`}>
-                        <div className="flex items-center gap-3">
-                            <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 overflow-hidden">
-                                {renderLogo('size-7 text-slate-950')}
-                            </div>
-                            <div>
-                                <h1 className="text-sm font-black tracking-tight text-white uppercase">{outletName}</h1>
-                                <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
-                                    <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-                                    {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
-                                </p>
-                            </div>
+                {/* Brand Info & Tabs */}
+                <header className={`${activeTheme.header} !static !bg-transparent !border-b-0 !shadow-none !px-4 !py-3 !flex-col !items-stretch gap-3`}>
+                    <div className="flex items-center gap-3">
+                        <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 overflow-hidden">
+                            {renderLogo('size-7 text-slate-950')}
+                        </div>
+                        <div>
+                            <h1 className="text-sm font-black tracking-tight text-white uppercase">{outletName}</h1>
+                            <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
+                                <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                                {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* View Mode Tabs */}
+                    <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5 max-w-full overflow-x-auto gap-0.5">
+                        <button
+                            onClick={() => setActiveTab('menu')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'menu'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Menu
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('reservasi')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'reservasi'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Reservasi
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('galeri')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'galeri'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Galeri
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('cart')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 shrink-0 ${
+                                activeTab === 'cart'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            <ShoppingCartIcon className="size-3" />
+                            {cartTotalItems > 0 && <span>{cartTotalItems}</span>}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('status')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'status'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-[#FF5B35] text-white shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Status
+                        </button>
+                    </div>
+                </header>
+
+                {/* Category Capsule Filter & Search Bar - only when viewing the Menu tab */}
+                {activeTab === 'menu' && (
+                    <div className="flex flex-col gap-2 pb-3.5">
+                        {/* Category Capsule Filter */}
+                        <div className="flex gap-2 overflow-x-auto px-4">
+                            {categories.map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`px-4.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                                        activeCategory === cat
+                                            ? isNanoBanana
+                                                ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-lg shadow-amber-500/10 scale-95'
+                                                : 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/10 scale-95'
+                                            : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/20'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
                         </div>
 
-                        {/* View Mode Tabs */}
-                        <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5 max-w-full overflow-x-auto gap-0.5">
-                            <button
-                                onClick={() => setActiveTab('menu')}
-                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                    activeTab === 'menu'
-                                        ? isNanoBanana
-                                            ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                            : 'bg-emerald-500 text-slate-950 shadow'
-                                        : 'text-slate-400'
-                                }`}
-                            >
-                                Menu
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('reservasi')}
-                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                    activeTab === 'reservasi'
-                                        ? isNanoBanana
-                                            ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                            : 'bg-emerald-500 text-slate-950 shadow'
-                                        : 'text-slate-400'
-                                }`}
-                            >
-                                Reservasi
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('galeri')}
-                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                    activeTab === 'galeri'
-                                        ? isNanoBanana
-                                            ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                            : 'bg-emerald-500 text-slate-950 shadow'
-                                        : 'text-slate-400'
-                                }`}
-                            >
-                                Galeri
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('cart')}
-                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 shrink-0 ${
-                                    activeTab === 'cart'
-                                        ? isNanoBanana
-                                            ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                            : 'bg-emerald-500 text-slate-950 shadow'
-                                        : 'text-slate-400'
-                                }`}
-                            >
-                                <ShoppingCartIcon className="size-3" />
-                                {cartTotalItems > 0 && <span>{cartTotalItems}</span>}
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('status')}
-                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                    activeTab === 'status'
-                                        ? isNanoBanana
-                                            ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                            : 'bg-[#FF5B35] text-white shadow'
-                                        : 'text-slate-400'
-                                }`}
-                            >
-                                Status
-                            </button>
-                        </div>
-                    </header>
-
-                    {/* Category Capsule Filter & Search Bar - only when viewing the Menu tab */}
-                    {activeTab === 'menu' && (
-                        <div className="flex flex-col gap-2 pb-3.5">
-                            {/* Category Capsule Filter */}
-                            <div className="flex gap-2 overflow-x-auto px-4">
-                                {categories.map((cat) => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setActiveCategory(cat)}
-                                        className={`px-4.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-                                            activeCategory === cat
-                                                ? isNanoBanana
-                                                    ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-lg shadow-amber-500/10 scale-95'
-                                                    : 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/10 scale-95'
-                                                : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/20'
-                                        }`}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Search Bar - under Category Filter */}
-                            <div className="px-4 pt-1">
-                                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 shadow-inner focus-within:border-emerald-500/40 focus-within:ring-1 focus-within:ring-emerald-500/25 transition-all">
-                                    <SearchIcon className="size-4 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Cari menu terlaris kami..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="bg-transparent text-xs text-slate-100 outline-none w-full placeholder:text-slate-500"
-                                    />
-                                </div>
+                        {/* Search Bar - under Category Filter */}
+                        <div className="px-4 pt-1">
+                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 shadow-inner focus-within:border-emerald-500/40 focus-within:ring-1 focus-within:ring-emerald-500/25 transition-all">
+                                <SearchIcon className="size-4 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Cari menu terlaris kami..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="bg-transparent text-xs text-slate-100 outline-none w-full placeholder:text-slate-500"
+                                />
                             </div>
                         </div>
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
 
             {appStage === 'landing' && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
@@ -852,7 +850,7 @@ export default function CustomerView() {
                                 <p className={`text-[9px] font-extrabold tracking-wider ${modalStyle.accentText}`}>
                                     📍 NOMOR MEJA ANDA
                                 </p>
-                                <p className={`text-base font-extrabold ${modalStyle.textTitle} mt-0.5`}>Meja {tableNumber ?? 'A1'}</p>
+                                <p className={`text-base font-extrabold ${modalStyle.textTitle} mt-0.5`}>Meja {tableNumber ?? 'A3'}</p>
                             </div>
                             <span className={`px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 ${modalStyle.accentText} text-[9px] font-extrabold flex items-center gap-1`}>
                                 ✓ Terverifikasi
