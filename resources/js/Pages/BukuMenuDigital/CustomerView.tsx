@@ -715,53 +715,47 @@ export default function CustomerView() {
             )}
 
             {appStage === 'landing' && (
-                <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div
-                        className="w-[92%] max-w-sm rounded-3xl p-6 text-white relative overflow-hidden"
-                        style={{
-                            background: 'linear-gradient(135deg,#2A1E16 0%,#3A2A1E 60%,#43261A 100%)',
-                            backgroundImage:
-                                'linear-gradient(rgba(245,158,11,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,.04) 1px,transparent 1px)',
-                            backgroundSize: '20px 20px',
-                        }}
-                    >
-                        <p className="text-[9px] font-bold tracking-[0.22em] text-[#F59E0B] uppercase">
-                            Sejak 2025 · Nusantara
-                        </p>
-                        <h2 className="font-serif text-2xl mt-2 leading-tight">
-                            Cita rasa Jawa,
-                            <br />
-                            <span className="italic text-[#F59E0B]">disajikan modern.</span>
-                        </h2>
-                        <div className="h-px bg-[#F59E0B]/30 my-4" />
-                        <p className="text-xs text-[#E9DFD3] leading-relaxed">
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
+                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden text-[#1A1410]">
+                        <div>
+                            <p className="text-[9px] font-bold tracking-[0.22em] text-[#FF5B35] uppercase">
+                                Sejak 2025 · Nusantara
+                            </p>
+                            <h2 className="font-serif text-2xl mt-2 leading-tight font-extrabold text-[#1A1410]">
+                                Cita rasa Jawa,
+                                <br />
+                                <span className="italic text-[#FF5B35]">disajikan modern.</span>
+                            </h2>
+                        </div>
+                        <div className="h-px bg-amber-900/10 my-1" />
+                        <p className="text-xs text-[#7A6F63] leading-relaxed">
                             Platform pemesanan digital terintegrasi — dari pemesanan langsung dari meja, dapur realtime,
                             hingga sajian tersaji hangat di meja Anda.
                         </p>
-                        <div className="mt-4 space-y-2.5">
+                        <div className="mt-1 space-y-2.5 text-left">
                             {[
                                 { ic: '▣', t: 'QR Self-Order', d: 'Tamu pesan langsung dari meja' },
                                 { ic: '🍴', t: 'Dapur Realtime', d: 'Antrian pesanan otomatis masuk' },
                                 { ic: '📊', t: 'Monitor Pesanan', d: 'Pantau semua transaksi live' },
                             ].map((f) => (
-                                <div key={f.t} className="flex items-center gap-3">
-                                    <div className="size-8 rounded-lg border border-[#F59E0B]/30 grid place-items-center text-[#F59E0B] text-sm shrink-0">
+                                <div key={f.t} className="flex items-center gap-3 bg-[#FFF3EC] p-2.5 rounded-2xl border border-[#FF5B35]/10">
+                                    <div className="size-8 rounded-lg border border-[#FF5B35]/20 grid place-items-center text-[#FF5B35] text-sm shrink-0">
                                         {f.ic}
                                     </div>
                                     <div>
-                                        <p className="font-bold text-xs">{f.t}</p>
-                                        <p className="text-[10px] text-[#CBBCAE]">{f.d}</p>
+                                        <p className="font-bold text-xs text-[#1A1410]">{f.t}</p>
+                                        <p className="text-[10px] text-[#7A6F63]">{f.d}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         <button
                             onClick={() => setAppStage('welcome')}
-                            className="mt-5 w-full bg-[#F59E0B] text-[#2A1E16] border-none rounded-xl py-3 text-xs font-black flex justify-center gap-2 items-center cursor-pointer shadow-lg shadow-[#F59E0B]/20"
+                            className="mt-2 w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black flex justify-center gap-2 items-center cursor-pointer shadow-md shadow-[#FF5B35]/25"
                         >
                             Masuk ke Menu →
                         </button>
-                        <p className="text-center text-[9px] text-[#9B8D7E] mt-3">© 2025 {outletName}</p>
+                        <p className="text-center text-[9px] text-[#9B8D7E]">© 2025 {outletName}</p>
                     </div>
                 </div>
             )}
@@ -841,131 +835,118 @@ export default function CustomerView() {
             )}
 
             {appStage === 'howto' && (
-                <div
-                    className="absolute inset-0 z-40 flex h-full flex-col gap-3 overflow-y-auto bg-[#FAF5EE] p-5 pb-24"
-                    style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
-                >
-                    <h2 className="text-center text-lg font-extrabold text-[#1A1410]">Cara Memesan</h2>
-                    <p className="text-center text-[12px] text-[#7A6F63] -mt-1">
-                        Cukup 3 langkah mudah, pesanan langsung masuk dapur!
-                    </p>
-                    {[
-                        {
-                            n: 1,
-                            c: 'from-[#7C3AED]',
-                            bg: 'bg-[#F4EEFD]',
-                            t: 'Pilih Menu Favorit',
-                            d: 'Tekan menu yang kamu inginkan, lihat foto & harga lengkap',
-                        },
-                        {
-                            n: 2,
-                            c: 'from-[#FF5B35]',
-                            bg: 'bg-[#FFF1E9]',
-                            t: 'Masuk ke Keranjang',
-                            d: 'Tambah qty, tulis catatan khusus untuk chef jika perlu',
-                        },
-                        {
-                            n: 3,
-                            c: 'from-[#0F8A4D]',
-                            bg: 'bg-[#EAF7EF]',
-                            t: 'Kirim Pesanan',
-                            d: 'Tekan "Pesan Sekarang" — pesanan langsung diterima dapur!',
-                        },
-                    ].map((s) => (
-                        <div key={s.n} className={`rounded-xl p-3 flex gap-3 items-start ${s.bg}`}>
-                            <div
-                                className={`size-6 rounded-full bg-gradient-to-br ${s.c} to-black/20 text-white font-extrabold grid place-items-center text-xs shrink-0`}
-                            >
-                                {s.n}
-                            </div>
-                            <div>
-                                <p className="font-extrabold text-[13px] text-[#1A1410]">{s.t}</p>
-                                <p className="text-[11px] text-[#7A6F63] mt-0.5">{s.d}</p>
-                            </div>
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
+                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden text-[#1A1410]">
+                        <h2 className="text-xl font-extrabold text-[#1A1410]">Cara Memesan</h2>
+                        <p className="text-[11px] text-[#7A6F63] -mt-2">
+                            Cukup 3 langkah mudah, pesanan langsung masuk dapur!
+                        </p>
+                        <div className="flex flex-col gap-2.5">
+                            {[
+                                {
+                                    n: 1,
+                                    bg: 'bg-[#F4EEFD] border-[#7C3AED]/10 text-[#7C3AED]',
+                                    t: 'Pilih Menu Favorit',
+                                    d: 'Tekan menu yang kamu inginkan, lihat foto & harga lengkap',
+                                },
+                                {
+                                    n: 2,
+                                    bg: 'bg-[#FFF1E9] border-[#FF5B35]/10 text-[#FF5B35]',
+                                    t: 'Masuk ke Keranjang',
+                                    d: 'Tambah qty, tulis catatan khusus untuk chef jika perlu',
+                                },
+                                {
+                                    n: 3,
+                                    bg: 'bg-[#EAF7EF] border-[#0F8A4D]/10 text-[#0F8A4D]',
+                                    t: 'Kirim Pesanan',
+                                    d: 'Tekan "Pesan Sekarang" — pesanan langsung diterima dapur!',
+                                },
+                            ].map((s) => (
+                                <div key={s.n} className={`rounded-2xl p-3 flex gap-3 items-start border text-left ${s.bg}`}>
+                                    <div className="size-5 rounded-full bg-current text-white font-extrabold grid place-items-center text-[10px] shrink-0">
+                                        <span className="text-slate-900 font-bold">{s.n}</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-extrabold text-[12px] text-[#1A1410]">{s.t}</p>
+                                        <p className="text-[10px] text-[#7A6F63] mt-0.5">{s.d}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                    <div className="flex items-center justify-between bg-[#FFF3EC] rounded-xl p-3 text-[12px] mt-1">
-                        <span className="text-[#5A4F43]">🪑 Tipe pesanan dipilih</span>
-                        <b className="text-[#1A1410]">
-                            {orderType === 'dine_in' ? 'Dine In — Makan di tempat' : 'Take Away — Dibawa pulang'}
-                        </b>
-                        <span className="text-[#FF5B35] font-extrabold">Ubah</span>
+                        <div className="flex items-center justify-between bg-[#FFF3EC] border border-[#FF5B35]/10 rounded-2xl p-3 text-[11px] mt-1">
+                            <span className="text-[#7A6F63]">🪑 Tipe pesanan</span>
+                            <b className="text-[#1A1410]">
+                                {orderType === 'dine_in' ? 'Dine In' : 'Take Away'}
+                            </b>
+                            <span className="text-[#FF5B35] font-extrabold cursor-pointer" onClick={() => setAppStage('welcome')}>Ubah</span>
+                        </div>
+                        <button
+                            onClick={() => setAppStage('app')}
+                            className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25 flex justify-center gap-2 items-center"
+                        >
+                            ✨ Mulai Pesan Sekarang!
+                        </button>
                     </div>
-                    <button
-                        onClick={() => setAppStage('app')}
-                        className="w-full bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] text-white border-none rounded-xl py-3.5 text-sm font-extrabold mt-auto cursor-pointer flex justify-center gap-2 items-center"
-                    >
-                        ✨ Mulai Pesan Sekarang!
-                    </button>
-                    <p className="text-center text-[10px] text-[#9B8D7E]">
-                        Meja {tableNumber ?? 'A3'} · {outletName}
-                    </p>
                 </div>
             )}
 
             {/* Verifikasi Dine-In: overlay saat app & dine_in & belum verified */}
             {appStage === 'app' && orderType === 'dine_in' && !dineVerified && (
-                <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
-                    <div
-                        className="w-full rounded-3xl p-6 text-white relative overflow-hidden"
-                        style={{
-                            background: 'linear-gradient(135deg,#2A1E16 0%,#3A2A1E 60%,#43261A 100%)',
-                            backgroundImage:
-                                'linear-gradient(rgba(245,158,11,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,158,11,.04) 1px,transparent 1px)',
-                            backgroundSize: '20px 20px',
-                        }}
-                    >
-                        <div className="flex items-start gap-3">
-                            <div className="size-10 rounded-full border border-[#F59E0B] grid place-items-center text-lg">
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
+                    <div className="w-[92%] max-w-sm rounded-3xl bg-[#FAF5EE] p-6 text-center shadow-2xl border border-amber-900/10 flex flex-col gap-4 overflow-hidden text-[#1A1410]">
+                        <div className="flex items-start gap-3 text-left">
+                            <div className="size-10 rounded-full border border-[#FF5B35] grid place-items-center text-lg text-[#FF5B35]">
                                 🛡
                             </div>
                             <div>
-                                <p className="font-extrabold text-[15px] text-[#F59E0B] tracking-wide">
+                                <p className="font-extrabold text-[15px] text-[#FF5B35] tracking-wide">
                                     VERIFIKASI DINE-IN
                                 </p>
-                                <p className="text-[10px] text-[#CBBCAE] mt-0.5 tracking-wide">
+                                <p className="text-[9px] text-[#7A6F63] mt-0.5 tracking-wide uppercase font-bold">
                                     PASTIKAN ANDA MEMESAN DI LOKASI
                                 </p>
                             </div>
                             <span
-                                className="ml-auto text-[#E9DFD3] text-lg cursor-pointer"
+                                className="ml-auto text-[#7A6F63] text-lg cursor-pointer hover:text-[#1A1410]"
                                 onClick={() => setDineVerified(true)}
                             >
                                 ✕
                             </span>
                         </div>
 
-                        <div className="mt-5">
-                            <p className="font-bold text-[12.5px] flex items-center gap-1.5">
+                        <div className="text-left bg-[#FFF3EC] border border-[#FF5B35]/10 p-3.5 rounded-2xl">
+                            <p className="font-bold text-[12.5px] text-[#1A1410] flex items-center gap-1.5">
                                 📍 Validasi GPS Otomatis
                             </p>
                             {gpsError && (
-                                <div className="mt-2 bg-[#7A2A1A] text-[#FF9B7A] rounded-xl p-2.5 text-[12px] font-semibold leading-snug">
+                                <div className="mt-2 bg-[#FEE2E2] text-[#991B1B] border border-[#FCA5A5]/40 rounded-xl p-2.5 text-[11px] font-semibold leading-snug">
                                     {gpsError}
                                 </div>
                             )}
                             <button
                                 onClick={() => setGpsError(null)}
-                                className="mt-3 w-full bg-transparent border-[1.5px] border-[#FF5B35] text-[#FF5B35] rounded-xl py-3 text-[12.5px] font-extrabold cursor-pointer"
+                                className="mt-3 w-full bg-white border border-[#FF5B35]/30 text-[#FF5B35] rounded-xl py-2.5 text-[12px] font-black cursor-pointer shadow-sm hover:bg-[#FFF3EC] transition-all"
                             >
                                 ⟳ DETEKSI ULANG LOKASI
                             </button>
                         </div>
 
-                        <div className="text-center text-[11px] text-[#9B8D7E] font-extrabold my-5 relative">ATAU</div>
+                        <div className="text-center text-[10px] text-[#8A7D70] font-extrabold relative my-1">
+                            — ATAU —
+                        </div>
 
-                        <div>
-                            <p className="font-extrabold text-[13px] text-[#F59E0B] tracking-wide">
+                        <div className="text-left">
+                            <p className="font-extrabold text-[12px] text-[#1A1410] tracking-wide">
                                 MASUKKAN PIN VERIFIKASI MEJA
                             </p>
-                            <p className="text-[11px] text-[#CBBCAE] mt-1.5 leading-relaxed">
+                            <p className="text-[10px] text-[#7A6F63] mt-1 leading-relaxed">
                                 Minta 4-digit PIN harian kepada pelayan kami di kedai.
                             </p>
-                            <div className="flex justify-center gap-2.5 my-4">
+                            <div className="flex justify-center gap-2.5 my-3.5">
                                 {[0, 1, 2, 3].map((i) => (
                                     <span
                                         key={i}
-                                        className="size-12 rounded-xl bg-white text-[#1A1410] grid place-items-center text-xl font-extrabold"
+                                        className="size-11 rounded-xl bg-white border border-amber-900/15 text-[#1A1410] grid place-items-center text-lg font-black shadow-sm"
                                     >
                                         {pin[i] ?? ''}
                                     </span>
@@ -980,7 +961,7 @@ export default function CustomerView() {
                                 placeholder="----"
                                 className="hidden"
                             />
-                            <div className="grid grid-cols-3 gap-2 mb-3">
+                            <div className="grid grid-cols-3 gap-1.5 mb-3.5">
                                 {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map((k) => (
                                     <button
                                         key={k}
@@ -990,7 +971,7 @@ export default function CustomerView() {
                                                 ? setPin((p) => p.slice(0, -1))
                                                 : k && setPin((p) => (p + k).slice(0, 4))
                                         }
-                                        className="h-11 rounded-xl bg-white/10 text-white font-bold text-lg disabled:opacity-30 cursor-pointer"
+                                        className="h-10 rounded-xl bg-white border border-amber-900/10 text-[#1A1410] font-bold text-sm disabled:opacity-30 cursor-pointer hover:bg-slate-50 transition-all flex items-center justify-center"
                                     >
                                         {k}
                                     </button>
@@ -998,8 +979,7 @@ export default function CustomerView() {
                             </div>
                             <button
                                 onClick={() => dailyPin && pin === dailyPin && setDineVerified(true)}
-                                className="w-full rounded-xl py-3.5 text-[13.5px] font-extrabold cursor-pointer border-none"
-                                style={{ background: 'linear-gradient(135deg,#8A3A1E,#C9542A)', color: '#F3D9CC' }}
+                                className="w-full bg-[#FF5B35] text-white border-none rounded-xl py-3 text-xs font-black cursor-pointer shadow-md shadow-[#FF5B35]/25"
                             >
                                 VERIFIKASI PIN
                             </button>
