@@ -88,12 +88,13 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         $role = optional(auth()->user())->role;
 
         return match ($role) {
-            'owner'   => Inertia::render('Dashboard/Index'),
-            'manager' => redirect('/laporan-penjualan'),
-            'kasir'   => redirect('/pos'),
-            'waiter'  => redirect('/waiter-bar'),
-            'kitchen' => redirect('/kds'),
-            default   => redirect('/login'),
+            'owner'    => Inertia::render('Dashboard/Index'),
+            'manager'  => redirect('/laporan-penjualan'),
+            'kasir'    => redirect('/pos'),
+            'cashier'  => redirect('/pos'), // seeder DB memakai 'cashier'
+            'waiter'   => redirect('/waiter-bar'),
+            'kitchen'  => redirect('/kds'),
+            default    => redirect('/login'),
         };
     })->name('dashboard');
     Route::get('/laporan-keuangan',   fn () => Inertia::render('Dashboard/Reports'))->name('reports');

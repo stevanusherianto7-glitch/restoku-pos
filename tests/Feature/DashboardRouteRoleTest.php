@@ -94,6 +94,23 @@ class DashboardRouteRoleTest extends TestCase
             ->assertRedirect('/pos');
     }
 
+    public function test_cashier_db_role_redirects_to_pos(): void
+    {
+        // Seeder DB memakai 'cashier' (bukan 'kasir'). Pastikan tetap -> /pos.
+        $cashier = User::create([
+            'tenant_id' => $this->tenant->id,
+            'outlet_id' => $this->outlet->id,
+            'name' => 'Cashier',
+            'email' => 'cashier@test.com',
+            'password' => bcrypt('pw'),
+            'role' => 'cashier',
+        ]);
+
+        $this->actingAs($cashier)
+            ->get('/dashboard')
+            ->assertRedirect('/pos');
+    }
+
     public function test_waiter_redirects_to_waiter_bar(): void
     {
         $waiter = User::create([
