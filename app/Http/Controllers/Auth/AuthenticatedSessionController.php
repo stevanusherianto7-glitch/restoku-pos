@@ -49,12 +49,12 @@ class AuthenticatedSessionController extends Controller
                 $request->session()->regenerate();
 
                 if ($matchedUser->role === 'kitchen') {
-                    return redirect()->intended('/kds');
+                    return redirect('/kds');
                 } elseif ($matchedUser->role === 'waiter') {
-                    return redirect()->intended('/waiter-bar');
+                    return redirect('/waiter-bar');
                 }
 
-                return redirect()->intended('/pos');
+                return redirect('/pos');
             }
             throw ValidationException::withMessages([
                 'pin' => 'PIN otorisasi salah atau tidak terdaftar.',
