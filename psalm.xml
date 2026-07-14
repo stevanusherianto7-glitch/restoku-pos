@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="1"
+    resolveFromConfigFile="true"
+    useBaseline="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    findUnusedBaselineEntry="true"
+>
+    <!--
+      Restoku PHP SAST (Psalm) — pengganti CodeQL-PHP (CodeQL tdk support PHP).
+      errorLevel=1  : HANYA laporkan isu kritis / kerentanan (bukan type-noise),
+                       supaya Security tab tidak banjir false-positive.
+      taintAnalysis : lacak aliran data tak-terpercaya (Request -> Query/HTML/Shell)
+                       -> temukan SQLi / XSS / command-injection.
+      Scope         : app/ (controller, model, service, middleware). Framework
+                       wiring (routes/bootstrap/config/database) diabaikan utk v1.
+    -->
+    <projectFiles>
+        <directory name="app" />
+        <ignoreFiles>
+            <directory name="vendor" />
+            <directory name="storage" />
+            <directory name="bootstrap" />
+            <directory name="database" />
+            <directory name="public" />
+            <directory name="routes" />
+            <directory name="config" />
+            <directory name="tests" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <taintAnalysis>true</taintAnalysis>
+</psalm>

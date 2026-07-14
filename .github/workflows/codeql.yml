@@ -21,7 +21,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript-typescript', 'php' ]
+        # NOTE: CodeQL GitHub SAAT INI TIDAK support PHP.
+        # SAST PHP ditangani job `php-sast` (Psalm, emit SARIF) di ci.yml.
+        # JS/TS tetap di-scan CodeQL; PHP diisi Psalm.
+        language: [ 'javascript-typescript' ]
 
     steps:
     - name: Checkout repository
