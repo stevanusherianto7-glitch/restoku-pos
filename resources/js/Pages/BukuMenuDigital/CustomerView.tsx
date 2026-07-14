@@ -665,10 +665,12 @@ export default function CustomerView() {
                         </div>
                         <div>
                             <h1 className="text-sm font-black tracking-tight text-white uppercase">{outletName}</h1>
-                            <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
-                                <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-                                {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
-                            </p>
+                            {appStage === 'app' && (
+                                <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
+                                    <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                                    {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
+                                </p>
+                            )}
                         </div>
                     </div>
 
