@@ -148,6 +148,19 @@ class HandleInertiaRequests extends Middleware
                     ->toArray()
                 : null,
 
+            // ── Cloudinary (public cloud name only — untuk display foto menu) ──
+            // Secret TIDAK pernah di-share ke client. Upload tetap dari backend.
+            // Cloud name diambil dari CLOUDINARY_URL (format cloudinary://@cloud).
+            'cloudinary' => (function () {
+                $url = config('services.cloudinary.url');
+                if (! $url || ! str_starts_with($url, 'cloudinary://')) {
+                    return null;
+                }
+                $host = parse_url($url, PHP_URL_HOST);
+
+                return $host ? ['cloud_name' => $host] : null;
+            })(),
+
             // ── Flash Messages ────────────────────────────────────────────────
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

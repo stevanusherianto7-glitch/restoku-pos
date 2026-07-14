@@ -24,12 +24,15 @@ import {
 import { ReceiptPreview } from '../../Components/POS/ReceiptPreview';
 import { CashierSession } from '../../Components/POS/CashierSession';
 import { RoleGuard } from '../../Components/RoleGuard';
+import DailyPinBadge from '../../Components/DailyPinBadge';
 
 // ─── Menu Catalog ─────────────────────────────────────────────────────────────
 // Foto menu diarahkan ke Cloudinary (sesuai konvensi Restoku: jangan hardcode
 // /images lokal). Saat modul upload owner aktif, path diganti jadi URL Cloudinary
 // penuh; ProductImage menangani fallback bila gambar gagal dimuat.
-const CLOUDINARY_BASE = 'https://res.cloudinary.com/restoku/image/upload';
+// Cloud name milik Restoku (publik, aman di client). Multi-tenant dynamic cloud
+// bisa di-override via shared prop di masa depan, tapi default tetap ini.
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/dwddaydzsh/image/upload';
 const MENU_CATALOG = [
     {
         id: 1,
@@ -435,8 +438,8 @@ function POSInner() {
                             </div>
                         )}
 
-                        <div className="flex justify-between items-center mb-5">
-                            <div className="flex gap-2">
+                        <div className="flex justify-between items-center mb-5 gap-3 flex-wrap">
+                            <div className="flex items-center gap-2 flex-wrap">
                                 {['Semua', 'Makanan', 'Minuman', 'Pelengkap'].map((cat) => (
                                     <button
                                         key={cat}
@@ -446,16 +449,17 @@ function POSInner() {
                                         {cat}
                                     </button>
                                 ))}
+                                <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 focus-within:border-white/20 transition-colors">
+                                    <SearchIcon className="size-4 text-slate-400" />
+                                    <input
+                                        placeholder="Cari menu..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="bg-transparent text-sm outline-none w-40 text-slate-200 placeholder:text-slate-400"
+                                    />
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 focus-within:border-white/20 transition-colors">
-                                <SearchIcon className="size-4 text-slate-400" />
-                                <input
-                                    placeholder="Cari menu..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="bg-transparent text-sm outline-none w-40 text-slate-200 placeholder:text-slate-400"
-                                />
-                            </div>
+                            <DailyPinBadge />
                         </div>
 
                         <div className="grid grid-cols-4 gap-5 auto-rows-max content-start flex-1 overflow-y-auto pr-2 pb-4">

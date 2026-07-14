@@ -11,6 +11,7 @@ import {
     BellRingIcon,
     ShieldAlertIcon,
 } from '../../Components/icons';
+import DailyPinBadge from '../../Components/DailyPinBadge';
 
 type KdsOrder = {
     id: string;
@@ -192,20 +193,23 @@ function WaiterBarContent() {
             <Screen
                 title="Waiter & Bar Display"
                 action={
-                    <button
-                        onClick={() => {
-                            setIsAudioEnabled(!isAudioEnabled);
-                            playNotificationSound();
-                        }}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${
-                            isAudioEnabled
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/30 hover:bg-amber-500/30'
-                                : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-200'
-                        }`}
-                    >
-                        {isAudioEnabled ? <Volume2Icon className="size-5" /> : <VolumeXIcon className="size-5" />}
-                        <span className="text-sm font-medium pr-1">Notifikasi Suara HP</span>
-                    </button>
+                    <>
+                        <button
+                            onClick={() => {
+                                setIsAudioEnabled(!isAudioEnabled);
+                                playNotificationSound();
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${
+                                isAudioEnabled
+                                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30 hover:bg-amber-500/30'
+                                    : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-200'
+                            }`}
+                        >
+                            {isAudioEnabled ? <Volume2Icon className="size-5" /> : <VolumeXIcon className="size-5" />}
+                            <span className="text-sm font-medium pr-1">Notifikasi Suara HP</span>
+                        </button>
+                        <DailyPinBadge />
+                    </>
                 }
             >
                 {/* Dynamic header notification alert */}
