@@ -81,7 +81,21 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     // ── Dashboard ───────────────────────────────────────────────────────────
-    Route::get('/dashboard',          fn () => Inertia::render('Dashboard/Index'))->name('dashboard');
+    // Route /dashboard role-aware: owner -> konsolidasi multi-outlet,
+    // manager -> laporan penjualan, kasir -> POS, waiter -> Waiter & Bar,
+    // kitchen -> KDS. Mencegah staff lihat Owner Dashboard (100 cabang).
+    Route::get('/dashboard', function () {
+        $role = optional(auth()->user())->role;
+
+        return match ($role) {
+            'owner'   => Inertia::render('Dashboard/Index'),
+            'manager' => redirect('/laporan-penjualan'),
+            'kasir'   => redirect('/pos'),
+            'waiter'  => redirect('/waiter-bar'),
+            'kitchen' => redirect('/kds'),
+            default   => redirect('/login'),
+        };
+    })->name('dashboard');
     Route::get('/laporan-keuangan',   fn () => Inertia::render('Dashboard/Reports'))->name('reports');
     Route::get('/owner/dashboard',    [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
     // Fase 3 — API dashboard pakai rollup (bukan scan orders). Query param ?days=30&outlet_id=
