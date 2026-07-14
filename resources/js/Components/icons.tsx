@@ -1584,3 +1584,17 @@ export function ImageIcon(p: P) {
         </svg>
     );
 }
+
+// Daun Restoku (logo mark) — dipakai di tengah QR code e-Menu.
+export function LeafIcon(p: P) {
+    return (
+        <svg {...base(p)} viewBox="0 0 24 24">
+            <path
+                d="M11 3C6 3 3 7 3 12c0 4.5 3 9 9 9 0-6-2-11-9-13 5 1 9 5 9 11 0-6-3-11-9-13Z"
+                fill="currentColor"
+                key="leaf-a"
+            />
+            <path d="M11 21c0-6 3-11 9-13-1 6-4 11-9 13Z" fill="currentColor" opacity="0.55" key="leaf-b" />
+        </svg>
+    );
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mockup — Peta &amp; QR Meja (Restoku)</title>
+<style>
+  :root{
+    --cabe:#FF5B35; --cabe-hover:#E04E2B; --emas:#F59E0B;
+    --cream:#FAF5EE; --cream-2:#FFF3EC; --cream-3:#FCE3D6;
+    --border:#E7D9CB; --ink:#1A1410; --muted:#7A6F63;
+  }
+  *{box-sizing:border-box;font-family:'Inter',system-ui,sans-serif;}
+  body{margin:0;background:#F4ECE2;padding:28px;color:var(--ink);}
+  .wrap{max-width:880px;margin:0 auto;background:var(--cream);border:1px solid var(--border);border-radius:18px;padding:24px;}
+  .head{display:flex;align-items:center;gap:10px;}
+  .head .pin{width:34px;height:34px;border-radius:10px;background:var(--cream-2);display:flex;align-items:center;justify-content:center;color:var(--cabe);font-size:18px;}
+  .head h1{font-size:22px;margin:0;font-weight:800;}
+  .head .sub{font-size:13px;color:var(--muted);margin-top:2px;}
+  .note{margin-top:16px;background:#EAF7EF;border:1px solid #CDEBD6;border-radius:12px;padding:12px 14px;font-size:13px;color:#1F6B3F;display:flex;gap:8px;}
+  .note .ck{color:#1F9D57;font-weight:700;}
+  .prod{margin-top:12px;background:#F1EEEA;border:1px solid #E2DDD5;border-radius:12px;padding:12px 14px;font-size:13px;color:#5A4F43;display:flex;gap:8px;}
+  .prod a{color:var(--cabe);text-decoration:none;font-family:monospace;}
+  .step{margin-top:22px;}
+  .step h2{font-size:14px;font-weight:800;letter-spacing:.04em;color:var(--ink);margin:0 0 12px;}
+  .floor{font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 8px;}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  .tbl{border:1px solid var(--border);background:#fff;border-radius:12px;padding:14px 0;text-align:center;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;}
+  .tbl.sel{background:var(--cabe);color:#fff;border-color:var(--cabe-hover);}
+  .preview{margin-top:26px;border-top:1px dashed var(--border);padding-top:20px;}
+  .preview h2{font-size:14px;font-weight:800;margin:0 0 14px;}
+  .preview h2 span{color:var(--cabe);}
+  .card{width:300px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;box-shadow:0 6px 20px rgba(0,0,0,.06);}
+  .card .tag{position:absolute;top:-10px;left:14px;background:var(--emas);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;letter-spacing:.05em;}
+  .card .brand{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;text-align:center;color:var(--ink);}
+  .card .scan{text-align:center;font-size:11px;letter-spacing:.18em;color:var(--muted);margin-top:2px;}
+  .card .qr{display:flex;justify-content:center;margin:14px 0;}
+  .card .qr svg{width:170px;height:170px;}
+  .card .meja{text-align:center;font-size:16px;font-weight:800;}
+  .card .url{margin-top:12px;font-size:10.5px;font-family:monospace;color:var(--muted);word-break:break-all;display:flex;align-items:center;gap:6px;}
+  .actions{margin-top:14px;display:flex;gap:8px;}
+  .btn{flex:1;border:1px solid var(--cream-3);background:var(--cream-2);color:var(--cabe-hover);font-weight:700;font-size:12px;padding:9px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;}
+  .btn.print{background:var(--cabe);color:#fff;border-color:var(--cabe-hover);}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <div class="pin">📍</div>
+      <div>
+        <h1>Peta &amp; QR Meja</h1>
+        <div class="sub">Generate QR Code Siap Cetak</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="ck">✓</span>
+      <div><b>QR Code Permanen (Statis):</b> Anda <b>TIDAK PERLU</b> mencetak ulang QR Code ini meskipun ada perubahan harga, foto, atau penambahan menu baru di aplikasi.</div>
+    </div>
+
+    <div class="prod">
+      <span>🔗</span>
+      <div>Link mengarah ke server produksi: <a href="#">https://restoku.app/m/pawon-salam-bandung</a></div>
+    </div>
+
+    <div class="step">
+      <h2>1. PILIH MEJA</h2>
+      <div class="floor">Lantai 1 (Format A)</div>
+      <div class="grid">
+        <div class="tbl sel">Meja A1</div>
+        <div class="tbl">Meja A2</div>
+        <div class="tbl">Meja A3</div>
+        <div class="tbl">Meja A4</div>
+        <div class="tbl">Meja A5</div>
+        <div class="tbl">Meja A6</div>
+        <div class="tbl">Meja A7</div>
+        <div class="tbl">Meja A8</div>
+        <div class="tbl">Meja A9</div>
+      </div>
+      <div class="floor">Lantai 2 (Format B)</div>
+      <div class="grid">
+        <div class="tbl">Meja B1</div>
+        <div class="tbl">Meja B2</div>
+        <div class="tbl">Meja B3</div>
+      </div>
+    </div>
+
+    <div class="preview">
+      <h2>2. PREVIEW &amp; DOWNLOAD QR: <span>MEJA A1</span></h2>
+      <div class="card">
+        <div class="tag">AREA CETAK</div>
+        <div class="brand">Pawon Salam</div>
+        <div class="scan">SCAN TO ORDER</div>
+        <div class="qr">
+          <svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#fff"/><rect x="6" y="6" width="22" height="22" fill="#111"/><rect x="72" y="6" width="22" height="22" fill="#111"/><rect x="6" y="72" width="22" height="22" fill="#111"/><rect x="40" y="40" width="20" height="20" fill="#111"/><circle cx="50" cy="50" r="14" fill="#FF5B35"/><text x="50" y="55" font-size="14" text-anchor="middle" fill="#fff">🌿</text></svg>
+        </div>
+        <div class="meja">A1</div>
+        <div class="url">🔗 Target URL: https://restoku.app/m/pawon-salam-bandung?t=A1</div>
+      </div>
+      <div class="actions">
+        <div class="btn">⬇ Unduh</div>
+        <div class="btn print">🖨 Cetak</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
