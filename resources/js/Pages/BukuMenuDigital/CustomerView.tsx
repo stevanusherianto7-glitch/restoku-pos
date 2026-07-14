@@ -304,7 +304,7 @@ export default function CustomerView() {
 
     const theme = {
         premium: {
-            outer: 'min-h-screen w-full bg-gradient-to-b from-[#031510] via-[#052119] to-[#020b08] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 max-w-md mx-auto shadow-2xl relative border-x border-emerald-950/40',
+            outer: 'min-h-[100dvh] w-full bg-gradient-to-b from-[#031510] via-[#052119] to-[#020b08] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 max-w-md mx-auto shadow-2xl relative border-x border-emerald-950/40',
             header: 'sticky top-0 z-40 bg-[#04130f]/60 backdrop-blur-md border-b border-white/5 px-5 py-4 flex items-center justify-between',
             textMuted: 'text-slate-400',
             textTitle: 'text-white',
@@ -330,7 +330,7 @@ export default function CustomerView() {
                 'flex gap-2 overflow-x-auto px-4 py-3 sticky top-[77px] z-30 bg-[#031510]/80 backdrop-blur-md',
         },
         minimalist: {
-            outer: 'min-h-screen w-full bg-slate-50 text-slate-800 flex flex-col font-sans max-w-md mx-auto shadow-2xl relative border-x border-slate-200',
+            outer: 'min-h-[100dvh] w-full bg-slate-50 text-slate-800 flex flex-col font-sans max-w-md mx-auto shadow-2xl relative border-x border-slate-200',
             header: 'sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 px-5 py-4 flex items-center justify-between shadow-sm',
             textMuted: 'text-slate-500',
             textTitle: 'text-slate-900',
@@ -354,7 +354,7 @@ export default function CustomerView() {
             categoryList: 'flex gap-2 overflow-x-auto px-4 py-3 sticky top-[77px] z-30 bg-slate-50/90 backdrop-blur-md',
         },
         cozy: {
-            outer: 'min-h-screen w-full bg-[linear-gradient(90deg,#fff3e0_0%,#ffe6c0_50%,#ffd99f_100%)] text-amber-950 flex flex-col font-sans max-w-md mx-auto shadow-2xl relative border-x border-amber-900/10',
+            outer: 'min-h-[100dvh] w-full bg-[linear-gradient(90deg,#fff3e0_0%,#ffe6c0_50%,#ffd99f_100%)] text-amber-950 flex flex-col font-sans max-w-md mx-auto shadow-2xl relative border-x border-amber-900/10',
             header: 'sticky top-0 z-40 bg-[#faf4ec]/95 backdrop-blur-md border-b border-amber-900/10 px-5 py-4 flex items-center justify-between shadow-sm',
             textMuted: 'text-amber-800/70',
             textTitle: 'text-amber-900',
@@ -379,7 +379,7 @@ export default function CustomerView() {
                 'flex gap-2 overflow-x-auto px-4 py-3 sticky top-[77px] z-30 bg-[#fcf8f2]/90 backdrop-blur-md',
         },
         nanoBanana: {
-            outer: 'min-h-screen w-full bg-[#030712] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 max-w-md mx-auto shadow-[0_0_50px_rgba(234,179,8,0.15)] relative border-x border-amber-500/30 dark nano-banana',
+            outer: 'min-h-[100dvh] w-full bg-[#030712] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 max-w-md mx-auto shadow-[0_0_50px_rgba(234,179,8,0.15)] relative border-x border-amber-500/30 dark nano-banana',
             header: 'sticky top-0 z-40 bg-[#030712]/80 backdrop-blur-xl border-b border-amber-500/20 px-5 py-4 flex items-center justify-between shadow-[0_4px_20px_rgba(234,179,8,0.1)]',
             textMuted: 'text-amber-200/60',
             textTitle: 'text-amber-100 font-bold',
@@ -407,7 +407,7 @@ export default function CustomerView() {
         // ─── ELVERA (Restoku warm brand default) ───────────────────────────────
         // Cabe #FF5B35 / Emas #F59E0B / Cream #FAF5EE — anti-AI SaaS-blue.
         elvera: {
-            outer: 'min-h-screen w-full bg-[#FAF5EE] text-[#1A1410] flex flex-col font-sans selection:bg-[#FF5B35]/20 max-w-md mx-auto shadow-2xl relative border-x border-[#E7D9CB]',
+            outer: 'min-h-[100dvh] w-full bg-[#FAF5EE] text-[#1A1410] flex flex-col font-sans selection:bg-[#FF5B35]/20 max-w-md mx-auto shadow-2xl relative border-x border-[#E7D9CB]',
             header: 'sticky top-0 z-40 bg-[#FFF3EC]/95 backdrop-blur-md border-b border-[#E7D9CB] px-5 py-4 flex items-center justify-between shadow-sm',
             textMuted: 'text-[#7A6F63]',
             textTitle: 'text-[#1A1410]',
@@ -621,86 +621,88 @@ export default function CustomerView() {
                 </div>
             )}
 
-            {/* Glassmorphism Header */}
-            <header className={activeTheme.header}>
-                <div className="flex items-center gap-3">
-                    <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 overflow-hidden">
-                        {renderLogo('size-5 stroke-[2.5] text-slate-950')}
+            {/* Glassmorphism Header — hanya render saat app sudah aktif (welcome/howto/landing = modal screen penuh) */}
+            {appStage === 'app' && (
+                <header className={activeTheme.header}>
+                    <div className="flex items-center gap-3">
+                        <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 overflow-hidden">
+                            {renderLogo('size-5 stroke-[2.5] text-slate-950')}
+                        </div>
+                        <div>
+                            <h1 className="text-sm font-black tracking-tight text-white uppercase">{outletName}</h1>
+                            <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
+                                <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                                {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-sm font-black tracking-tight text-white uppercase">{outletName}</h1>
-                        <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
-                            <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-                            {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
-                        </p>
-                    </div>
-                </div>
 
-                {/* View Mode Tabs */}
-                <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5 max-w-full overflow-x-auto gap-0.5">
-                    <button
-                        onClick={() => setActiveTab('menu')}
-                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                            activeTab === 'menu'
-                                ? isNanoBanana
-                                    ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                    : 'bg-emerald-500 text-slate-950 shadow'
-                                : 'text-slate-400'
-                        }`}
-                    >
-                        Menu
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('reservasi')}
-                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                            activeTab === 'reservasi'
-                                ? isNanoBanana
-                                    ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                    : 'bg-emerald-500 text-slate-950 shadow'
-                                : 'text-slate-400'
-                        }`}
-                    >
-                        Reservasi
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('galeri')}
-                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                            activeTab === 'galeri'
-                                ? isNanoBanana
-                                    ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                    : 'bg-emerald-500 text-slate-950 shadow'
-                                : 'text-slate-400'
-                        }`}
-                    >
-                        Galeri
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('cart')}
-                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 shrink-0 ${
-                            activeTab === 'cart'
-                                ? isNanoBanana
-                                    ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                    : 'bg-emerald-500 text-slate-950 shadow'
-                                : 'text-slate-400'
-                        }`}
-                    >
-                        <ShoppingCartIcon className="size-3" />
-                        {cartTotalItems > 0 && <span>{cartTotalItems}</span>}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('status')}
-                        className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                            activeTab === 'status'
-                                ? isNanoBanana
-                                    ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                    : 'bg-[#FF5B35] text-white shadow'
-                                : 'text-slate-400'
-                        }`}
-                    >
-                        Status
-                    </button>
-                </div>
-            </header>
+                    {/* View Mode Tabs */}
+                    <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5 max-w-full overflow-x-auto gap-0.5">
+                        <button
+                            onClick={() => setActiveTab('menu')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'menu'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Menu
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('reservasi')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'reservasi'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Reservasi
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('galeri')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'galeri'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Galeri
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('cart')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 shrink-0 ${
+                                activeTab === 'cart'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-emerald-500 text-slate-950 shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            <ShoppingCartIcon className="size-3" />
+                            {cartTotalItems > 0 && <span>{cartTotalItems}</span>}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('status')}
+                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
+                                activeTab === 'status'
+                                    ? isNanoBanana
+                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
+                                        : 'bg-[#FF5B35] text-white shadow'
+                                    : 'text-slate-400'
+                            }`}
+                        >
+                            Status
+                        </button>
+                    </div>
+                </header>
+            )}
 
             {/* ─── SCREENSHOT CLONE: FLOW BARU (stub FE-first) ───────────── */}
             {appStage === 'landing' && (
@@ -756,7 +758,7 @@ export default function CustomerView() {
             )}
 
             {appStage === 'welcome' && (
-                <div className="absolute inset-0 z-40 flex flex-col items-center p-7 gap-4 text-center bg-[#FAF5EE] overflow-y-auto">
+                <div className="absolute inset-0 z-40 flex h-full flex-col items-center gap-4 overflow-y-auto bg-[#FAF5EE] p-7 text-center">
                     <div className="w-full flex items-center justify-center gap-3">
                         <div className="size-14 rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] grid place-items-center text-white font-extrabold text-lg shadow-lg">
                             {outletName.slice(0, 2).toUpperCase()}
@@ -826,7 +828,7 @@ export default function CustomerView() {
             )}
 
             {appStage === 'howto' && (
-                <div className="absolute inset-0 z-40 p-5 flex flex-col gap-3 bg-[#FAF5EE] overflow-y-auto">
+                <div className="absolute inset-0 z-40 flex h-full flex-col gap-3 overflow-y-auto bg-[#FAF5EE] p-5">
                     <h2 className="text-center text-lg font-extrabold text-[#1A1410]">Cara Memesan</h2>
                     <p className="text-center text-[12px] text-[#7A6F63] -mt-1">
                         Cukup 3 langkah mudah, pesanan langsung masuk dapur!

@@ -108,12 +108,17 @@ describe('BukuMenuDigital/CustomerView', () => {
     });
 
     it('reads table from ?t= param (QR generator format)', async () => {
-        // Simulasikan URL QR: /m/slug?t=A1
+        // Simulasikan URL QR: /m/slug?t=A1, lalu lewati landing -> welcome
         vi.stubGlobal('window', {
             ...window,
             location: { ...window.location, search: '?t=A1' },
         });
         render(<CustomerView />);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 50));
+        });
+        // landing -> welcome
+        fireEvent.click(screen.getByText(/Masuk ke Menu/i));
         await act(async () => {
             await new Promise((r) => setTimeout(r, 50));
         });
@@ -127,6 +132,10 @@ describe('BukuMenuDigital/CustomerView', () => {
             location: { ...window.location, search: '?table=B2' },
         });
         render(<CustomerView />);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 50));
+        });
+        fireEvent.click(screen.getByText(/Masuk ke Menu/i));
         await act(async () => {
             await new Promise((r) => setTimeout(r, 50));
         });
