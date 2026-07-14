@@ -112,6 +112,20 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/owner/inventory/alerts', fn () => Inertia::render('Owner/InventoryAlerts'))->name('owner.inventory.alerts');
     Route::get('/admin/employees', fn () => Inertia::render('Admin/Employees'))->name('admin.employees');
 
+    // ── [L2] Lapisan 2 — 6 halaman laporan sidebar baru ──────────────────────
+    // Laporan grup: Laba & Rugi, Produk, Shift, Meja, Void
+    Route::get('/laporan/laba-rugi', [OwnerDashboardController::class, 'labaRugi'])->name('laporan.laba-rugi');
+    Route::get('/laporan/produk', [OwnerDashboardController::class, 'laporanProduk'])->name('laporan.produk');
+    Route::get('/laporan/shift', [OwnerDashboardController::class, 'laporanShift'])->name('laporan.shift');
+    Route::get('/laporan/meja', [OwnerDashboardController::class, 'laporanMeja'])->name('laporan.meja');
+    Route::get('/laporan/void', [OwnerDashboardController::class, 'laporanVoid'])->name('laporan.void');
+    // Owner View grup: Kehadiran, Jadwal Shift
+    Route::get('/owner/kehadiran', [OwnerDashboardController::class, 'kehadiran'])->name('owner.kehadiran');
+    Route::get('/owner/jadwal-shift', [OwnerDashboardController::class, 'jadwalShift'])->name('owner.jadwal-shift');
+    // Keuangan grup: Biaya Operasional (controller + migration expenses sendiri)
+    Route::get('/biaya-operasional', [App\Http\Controllers\BiayaOperasionalController::class, 'index'])->name('biaya-operasional.index');
+    Route::post('/biaya-operasional', [App\Http\Controllers\BiayaOperasionalController::class, 'store'])->name('biaya-operasional.store');
+
     // ── Meja outlet (PIN untuk display owner/waiter) ────────────────────────
     Route::get('/api/outlet-tables/{outlet}', [OutletTableController::class, 'index'])->middleware('throttle:60,1');
 
