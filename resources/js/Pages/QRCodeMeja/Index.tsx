@@ -225,7 +225,7 @@ function QRCodeMejaInner() {
                                 >
                                     <h3 className="text-sm font-bold text-slate-200 self-start mb-1.5">Meja {t}</h3>
                                     <div className="size-24 bg-white rounded-xl p-1.5 shadow-sm">
-                                        <QRCodeSVG value={tableUrl(t)} size={84} level="M" data-qr={t} />
+                                        <QRCodeSVG value={tableUrl(t)} size={84} level="M" margin={2} data-qr={t} />
                                     </div>
                                     <p className="text-[9px] font-mono text-slate-500 mt-1.5 text-center break-all w-full leading-tight">
                                         {tableUrl(t)}
@@ -268,7 +268,7 @@ function QRCodeMejaInner() {
                             <div className="pt">Buku Menu Digital</div>
                             <div className="ps">{(selectedOutlet?.name ?? 'Restoku').toUpperCase()}</div>
                             <div className="pqr">
-                                <QRCodeSVG value={tableUrl(t)} size={180} level="M" />
+                                <QRCodeSVG value={tableUrl(t)} size={180} level="M" margin={2} />
                             </div>
                             <div className="brand-badge">Restoku</div>
                             <div className="lbl">NOMOR MEJA</div>

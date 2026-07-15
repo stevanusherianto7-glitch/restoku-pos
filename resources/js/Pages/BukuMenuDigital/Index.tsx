@@ -550,7 +550,13 @@ function BukuMenuDigitalInner() {
                                         SCAN TO ORDER
                                     </p>
                                     <div className="relative mx-auto my-3 w-[180px]">
-                                        <QRCodeSVG ref={previewSvgRef} value={tableUrl} size={164} level="M" />
+                                        <QRCodeSVG
+                                            ref={previewSvgRef}
+                                            value={tableUrl}
+                                            size={164}
+                                            level="M"
+                                            margin={2}
+                                        />
                                         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                                             <div className="flex size-9 items-center justify-center rounded-full bg-[#FF5B35] text-white ring-2 ring-white">
                                                 <LeafIcon className="size-5" />
@@ -625,7 +631,13 @@ function BukuMenuDigitalInner() {
                                 <div className="flex flex-col items-center">
                                     <div className="w-full max-w-[260px] rounded-2xl bg-[#FF5B35] p-4 shadow-inner">
                                         <div className="relative mx-auto w-[200px] bg-white p-3 rounded-xl">
-                                            <QRCodeSVG ref={modalSvgRef} value={modalUrl} size={184} level="M" />
+                                            <QRCodeSVG
+                                                ref={modalSvgRef}
+                                                value={modalUrl}
+                                                size={184}
+                                                level="M"
+                                                margin={2}
+                                            />
                                             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                                                 {modalQrKind === 'logo' || modalQrKind === 'frame' ? (
                                                     <div className="flex size-10 items-center justify-center rounded-full bg-white text-[#FF5B35] ring-2 ring-white">
