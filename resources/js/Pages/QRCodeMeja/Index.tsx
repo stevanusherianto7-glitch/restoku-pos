@@ -53,7 +53,7 @@ function QRCodeMejaInner() {
 
     const selectedOutlet = outlets.find((o) => o.id === selectedOutletId) ?? outlets[0];
 
-    // Base URL untuk QR: env MENU_BASE_URL (dev/LAN/ngrok) → fallback origin browser.
+    // Base URL untuk QR: env MENU_BASE_URL (dev/LAN/cloudflared) → fallback origin browser.
     const baseUrl = (props.menu_base_url as string) || (typeof window !== 'undefined' ? window.location.origin : '');
 
     const tables = useMemo(() => {

@@ -110,7 +110,7 @@ class HandleInertiaRequests extends Middleware
             // ── Menu Base URL (QR generator) ──────────────────────────────────
             // Base URL untuk QR buku menu tamu. Kosong → frontend pakai
             // window.location.origin (benar di produksi/VPS).
-            // Di dev, isi MENU_BASE_URL=http://<IP-LAN>:8000 atau ngrok agar
+            // Di dev, isi MENU_BASE_URL=<URL cloudflared/ngrok/LAN> agar
             // HP bisa scan QR (localhost tidak reachable dari HP).
             'menu_base_url' => config('app.menu_base_url', ''),
 
