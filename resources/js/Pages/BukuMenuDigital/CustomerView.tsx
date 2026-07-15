@@ -104,7 +104,12 @@ const FALLBACK_ITEMS: MenuItem[] = [
 ];
 
 export default function CustomerView() {
-    const { tenantName, renderLogo, tenantLayout, screenMode } = useTenantSettings();
+    const { tenantName, renderLogo, tenantLayout: lsTenantLayout, screenMode: lsScreenMode } = useTenantSettings();
+    // SERVER-DRIVEN tema: prop dari getPublicMenu (outlet_settings.screen_mode).
+    // localStorage (useTenantSettings) hanya fallback kalau prop kosong/offline.
+    const page = usePage();
+    const screenMode = (page.props.screen_mode as string) || lsScreenMode;
+    const tenantLayout = (page.props.tenant_layout as string) || lsTenantLayout;
     const isNanoBanana = screenMode === 'nano-banana' || tenantLayout === 'nano-banana';
     const [tableNumber, setTableNumber] = useState<string | null>(null);
     // Verifikasi kehadiran tamu (anti-fraud)
@@ -456,11 +461,19 @@ export default function CustomerView() {
 
     const isDarkTheme = isNanoBanana || tenantLayout === 'premium' || screenMode === 'premium';
     const modalStyle = {
-        bg: isDarkTheme ? (isNanoBanana ? 'bg-[#111827] border-amber-500/25' : 'bg-[#0d2a21] border-[#0F8A4D]/25') : 'bg-[#FAF5EE] border-amber-900/10',
+        bg: isDarkTheme
+            ? isNanoBanana
+                ? 'bg-[#111827] border-amber-500/25'
+                : 'bg-[#0d2a21] border-[#0F8A4D]/25'
+            : 'bg-[#FAF5EE] border-amber-900/10',
         textTitle: isDarkTheme ? 'text-white' : 'text-[#1A1410]',
         textDesc: isDarkTheme ? 'text-slate-300' : 'text-[#7A6F63]',
         accentText: isDarkTheme ? (isNanoBanana ? 'text-amber-400' : 'text-[#0F8A4D]') : 'text-[#FF5B35]',
-        accentBorder: isDarkTheme ? (isNanoBanana ? 'border-amber-500/20' : 'border-[#0F8A4D]/20') : 'border-[#FF5B35]/15',
+        accentBorder: isDarkTheme
+            ? isNanoBanana
+                ? 'border-amber-500/20'
+                : 'border-[#0F8A4D]/20'
+            : 'border-[#FF5B35]/15',
         accentBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500/10' : 'bg-[#0F8A4D]/10') : 'bg-[#FF5B35]/10',
         cardBg: isDarkTheme ? 'bg-white/5 border-white/5' : 'bg-[#FFF3EC] border-[#FF5B35]/10',
         divider: isDarkTheme ? 'bg-white/10' : 'bg-amber-900/10',
@@ -469,13 +482,21 @@ export default function CustomerView() {
                 ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/25'
                 : 'bg-[#0F8A4D] hover:bg-[#0c6e3d] text-white shadow-md shadow-[#0F8A4D]/25'
             : 'bg-[#FF5B35] text-white hover:bg-[#E04E2B] shadow-md shadow-[#FF5B35]/25',
-        pinBox: isDarkTheme ? 'bg-white/5 border border-white/10 text-white' : 'bg-white border border-amber-900/15 text-[#1A1410]',
-        pinKey: isDarkTheme ? 'bg-white/5 border border-white/5 text-white hover:bg-white/10' : 'bg-white border border-amber-900/10 text-[#1A1410] hover:bg-slate-50',
+        pinBox: isDarkTheme
+            ? 'bg-white/5 border border-white/10 text-white'
+            : 'bg-white border border-amber-900/15 text-[#1A1410]',
+        pinKey: isDarkTheme
+            ? 'bg-white/5 border border-white/5 text-white hover:bg-white/10'
+            : 'bg-white border border-amber-900/10 text-[#1A1410] hover:bg-slate-50',
     };
 
     const headerBg = isDarkTheme
-        ? (isNanoBanana ? 'bg-[#030712]' : 'bg-[#04130f]')
-        : (tenantLayout === 'warm-cozy' ? 'bg-[#faf4ec]' : 'bg-[#FAF5EE]');
+        ? isNanoBanana
+            ? 'bg-[#030712]'
+            : 'bg-[#04130f]'
+        : tenantLayout === 'warm-cozy'
+          ? 'bg-[#faf4ec]'
+          : 'bg-[#FAF5EE]';
     const headerBorder = isDarkTheme ? 'border-b border-white/5' : 'border-b border-amber-900/10';
 
     useEffect(() => {
@@ -637,7 +658,9 @@ export default function CustomerView() {
             <Head title={`E-Menu - ${outletName}`} />
 
             {/* Dynamic Sticky Header Area */}
-            <div className={`${appStage === 'app' ? `sticky top-0 z-40 ${headerBg} ${headerBorder}` : 'fixed inset-x-0 top-0 -z-10 opacity-0 pointer-events-none'} flex flex-col shrink-0`}>
+            <div
+                className={`${appStage === 'app' ? `sticky top-0 z-40 ${headerBg} ${headerBorder}` : 'fixed inset-x-0 top-0 -z-10 opacity-0 pointer-events-none'} flex flex-col shrink-0`}
+            >
                 {/* Operating Hours Alert Banner */}
                 {!isOutletOpen && (
                     <div className="bg-rose-500/20 border-b border-rose-500/30 px-4 py-3 flex items-center gap-3 text-rose-300">
@@ -658,7 +681,9 @@ export default function CustomerView() {
                 )}
 
                 {/* Brand Info & Tabs */}
-                <header className={`${activeTheme.header} !static !bg-transparent !border-b-0 !shadow-none !px-4 !py-3 !flex-col !items-stretch gap-3`}>
+                <header
+                    className={`${activeTheme.header} !static !bg-transparent !border-b-0 !shadow-none !px-4 !py-3 !flex-col !items-stretch gap-3`}
+                >
                     <div className="flex items-center gap-3">
                         <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 overflow-hidden">
                             {renderLogo('size-7 text-slate-950')}
@@ -781,12 +806,16 @@ export default function CustomerView() {
 
             {appStage === 'landing' && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}>
+                    <div
+                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
+                    >
                         <div>
                             <p className={`text-[9px] font-bold tracking-[0.22em] ${modalStyle.accentText} uppercase`}>
                                 Sejak 2025 · Nusantara
                             </p>
-                            <h2 className={`font-serif text-2xl mt-2 leading-tight font-extrabold ${modalStyle.textTitle}`}>
+                            <h2
+                                className={`font-serif text-2xl mt-2 leading-tight font-extrabold ${modalStyle.textTitle}`}
+                            >
                                 Cita rasa Jawa,
                                 <br />
                                 <span className={`italic ${modalStyle.accentText}`}>disajikan modern.</span>
@@ -803,8 +832,13 @@ export default function CustomerView() {
                                 { ic: '🍴', t: 'Dapur Realtime', d: 'Antrian pesanan otomatis masuk' },
                                 { ic: '📊', t: 'Monitor Pesanan', d: 'Pantau semua transaksi live' },
                             ].map((f) => (
-                                <div key={f.t} className={`flex items-center gap-3 ${modalStyle.cardBg} p-2.5 rounded-2xl border`}>
-                                    <div className={`size-8 rounded-lg border ${modalStyle.accentBorder} grid place-items-center ${modalStyle.accentText} text-sm shrink-0`}>
+                                <div
+                                    key={f.t}
+                                    className={`flex items-center gap-3 ${modalStyle.cardBg} p-2.5 rounded-2xl border`}
+                                >
+                                    <div
+                                        className={`size-8 rounded-lg border ${modalStyle.accentBorder} grid place-items-center ${modalStyle.accentText} text-sm shrink-0`}
+                                    >
                                         {f.ic}
                                     </div>
                                     <div>
@@ -827,7 +861,9 @@ export default function CustomerView() {
 
             {appStage === 'welcome' && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}>
+                    <div
+                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
+                    >
                         <div className="flex w-full items-center justify-between gap-3">
                             <div className="grid size-12 place-items-center overflow-hidden rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-md">
                                 {renderLogo('size-7 text-white')}
@@ -847,19 +883,27 @@ export default function CustomerView() {
                             Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
                             MSG. Selamat menikmati!
                         </p>
-                        <div className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center justify-between text-left border`}>
+                        <div
+                            className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center justify-between text-left border`}
+                        >
                             <div>
                                 <p className={`text-[9px] font-extrabold tracking-wider ${modalStyle.accentText}`}>
                                     📍 NOMOR MEJA ANDA
                                 </p>
-                                <p className={`text-base font-extrabold ${modalStyle.textTitle} mt-0.5`}>Meja {tableNumber ?? 'A3'}</p>
+                                <p className={`text-base font-extrabold ${modalStyle.textTitle} mt-0.5`}>
+                                    Meja {tableNumber ?? 'A3'}
+                                </p>
                             </div>
-                            <span className={`px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 ${modalStyle.accentText} text-[9px] font-extrabold flex items-center gap-1`}>
+                            <span
+                                className={`px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 ${modalStyle.accentText} text-[9px] font-extrabold flex items-center gap-1`}
+                            >
                                 ✓ Terverifikasi
                             </span>
                         </div>
                         <div className="w-full text-left">
-                            <p className={`text-[10px] font-extrabold tracking-wider ${modalStyle.textDesc} text-left mb-1.5`}>
+                            <p
+                                className={`text-[10px] font-extrabold tracking-wider ${modalStyle.textDesc} text-left mb-1.5`}
+                            >
                                 PILIH TIPE PESANAN
                             </p>
                             <div className="flex gap-3">
@@ -901,7 +945,9 @@ export default function CustomerView() {
 
             {appStage === 'howto' && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden text-[#1A1410]`}>
+                    <div
+                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden text-[#1A1410]`}
+                    >
                         <h2 className={`text-xl font-extrabold ${modalStyle.textTitle}`}>Cara Memesan</h2>
                         <p className={`text-[11px] ${modalStyle.textDesc} -mt-2`}>
                             Cukup 3 langkah mudah, pesanan langsung masuk dapur!
@@ -910,26 +956,43 @@ export default function CustomerView() {
                             {[
                                 {
                                     n: 1,
-                                    bg: isDarkTheme ? 'bg-white/5 border-white/5 text-slate-300' : 'bg-[#F4EEFD] border-[#7C3AED]/10 text-[#7C3AED]',
+                                    bg: isDarkTheme
+                                        ? 'bg-white/5 border-white/5 text-slate-300'
+                                        : 'bg-[#F4EEFD] border-[#7C3AED]/10 text-[#7C3AED]',
                                     t: 'Pilih Menu Favorit',
                                     d: 'Tekan menu yang kamu inginkan, lihat foto & harga lengkap',
                                 },
                                 {
                                     n: 2,
-                                    bg: isDarkTheme ? 'bg-white/5 border-white/5 text-slate-300' : 'bg-[#FFF1E9] border-[#FF5B35]/10 text-[#FF5B35]',
+                                    bg: isDarkTheme
+                                        ? 'bg-white/5 border-white/5 text-slate-300'
+                                        : 'bg-[#FFF1E9] border-[#FF5B35]/10 text-[#FF5B35]',
                                     t: 'Masuk ke Keranjang',
                                     d: 'Tambah qty, tulis catatan khusus untuk chef jika perlu',
                                 },
                                 {
                                     n: 3,
-                                    bg: isDarkTheme ? 'bg-white/5 border-white/5 text-slate-300' : 'bg-[#EAF7EF] border-[#0F8A4D]/10 text-[#0F8A4D]',
+                                    bg: isDarkTheme
+                                        ? 'bg-white/5 border-white/5 text-slate-300'
+                                        : 'bg-[#EAF7EF] border-[#0F8A4D]/10 text-[#0F8A4D]',
                                     t: 'Kirim Pesanan',
                                     d: 'Tekan "Pesan Sekarang" — pesanan langsung diterima dapur!',
                                 },
                             ].map((s) => (
-                                <div key={s.n} className={`rounded-2xl p-3 flex gap-3 items-start border text-left ${s.bg}`}>
-                                    <div className={`size-5 rounded-full ${isDarkTheme ? 'bg-emerald-500 text-slate-950' : 'bg-current text-white'} font-extrabold grid place-items-center text-[10px] shrink-0`}>
-                                        <span className={isDarkTheme ? 'text-slate-900 font-bold' : 'text-white font-bold'}>{s.n}</span>
+                                <div
+                                    key={s.n}
+                                    className={`rounded-2xl p-3 flex gap-3 items-start border text-left ${s.bg}`}
+                                >
+                                    <div
+                                        className={`size-5 rounded-full ${isDarkTheme ? 'bg-emerald-500 text-slate-950' : 'bg-current text-white'} font-extrabold grid place-items-center text-[10px] shrink-0`}
+                                    >
+                                        <span
+                                            className={
+                                                isDarkTheme ? 'text-slate-900 font-bold' : 'text-white font-bold'
+                                            }
+                                        >
+                                            {s.n}
+                                        </span>
                                     </div>
                                     <div>
                                         <p className={`font-extrabold text-[12px] ${modalStyle.textTitle}`}>{s.t}</p>
@@ -938,12 +1001,17 @@ export default function CustomerView() {
                                 </div>
                             ))}
                         </div>
-                        <div className={`flex items-center justify-between ${modalStyle.cardBg} border rounded-2xl p-3 text-[11px] mt-1`}>
+                        <div
+                            className={`flex items-center justify-between ${modalStyle.cardBg} border rounded-2xl p-3 text-[11px] mt-1`}
+                        >
                             <span className={modalStyle.textDesc}>🪑 Tipe pesanan</span>
-                            <b className={modalStyle.textTitle}>
-                                {orderType === 'dine_in' ? 'Dine In' : 'Take Away'}
-                            </b>
-                            <span className={`${modalStyle.accentText} font-extrabold cursor-pointer`} onClick={() => setAppStage('welcome')}>Ubah</span>
+                            <b className={modalStyle.textTitle}>{orderType === 'dine_in' ? 'Dine In' : 'Take Away'}</b>
+                            <span
+                                className={`${modalStyle.accentText} font-extrabold cursor-pointer`}
+                                onClick={() => setAppStage('welcome')}
+                            >
+                                Ubah
+                            </span>
                         </div>
                         <button
                             onClick={() => setAppStage('app')}
@@ -958,16 +1026,22 @@ export default function CustomerView() {
             {/* Verifikasi Dine-In: overlay saat app & dine_in & belum verified */}
             {appStage === 'app' && orderType === 'dine_in' && !dineVerified && (
                 <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}>
+                    <div
+                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
+                    >
                         <div className="flex items-start gap-3 text-left">
-                            <div className={`size-10 rounded-full border ${modalStyle.accentBorder} grid place-items-center text-lg ${modalStyle.accentText}`}>
+                            <div
+                                className={`size-10 rounded-full border ${modalStyle.accentBorder} grid place-items-center text-lg ${modalStyle.accentText}`}
+                            >
                                 🛡
                             </div>
                             <div>
                                 <p className={`font-extrabold text-[15px] ${modalStyle.accentText} tracking-wide`}>
                                     VERIFIKASI DINE-IN
                                 </p>
-                                <p className={`text-[9px] ${modalStyle.textDesc} mt-0.5 tracking-wide uppercase font-bold`}>
+                                <p
+                                    className={`text-[9px] ${modalStyle.textDesc} mt-0.5 tracking-wide uppercase font-bold`}
+                                >
                                     PASTIKAN ANDA MEMESAN DI LOKASI
                                 </p>
                             </div>
@@ -984,7 +1058,9 @@ export default function CustomerView() {
                                 📍 Validasi GPS Otomatis
                             </p>
                             {gpsError && (
-                                <div className={`mt-2 ${isDarkTheme ? 'bg-[#7A2A1A] text-[#FF9B7A]' : 'bg-[#FEE2E2] text-[#991B1B] border-[#FCA5A5]/40'} rounded-xl p-2.5 text-[11px] font-semibold leading-snug`}>
+                                <div
+                                    className={`mt-2 ${isDarkTheme ? 'bg-[#7A2A1A] text-[#FF9B7A]' : 'bg-[#FEE2E2] text-[#991B1B] border-[#FCA5A5]/40'} rounded-xl p-2.5 text-[11px] font-semibold leading-snug`}
+                                >
                                     {gpsError}
                                 </div>
                             )}
@@ -1055,7 +1131,6 @@ export default function CustomerView() {
 
             {activeTab === 'menu' && (
                 <>
-
                     {/* Menu Items List */}
                     <main className="flex-1 px-4 pb-28 space-y-4 overflow-y-auto">
                         {filteredItems.length > 0 ? (
@@ -1725,8 +1800,16 @@ export default function CustomerView() {
                             </div>
 
                             <div className="flex justify-between text-[8px] font-bold text-[#8A7D70] uppercase tracking-wider">
-                                <span className={orderStatus === 'Antrian Masuk' ? 'text-amber-600 font-extrabold' : ''}>Antrian</span>
-                                <span className={orderStatus === 'Sedang Dimasak' ? 'text-blue-600 font-extrabold' : ''}>Dimasak</span>
+                                <span
+                                    className={orderStatus === 'Antrian Masuk' ? 'text-amber-600 font-extrabold' : ''}
+                                >
+                                    Antrian
+                                </span>
+                                <span
+                                    className={orderStatus === 'Sedang Dimasak' ? 'text-blue-600 font-extrabold' : ''}
+                                >
+                                    Dimasak
+                                </span>
                                 <span
                                     className={
                                         orderStatus === 'Siap Sajikan' || orderStatus === 'Selesai'
@@ -1797,21 +1880,39 @@ function MenuDetailSheet({
     onClose: () => void;
     onAdd: (id: number) => void;
 }) {
-    const { tenantLayout, screenMode } = useTenantSettings();
+    // SERVER-DRIVEN tema (sama dengan parent).
+    const page = usePage();
+    const { tenantLayout: lsTenantLayout, screenMode: lsScreenMode } = useTenantSettings();
+    const screenMode = (page.props.screen_mode as string) || lsScreenMode;
+    const tenantLayout = (page.props.tenant_layout as string) || lsTenantLayout;
     const isNanoBanana = screenMode === 'nano-banana' || tenantLayout === 'nano-banana';
     const isDarkTheme = isNanoBanana || tenantLayout === 'premium' || screenMode === 'premium';
 
     const modalStyle = {
-        bg: isDarkTheme ? (isNanoBanana ? 'bg-[#111827] border-amber-500/25' : 'bg-[#0d2a21] border-[#0F8A4D]/25') : 'bg-[#FAF5EE] border-amber-900/10',
+        bg: isDarkTheme
+            ? isNanoBanana
+                ? 'bg-[#111827] border-amber-500/25'
+                : 'bg-[#0d2a21] border-[#0F8A4D]/25'
+            : 'bg-[#FAF5EE] border-amber-900/10',
         textTitle: isDarkTheme ? 'text-white' : 'text-[#1A1410]',
         textDesc: isDarkTheme ? 'text-slate-300' : 'text-[#7A6F63]',
         textMuted: isDarkTheme ? 'text-slate-400' : 'text-[#5A4F43]',
         accentText: isDarkTheme ? (isNanoBanana ? 'text-amber-400' : 'text-[#0f9f59]') : 'text-[#FF5B35]',
         accentBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500' : 'bg-[#0F8A4D]') : 'bg-[#FF5B35]',
-        accentBadgeBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500/15 border-amber-500/30 text-amber-400' : 'bg-[#0F8A4D]/15 border-[#0F8A4D]/30 text-emerald-400') : 'bg-[#FF5B35]/15 border-[#FF5B35]/30 text-[#FF5B35]',
-        accentStepBg: isDarkTheme ? (isNanoBanana ? 'bg-amber-500/10 text-amber-400' : 'bg-[#0F8A4D]/10 text-emerald-400') : 'bg-[#FF5B35]/10 text-[#FF5B35]',
+        accentBadgeBg: isDarkTheme
+            ? isNanoBanana
+                ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
+                : 'bg-[#0F8A4D]/15 border-[#0F8A4D]/30 text-emerald-400'
+            : 'bg-[#FF5B35]/15 border-[#FF5B35]/30 text-[#FF5B35]',
+        accentStepBg: isDarkTheme
+            ? isNanoBanana
+                ? 'bg-amber-500/10 text-amber-400'
+                : 'bg-[#0F8A4D]/10 text-emerald-400'
+            : 'bg-[#FF5B35]/10 text-[#FF5B35]',
         divider: isDarkTheme ? 'border-white/10' : 'border-amber-900/10',
-        cardBg: isDarkTheme ? 'bg-white/5 border-white/10 p-2.5 rounded-2xl' : 'border border-amber-900/10 p-2.5 rounded-2xl',
+        cardBg: isDarkTheme
+            ? 'bg-white/5 border-white/10 p-2.5 rounded-2xl'
+            : 'border border-amber-900/10 p-2.5 rounded-2xl',
         ctaBg: isDarkTheme ? 'bg-[#0a2019]/60 border-t border-white/5' : 'bg-[#FFF3EC]/50 border-t border-amber-900/10',
         button: isDarkTheme
             ? isNanoBanana
@@ -1829,7 +1930,10 @@ function MenuDetailSheet({
     const reviews = item.reviews ?? [];
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto" onClick={onClose}>
+        <div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto"
+            onClick={onClose}
+        >
             <div
                 className={`relative w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} overflow-hidden shadow-2xl border max-h-[85vh] flex flex-col`}
                 onClick={(e) => e.stopPropagation()}
@@ -1849,7 +1953,9 @@ function MenuDetailSheet({
                         ✕
                     </button>
                     {item.isPopular && (
-                        <span className={`absolute top-3 left-3 ${modalStyle.accentBadgeBg} font-black text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm`}>
+                        <span
+                            className={`absolute top-3 left-3 ${modalStyle.accentBadgeBg} font-black text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm`}
+                        >
                             🔥 Favorit
                         </span>
                     )}
@@ -1863,12 +1969,16 @@ function MenuDetailSheet({
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto px-5 py-4 text-left">
                     <h2 className={`text-xl font-extrabold ${modalStyle.textTitle} tracking-tight`}>{item.name}</h2>
-                    <p className={`text-[10px] font-bold ${modalStyle.accentText} uppercase tracking-wide mt-0.5`}>{outletName}</p>
+                    <p className={`text-[10px] font-bold ${modalStyle.accentText} uppercase tracking-wide mt-0.5`}>
+                        {outletName}
+                    </p>
 
                     <div className={`flex items-center gap-3 mt-2 text-[10px] ${modalStyle.textDesc} font-bold`}>
                         <span className="text-[#F59E0B]">
                             {'★'.repeat(Math.round(item.rating ?? 4.9))}{' '}
-                            <span className={`${modalStyle.textTitle} font-extrabold`}>{(item.rating ?? 4.9).toFixed(1)}</span>
+                            <span className={`${modalStyle.textTitle} font-extrabold`}>
+                                {(item.rating ?? 4.9).toFixed(1)}
+                            </span>
                         </span>
                         {item.cookTime && <span>⏱ {item.cookTime}</span>}
                         {item.servings && <span>🍽 {item.servings}</span>}
@@ -1917,8 +2027,12 @@ function MenuDetailSheet({
                                     {reviews.map((r, i) => (
                                         <div key={i} className={`border ${modalStyle.cardBg}`}>
                                             <div className="flex items-center justify-between">
-                                                <span className={`text-xs font-bold ${modalStyle.textTitle}`}>{r.name}</span>
-                                                <span className="text-[#F59E0B] text-[10px]">{'★'.repeat(r.rating)}</span>
+                                                <span className={`text-xs font-bold ${modalStyle.textTitle}`}>
+                                                    {r.name}
+                                                </span>
+                                                <span className="text-[#F59E0B] text-[10px]">
+                                                    {'★'.repeat(r.rating)}
+                                                </span>
                                             </div>
                                             <p className={`text-[10px] ${modalStyle.textDesc} mt-1`}>{r.text}</p>
                                         </div>

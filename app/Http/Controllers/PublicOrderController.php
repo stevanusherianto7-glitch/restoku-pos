@@ -72,6 +72,11 @@ class PublicOrderController extends Controller
                 ->toArray())
         );
 
+        // Tema e-Menu (Customer View) diambil dari outlet_settings — SERVER-DRIVEN,
+        // bukan localStorage per-origin (biar tamu HP vs desktop lihat tema SAMA).
+        // Fallback 'nano-banana' = standar brand (dark + amber/orange) per keputusan owner.
+        $screenMode = $outlet->settings?->screen_mode ?? 'nano-banana';
+
         return response()->json([
             'outlet' => [
                 'id' => $outlet->id,
@@ -81,6 +86,8 @@ class PublicOrderController extends Controller
                 'longitude' => $outlet->longitude,
                 'geo_radius_meters' => $outlet->geo_radius_meters ?? 50,
             ],
+            'screen_mode' => $screenMode,
+            'tenant_layout' => 'nano-banana',
             'menu' => $menu,
         ]);
     }
