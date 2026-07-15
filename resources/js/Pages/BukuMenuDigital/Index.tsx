@@ -10,6 +10,7 @@ import {
     CopyIcon,
     PrinterIcon,
     DownloadIcon,
+    UploadIcon,
     ExternalLinkIcon,
     MapPinIcon,
     LeafIcon,
