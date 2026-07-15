@@ -129,6 +129,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // ── Meja outlet (PIN untuk display owner/waiter + CRUD nyata) ──────────
     Route::get('/api/outlet-tables/{outlet}', [OutletTableController::class, 'index'])->middleware('throttle:60,1');
     Route::post('/api/outlet-tables', [OutletTableController::class, 'store'])->middleware('throttle:30,1');
+    Route::post('/api/outlet-tables/bulk', [OutletTableController::class, 'bulkStore'])->middleware('throttle:30,1');
     Route::put('/api/outlet-tables/{id}', [OutletTableController::class, 'update'])->middleware('throttle:30,1');
     Route::delete('/api/outlet-tables/{id}', [OutletTableController::class, 'destroy'])->middleware('throttle:30,1');
 

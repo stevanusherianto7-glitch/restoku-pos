@@ -143,6 +143,80 @@ class OutletTableController extends Controller
     }
 
     /**
+     * Import massal dari CSV (Upload di FE). Baris berisi {label, is_queue, qr_type}.
+     * Cross-tenant safe: outlet di-resolve dari tenant user. Duplikat (dalam file / sudah ada)
+     * dilewati dan dilaporkan, bukan gagal total.
+     */
+    public function bulkStore(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        $outlet = $this->resolveOutlet((int) $request->input('outlet_id'), $user->tenant_id);
+        if (! $outlet) {
+            abort(403);
+        }
+
+        $rows = $request->input('rows', []);
+        if (! is_array($rows) || count($rows) === 0) {
+            return response()->json(['error' => 'Tidak ada baris untuk diimpor.'], 422);
+        }
+
+        $created = 0;
+        $skipped = 0;
+        $errors = [];
+        $seen = [];
+
+        foreach ($rows as $i => $row) {
+            $label = isset($row['label']) ? trim((string) $row['label']) : '';
+            if ($label === '') {
+                $errors[] = 'Baris '.($i + 1).': label kosong.';
+                $skipped++;
+
+                continue;
+            }
+            $qrType = in_array($row['qr_type'] ?? null, ['qr', 'logo', 'frame'], true)
+                ? $row['qr_type']
+                : 'frame';
+            $isQueue = filter_var($row['is_queue'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+            // Duplikat dalam satu file import.
+            if (in_array(strtolower($label), $seen, true)) {
+                $errors[] = 'Baris '.($i + 1).": meja {$label} duplikat dalam file.";
+                $skipped++;
+
+                continue;
+            }
+            // Sudah ada di DB.
+            $exists = OutletTable::withoutGlobalScope(TenantScope::class)
+                ->where('outlet_id', $outlet->id)
+                ->where('label', $label)
+                ->exists();
+            if ($exists) {
+                $errors[] = 'Baris '.($i + 1).": meja {$label} sudah ada (dilewati).";
+                $skipped++;
+
+                continue;
+            }
+
+            OutletTable::withoutGlobalScope(TenantScope::class)->create([
+                'tenant_id' => $outlet->tenant_id,
+                'outlet_id' => $outlet->id,
+                'label' => $label,
+                'pin_hash' => Hash::make(OutletTable::derivePin($outlet->id, $label)),
+                'is_queue' => $isQueue,
+                'qr_type' => $qrType,
+            ]);
+            $seen[] = strtolower($label);
+            $created++;
+        }
+
+        return response()->json([
+            'created' => $created,
+            'skipped' => $skipped,
+            'errors' => $errors,
+        ], 201);
+    }
+
+    /**
      * Hapus meja.
      */
     public function destroy(int $id): JsonResponse

@@ -135,4 +135,37 @@ class OutletTableControllerTest extends TestCase
 
         $this->assertDatabaseMissing('outlet_tables', ['id' => $table->id]);
     }
+
+    public function test_bulk_import_creates_and_skips(): void
+    {
+        OutletTable::withoutGlobalScopes()->create([
+            'tenant_id' => $this->testTenant->id,
+            'outlet_id' => $this->testOutlet->id,
+            'label' => 'A1',
+            'pin_hash' => Hash::make('x'),
+        ]);
+
+        $resp = $this->actingAs($this->testOwner)
+            ->postJson('/api/outlet-tables/bulk', [
+                'outlet_id' => $this->testOutlet->id,
+                'rows' => [
+                    ['label' => 'B1', 'is_queue' => true, 'qr_type' => 'logo'],
+                    ['label' => 'B2', 'is_queue' => false, 'qr_type' => 'qr'],
+                    ['label' => 'A1', 'qr_type' => 'frame'], // sudah ada -> dilewati
+                    ['label' => 'B2'], // duplikat dalam file -> dilewati
+                    ['label' => '', 'qr_type' => 'qr'], // kosong -> skip
+                ],
+            ]);
+
+        $resp->assertCreated();
+        $resp->assertJsonPath('created', 2);
+        $resp->assertJsonPath('skipped', 3);
+
+        $this->assertDatabaseHas('outlet_tables', [
+            'outlet_id' => $this->testOutlet->id, 'label' => 'B1', 'is_queue' => true, 'qr_type' => 'logo',
+        ]);
+        $this->assertDatabaseHas('outlet_tables', [
+            'outlet_id' => $this->testOutlet->id, 'label' => 'B2', 'qr_type' => 'qr',
+        ]);
+    }
 }

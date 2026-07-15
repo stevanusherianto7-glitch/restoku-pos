@@ -246,6 +246,81 @@ function BukuMenuDigitalInner() {
         }
     };
 
+    // ── Upload CSV (import massal) ───────────────────────────────────────────
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Parse CSV sederhana: header no.1 = label, kol.2 = is_queue (ya/tidak/1/0), kol.3 = qr_type.
+    const parseCsv = (text: string): { label: string; is_queue: boolean; qr_type: string }[] => {
+        const lines = text
+            .split(/\r?\n/)
+            .map((l) => l.trim())
+            .filter((l) => l.length > 0);
+        if (lines.length === 0) return [];
+        const rows = lines.slice(1); // skip header
+        return rows.map((line) => {
+            const cols = line.split(',').map((c) => c.trim());
+            const label = cols[0] ?? '';
+            const isQueueRaw = (cols[1] ?? '').toLowerCase();
+            const is_queue = ['ya', 'yes', '1', 'true'].includes(isQueueRaw);
+            const qr_type = ['qr', 'logo', 'frame'].includes((cols[2] ?? '').toLowerCase())
+                ? cols[2].toLowerCase()
+                : 'frame';
+            return { label, is_queue, qr_type };
+        });
+    };
+
+    const uploadCsv = async (file: File) => {
+        if (!selectedOutletId) return;
+        setSaving(true);
+        setTableError('');
+        try {
+            const text = await file.text();
+            const rows = parseCsv(text);
+            if (rows.length === 0) {
+                setTableError('File CSV kosong atau format salah (butuh header: label,is_queue,qr_type).');
+                return;
+            }
+            const res = await fetch('/api/outlet-tables/bulk', {
+                method: 'POST',
+                headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-Inertia': 'false' },
+                body: JSON.stringify({ outlet_id: selectedOutletId, rows }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error ?? 'Gagal mengimpor CSV');
+            let msg = `Import selesai: ${data.created} dibuat`;
+            if (data.skipped > 0) msg += `, ${data.skipped} dilewati`;
+            if (Array.isArray(data.errors) && data.errors.length > 0) {
+                msg += `\n${data.errors.slice(0, 5).join('\n')}`;
+            }
+            await loadTables(selectedOutletId);
+            setTableError(msg);
+        } catch (e: any) {
+            setTableError(e?.message ?? 'Gagal mengimpor CSV');
+        } finally {
+            setSaving(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    // ── Download CSV (export) ────────────────────────────────────────────────
+    const downloadCsv = () => {
+        const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
+        const header = 'label,is_queue,qr_type';
+        const body = apiTables
+            .map((t) => [t.label, t.is_queue ? 'ya' : 'tidak', t.qr_type].map(escape).join(','))
+            .join('\n');
+        const csv = `${header}\n${body}`;
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `meja_${selectedOutlet?.slug ?? 'outlet'}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     const copyMenuLink = async () => {
         if (!tableUrl) return;
         try {
@@ -334,12 +409,29 @@ function BukuMenuDigitalInner() {
                                 >
                                     <PlusIcon className="size-4" /> Tambah Data
                                 </button>
-                                <button className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7D9CB] bg-white px-3 py-2 text-[12px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]">
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={saving}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7D9CB] bg-white px-3 py-2 text-[12px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2] disabled:opacity-50"
+                                >
                                     <UploadIcon className="size-4" /> Upload
                                 </button>
-                                <button className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7D9CB] bg-white px-3 py-2 text-[12px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]">
+                                <button
+                                    onClick={downloadCsv}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7D9CB] bg-white px-3 py-2 text-[12px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]"
+                                >
                                     <DownloadIcon className="size-4" /> Download
                                 </button>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept=".csv,text/csv"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const f = e.target.files?.[0];
+                                        if (f) uploadCsv(f);
+                                    }}
+                                />
                                 <button
                                     onClick={() => tables[0] && openModal('edit', apiTables[0])}
                                     className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7D9CB] bg-white px-3 py-2 text-[12px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]"
@@ -362,8 +454,8 @@ function BukuMenuDigitalInner() {
                         </div>
 
                         {tableError && (
-                            <div className="border-b border-[#F0E6DA] bg-[#FDECEC] px-4 py-2 text-[12px] text-[#C0392B]">
-                                {tableError}
+                            <div className="border-b border-[#F0E6DA] bg-[#FFF6EC] px-4 py-2 text-[12px] text-[#7A4A12]">
+                                <pre className="whitespace-pre-wrap font-sans">{tableError}</pre>
                             </div>
                         )}
 
