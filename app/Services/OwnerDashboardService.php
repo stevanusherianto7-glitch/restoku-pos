@@ -186,15 +186,15 @@ class OwnerDashboardService
             fn ($o) => (int) $o->created_at->format('H') >= 6 && (int) $o->created_at->format('H') <= 22
         );
 
-        $buckets = collect(range(6, 22))->mapWithKeys(fn ($h) => [sprintf('%02d:00', $h) => 0]);
+        $buckets = collect(range(6, 22))->mapWithKeys(fn ($h) => [sprintf('%02d:00', $h) => 0])->all();
         foreach ($rows as $o) {
             $key = sprintf('%02d:00', (int) $o->created_at->format('H'));
-            if (isset($buckets[$key])) {
+            if (array_key_exists($key, $buckets)) {
                 $buckets[$key]++;
             }
         }
 
-        return $buckets->map(fn ($v, $k) => ['hour' => $k, 'orders' => $v])->values()->all();
+        return collect($buckets)->map(fn ($v, $k) => ['hour' => $k, 'orders' => $v])->values()->all();
     }
 
     public function getPeakDays(int $tenantId, string $dateRange = 'today'): array
