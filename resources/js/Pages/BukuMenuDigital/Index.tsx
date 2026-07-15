@@ -623,34 +623,34 @@ function BukuMenuDigitalInner() {
                             <div className="grid grid-cols-1 gap-5 p-5 md:grid-cols-2">
                                 {/* Kiri: stiker QR */}
                                 <div className="flex flex-col items-center">
-                                    <div className="w-full max-w-[260px] rounded-2xl bg-[#CFFAFE] p-4 shadow-inner">
+                                    <div className="w-full max-w-[260px] rounded-2xl bg-[#FF5B35] p-4 shadow-inner">
                                         <div className="relative mx-auto w-[200px] bg-white p-3 rounded-xl">
                                             <QRCodeSVG ref={modalSvgRef} value={modalUrl} size={184} level="M" />
                                             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                                                 {modalQrKind === 'logo' || modalQrKind === 'frame' ? (
-                                                    <div className="flex size-10 items-center justify-center rounded-full bg-[#FF5B35] text-white ring-2 ring-white">
+                                                    <div className="flex size-10 items-center justify-center rounded-full bg-white text-[#FF5B35] ring-2 ring-white">
                                                         <LeafIcon className="size-5" />
                                                     </div>
                                                 ) : null}
                                             </div>
                                         </div>
                                         <div className="mt-3 rounded-xl bg-white px-3 py-2 text-center">
-                                            <p className="text-[11px] font-semibold text-[#0E7490]">
+                                            <p className="text-[11px] font-semibold text-[#FF5B35]">
                                                 Download Aplikasi
                                             </p>
-                                            <p className="text-[13px] font-extrabold text-[#0E7490]">
+                                            <p className="text-[13px] font-extrabold text-[#FF5B35]">
                                                 Restoku Self Order
                                             </p>
                                             <div className="mt-2 flex items-center justify-center gap-2">
                                                 <span className="rounded bg-black px-2 py-1 text-[9px] font-bold text-white">
                                                     App Store
                                                 </span>
-                                                <span className="rounded bg-[#0E7490] px-2 py-1 text-[9px] font-bold text-white">
+                                                <span className="rounded bg-[#FF5B35] px-2 py-1 text-[9px] font-bold text-white">
                                                     Google Play
                                                 </span>
                                             </div>
                                         </div>
-                                        <p className="mt-3 text-center text-[34px] font-extrabold leading-none text-white drop-shadow">
+                                        <p className="mt-3 text-center text-[34px] font-extrabold leading-none text-[#1A1410] drop-shadow">
                                             {modalNoMeja}
                                         </p>
                                     </div>
