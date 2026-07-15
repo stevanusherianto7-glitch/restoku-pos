@@ -13,6 +13,7 @@ use App\Services\RedisHealthService;
 use App\Services\SalesRollupService;
 use App\Services\TenantContext;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class OwnerDashboardController extends Controller
@@ -30,19 +31,26 @@ class OwnerDashboardController extends Controller
         $tenantId = $this->ctx->id();
         $dateRange = $request->input('date_range', 'today');
 
-        return Inertia::render('Dashboard/OwnerDashboard', [
-            'metrics' => $this->dashboardService->getAggregateMetrics($tenantId, $dateRange),
-            'leaderboard' => $this->dashboardService->getOutletLeaderboard($tenantId, $dateRange),
-            'menuPerformance' => $this->dashboardService->getMenuPerformance($tenantId, $dateRange),
-            'profitMetrics' => $this->dashboardService->getProfitMetrics($tenantId, $dateRange),
-            'peakHours' => $this->dashboardService->getPeakHours($tenantId, $dateRange),
-            'peakDays' => $this->dashboardService->getPeakDays($tenantId, $dateRange),
-            'topProducts' => $this->dashboardService->getTopProducts($tenantId, $dateRange, 10),
-            'transactionTypes' => $this->dashboardService->getTransactionTypes($tenantId, $dateRange),
+        // S-10: cache agregasi dashboard 60s per tenant+range (hindari ~20 query/load).
+        $cacheKey = "dashboard:{$tenantId}:{$dateRange}";
+        $data = Cache::remember($cacheKey, 60, function () use ($tenantId, $dateRange) {
+            return [
+                'metrics' => $this->dashboardService->getAggregateMetrics($tenantId, $dateRange),
+                'leaderboard' => $this->dashboardService->getOutletLeaderboard($tenantId, $dateRange),
+                'menuPerformance' => $this->dashboardService->getMenuPerformance($tenantId, $dateRange),
+                'profitMetrics' => $this->dashboardService->getProfitMetrics($tenantId, $dateRange),
+                'peakHours' => $this->dashboardService->getPeakHours($tenantId, $dateRange),
+                'peakDays' => $this->dashboardService->getPeakDays($tenantId, $dateRange),
+                'topProducts' => $this->dashboardService->getTopProducts($tenantId, $dateRange, 10),
+                'transactionTypes' => $this->dashboardService->getTransactionTypes($tenantId, $dateRange),
+            ];
+        });
+
+        return Inertia::render('Dashboard/OwnerDashboard', array_merge($data, [
             'stockAlerts' => $this->dashboardService->getStockAlerts($tenantId),
             'shiftPerformance' => $this->dashboardService->getShiftPerformance($tenantId),
             'filters' => ['date_range' => $dateRange],
-        ]);
+        ]));
     }
 
     public function reports(Request $request)

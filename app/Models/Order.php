@@ -28,6 +28,63 @@ class Order extends Model
 
     public const STATUS_DIBATALKAN = 'dibatalkan';
 
+    /**
+     * S-07 — State machine order.
+     * Transisi yang diizinkan. Status akhir (selesai/dibatalkan) bersifat terminal.
+     * Tanpa ini, order "siap_bayar" bisa dipindah balik ke "antrian_masuk" (bug).
+     */
+    public const TRANSITIONS = [
+        self::STATUS_ANTRIAN_MASUK => [
+            self::STATUS_SEDANG_DIMASAK,
+            self::STATUS_SIAP_SAJIKAN,
+            self::STATUS_SIAP_BAYAR,
+            self::STATUS_DIBATALKAN,
+        ],
+        self::STATUS_SEDANG_DIMASAK => [
+            self::STATUS_SIAP_SAJIKAN,
+            self::STATUS_SIAP_BAYAR,
+            self::STATUS_DIBATALKAN,
+        ],
+        self::STATUS_SIAP_SAJIKAN => [
+            self::STATUS_SIAP_BAYAR,
+            self::STATUS_DIBATALKAN,
+        ],
+        self::STATUS_SIAP_BAYAR => [
+            self::STATUS_SELESAI,
+            self::STATUS_DIBATALKAN,
+        ],
+        self::STATUS_SELESAI => [],
+        self::STATUS_DIBATALKAN => [],
+    ];
+
+    /**
+     * Apakah transisi dari status saat ini ke $target diizinkan?
+     */
+    public function canTransitionTo(string $target): bool
+    {
+        if ($this->status === $target) {
+            return true; // idempoten (re-set status sama = no-op)
+        }
+
+        return in_array($target, self::TRANSITIONS[$this->status] ?? [], true);
+    }
+
+    /**
+     * Update status dengan validasi transisi. Throw jika ilegal.
+     * Menggantikan update(['status'=>...]) mentah di controller.
+     */
+    public function transitionTo(string $target): void
+    {
+        if (! $this->canTransitionTo($target)) {
+            throw new \InvalidArgumentException(
+                "Transisi order ilegal: {$this->status} -> {$target}"
+            );
+        }
+
+        $this->status = $target;
+        $this->save();
+    }
+
     protected $casts = [
         'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',

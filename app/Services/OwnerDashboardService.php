@@ -40,33 +40,43 @@ class OwnerDashboardService
 
     /**
      * Get leaderboard of outlets comparing revenue and profit.
+     * S-08 FIX: single grouped query (bukan N+1 loop per outlet).
      */
     public function getOutletLeaderboard(int $tenantId, string $dateRange = 'today')
     {
-        $outlets = Outlet::where('tenant_id', $tenantId)->get();
+        // Ambil nama outlet sekali jalan (hindari N+1).
+        $outletNames = Outlet::where('tenant_id', $tenantId)
+            ->pluck('name', 'id')
+            ->all();
+
+        $query = Order::byTenant($tenantId)
+            ->where('status', Order::STATUS_SELESAI);
+
+        if ($dateRange === 'today') {
+            $query->whereDate('created_at', now()->toDateString());
+        } elseif ($dateRange === 'month') {
+            $query->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
+        // S-08: 1 query grouped by outlet_id (bukan N query).
+        $revenueByOutlet = $query
+            ->select('outlet_id', DB::raw('SUM(total) as revenue'))
+            ->groupBy('outlet_id')
+            ->pluck('revenue', 'outlet_id')
+            ->all();
+
+        $cogsPct = (float) config('resto-benchmarks.cogs', 0.35);
 
         $leaderboard = [];
-        foreach ($outlets as $outlet) {
-            $outletOrders = Order::forOutlet($outlet)
-                ->where('status', Order::STATUS_SELESAI);
-
-            if ($dateRange === 'today') {
-                $outletOrders->whereDate('created_at', now()->toDateString());
-            } elseif ($dateRange === 'month') {
-                $outletOrders->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year);
-            }
-
-            $revenue = (float) $outletOrders->sum('total');
-            $cogsPct = (float) config('resto-benchmarks.cogs', 0.35);
-            $profit = $revenue * $cogsPct; // benchmark net margin
-
+        foreach ($outletNames as $outletId => $name) {
+            $revenue = (float) ($revenueByOutlet[$outletId] ?? 0);
             $leaderboard[] = [
-                'id' => $outlet->id,
-                'name' => $outlet->name,
+                'id' => $outletId,
+                'name' => $name,
                 'revenue' => $revenue,
-                'profit_estimate' => $profit,
-                'food_cost_percentage' => 35,
+                'profit_estimate' => $revenue * $cogsPct,
+                'food_cost_percentage' => (int) ($cogsPct * 100),
                 'is_estimate' => true,
             ];
         }
@@ -178,24 +188,36 @@ class OwnerDashboardService
 
     /**
      * [L1] Jam ramai (06:00–22:00, 17 bucket) + hari ramai (Sen–Ming, 7 bucket).
-     * Dihitung dari Order::created_at yang status selesai dalam rentang.
+     * S-15 FIX: GROUP BY HOUR() di SQL (bukan load semua order ke memory).
+     * Kompatibel SQLite (strftime) + MySQL (HOUR()).
      */
     public function getPeakHours(int $tenantId, string $dateRange = 'today'): array
     {
-        $orders = Order::byTenant($tenantId)
+        $driver = DB::getDriverName();
+        $hourExpr = $driver === 'sqlite'
+            ? DB::raw("CAST(strftime('%H', created_at) AS INTEGER)")
+            : DB::raw('HOUR(created_at)');
+
+        $counts = Order::byTenant($tenantId)
             ->where('status', Order::STATUS_SELESAI);
-        $this->applyDateRange($orders, $dateRange);
+        $this->applyDateRange($counts, $dateRange);
 
-        // Filter jam 06–22 di PHP (bukan HOUR() SQL) agar kompatibel MySQL + SQLite.
-        $rows = $orders->get(['created_at'])->filter(
-            fn ($o) => (int) $o->created_at->format('H') >= 6 && (int) $o->created_at->format('H') <= 22
-        );
+        $counts = $counts
+            ->select($hourExpr, DB::raw('COUNT(*) as cnt'))
+            ->groupBy($hourExpr)
+            ->pluck('cnt', $driver === 'sqlite' ? 'HOUR' : 'HOUR')
+            ->all();
 
-        $buckets = collect(range(6, 22))->mapWithKeys(fn ($h) => [sprintf('%02d:00', $h) => 0])->all();
-        foreach ($rows as $o) {
-            $key = sprintf('%02d:00', (int) $o->created_at->format('H'));
+        // Map hasil ke bucket 06–22.
+        $buckets = collect(range(6, 22))->mapWithKeys(
+            fn ($h) => [sprintf('%02d:00', $h) => 0]
+        )->all();
+
+        foreach ($counts as $hour => $cnt) {
+            $h = (int) $hour;
+            $key = sprintf('%02d:00', $h);
             if (array_key_exists($key, $buckets)) {
-                $buckets[$key]++;
+                $buckets[$key] = (int) $cnt;
             }
         }
 

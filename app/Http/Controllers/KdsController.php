@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * KdsController — Kitchen Display System endpoints.
@@ -46,35 +47,40 @@ class KdsController extends Controller
 
     private function buildKdsGroups(Request $request): array
     {
-        $query = Order::whereIn('status', array_keys(self::KDS_STATUS_LABELS))
-            ->with('items');
+        // S-31: cache 5s per tenant+outlet (polling realtime, hindari query berulang).
+        $outletKey = $request->filled('outlet_id') ? (int) $request->input('outlet_id') : 'all';
+        $cacheKey = 'kds:'.auth()->user()->tenant_id.':'.$outletKey;
 
-        // Q7/Q10: filter per-outlet (scope tenant sudah aktif via TenantScope).
-        if ($request->filled('outlet_id')) {
-            $query->where('outlet_id', (int) $request->input('outlet_id'));
-        }
+        return Cache::remember($cacheKey, 5, function () use ($request) {
+            $query = Order::whereIn('status', array_keys(self::KDS_STATUS_LABELS))
+                ->with('items');
 
-        $orders = $query->orderBy('created_at')->get();
-
-        $grouped = array_fill_keys(self::KDS_STATUS_LABELS, []);
-
-        foreach ($orders as $order) {
-            $label = self::KDS_STATUS_LABELS[$order->status] ?? null;
-            if (! $label) {
-                continue;
+            if ($request->filled('outlet_id')) {
+                $query->where('outlet_id', (int) $request->input('outlet_id'));
             }
 
-            $grouped[$label][] = [
-                'id' => $order->order_code,
-                'table' => $order->table_number,
-                'status' => $label,
-                'tone' => $this->toneForStatus($order->status),
-                'time' => max(1, (int) $order->created_at->diffInMinutes(now())),
-                'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}".($item->notes ? " ({$item->notes})" : ''))->all(),
-            ];
-        }
+            $orders = $query->orderBy('created_at')->get();
 
-        return $grouped;
+            $grouped = array_fill_keys(self::KDS_STATUS_LABELS, []);
+
+            foreach ($orders as $order) {
+                $label = self::KDS_STATUS_LABELS[$order->status] ?? null;
+                if (! $label) {
+                    continue;
+                }
+
+                $grouped[$label][] = [
+                    'id' => $order->order_code,
+                    'table' => $order->table_number,
+                    'status' => $label,
+                    'tone' => $this->toneForStatus($order->status),
+                    'time' => max(1, (int) $order->created_at->diffInMinutes(now())),
+                    'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}".($item->notes ? " ({$item->notes})" : ''))->all(),
+                ];
+            }
+
+            return $grouped;
+        });
     }
 
     /**
@@ -94,11 +100,17 @@ class KdsController extends Controller
         $statusInput = $request->input('status');
 
         if ($statusInput === 'Selesai') {
-            $order->update(['status' => Order::STATUS_SIAP_BAYAR]);
+            $target = Order::STATUS_SIAP_BAYAR;
         } else {
             $map = array_flip(self::KDS_STATUS_LABELS);
-            $order->update(['status' => $map[$statusInput]]);
+            $target = $map[$statusInput];
         }
+
+        // S-07: tolak transisi ilegal (mis. siap_bayar → antrian_masuk).
+        if (! $order->canTransitionTo($target)) {
+            abort(422, "Transisi status ilegal: {$order->status} -> {$target}");
+        }
+        $order->update(['status' => $target]);
 
         return response()->json(['success' => true]);
     }

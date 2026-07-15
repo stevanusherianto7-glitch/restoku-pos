@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * CashierController — Antrean kasir dan pembayaran.
@@ -15,21 +16,25 @@ class CashierController extends Controller
      */
     public function getCashierQueue()
     {
-        $queue = Order::where('status', Order::STATUS_SIAP_BAYAR)
-            ->with('items')
-            ->get()
-            ->map(fn ($order) => [
-                'id' => $order->order_code,
-                'table' => $order->table_number,
-                'status' => 'Siap Bayar',
-                'tone' => 'emerald',
-                'time' => max(1, (int) $order->created_at->diffInMinutes(now())),
-                'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}")->all(),
-            ]);
+        // S-32: cache 5s antrean kasir (polling).
+        $cacheKey = 'cashier:'.auth()->user()->tenant_id;
+        $queue = Cache::remember($cacheKey, 5, function () {
+            return Order::where('status', Order::STATUS_SIAP_BAYAR)
+                ->with('items')
+                ->get()
+                ->map(fn ($order) => [
+                    'id' => $order->order_code,
+                    'table' => $order->table_number,
+                    'status' => 'Siap Bayar',
+                    'tone' => 'emerald',
+                    'time' => max(1, (int) $order->created_at->diffInMinutes(now())),
+                    'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}")->all(),
+                ])->values();
+        });
 
         return response()->json([
             'success' => true,
-            'queue' => $queue->values(),
+            'queue' => $queue,
         ]);
     }
 
@@ -43,11 +48,20 @@ class CashierController extends Controller
             ->firstOrFail();
         $this->authorize('update', $order);
 
+        // S-07: hanya order "siap_bayar" yang boleh diselesaikan.
+        // Transisi balik (mis. selesai → siap_bayar) ditolak.
+        if (! $order->canTransitionTo(Order::STATUS_SELESAI)) {
+            abort(422, "Order tidak dalam status siap bayar: {$order->status}");
+        }
+
         $order->update([
             'status' => Order::STATUS_SELESAI,
             'payment_status' => 'paid',
             'paid_at' => now(),
         ]);
+
+        // S-32: invalidate cache antrean kasir setelah mutasi.
+        Cache::forget('cashier:'.auth()->user()->tenant_id);
 
         return response()->json(['success' => true]);
     }
