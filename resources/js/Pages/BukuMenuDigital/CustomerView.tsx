@@ -158,6 +158,13 @@ export default function CustomerView() {
                         geo_radius_meters: data.outlet.geo_radius_meters ?? 50,
                     });
                 }
+                // SERVER-DRIVEN tema: screen_mode dari API (outlet_settings) = source-of-truth.
+                // Simpan ke localStorage supaya useTenantSettings() (yang baca localStorage)
+                // sekarang SAMA di HP (cloudflare) & desktop (localhost).
+                if (data?.screen_mode) {
+                    window.localStorage.setItem('outlet_screen_mode', data.screen_mode);
+                    window.localStorage.setItem('tenant_layout', data.tenant_layout ?? data.screen_mode);
+                }
                 setMenuItems(items.length ? items : FALLBACK_ITEMS);
             })
             .catch(() => setMenuItems(FALLBACK_ITEMS))
