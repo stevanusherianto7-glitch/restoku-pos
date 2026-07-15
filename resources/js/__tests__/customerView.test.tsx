@@ -7,6 +7,9 @@ vi.mock('@inertiajs/react', async (importOriginal) => {
     return {
         ...actual,
         Head: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+        usePage: () => ({
+            props: { screen_mode: 'nano-banana', tenant_layout: 'default' },
+        }),
     };
 });
 vi.mock('../Components/Shared', async (importOriginal) => {
@@ -149,16 +152,16 @@ describe('BukuMenuDigital/CustomerView', () => {
         vi.unstubAllGlobals();
     });
 
-    it('verifies dine-in with correct daily PIN (fetches from BE, not hardcoded)', async () => {
+    it('checkout locked "Verifikasi Dulu" before verify', async () => {
+        // SEBELUM verify: guestVerified=false -> tombol terkunci
         vi.stubGlobal('window', {
             ...window,
-            location: { ...window.location, pathname: '/m/pawon-salam-bandung', search: '' },
+            location: { ...window.location, pathname: '/m/pawon-salam', search: '?t=A3' },
         });
         render(<CustomerView />);
         await act(async () => {
             await new Promise((r) => setTimeout(r, 150));
         });
-        // landing -> welcome -> howto -> app
         fireEvent.click(screen.getByText(/Masuk ke Menu/i));
         await act(async () => {
             await new Promise((r) => setTimeout(r, 30));
@@ -171,28 +174,60 @@ describe('BukuMenuDigital/CustomerView', () => {
         await act(async () => {
             await new Promise((r) => setTimeout(r, 30));
         });
-
-        // Modal verifikasi dine-in harus muncul
-        expect(screen.getByText(/VERIFIKASI DINE-IN/i)).toBeInTheDocument();
-
-        // Masukkan PIN harian dari BE (7264) via keypad
-        for (const d of ['7', '2', '6', '4']) {
-            fireEvent.click(screen.getByText(d, { selector: 'button' }));
-        }
-        fireEvent.click(screen.getByText(/VERIFIKASI PIN/i));
+        // add item
+        fireEvent.click(screen.getByText('Nasi Goreng'));
         await act(async () => {
             await new Promise((r) => setTimeout(r, 30));
         });
-
-        // Modal harus tertutup (verifikasi sukses)
-        expect(screen.queryByText(/VERIFIKASI DINE-IN/i)).not.toBeInTheDocument();
+        const addBtn = screen.queryByText(/Tambah ke Pesanan/i);
+        if (addBtn) fireEvent.click(addBtn);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        // checkout bar harus terkunci
+        expect(screen.getByText(/Verifikasi Dulu/i)).toBeInTheDocument();
         vi.unstubAllGlobals();
     });
 
-    it('rejects wrong daily PIN (modal stays open)', async () => {
+    it('checkout active "Kirim Pesanan Ke Dapur" after guestVerified (localStorage restore)', async () => {
+        // SETELAH verify: token di localStorage -> guestVerified=true -> langsung app
+        localStorage.setItem(
+            'restoku_guest_verify',
+            JSON.stringify({ slug: 'pawon-salam', table: 'A3', token: 'TESTTOKEN', exp: Date.now() + 15 * 60 * 1000 }),
+        );
         vi.stubGlobal('window', {
             ...window,
-            location: { ...window.location, pathname: '/m/pawon-salam-bandung', search: '' },
+            location: { ...window.location, pathname: '/m/pawon-salam', search: '?t=A3' },
+        });
+        render(<CustomerView />);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 150));
+        });
+        // guestVerified -> skip landing, langsung app
+        fireEvent.click(screen.getByText('Nasi Goreng'));
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        const addBtn = screen.queryByText(/Tambah ke Pesanan/i);
+        if (addBtn) fireEvent.click(addBtn);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        // buka cart tab supaya button checkout (dalam cart section) ter-render
+        const cartTab = screen.getByTestId('cart-tab');
+        fireEvent.click(cartTab);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        // checkout sekarang aktif
+        expect(screen.getByText(/Kirim Pesanan Ke Dapur/i)).toBeInTheDocument();
+        vi.unstubAllGlobals();
+    });
+
+    it('GuestVerifyGate appears in cart tab when item added & unverified', async () => {
+        vi.stubGlobal('window', {
+            ...window,
+            location: { ...window.location, pathname: '/m/pawon-salam', search: '?t=A3' },
         });
         render(<CustomerView />);
         await act(async () => {
@@ -210,20 +245,26 @@ describe('BukuMenuDigital/CustomerView', () => {
         await act(async () => {
             await new Promise((r) => setTimeout(r, 30));
         });
-
-        expect(screen.getByText(/VERIFIKASI DINE-IN/i)).toBeInTheDocument();
-
-        // PIN salah (0000, bukan 7264 dari BE)
-        for (const d of ['0', '0', '0', '0']) {
-            fireEvent.click(screen.getByText(d, { selector: 'button' }));
-        }
-        fireEvent.click(screen.getByText(/VERIFIKASI PIN/i));
+        // add item
+        fireEvent.click(screen.getByText('Nasi Goreng'));
         await act(async () => {
             await new Promise((r) => setTimeout(r, 30));
         });
-
-        // Modal tetap terbuka
-        expect(screen.getByText(/VERIFIKASI DINE-IN/i)).toBeInTheDocument();
+        const addBtn = screen.queryByText(/Tambah ke Pesanan/i);
+        if (addBtn) fireEvent.click(addBtn);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        // buka cart tab (data-testid=cart-tab)
+        const cartTab = screen.getByTestId('cart-tab');
+        fireEvent.click(cartTab);
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 30));
+        });
+        // GuestVerifyGate (satu-satunya gate) harus muncul
+        expect(screen.getByText(/VERIFIKASI KEHADIRAN/i)).toBeInTheDocument();
+        expect(screen.getByText(/PIN Meja/i)).toBeInTheDocument();
+        expect(screen.getByText(/PIN Harian Restoran/i)).toBeInTheDocument();
         vi.unstubAllGlobals();
     });
 });
