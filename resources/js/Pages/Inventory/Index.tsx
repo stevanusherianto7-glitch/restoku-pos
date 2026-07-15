@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah, MOCK_OUTLET } from '../../Components/Shared';
-import { SearchIcon, PlusIcon, SlidersHorizontalIcon, DownloadIcon } from '../../Components/icons';
+import { SearchIcon, PlusIcon, SlidersHorizontalIcon, DownloadIcon, PencilIcon } from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 
@@ -87,7 +87,7 @@ function InventoryInner() {
                                     <span className="font-mono text-slate-300">{formatRupiah(r.cost)}</span>
                                     <span className="text-slate-400">{r.updated}</span>
                                     <button className="text-slate-500 hover:text-slate-300 transition-colors">
-                                        <Pencil className="size-3.5" />
+                                        <PencilIcon className="size-3.5" />
                                     </button>
                                 </div>
                             ))}
