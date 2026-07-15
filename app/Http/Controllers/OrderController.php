@@ -4,26 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Outlet;
 use App\Models\OutletSetting;
 use App\Models\PrintJob;
 use App\Models\ReceiptConfig;
 use App\Models\Reservation;
 use App\Models\Scopes\TenantScope;
+use App\Services\GuestOrderService;
 use App\Services\TenantContext;
 use App\Services\TenantReadConnection;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class OrderController extends Controller
 {
     public function __construct(
         private TenantContext $ctx,
-        private TenantReadConnection $readConn
+        private TenantReadConnection $readConn,
+        private GuestOrderService $guestOrderService
     ) {}
 
     /**
@@ -136,64 +139,21 @@ class OrderController extends Controller
             'items.*.notes' => 'nullable|string|max:255',
         ]);
 
-        // BUG-006 FIX: Ambil tenant_id dari outlet, bukan dari request
-        // Ini memastikan client tidak bisa memilih tenant sembarangan
-        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
-            ->select('id', 'tenant_id')
-            ->findOrFail($validated['outlet_id']);
-
-        $tenantId = $outlet->tenant_id;
-        $menuItemIds = collect($validated['items'])->pluck('menu_item_id')->unique();
-
-        // Query manual tanpa TenantScope (guest belum login) tapi tetap
-        // dikunci ke tenant_id yang didapat dari outlet (bukan dari client).
-        $menuItems = MenuItem::withoutGlobalScope(TenantScope::class)
-            ->where('tenant_id', $tenantId)
-            ->where('is_available', true)  // BUG-012 FIX: cek is_available
-            ->whereIn('id', $menuItemIds)
-            ->get()
-            ->keyBy('id');
-
-        if ($menuItems->count() !== $menuItemIds->count()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Beberapa item menu tidak ditemukan atau tidak tersedia saat ini.',
-            ], 422);
-        }
-
-        $order = DB::transaction(function () use ($validated, $tenantId, $menuItems, $outlet) {
-            $order = Order::withoutGlobalScope(TenantScope::class)->create([
-                'tenant_id' => $tenantId,
-                'outlet_id' => $outlet->id,
-                'order_code' => Order::generateOrderCode($tenantId),
-                'table_number' => str_starts_with($validated['table'], 'Meja') ? $validated['table'] : 'Meja '.$validated['table'],
-                'source' => 'guest_qr',
-                'status' => Order::STATUS_ANTRIAN_MASUK,
-            ]);
-
-            $subtotal = 0;
-
-            foreach ($validated['items'] as $row) {
-                $menuItem = $menuItems[$row['menu_item_id']];
-                $lineSubtotal = $menuItem->price * $row['quantity'];
-                $subtotal += $lineSubtotal;
-
-                OrderItem::withoutGlobalScope(TenantScope::class)->create([
-                    'tenant_id' => $tenantId,
-                    'order_id' => $order->id,
-                    'menu_item_id' => $menuItem->id,
-                    'item_name' => $menuItem->name,
-                    'quantity' => $row['quantity'],
-                    'unit_price' => $menuItem->price,
-                    'subtotal' => $lineSubtotal,
-                    'notes' => $row['notes'] ?? null,
-                ]);
+        // S-11: delegasikan ke GuestOrderService (logika bisnis dipusatkan).
+        // Tangkap 422 dari service agar response tetap {success:false,message:...}.
+        try {
+            $order = $this->guestOrderService->create($validated);
+        } catch (HttpResponseException $e) {
+            throw $e;
+        } catch (HttpException $e) {
+            if ($e->getStatusCode() === 422) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 422);
             }
-
-            $order->update(['subtotal' => $subtotal, 'total' => $subtotal]);
-
-            return $order->load('items');
-        });
+            throw $e;
+        }
 
         return response()->json([
             'success' => true,

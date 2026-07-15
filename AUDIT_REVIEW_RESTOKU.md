@@ -71,7 +71,7 @@ Sisanya (S-24, S-26–S-35, S-37 dup, S-39–S-43, S-45, S-46, S-47 dup) **BELUM
 
 **JANGAN eksekusi "88 perbaikan" dari audit asli secara blind.** Audit tersebut:
 1. **Salah premis** (schema-per-tenant → sebenarnya shared-schema).
-2. **Mengandung halusinasi faktual** di temuan Kritis (S-01, S-04, S-05, S-21, S-22) yang sudah ter-bukti SALAH via `file:line`.
+2. **Mengandung halusinasi faktual** di temuan Kritis (S-01, S-04, S-05, S-21, S-22, **S-17**) yang sudah ter-bukti SALAH via `file:line`.
 3. **Over-count** (S-37 == S-47).
 
 **Subset VALID yang layak dieksekusi (dengan plan dulu, sesuai aturan plan-first):**
@@ -79,11 +79,11 @@ Sisanya (S-24, S-26–S-35, S-37 dup, S-39–S-43, S-45, S-46, S-47 dup) **BELUM
 | Prioritas | Temuan | Estimasi | Status |
 |---|---|---|---|
 | 1 | **S-03** hapus `tenant_id`/`role` dari `User::$fillable` | 15 mnt | ⚠️ **DITUNDA** — sdh ter-mitigasi di `OrderController.php:119`; fillable change BREAK 17 test legit |
-| 2 | **S-07** state-machine validasi transisi order | 4 jam | ⏳ Fase 2 |
-| 3 | **S-08 / S-15** fix N+1 + peak-hours SQL grouping | 3 jam | ⏳ Fase 2 |
-| 4 | **S-10 / S-31 / S-32** caching dashboard/queue/KDS | 4 jam | ⏳ Fase 2 |
-| 5 | **S-11 / S-12 / S-13 / S-14** refactor fat controllers | 8 jam | ⏳ Fase 3 |
-| 6 | **S-17 / S-16 / S-33** AI async + no global config mutation | 5 jam | ⏳ Fase 2 |
+| 2 | **S-07** state-machine validasi transisi order | 4 jam | ✅ **DONE (Fase 2, commit e134f5d)** |
+| 3 | **S-08 / S-15** fix N+1 + peak-hours SQL grouping | 3 jam | ✅ **DONE (Fase 2, e134f5d)** |
+| 4 | **S-10 / S-31 / S-32** caching dashboard/queue/KDS | 4 jam | ✅ **DONE (Fase 2, e134f5d)** |
+| 5 | **S-11 / S-12 / S-13 / S-14** refactor fat controllers | 8 jam | ⏳ Fase 3 — **S-11 DONE** (commit Fase-3): `GuestOrderService` ekstrak `submitOrder` dari `OrderController`. S-12/13/14 pending (Out/Settings/KDS masih panjang tapi aman, lanjut bertahap) |
+| 6 | **S-17 / S-16 / S-33** AI async + no global config mutation | 5 jam | ❌ **S-17 = HALUSINASI** — tidak ada `AiFallbackService` & tidak ada global `config()` mutation di kode (fallback ada di `GeminiAiController.php:59`/`GoogleReviewController.php:166` pakai try/catch+Log, BUKAN mutate config). S-16/S-33 (AI→queue) belum dieksekusi (perlu rencana terpisah) |
 | 7 | **S-29 / S-30 / S-36** indexes + `$fillable` eksplisit | 2 jam | ✅ **S-29/S-30 DONE (Fase 1)**; S-36 DITUNDA (break 101 test) |
 | 8 | **S-19** benchmark COGS/OpEx ke config | 1 jam | ✅ **DONE (Fase 1)** |
 | + | **S-20** SSL verify gate | — | ✅ **DONE (Fase 1)** |
@@ -94,7 +94,7 @@ Sisanya (S-24, S-26–S-35, S-37 dup, S-39–S-43, S-45, S-46, S-47 dup) **BELUM
 
 ## 4. Tindakan Selanjutnya
 
-- [x] **FASE 1 SELESAI** (commit terpisah): S-19 ✅, S-20 ✅, S-29/S-30 ✅ (index migration, migrated). S-03 & S-36 **DITUNDA** (lihat note S-03/S-36 — fillable change BREAK 17/101 existing test; vektor asli sdh ter-mitigasi).
+- [x] **FASE 2 SELESAI** (commit e134f5d): S-07 ✅ (state-machine + guard 422 Kds/Cashier), S-08 ✅ (N+1→grouped), S-15 ✅ (GROUP BY HOUR), S-10/31/32 ✅ (Cache::remember). Verified: BE 426 pass / 7 pre-existing Google-network fails (0 new); FE 234/234.
 - [ ] **FASE 2** (medium risk): S-07 (state-machine), S-08/S-15 (N+1+SQL), S-10/S-31/S-32 (caching), S-17/S-16/S-33 (AI async).
 - [ ] **FASE 3** (HIGH risk, maintainability): S-11/12/13/14 refactor fat controllers — butuh FE green sebelum/sesudah.
 - [ ] Spot-check sisa temuan Tinggi/Sedang yang belum di-cek (S-09, S-23–S-35, S-39–S-46, S-48–S-90) sebelum diklaim valid.
