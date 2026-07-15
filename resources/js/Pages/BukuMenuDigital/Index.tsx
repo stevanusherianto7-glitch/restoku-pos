@@ -726,6 +726,20 @@ function BukuMenuDigitalInner() {
                                 >
                                     Batal
                                 </button>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        window.open(
+                                            buildMenuUrl(baseUrl, selectedOutlet?.slug ?? '', modalNoMeja),
+                                            '_blank',
+                                            'noopener',
+                                        )
+                                    }
+                                    disabled={!selectedOutlet || !modalNoMeja.trim()}
+                                    className="rounded-lg border border-[#FF5B35] bg-white px-4 py-2 text-[12.5px] font-bold text-[#FF5B35] hover:bg-[#FFF3EC] disabled:opacity-40"
+                                >
+                                    Buka Preview
+                                </button>
                                 {modalMode === 'edit' && (
                                     <button
                                         onClick={() => deleteTable(modalId!, modalNoMeja)}
