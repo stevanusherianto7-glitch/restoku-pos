@@ -423,8 +423,7 @@ class OrderController extends Controller
         $reservation = $this->reservationService->updateStatus(
             $id,
             $request->input('status'),
-            $this->ctx->id(),
-            self::RESERVATION_STATUSES
+            $this->ctx->id()
         );
 
         return response()->json([

@@ -62,10 +62,10 @@ class ReservationService
 
     /**
      * Update status reservasi dengan validasi + ownership (BUG-007/008).
-     *
-     * @param  string[]  $allowedStatuses
+     * Validasi nilai status ditangani controller (in:RESERVATION_STATUSES);
+     * di sini cukup cek kepemilikan tenant (defense-in-depth).
      */
-    public function updateStatus(string $code, string $status, int $currentTenantId, array $allowedStatuses): Reservation
+    public function updateStatus(string $code, string $status, int $currentTenantId): Reservation
     {
         $reservation = Reservation::where('reservation_code', $code)->firstOrFail();
 

@@ -82,8 +82,9 @@ Sisanya (S-24, S-26–S-35, S-37 dup, S-39–S-43, S-45, S-46, S-47 dup) **BELUM
 | 2 | **S-07** state-machine validasi transisi order | 4 jam | ✅ **DONE (Fase 2, commit e134f5d)** |
 | 3 | **S-08 / S-15** fix N+1 + peak-hours SQL grouping | 3 jam | ✅ **DONE (Fase 2, e134f5d)** |
 | 4 | **S-10 / S-31 / S-32** caching dashboard/queue/KDS | 4 jam | ✅ **DONE (Fase 2, e134f5d)** |
-| 5 | **S-11 / S-12 / S-13 / S-14** refactor fat controllers | 8 jam | ⏳ Fase 3 — **S-11 DONE** (GuestOrderService), **S-13 DONE** (ReservationService). S-12/14 pending (OutletSettings/KDS masuk akal tapi aman, lanjut bertahap) |
-| 6 | **S-17 / S-16 / S-33** AI global config + async | 5 jam | ⚠️ **S-17 SEBAGIAN VALID — SUDAH FIX** (`GeminiAiController.php:61` memang `config(['ai.default'=>...])` global mutation → diganti `prompt($prompt,[],'gemini')` per-call, commit Fase-3b). **S-16/S-33 (AI→queue)** = perubahan kontrak sync→async, butuh FE align → **DITUNDA** (bukan bug, fitur) |
+| 5 | **S-11 / S-12 / S-13 / S-14** refactor fat controllers | 8 jam | ✅ **S-11 DONE** (GuestOrderService), **S-13 DONE** (ReservationService). S-12/14 pending (OutletSettings/KDS, lanjut bertahap) |
+| 6 | **S-17 / S-16 / S-33** AI global config + async | 5 jam | ✅ **S-17 DONE** (config()→prompt per-call, + unit test GeminiAiControllerS17Test). S-16/S-33 DITUNDA (kontrak sync→async butuh FE align) |
+| 9 | **Unit test coverage kode baru** (S-07/S-11/S-13/S-17) | 2 jam | ✅ **DONE** — OrderStateMachineTest + GuestOrderServiceTest + ReservationServiceTest + GeminiAiControllerS17Test (16 test, 442 BE pass) |
 | 7 | **S-29 / S-30 / S-36** indexes + `$fillable` eksplisit | 2 jam | ✅ **S-29/S-30 DONE (Fase 1)**; S-36 DITUNDA (break 101 test) |
 | 8 | **S-19** benchmark COGS/OpEx ke config | 1 jam | ✅ **DONE (Fase 1)** |
 | + | **S-20** SSL verify gate | — | ✅ **DONE (Fase 1)** |
