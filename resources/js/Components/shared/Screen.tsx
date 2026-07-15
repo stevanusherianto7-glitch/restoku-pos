@@ -4,6 +4,7 @@ import { Badge } from './Badge';
 import { formatDate } from '../../lib/formatters';
 import { usePage } from '@inertiajs/react';
 import { useTenantSettings } from '../Shared';
+import CashierPins from '../CashierPins';
 import type { SharedProps } from '../../Types';
 
 interface ScreenProps {
@@ -56,6 +57,7 @@ export function Screen({
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
+                    <CashierPins />
                     {actions || action}
                     <Badge tone="emerald" dot>
                         <WifiIcon className="size-3" /> Live
