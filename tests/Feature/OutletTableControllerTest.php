@@ -62,4 +62,77 @@ class OutletTableControllerTest extends TestCase
             ->getJson("/api/outlet-tables/{$otherOutlet->id}")
             ->assertForbidden();
     }
+
+    public function test_store_persists_is_queue_and_qr_type(): void
+    {
+        $resp = $this->actingAs($this->testOwner)
+            ->postJson('/api/outlet-tables', [
+                'outlet_id' => $this->testOutlet->id,
+                'label' => 'B7',
+                'is_queue' => true,
+                'qr_type' => 'logo',
+            ]);
+
+        $resp->assertCreated();
+        $resp->assertJsonPath('label', 'B7');
+        $resp->assertJsonPath('is_queue', true);
+        $resp->assertJsonPath('qr_type', 'logo');
+
+        $this->assertDatabaseHas('outlet_tables', [
+            'outlet_id' => $this->testOutlet->id,
+            'label' => 'B7',
+            'is_queue' => true,
+            'qr_type' => 'logo',
+        ]);
+    }
+
+    public function test_store_rejects_duplicate_label(): void
+    {
+        OutletTable::withoutGlobalScopes()->create([
+            'tenant_id' => $this->testTenant->id,
+            'outlet_id' => $this->testOutlet->id,
+            'label' => 'A1',
+            'pin_hash' => Hash::make('x'),
+        ]);
+
+        $this->actingAs($this->testOwner)
+            ->postJson('/api/outlet-tables', [
+                'outlet_id' => $this->testOutlet->id,
+                'label' => 'A1',
+            ])
+            ->assertStatus(422);
+    }
+
+    public function test_update_and_destroy(): void
+    {
+        $table = OutletTable::withoutGlobalScopes()->create([
+            'tenant_id' => $this->testTenant->id,
+            'outlet_id' => $this->testOutlet->id,
+            'label' => 'A1',
+            'pin_hash' => Hash::make('x'),
+            'qr_type' => 'frame',
+        ]);
+
+        $this->actingAs($this->testOwner)
+            ->putJson("/api/outlet-tables/{$table->id}", [
+                'label' => 'A2',
+                'is_queue' => true,
+                'qr_type' => 'qr',
+            ])
+            ->assertOk()
+            ->assertJsonPath('label', 'A2')
+            ->assertJsonPath('is_queue', true)
+            ->assertJsonPath('qr_type', 'qr');
+
+        $this->assertDatabaseHas('outlet_tables', [
+            'id' => $table->id, 'label' => 'A2', 'qr_type' => 'qr',
+        ]);
+
+        $this->actingAs($this->testOwner)
+            ->deleteJson("/api/outlet-tables/{$table->id}")
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseMissing('outlet_tables', ['id' => $table->id]);
+    }
 }

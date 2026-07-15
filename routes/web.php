@@ -126,8 +126,11 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/biaya-operasional', [App\Http\Controllers\BiayaOperasionalController::class, 'index'])->name('biaya-operasional.index');
     Route::post('/biaya-operasional', [App\Http\Controllers\BiayaOperasionalController::class, 'store'])->name('biaya-operasional.store');
 
-    // ── Meja outlet (PIN untuk display owner/waiter) ────────────────────────
+    // ── Meja outlet (PIN untuk display owner/waiter + CRUD nyata) ──────────
     Route::get('/api/outlet-tables/{outlet}', [OutletTableController::class, 'index'])->middleware('throttle:60,1');
+    Route::post('/api/outlet-tables', [OutletTableController::class, 'store'])->middleware('throttle:30,1');
+    Route::put('/api/outlet-tables/{id}', [OutletTableController::class, 'update'])->middleware('throttle:30,1');
+    Route::delete('/api/outlet-tables/{id}', [OutletTableController::class, 'destroy'])->middleware('throttle:30,1');
 
     // ── POS & Operasional (semua plan) ──────────────────────────────────────
     Route::get('/pos', [PosController::class, 'menuView']);

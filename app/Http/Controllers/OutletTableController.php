@@ -7,6 +7,7 @@ use App\Models\OutletTable;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * OutletTableController — manajemen meja outlet (PIN untuk display ke owner/waiter).
@@ -31,7 +32,7 @@ class OutletTableController extends Controller
         $tables = OutletTable::withoutGlobalScope(TenantScope::class)
             ->where('outlet_id', $outlet->id)
             ->orderBy('label')
-            ->get(['id', 'outlet_id', 'label', 'latitude', 'longitude']);
+            ->get(['id', 'outlet_id', 'label', 'latitude', 'longitude', 'is_queue', 'qr_type']);
 
         return response()->json([
             'outlet' => ['id' => $outlet->id, 'name' => $outlet->name],
@@ -41,7 +42,130 @@ class OutletTableController extends Controller
                 'pin' => $t->pin,
                 'latitude' => $t->latitude,
                 'longitude' => $t->longitude,
+                'is_queue' => (bool) $t->is_queue,
+                'qr_type' => $t->qr_type,
             ]),
         ]);
+    }
+
+    /**
+     * Buat meja baru untuk outlet (CRUD nyata, persist is_queue + qr_type).
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        $outlet = $this->resolveOutlet((int) $request->input('outlet_id'), $user->tenant_id);
+        if (! $outlet) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'label' => ['required', 'string', 'max:32'],
+            'is_queue' => ['sometimes', 'boolean'],
+            'qr_type' => ['sometimes', 'in:qr,logo,frame'],
+        ]);
+
+        $label = trim($validated['label']);
+        $exists = OutletTable::withoutGlobalScope(TenantScope::class)
+            ->where('outlet_id', $outlet->id)
+            ->where('label', $label)
+            ->exists();
+        if ($exists) {
+            return response()->json(['error' => "Meja {$label} sudah ada di outlet ini."], 422);
+        }
+
+        $table = OutletTable::withoutGlobalScope(TenantScope::class)
+            ->create([
+                'tenant_id' => $outlet->tenant_id,
+                'outlet_id' => $outlet->id,
+                'label' => $label,
+                'pin_hash' => Hash::make(OutletTable::derivePin($outlet->id, $label)),
+                'is_queue' => (bool) ($validated['is_queue'] ?? false),
+                'qr_type' => $validated['qr_type'] ?? 'frame',
+            ]);
+
+        return response()->json([
+            'id' => $table->id,
+            'label' => $table->label,
+            'pin' => $table->pin,
+            'is_queue' => (bool) $table->is_queue,
+            'qr_type' => $table->qr_type,
+        ], 201);
+    }
+
+    /**
+     * Update meja (label / is_queue / qr_type).
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $user = auth()->user();
+        $table = OutletTable::withoutGlobalScope(TenantScope::class)->findOrFail($id);
+        $outlet = $this->resolveOutlet($table->outlet_id, $user->tenant_id);
+        if (! $outlet) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'label' => ['sometimes', 'string', 'max:32'],
+            'is_queue' => ['sometimes', 'boolean'],
+            'qr_type' => ['sometimes', 'in:qr,logo,frame'],
+        ]);
+
+        if (isset($validated['label'])) {
+            $label = trim($validated['label']);
+            $dup = OutletTable::withoutGlobalScope(TenantScope::class)
+                ->where('outlet_id', $outlet->id)
+                ->where('label', $label)
+                ->where('id', '!=', $table->id)
+                ->exists();
+            if ($dup) {
+                return response()->json(['error' => "Meja {$label} sudah ada di outlet ini."], 422);
+            }
+            $table->label = $label;
+            // Pin di-derive ulang dari (outlet, label) biar tetap stabil per meja.
+            $table->pin_hash = Hash::make(OutletTable::derivePin($outlet->id, $label));
+        }
+        if (isset($validated['is_queue'])) {
+            $table->is_queue = (bool) $validated['is_queue'];
+        }
+        if (isset($validated['qr_type'])) {
+            $table->qr_type = $validated['qr_type'];
+        }
+        $table->save();
+
+        return response()->json([
+            'id' => $table->id,
+            'label' => $table->label,
+            'pin' => $table->pin,
+            'is_queue' => (bool) $table->is_queue,
+            'qr_type' => $table->qr_type,
+        ]);
+    }
+
+    /**
+     * Hapus meja.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $user = auth()->user();
+        $table = OutletTable::withoutGlobalScope(TenantScope::class)->findOrFail($id);
+        $outlet = $this->resolveOutlet($table->outlet_id, $user->tenant_id);
+        if (! $outlet) {
+            abort(403);
+        }
+        $table->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Resolve outlet milik tenant (cegah cross-tenant).
+     */
+    private function resolveOutlet(int $outletId, int $tenantId): ?Outlet
+    {
+        return Outlet::withoutGlobalScope(TenantScope::class)
+            ->where('id', $outletId)
+            ->where('tenant_id', $tenantId)
+            ->first();
     }
 }

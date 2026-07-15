@@ -1,14 +1,13 @@
-import { useState, useMemo, useRef, ElementType } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass } from '../../Components/Shared';
+import { Screen } from '../../Components/Shared';
 import {
     QrCodeIcon,
     CheckCircle2Icon,
     Link2Icon,
     CopyIcon,
-    LayoutGridIcon,
     PrinterIcon,
     DownloadIcon,
     ExternalLinkIcon,
@@ -19,15 +18,11 @@ import {
     PencilIcon,
     TrashIcon,
     XIcon,
-    StoreIcon,
-    SmartphoneIcon,
-    ChevronDownIcon,
 } from '../../Components/icons';
 
 import { RoleGuard } from '../../Components/RoleGuard';
 import { QRCodeSVG } from 'qrcode.react';
 import { buildMenuUrl } from '../../lib/menuUrl';
-import { defaultTables, groupTablesByFloor } from '../../lib/tableFormat';
 
 type Outlet = { id: number; name: string; slug: string; is_active: boolean };
 
@@ -88,33 +83,67 @@ function downloadSvgAsPng(filename: string, svgText: string, scale = 4) {
 // Tipe QR terpilih per stiker.
 type QrKind = 'qr' | 'logo' | 'frame';
 
+// Meja dari backend (CRUD nyata via outlet_tables).
+type ApiTable = {
+    id: number;
+    label: string;
+    pin: string;
+    is_queue: boolean;
+    qr_type: QrKind;
+};
+
 function BukuMenuDigitalInner() {
     const { props } = usePage();
     const outlets = (props.outlets as Outlet[]) ?? [];
     const activeOutletId = (props.outlet as Outlet | undefined)?.id;
     const [selectedOutletId, setSelectedOutletId] = useState<number>(activeOutletId ?? outlets[0]?.id ?? 0);
 
-    // Label meja — default permanen A1..A9 (lantai 1), B1..B3 (lantai 2).
-    const [tableInput, setTableInput] = useState<string>(defaultTables());
     const [copied, setCopied] = useState(false);
-    const [selectedTable, setSelectedTable] = useState<string>('A1');
+    const [selectedTable, setSelectedTable] = useState<string>('');
+
+    // Data meja nyata dari backend.
+    const [apiTables, setApiTables] = useState<ApiTable[]>([]);
+    const [loadingTables, setLoadingTables] = useState(false);
+    const [tableError, setTableError] = useState<string>('');
+    const [saving, setSaving] = useState(false);
 
     const selectedOutlet = outlets.find((o) => o.id === selectedOutletId) ?? outlets[0];
     const baseUrl = (props.menu_base_url as string) || (typeof window !== 'undefined' ? window.location.origin : '');
     const menuUrl = selectedOutlet ? buildMenuUrl(baseUrl, selectedOutlet.slug) : '';
 
-    const tables = useMemo(
-        () =>
-            tableInput
-                .split('\n')
-                .map((s) => s.trim())
-                .filter(Boolean)
-                .slice(0, 200),
-        [tableInput],
-    );
+    // Load meja per outlet dari backend.
+    const loadTables = useCallback(async (outletId: number) => {
+        if (!outletId) return;
+        setLoadingTables(true);
+        setTableError('');
+        try {
+            const res = await fetch(`/api/outlet-tables/${outletId}`, {
+                headers: { Accept: 'application/json', 'X-Inertia': 'false' },
+            });
+            if (!res.ok) throw new Error('Gagal memuat meja');
+            const data = await res.json();
+            const rows: ApiTable[] = (data.tables ?? []).map((t: any) => ({
+                id: t.id,
+                label: t.label,
+                pin: t.pin,
+                is_queue: !!t.is_queue,
+                qr_type: (t.qr_type as QrKind) || 'frame',
+            }));
+            setApiTables(rows);
+            setSelectedTable(rows[0]?.label ?? '');
+        } catch (e: any) {
+            setTableError(e?.message ?? 'Gagal memuat meja');
+            setApiTables([]);
+        } finally {
+            setLoadingTables(false);
+        }
+    }, []);
 
-    // Kelompokkan per lantai berdasar huruf depan (A=1, B=2, dst).
-    const floors = useMemo(() => groupTablesByFloor(tables), [tables]);
+    useEffect(() => {
+        loadTables(selectedOutletId);
+    }, [selectedOutletId, loadTables]);
+
+    const tables = useMemo(() => apiTables.map((t) => t.label), [apiTables]);
 
     const previewTable = tables.includes(selectedTable) ? selectedTable : (tables[0] ?? '');
     const tableUrl = previewTable ? buildMenuUrl(baseUrl, selectedOutlet?.slug ?? '', previewTable) : '';
@@ -125,15 +154,28 @@ function BukuMenuDigitalInner() {
 
     // Modal stiker QR (referensi: Data Meja -> klik meja -> modal Ubah Data Meja).
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<'create' | 'edit'>('edit');
+    const [modalId, setModalId] = useState<number | null>(null);
     const [modalTable, setModalTable] = useState<string>('');
     const [modalQrKind, setModalQrKind] = useState<QrKind>('frame');
     const [modalQueue, setModalQueue] = useState(false);
     const [modalNoMeja, setModalNoMeja] = useState('');
 
-    const openModal = (t: string) => {
-        setModalTable(t);
-        setModalNoMeja(t);
-        setModalQueue(false);
+    const openModal = (mode: 'create' | 'edit', row?: ApiTable) => {
+        setModalMode(mode);
+        if (mode === 'edit' && row) {
+            setModalId(row.id);
+            setModalTable(row.label);
+            setModalNoMeja(row.label);
+            setModalQueue(row.is_queue);
+            setModalQrKind(row.qr_type);
+        } else {
+            setModalId(null);
+            setModalTable('');
+            setModalNoMeja('');
+            setModalQueue(false);
+            setModalQrKind('frame');
+        }
         setModalOpen(true);
     };
 
@@ -143,6 +185,65 @@ function BukuMenuDigitalInner() {
         const svg = modalSvgRef.current;
         if (!svg) return;
         downloadSvgAsPng(`qrcode-${selectedOutlet?.slug ?? 'outlet'}-${modalTable}.png`, svgToString(svg));
+    };
+
+    const saveModal = async () => {
+        if (!selectedOutletId) return;
+        if (!modalNoMeja.trim()) {
+            setTableError('No Meja wajib diisi.');
+            return;
+        }
+        setSaving(true);
+        setTableError('');
+        try {
+            const payload = {
+                label: modalNoMeja.trim(),
+                is_queue: modalQueue,
+                qr_type: modalQrKind,
+            };
+            let res: Response;
+            if (modalMode === 'create') {
+                res = await fetch('/api/outlet-tables', {
+                    method: 'POST',
+                    headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-Inertia': 'false' },
+                    body: JSON.stringify({ outlet_id: selectedOutletId, ...payload }),
+                });
+            } else {
+                res = await fetch(`/api/outlet-tables/${modalId}`, {
+                    method: 'PUT',
+                    headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-Inertia': 'false' },
+                    body: JSON.stringify(payload),
+                });
+            }
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error ?? 'Gagal menyimpan meja');
+            }
+            await loadTables(selectedOutletId);
+            setModalOpen(false);
+        } catch (e: any) {
+            setTableError(e?.message ?? 'Gagal menyimpan meja');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const deleteTable = async (id: number, label: string) => {
+        if (!confirm(`Hapus meja ${label}?`)) return;
+        setSaving(true);
+        setTableError('');
+        try {
+            const res = await fetch(`/api/outlet-tables/${id}`, {
+                method: 'DELETE',
+                headers: { Accept: 'application/json', 'X-Inertia': 'false' },
+            });
+            if (!res.ok) throw new Error('Gagal menghapus meja');
+            await loadTables(selectedOutletId);
+        } catch (e: any) {
+            setTableError(e?.message ?? 'Gagal menghapus meja');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const copyMenuLink = async () => {
@@ -228,7 +329,7 @@ function BukuMenuDigitalInner() {
                             <h3 className="text-[14px] font-extrabold text-[#1A1410]">Data Meja</h3>
                             <div className="flex flex-wrap items-center gap-2">
                                 <button
-                                    onClick={() => setSelectedTable(tables[0] ?? 'A1')}
+                                    onClick={() => openModal('create')}
                                     className="inline-flex items-center gap-1.5 rounded-lg bg-[#FF5B35] px-3 py-2 text-[12px] font-bold text-white hover:bg-[#E04E2B] transition-colors"
                                 >
                                     <PlusIcon className="size-4" /> Tambah Data
@@ -240,7 +341,7 @@ function BukuMenuDigitalInner() {
                                     <DownloadIcon className="size-4" /> Download
                                 </button>
                                 <button
-                                    onClick={() => tables[0] && openModal(tables[0])}
+                                    onClick={() => tables[0] && openModal('edit', apiTables[0])}
                                     className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7D9CB] bg-white px-3 py-2 text-[12px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]"
                                 >
                                     <QrCodeIcon className="size-4" /> Download QR
@@ -260,6 +361,12 @@ function BukuMenuDigitalInner() {
                             </div>
                         </div>
 
+                        {tableError && (
+                            <div className="border-b border-[#F0E6DA] bg-[#FDECEC] px-4 py-2 text-[12px] text-[#C0392B]">
+                                {tableError}
+                            </div>
+                        )}
+
                         {/* Table */}
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-[12.5px]">
@@ -272,36 +379,49 @@ function BukuMenuDigitalInner() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#F4ECE2]">
-                                    {tables.map((t, i) => (
-                                        <tr key={t} className="hover:bg-[#FFF8F1]">
-                                            <td className="px-4 py-3 text-[#5A4F43]">{i + 1}</td>
-                                            <td className="px-4 py-3 font-bold text-[#1A1410]">{t}</td>
-                                            <td className="px-4 py-3 text-[#5A4F43]">Tidak</td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center justify-end gap-1.5">
-                                                    <button
-                                                        onClick={() => openModal(t)}
-                                                        className="inline-flex items-center gap-1 rounded-lg border border-[#FFE0D1] bg-[#FFF3EC] px-2.5 py-1.5 text-[11.5px] font-bold text-[#C9431F] hover:bg-[#FBE7D6]"
-                                                    >
-                                                        <QrCodeIcon className="size-3.5" /> QR
-                                                    </button>
-                                                    <button
-                                                        onClick={() => openModal(t)}
-                                                        className="inline-flex items-center gap-1 rounded-lg border border-[#E7D9CB] bg-white px-2.5 py-1.5 text-[11.5px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]"
-                                                    >
-                                                        <PencilIcon className="size-3.5" /> Edit
-                                                    </button>
-                                                    <button className="inline-flex items-center gap-1 rounded-lg border border-[#E7D9CB] bg-white px-2.5 py-1.5 text-[11.5px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]">
-                                                        <TrashIcon className="size-3.5" /> Hapus
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {tables.length === 0 && (
+                                    {loadingTables && (
                                         <tr>
                                             <td colSpan={4} className="px-4 py-6 text-center text-[#A99A8C]">
-                                                Belum ada meja.
+                                                Memuat…
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {!loadingTables &&
+                                        apiTables.map((t, i) => (
+                                            <tr key={t.id} className="hover:bg-[#FFF8F1]">
+                                                <td className="px-4 py-3 text-[#5A4F43]">{i + 1}</td>
+                                                <td className="px-4 py-3 font-bold text-[#1A1410]">{t.label}</td>
+                                                <td className="px-4 py-3 text-[#5A4F43]">
+                                                    {t.is_queue ? 'Ya' : 'Tidak'}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center justify-end gap-1.5">
+                                                        <button
+                                                            onClick={() => openModal('edit', t)}
+                                                            className="inline-flex items-center gap-1 rounded-lg border border-[#FFE0D1] bg-[#FFF3EC] px-2.5 py-1.5 text-[11.5px] font-bold text-[#C9431F] hover:bg-[#FBE7D6]"
+                                                        >
+                                                            <QrCodeIcon className="size-3.5" /> QR
+                                                        </button>
+                                                        <button
+                                                            onClick={() => openModal('edit', t)}
+                                                            className="inline-flex items-center gap-1 rounded-lg border border-[#E7D9CB] bg-white px-2.5 py-1.5 text-[11.5px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]"
+                                                        >
+                                                            <PencilIcon className="size-3.5" /> Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => deleteTable(t.id, t.label)}
+                                                            className="inline-flex items-center gap-1 rounded-lg border border-[#E7D9CB] bg-white px-2.5 py-1.5 text-[11.5px] font-medium text-[#5A4F43] hover:bg-[#FBEDE2]"
+                                                        >
+                                                            <TrashIcon className="size-3.5" /> Hapus
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    {!loadingTables && apiTables.length === 0 && (
+                                        <tr>
+                                            <td colSpan={4} className="px-4 py-6 text-center text-[#A99A8C]">
+                                                Belum ada meja. Klik "Tambah Data".
                                             </td>
                                         </tr>
                                     )}
@@ -311,23 +431,9 @@ function BukuMenuDigitalInner() {
 
                         {/* Pagination */}
                         <div className="flex items-center justify-end gap-2 border-t border-[#F0E6DA] bg-[#FBF4EC] px-4 py-2.5 text-[12px] text-[#7A6F63]">
-                            <span>{tables.length} meja</span>
+                            <span>{apiTables.length} meja</span>
                         </div>
                     </div>
-
-                    {/* Editor label (backward-compat) */}
-                    <details className="mt-4">
-                        <summary className="cursor-pointer text-[12px] font-semibold text-[#8A7D70] hover:text-[#C9431F]">
-                            Edit label meja (1 per baris, format A = lantai 1, B = lantai 2)
-                        </summary>
-                        <textarea
-                            value={tableInput}
-                            onChange={(e) => setTableInput(e.target.value)}
-                            rows={3}
-                            className="mt-2 w-full max-w-md rounded-xl border border-[#E7D9CB] bg-white px-3 py-2 text-[13px] text-[#1A1410] font-mono outline-none focus:border-[#FF5B35]/50"
-                            placeholder={'A1\nA2\nB1'}
-                        />
-                    </details>
 
                     {/* 2. PREVIEW & DOWNLOAD */}
                     <div className="mt-7 border-t border-dashed border-[#E7D9CB] pt-6">
@@ -410,7 +516,9 @@ function BukuMenuDigitalInner() {
                         >
                             {/* Header modal */}
                             <div className="flex items-center justify-between rounded-t-2xl bg-[#FFE9E0] px-5 py-4">
-                                <h3 className="text-[15px] font-extrabold text-[#1A1410]">Ubah Data Meja</h3>
+                                <h3 className="text-[15px] font-extrabold text-[#1A1410]">
+                                    {modalMode === 'create' ? 'Tambah Data Meja' : 'Ubah Data Meja'}
+                                </h3>
                                 <button
                                     onClick={() => setModalOpen(false)}
                                     className="text-[#7A6F63] hover:text-[#C9431F]"
@@ -525,9 +633,15 @@ function BukuMenuDigitalInner() {
                                 >
                                     Batal
                                 </button>
-                                <button className="rounded-lg bg-[#FF5B35] px-4 py-2 text-[12.5px] font-bold text-white hover:bg-[#E04E2B]">
-                                    Hapus
-                                </button>
+                                {modalMode === 'edit' && (
+                                    <button
+                                        onClick={() => deleteTable(modalId!, modalNoMeja)}
+                                        disabled={saving}
+                                        className="rounded-lg bg-[#FF5B35] px-4 py-2 text-[12.5px] font-bold text-white hover:bg-[#E04E2B] disabled:opacity-50"
+                                    >
+                                        Hapus
+                                    </button>
+                                )}
                                 <button
                                     onClick={downloadModalQr}
                                     className="rounded-lg bg-[#FF5B35] px-4 py-2 text-[12.5px] font-bold text-white hover:bg-[#E04E2B]"
@@ -535,10 +649,11 @@ function BukuMenuDigitalInner() {
                                     Download QR
                                 </button>
                                 <button
-                                    onClick={() => setModalOpen(false)}
-                                    className="rounded-lg bg-[#FF5B35] px-4 py-2 text-[12.5px] font-bold text-white hover:bg-[#E04E2B]"
+                                    onClick={saveModal}
+                                    disabled={saving}
+                                    className="rounded-lg bg-[#FF5B35] px-4 py-2 text-[12.5px] font-bold text-white hover:bg-[#E04E2B] disabled:opacity-50"
                                 >
-                                    Simpan
+                                    {saving ? 'Menyimpan…' : 'Simpan'}
                                 </button>
                             </div>
                         </div>

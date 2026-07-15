@@ -9,12 +9,13 @@ class OutletTable extends Model
 {
     protected $fillable = [
         'tenant_id', 'outlet_id', 'label', 'pin_hash',
-        'latitude', 'longitude',
+        'latitude', 'longitude', 'is_queue', 'qr_type',
     ];
 
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',
+        'is_queue' => 'boolean',
     ];
 
     protected $appends = ['pin'];
