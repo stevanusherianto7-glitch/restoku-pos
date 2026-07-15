@@ -202,8 +202,6 @@ export default function CustomerView() {
     // ─── Screenshot clone flow (stub FE-first) ───────────────────────────
     // Stage: landind modal → welcome/meja → cara-memasan → app (tabs).
     const [appStage, setAppStage] = useState<'landing' | 'welcome' | 'howto' | 'app'>('landing');
-    const [dineVerified, setDineVerified] = useState(false);
-    const [pin, setPin] = useState('');
     // PIN harian restoran (dari BE, publik per outlet/slug) — untuk verifikasi dine-in tamu.
     const [dailyPin, setDailyPin] = useState<string | null>(null);
     // Stub GPS (BE nyata = Batch 2: outlat lat/lng + radius).
@@ -745,6 +743,7 @@ export default function CustomerView() {
                             Galeri
                         </button>
                         <button
+                            data-testid="cart-tab"
                             onClick={() => setActiveTab('cart')}
                             className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 shrink-0 ${
                                 activeTab === 'cart'
@@ -1026,112 +1025,6 @@ export default function CustomerView() {
                         >
                             ✨ Mulai Pesan Sekarang!
                         </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Verifikasi Dine-In: overlay saat app & dine_in & belum verified */}
-            {appStage === 'app' && orderType === 'dine_in' && !dineVerified && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div
-                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
-                    >
-                        <div className="flex items-start gap-3 text-left">
-                            <div
-                                className={`size-10 rounded-full border ${modalStyle.accentBorder} grid place-items-center text-lg ${modalStyle.accentText}`}
-                            >
-                                🛡
-                            </div>
-                            <div>
-                                <p className={`font-extrabold text-[15px] ${modalStyle.accentText} tracking-wide`}>
-                                    VERIFIKASI DINE-IN
-                                </p>
-                                <p
-                                    className={`text-[9px] ${modalStyle.textDesc} mt-0.5 tracking-wide uppercase font-bold`}
-                                >
-                                    PASTIKAN ANDA MEMESAN DI LOKASI
-                                </p>
-                            </div>
-                            <span
-                                className={`ml-auto ${modalStyle.textDesc} text-lg cursor-pointer hover:${modalStyle.textTitle}`}
-                                onClick={() => setDineVerified(true)}
-                            >
-                                ✕
-                            </span>
-                        </div>
-
-                        <div className={`text-left ${modalStyle.cardBg} border p-3.5 rounded-2xl`}>
-                            <p className={`font-bold text-[12.5px] ${modalStyle.textTitle} flex items-center gap-1.5`}>
-                                📍 Validasi GPS Otomatis
-                            </p>
-                            {gpsError && (
-                                <div
-                                    className={`mt-2 ${isDarkTheme ? 'bg-[#7A2A1A] text-[#FF9B7A]' : 'bg-[#FEE2E2] text-[#991B1B] border-[#FCA5A5]/40'} rounded-xl p-2.5 text-[11px] font-semibold leading-snug`}
-                                >
-                                    {gpsError}
-                                </div>
-                            )}
-                            <button
-                                onClick={() => setGpsError(null)}
-                                className={`mt-3 w-full bg-transparent border-[1.5px] ${modalStyle.accentBorder} ${modalStyle.accentText} rounded-xl py-2 text-[12px] font-black cursor-pointer shadow-sm`}
-                            >
-                                ⟳ DETEKSI ULANG LOKASI
-                            </button>
-                        </div>
-
-                        <div className={`text-center text-[10px] ${modalStyle.textDesc} font-extrabold relative my-1`}>
-                            — ATAU —
-                        </div>
-
-                        <div className="text-left">
-                            <p className={`font-extrabold text-[12px] ${modalStyle.textTitle} tracking-wide`}>
-                                MASUKKAN PIN VERIFIKASI MEJA
-                            </p>
-                            <p className={`text-[10px] ${modalStyle.textDesc} mt-1 leading-relaxed`}>
-                                Minta 4-digit PIN harian kepada pelayan kami di kedai.
-                            </p>
-                            <div className="flex justify-center gap-2.5 my-3.5">
-                                {[0, 1, 2, 3].map((i) => (
-                                    <span
-                                        key={i}
-                                        className={`size-11 rounded-xl ${modalStyle.pinBox} grid place-items-center text-lg font-black shadow-sm`}
-                                    >
-                                        {pin[i] ?? ''}
-                                    </span>
-                                ))}
-                            </div>
-                            <input
-                                type="text"
-                                inputMode="numeric"
-                                maxLength={4}
-                                value={pin}
-                                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                placeholder="----"
-                                className="hidden"
-                            />
-                            <div className="grid grid-cols-3 gap-1.5 mb-3.5">
-                                {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map((k) => (
-                                    <button
-                                        key={k}
-                                        disabled={!k}
-                                        onClick={() =>
-                                            k === '⌫'
-                                                ? setPin((p) => p.slice(0, -1))
-                                                : k && setPin((p) => (p + k).slice(0, 4))
-                                        }
-                                        className={`h-10 rounded-xl ${modalStyle.pinKey} font-bold text-sm disabled:opacity-30 cursor-pointer transition-all flex items-center justify-center`}
-                                    >
-                                        {k}
-                                    </button>
-                                ))}
-                            </div>
-                            <button
-                                onClick={() => dailyPin && pin === dailyPin && setDineVerified(true)}
-                                className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black cursor-pointer`}
-                            >
-                                VERIFIKASI PIN
-                            </button>
-                        </div>
                     </div>
                 </div>
             )}

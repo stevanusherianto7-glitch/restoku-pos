@@ -1,352 +1,319 @@
-# JAWABAN 100 Pertanyaan Teknis — Sidebar Restoku (Multi-Tenant @ Scale)
+# Jawaban Bank Soal QA Teknis Restoku (100 Soal)
 
-> Setiap jawaban merujuk ke **fakta kode** (`routes/web.php`, `app/Http/Controllers/*`,
-> `app/Models/*`, `resources/js/*`) — bukan asumsi. Konteks: 5.000 tenant × ratusan outlet,
-> shared-schema (Fase 0–1) → schema-per-tenant (Fase 2), Redis wajib, Cloudinary.
-
----
-
-## A. UTAMA (Q1–Q18)
-
-**Q1. Pusat pengaturan operasional: di Pengaturan Outlet (Owner) atau terdistribusi?**
-**Jawab:** Terpusat di **`Pengaturan Outlet`** (`/pengaturan-outlet` → `OutletSettingsController::index`, `routes/web.php:160`). Canonical store = tabel `outlet_settings` (per-outlet, via `SettingsService`) + `tenant_settings` (pajak global tenant). Semua halaman lain (Kasir, KDS, Printer) **membaca** dari sana, tidak menyimpan duplikat. Jadi ya — pusat pengaturan ada di sidebar Owner.
-
-**Q2. Dashboard query lock ke tenant_id via TenantScope?**
-**Jawab:** Ya. `OwnerDashboardController` (route `:103`) membaca via `TenantContext->id()` + `SalesDailyRollup` (Fase 3) yang di-partisi per `tenant_id`. Tidak ada raw query tanpa scope.
-
-**Q3. Dashboard 300 outlet — agregasi semua atau pagination?**
-**Jawab:** Agregasi lewat **rollup** (`sales:rollup` scheduler 01:00, Fase 3 `e7ad243`), bukan query mentah 300 outlet real-time. Dashboard panggil `/api/owner/sales-summary` (`:105`) yang baca `sales_daily_rollups` → O(1), aman di scale.
-
-**Q4. PosController::menuView aman tanpa filter outlet_id (menu global)?**
-**Jawab:** Ya. `MenuItem` punya `outlet_id` nullable = menu **global tenant** (`PosController::menuView` `:26-33` query `MenuItem::with('category')` tanpa where outlet). Karena menu global, tidak perlu filter per-outlet → tidak membengkak di 300 outlet.
-
-**Q5. /api/pos/menu tanpa paginasi — 5000 item membebani jaringan?**
-**Jawab:** Risiko ya. Saat ini `PosController::menu` (`:52-87`) return semua `is_available=true` tanpa `paginate()`. Pada 32 item aman; pada 5000 item JSON bisa >1MB. **Rekomendasi:** tambah `paginate(100)` + param `page` di FE (belum diimplementasi — gap scale).
-
-**Q6. Kasir ganti outlet A→B — TenantContext rebind atau level tenant?**
-**Jawab:** `TenantContext` di-bind di level **tenant** (`EnsureTenantContext` isi dari `Auth::user()->tenant_id`). Ganti outlet tidak rebind tenant — outlet dipassing via `outlet_id` di request (lihat `PosController::menu` `:54` baca `?outlet_id=`).
-
-**Q7. Monitor Pesanan — semua outlet atau filter eksplisit?**
-**Jawab:** Saat ini `MonitorPesanan/Index` (route `:123`) adalah Inertia page; data di-fetch via endpoint KDS/order. `KdsController::getKdsOrders` (`:25`) query `Order::whereIn('status',...)` **TANPA filter outlet** → menampilkan semua outlet tenant. Di 300 outlet butuh filter `outlet_id` eksplisit (gap: KDS order tidak filter outlet — lihat Q10).
-
-**Q8. 300 outlet submit order bersamaan — write-contention di orders?**
-**Jawab:** Di shared-schema (Fase 0–1) ya, berpotensi contention. **Mitigasi Fase 2** (`4e9f9ad`): `orders` di-partisi by date + schema-per-tenant (1 DB fisik per tenant) → contention terpecah per tenant, bukan global.
-
-**Q9. Badge notif Monitor Reservasi — live query atau cache Redis?**
-**Jawab:** `MonitorReservasi/Index` (`:125`) adalah SPA; badge di-hitung di FE dari props `auth`/reservasi. Tidak ada mekanisme cache Redis khusus badge di kode saat ini — tiap mount FE fetch ulang. Di scale, sebaiknya Redis counter (gap).
-
-**Q10. KDS — pilih outlet tertentu atau semua tenant?**
-**Jawab:** `KdsController::getKdsOrders` (`:25`) **TIDAK** filter outlet → semua outlet tenant. Tidak ada param `outlet_id`. Jadi KDS lihat semua outlet (per tenant). Untuk multi-outlet besar, butuh filter (gap, sama dgn Q7).
-
-**Q11. KDS realtime — polling atau WebSocket?**
-**Jawab:** **Polling** via Inertia/axios ke `/api/orders` (`:176`), bukan WebSocket. Interval diatur FE (tidak ada di BE). Di 300 outlet, polling tiap 5s = 300×N request/menit — berat. Rekomendasi: WebSocket/SSE (gap, belum ada).
-
-**Q12. Refund & Void — tulis orders atau tabel terpisah?**
-**Jawab:** `RefundVoidManager/Index` (`:142`, plan `refund_void`) adalah UI; logika refund di `Order` (update `status` ke `STATUS_*` + kolom `refund_*`). Tidak ada tabel `refund_logs` terpisah di kode saat ini (gap audit trail).
-
-**Q13. Refund — kasir hanya bisa refund order outlet aktif?**
-**Jawab:** `KdsController::updateOrderStatus` (`:62`) pakai `Order::byTenant(...)->where('order_code',$id)` — scope tenant, **TIDAK** cek `outlet_id` aktif. Jadi kasir bisa refund order outlet lain dalam 1 tenant (cross-outlet dalam tenant diizinkan, bukan leak lintas-tenant).
-
-**Q14. Dashboard & Monitor Pesanan duplikasi query atau shared repo?**
-**Jawab:** Tidak ada shared repository — `OwnerDashboardController` (rollup) vs `KdsController`/`MonitorPesanan` (order mentah) query berbeda. DRY violation ringan (gap).
-
-**Q15. PosController dilindungi EnsureTenantContext + RequiresPlan?**
-**Jawab:** `EnsureTenantContext` **YA** (route `/pos` di dalam group `auth+tenant`, `:81-119`). `RequiresPlan` **TIDAK** — `/pos` tidak pakai `plan:*` (semua plan bisa akses POS). Sesuai `feature_locks`: POS tidak dikunci plan.
-
-**Q16. Tenant basic — Kasir (POS) di-lock via feature_locks?**
-**Jawab:** **TIDAK**. `routes/web.php:118-119` `/pos` tanpa `plan:*` middleware. Jadi POS tersedia semua plan (basic pun bisa). `feature_locks` hanya mengunci `kds` (enterprise), `inventory`, `arus_kas`, dll — bukan POS.
-
-**Q17. Monitor Pesanan diakses owner — lihat lintas outlet atau 1 outlet?**
-**Jawab:** Owner role → `Dashboard/Index` (`:93` redirect owner ke `Dashboard/Index`, bukan monitor). Tapi jika owner buka `/monitor-pesanan` langsung, FE menampilkan semua outlet tenant (karena BE tidak filter outlet, Q7). Lintas-outlet dalam 1 tenant = expected (owner = all outlets).
-
-**Q18. Sesi kasir expired (Redis down) — fallback local atau 500?**
-**Jawab:** Invarian: "Redis down → fallback DB, bukan 500". Session driver `redis` (prod) → jika Redis down, Laravel fallback ke `database` session (config). Kasir tidak langsung 500, tapi kehilangan cache menu (re-fetch DB). Sesuai PRD §9.4.
+Semua jawaban mengutip **baris nyata** dari kode Restoku. Format: `file:line`.
+Soal bertanda (TRAP) dirancang menjebak agen dangkal — jawabannya menunjukkan
+"apa yang sebenarnya terjadi", bukan apa yang disangka.
 
 ---
 
-## B. MANAJEMEN (Q19–Q36)
+## BAGIAN 1 — Sidebar & Pemetaan Route (1–26)
 
-**Q19. Produk & Menu (/produk) vs Katalog Menu (/katalog-menu) — beda?**
-**Jawab:** **Redundan**. Di `routes/web.php` TIDAK ada route `/produk` (hanya `/katalog-menu` `:120`). `Produk & Menu` di SIDEBAR_MENU.md merujuk ke route yang tidak terdaftar → kemungkinan legacy/placeholder. Faktanya Katalog Menu (`MenuController::index`) adalah satu-satunya CRUD menu nyata.
+**1.** `MainLayout.tsx` mendaftarkan **38 item** (`NavItem`) dalam **8 grup** (`NavGroup`):
+Utama(6), Manajemen(4), Inventaris(4), Operasional(2), Laporan(8), Keuangan(1),
+Pengaturan(7), Owner View(6). Definisi array `nav` di `MainLayout.tsx:30-133`.
 
-**Q20. Katalog Menu kirim outlets seluruhnya (tanpa paginasi)?**
-**Jawab:** Ya. `MenuController::index` (`:40`) `Outlet::select('id','name')->get()` — **semua** outlet tenant dikirim ke props. Di 300 outlet, props `outlets` memuat 300 entry (masih kecil, aman). Tapi `menuItems` (`:35`) juga tanpa paginasi → di 5000 item props membengkak (sama dgn Q5).
+**2.** `routes/web.php:89-101`. `Route::get('/dashboard', fn () => match($role) {...})`.
+Owner → `Inertia::render('Dashboard/Index')`; manager → `redirect('/laporan-penjualan')`;
+kasir → `redirect('/pos')`; cashier → `redirect('/pos')`; waiter → `redirect('/waiter-bar')`;
+kitchen → `redirect('/kds')`; default → `redirect('/login')`.
 
-**Q21. Menu global tenant — filter per-outlet di BE atau FE?**
-**Jawab:** `MenuItem.outlet_id` nullable. `MenuController::index` (`:35`) return **semua** (global + per-outlet). Filter per-outlet dilakukan di **FE** (dropdown outlet di KatalogMenu/Index). BE tidak filter.
+**3.** `/pos` → `PosController::menuView`. `routes/web.php:137`.
 
-**Q22. Upload foto Cloudinary — validasi ukuran/jumlah agar quota aman?**
-**Jawab:** **TIDAK ada** validasi ukuran/jumlah di `MenuController::store` (`:55-71`) — hanya `photo` nullable string (base64). Quota Cloudinary (`dwdaydzsh`) tidak dibatasi per-tenant di kode. Risiko di 5000 tenant (gap: butuh limit upload).
+**4.** `/monitor-pesanan` → sekadar `Inertia::render('MonitorPesanan/Index')` (tanpa controller).
+`routes/web.php:141`.
 
-**Q23. Ganti foto — deleteMenuPhoto sync atau queue?**
-**Jawab:** **Sync/blocking**. `MenuController::update` (`:128-140`) panggil `$this->cloudinary->deleteMenuPhoto(...)` langsung dalam request (bukan dispatch job). UI menunggu HTTP ke Cloudinary selesai. Di scale, sebaiknya queue (gap).
+**5.** `/kds` → `Inertia::render('KDS/Index')` dengan `->middleware('plan:kds')`.
+`routes/web.php:198-199`.
 
-**Q24. Buku Menu Digital — generator QR atau preview e-Menu?**
-**Jawab:** **Generator + preview**. `BukuMenuDigital/Index` (`:122`) adalah halaman redesign "Peta & QR Meja" (commit `84e7a24`) — generate QR per outlet pakai `buildMenuUrl`. Berbeda dengan `QRCodeMeja/Index` (`:127`) yang fokus QR per-meja. Dua tempat generate QR (overlap, historical).
+**6.** `/refund-void` → `Inertia::render('RefundVoidManager/Index')` dengan
+`->middleware('plan:refund_void')`. `routes/web.php:184-185`. Tidak ada controller khusus.
 
-**Q25. Buku Menu Digital grid QR 300 outlet — lazy atau semua?**
-**Jawab:** FE `BukuMenuDigital/Index` render `QRCodeSVG` per outlet — **semua sekaligus** (tidak virtualized). Di 300 outlet = 300 SVG DOM (berat). Rekomendasi: paginate/virtualize (gap).
+**7. (TRAP)** `MainLayout.tsx:54` memetakan "Produk & Menu" ke `href: '/produk'`, **tetapi**
+`routes/web.php` TIDAK memiliki `Route::get('/produk', ...)` (hanya ada `/katalog-menu` di
+`web.php:138`). Maka klik menu → **route tidak ditemukan (404/Inertia error)**. Ini gap nyata.
 
-**Q26. Manajemen Meja — data di outlet_tables, scope lock?**
-**Jawab:** Ya. `OutletTable` (`OutletTable.php`) punya `tenant_id` + `outlet_id`. API `/api/outlet-tables/{outlet}` (`:116`) di grup auth+tenant → `OutletTableController` harus filter `tenant_id` (via `TenantScope` atau eksplisit). Relasi `OutletTable → Outlet → Tenant` ter-lock.
+**8.** `/katalog-menu` → `MenuController::index`. `routes/web.php:138`.
 
-**Q27. PIN meja collision antar outlet 300×50?**
-**Jawab:** `OutletTable::derivePin` (`:40-46`) = `sha256("restoku:tablepin:{outletId}:{label}")` → **unik per (outlet, label)**. Collision antar outlet **TIDAK mungkin** karena `outletId` masuk seed. Aman.
+**9.** `/buku-menu-digital` → `Inertia::render('BukuMenuDigital/Index')` (tanpa controller).
+`routes/web.php:140`.
 
-**Q28. Manajemen Meja — validasi max meja per outlet?**
-**Jawab:** **TIDAK ada** validasi max di `OutletTableController` (perlu cek, tapi route `:116` hanya `index`). Bulk meja dari `QRCodeMeja` textarea (max 200 di FE). Tidak ada hard-limit BE (gap).
+**10.** `/manajemen-meja` → `Inertia::render('ManajemenMeja/Index')`. `routes/web.php:139`.
 
-**Q29. Owner rename outlet (slug berubah) — QR tercetak invalid?**
-**Jawab:** Ya. `buildMenuUrl(origin, slug, meja)` pakai slug (`:51` route `/m/{slug}`). Jika slug berubah, QR lama (`/m/slug-lama`) 404. **Mitigasi:** invarian slug global-unique (migration `2026_07_10_000001`) — rename harus regenerate QR. Tidak ada auto-redirect slug lama (gap).
+**11.** `/inventory` → `Inertia::render('Inventory/Index')` + `->middleware('plan:inventory')`.
+`routes/web.php:186-187`.
 
-**Q30. Produk & Menu (/produk) masih aktif atau diganti Katalog Menu?**
-**Jawab:** Route `/produk` **TIDAK ADA** di `web.php` (Q19). `Produk & Menu` di sidebar adalah entry usang/legacy yang tidak punya controller (atau redirect ke Katalog Menu di FE). Deprecation flag tidak ada (gap dokumentasi).
+**12.** `/pembelian-vendor` → `Inertia::render('PembelianVendor/Index')`, **TANPA** controller
+dan **TANPA** plan gate (`web.php:188-189`). Placeholder kosong (sengaja).
 
-**Q31. MenuCategory sort_order global tenant atau per-outlet?**
-**Jawab:** `MenuCategory` (`MenuController::index` `:41-44`) query `where('tenant_id',$ctx->id())` — **global tenant**, tidak per-outlet. `sort_order` global tenant. FE urutkan by `sort_order` (`:36`).
+**13.** `/stok-opname` → `Inertia::render('StokOpname/Index')`, **TANPA** plan gate (`web.php:190-191`).
+Placeholder kosong (sengaja).
 
-**Q32. Hapus kategori masih dipakai item — NULL atau FK constraint?**
-**Jawab:** `menu_items.menu_category_id` adalah FK ke `menu_categories`. Jika kategori dihapus, **FK constraint** meledak (tidak ada `onDelete SET NULL` di migration). Sebaiknya cek `MenuItem::where('menu_category_id',$id)->count()` sebelum hapus (gap di `MenuController` — tidak ada `destroyCategory`).
+**14.** `/dashboard-inventory` → `Inertia::render('DashboardInventory/Index')` + `->middleware('plan:dashboard_inventory')`.
+`routes/web.php:192-193`.
 
-**Q33. MenuSeeder 32 item — per-tenant saat tenant:migrate (Fase 2) atau sekali global?**
-**Jawab:** `MenuSeeder` (diperbaiki di sesi lalu) seed **1× per tenant** (`outlet_id=null`). Di Fase 2 (`tenant:migrate`), seeder dijalankan per schema tenant → 32 item per tenant, tidak global. Aman di 5000 tenant (5000×32 = 160k rows, tapi per-schema terpisah).
+**15.** `/staf-shift` → `Inertia::render('StafShift/Index')` + `->middleware('plan:staf_shift')`.
+`routes/web.php:180-181`.
 
-**Q34. Katalog Menu search/filter — client-side atau server-side?**
-**Jawab:** FE filter (KatalogMenu/Index) client-side atas `menuItems` props. Tidak ada param query BE (`MenuController::index` tidak terima `?search=`). Di 5000 item, client-side berat (gap: butuh server-side filter).
+**16.** `/cashier-session` → `Inertia::render('CashierSession/Index')` + `->middleware('plan:cashier_session')`.
+`routes/web.php:182-183`.
 
-**Q35. Buku Menu Digital preview — panggil getPublicMenu atau query DB? Cache?**
-**Jawab:** Preview di FE `BukuMenuDigital/Index` biasanya panggil `/api/menu/{slug}` (`PublicOrderController::getPublicMenu`) — route publik `:53`. Cache Redis 24j di `PlaceIdResolver`/menu (PRD §9.3) → tidak hit DB tiap preview.
+**17.** `/laporan-penjualan` → `Inertia::render('LaporanPenjualan/Index')`, **TANPA** plan gate
+(tersedia semua plan). `routes/web.php:175`.
 
-**Q36. PIN meja tersimpan plaintext atau derived?**
-**Jawab:** **Derived** (TIDAK plaintext). `OutletTable` (`:20`) `$appends=['pin']` tapi `getPinAttribute` (`:31-34`) generate ulang via `derivePin($outlet_id,$label)` (sha256). `pin_hash` di `$fillable` (`:11`) tapi tidak dipakai untuk display — PIN murni deterministic dari seed. Aman dari reverse-engineering (butuh `outlet_id`+`label`).
+**18.** `/perbandingan-outlet` → `->middleware('plan:perbandingan_outlet')`. `routes/web.php:176-177`.
 
----
+**19.** `/arus-kas` → `->middleware('plan:arus_kas')`. `routes/web.php:178-179`.
 
-## C. INVENTARIS (Q37–Q48)
+**20.** `/laporan/laba-rugi` → `OwnerDashboardController::labaRugi`. `routes/web.php:117`.
 
-**Q37. Stok per outlet_id atau global tenant?**
-**Jawab:** `Inventory/Index` (`:144`, plan `inventory`) adalah placeholder fase 2. Berdasar pola `outlet_id` di `MenuItem`/`OutletTable`, stok direncanakan **per-outlet** (`Inventory` model punya `outlet_id`). Scope via `TenantScope` + `outlet_id`.
+**21.** `/laporan/produk` → `OwnerDashboardController::laporanProduk`. `routes/web.php:118`.
 
-**Q38. Dasbor Stok 300 outlet — agregasi realtime atau delay (rollup)?**
-**Jawab:** `DashboardInventory/Index` (`:151`, plan `dashboard_inventory`) placeholder. Tidak ada rollup stok di Fase 3 (rollup hanya sales). Agregasi stok 300 outlet = query mentah (berat di scale, gap).
+**22.** `/laporan/shift` → `OwnerDashboardController::laporanShift`. `routes/web.php:119`.
 
-**Q39. Supplier — tenant-scoped atau share antar outlet?**
-**Jawab:** `PembelianVendor/Index` (`:146`, plan `pembelian_vendor`) **placeholder** (belum diimplementasi). Sesuai pola, `Supplier` akan `tenant_id`-scoped, bisa di-share ke banyak outlet dalam 1 tenant via `outlet_id` nullable.
+**23.** `/laporan/meja` → `OwnerDashboardController::laporanMeja`. `routes/web.php:120`.
 
-**Q40. Stock Opname — lock stok outlet agar order tidak bentrok?**
-**Jawab:** `StokOpname/Index` (`:148`, plan `stok_opname`) **placeholder**. Belum ada mekanisme lock saat opname. Di implementasi nanti, butuh `SELECT ... FOR UPDATE` atau status `opname_in_progress` (gap).
+**24.** `/laporan/void` → `OwnerDashboardController::laporanVoid`. `routes/web.php:121`.
 
-**Q41. Stok aktif — POS order otomatis decrement stok outlet?**
-**Jawab:** Tidak ada logika decrement di `PosController`/`OrderController` saat ini (inventory placeholder). Saat diaktifkan, decrement lewat **event/observer** `OrderCreated` → `Inventory::decrement` by `outlet_id` (belum ada, gap).
+**25.** `/biaya-operasional` → `BiayaOperasionalController` (`index` + `store`).
+`routes/web.php:126-127`.
 
-**Q42. Race 2 kasir order item sama — decrement aman atau negatif?**
-**Jawab:** Tanpa inventory aktif, belum relevan. Jika diimplementasi, butuh **DB transaction + row lock** (`->lockForUpdate()`) di decrement agar tidak negatif (gap, harus didesain).
-
-**Q43. Dasbor Stok threshold rendah — di MenuItem atau inventory_settings?**
-**Jawab:** Threshold per-item sebaiknya di tabel `inventory_settings` terpisah (bukan `MenuItem`). Saat ini `MenuItem` tidak punya kolom threshold. (Gap saat implementasi.)
-
-**Q44. Tenant basic — modul Stok di-lock feature_locks?**
-**Jawab:** **YA**. `routes/web.php:144-145` `/inventory` pakai `plan:inventory` (pro). `basic` plan → 403. Sesuai `feature_locks` (`inventory`=pro).
-
-**Q45. Supplier placeholder — route /pembelian-vendor terdaftar meski komponen kosong?**
-**Jawab:** **YA**. `routes/web.php:146` `Route::get('/pembelian-vendor', ...)` terdaftar, render `PembelianVendor/Index` (komponen placeholder). Route ada, isi kosong (sesuai catatan 3 placeholder).
-
-**Q46. Owner 300 outlet — view stok terpusat atau per-outlet?**
-**Jawab:** `DashboardInventory` (placeholder) direncanakan agregat lintas-outlet untuk owner. FE harus support filter outlet (belum ada). (Gap.)
-
-**Q47. Data inventory — schema-per-tenant atau shared?**
-**Jawab:** Fase 2 (`4e9f9ad`): 11 model pakai `UsesTenantConnection`. `Inventory` (jika mengikuti pola) akan pakai trait tersebut → schema-per-tenant. Shared-schema hanya untuk model belum migrasi.
-
-**Q48. Stock Opname historical — snapshot atau overwrite?**
-**Jawab:** Belum diimplementasi. Rekomendasi: snapshot (`inventory_snapshots` dengan `recorded_at`) agar audit trail, bukan overwrite (gap desain).
+**26.** "Diskon & Pajak" `/diskon-pajak` → `Inertia::render('DiskonPajak/Index')` tanpa plan gate
+(placeholder) — `web.php:144`. "Pengaturan Outlet" `/pengaturan-outlet` →
+`OutletSettingsController::index` — `web.php:202`. "QR Code Meja" `/qrcode-meja` →
+`Inertia::render('QRCodeMeja/Index')` — `web.php:149`. "WhatsApp API integration"
+→ `->middleware('plan:wa_notif')` — `web.php:194-195`.
 
 ---
 
-## D. OPERASIONAL (Q49–Q58)
+## BAGIAN 2 — Multi-Tenancy (27–46)
 
-**Q49. Shift Kerja — ikat outlet_id atau global tenant?**
-**Jawab:** `StafShift/Index` (`:138`, plan `staf_shift`) **placeholder**. Pola: shift per **outlet** (`Shift` punya `outlet_id`) karena tiap outlet punya jadwal beda. Scope tenant via `TenantScope`.
+**27.** Dari **service container**: `$tenantId = app('tenant.id')`. `TenantScope.php:47`.
 
-**Q50. Shift Kerja 300 outlet — semua atau filter outlet aktif?**
-**Jawab:** FE `StafShift` harus filter by `outlet_id` aktif kasir (karena per-outlet). BE belum ada query (placeholder). (Gap filter.)
+**28.** `EnsureTenantContext::handle()` memanggil `$this->ctx->setFromUser($user)` yang melakukan
+`App::bind('tenant.id', fn () => $this->tenantId)`. `EnsureTenantContext.php:36-38`;
+`TenantContext.php:38-46`.
 
-**Q51. Sesi Kasir — 1 sesi = 1 outlet + 1 user?**
-**Jawab:** `CashierSession/Index` (`:140`, plan `cashier_session`) **placeholder**. Desain: 1 sesi = 1 `outlet_id` + 1 `user_id` + `opened_at` + `opening_balance`. Membedakan outlet A vs B via kolom `outlet_id`.
+**29.** **TIDAK** — `TenantScope` tidak membaca `Auth::user()` langsung; ia membaca container
+yang diisi middleware. Komentar jelas di `TenantScope.php:12-15`.
 
-**Q52. Kasir lupa Tutup Sesi — auto-close scheduler?**
-**Jawab:** Belum ada scheduler auto-close di `routes/web.php` (hanya `sales:rollup`, `orders:archive`). Sesi menggantung sampai manual close (gap: butuh `cashier:auto-close` scheduler).
+**30.** Di production: `abort(500, 'TenantContext belum diinisialisasi (misconfig).')` — fail closed
+agar tidak kembalikan data lintas-tenant. `TenantScope.php:40-42`.
 
-**Q53. Sesi Kasir opening balance — integer minor unit atau float?**
-**Jawab:** Desain sebaiknya **integer minor unit** (sen, mis. Rp dalam integer) untuk hindari rounding. `CashierSession` model belum ada (placeholder) — pastikan pakai `integer`/`decimal:2` (gap).
+**31.** Di local/testing/console/seeding: scope **tidak aktif** (return tanpa filter) — "Plan B"
+agar `db:seed` tetap jalan. `TenantScope.php:44`.
 
-**Q54. Multi-outlet — laporan Sesi Kasir gabung tenant atau per-outlet?**
-**Jawab:** Owner = gabung tenant (agregat). Kasir/manager = per-outlet aktif. Scope via `TenantScope` + `outlet_id` (desain placeholder).
+**32.** `abort(403, 'Akun ini tidak terhubung ke tenant manapun.')`. `EnsureTenantContext.php:32-34`.
 
-**Q55. Shift Kerja vs Sesi Kasir — batas domain?**
-**Jawab:** **Shift** = template jadwal (kapan toko buka, siapa jaga). **Sesi Kasir** = eksekusi aktual (kasir login, buka tutup, hitung kas). Dua entitas berbeda (shift → sesi).
+**33.** `Route::middleware(['auth', 'tenant'])->group(function () { ... })` membungkus hampir semua
+route terproteksi. `routes/web.php:81`.
 
-**Q56. Redis down saat buka sesi — tersimpan DB atau hilang?**
-**Jawab:** Sesi disimpan di **DB** (`cashier_sessions` table, bukan Redis) → Redis down tidak menghapus. Session Laravel fallback DB (Q18). Aman.
+**34.** Di-binding sebagai **singleton** di `AppServiceProvider`:
+`$this->app->singleton(TenantContext::class, fn() => new TenantContext())`.
+Komentar `TenantContext.php:13-14`.
 
-**Q57. Sesi Kasir terintegrasi Refund & Void (audit)?**
-**Jawab:** Belum. `RefundVoidManager` (`:142`) tidak reference `cashier_session_id`. Gap audit: refund harus mencatat `session_id` + `user_id` (implementasi nanti).
+**35.** Fallback: `new Subscription(['tenant_id'=>$id, 'plan'=>'basic', 'status'=>'expired'])`.
+`TenantContext.php:91-106`.
 
-**Q58. Tenant besar — limit sesi kasir aktif bersamaan?**
-**Jawab:** Tidak ada limit di kode (placeholder). Rekomendasi: 1 sesi aktif per (outlet, user) via unique constraint (gap).
+**36.** Menghapus `unique(['tenant_id','slug'])` dan menambah `unique('slug')` (global).
+Migration `2026_07_10_000001_make_outlet_slug_globally_unique.php:25-26`.
 
----
+**37.** Karena `/m/{slug}` adalah route publik **global**. Unique per-tenant menyebabkan dua tenant
+dengan outlet bernama sama menghasilkan slug identik → QR tenant B membuka menu tenant A
+(cross-tenant leak). Komentar migration `lines 8-14`.
 
-## E. LAPORAN (Q59–Q70)
+**38.** Karena endpoint publik: tenant **belum diketahui** dari slug. Harus query **lintas semua**
+tenant untuk cocokkan `slug`. `PublicOrderController.php:42-44`.
 
-**Q59. Laporan Penjualan — rollup atau query mentah orders?**
-**Jawab:** **Rollup**. `OwnerDashboardController::salesSummary` (`:105`) baca `sales_daily_rollups` (Fase 3 `e7ad243`), bukan scan `orders`. Penting di 25jt order/hari karena rollup O(1).
+**39.** Ya. `Outlet::withoutGlobalScope(TenantScope::class)->where('slug', $outletParam)`.
+`PublicOrderController.php:318-320`.
 
-**Q60. Laporan range 1 tahun — O(1) berkat rollup?**
-**Jawab:** Ya. Rollup harian (`sales_daily_rollups`) → range 1 tahun = 365 row aggregate, bukan miliaran row `orders`. O(1) relatif.
+**40.** Ya. `Outlet::booted()` → `static::addGlobalScope(new TenantScope)`.
+`Outlet.php:30-36`.
 
-**Q61. Perbandingan Outlet 300 outlet — 300 seri atau top-N?**
-**Jawab:** FE `PerbandinganOutlet/Index` (`:134`, plan `perbandingan_outlet`) — belum ada virtualize. Di 300 outlet, chart 300 seri = browser lag. Rekomendasi top-N + drill-down (gap).
+**41.** **TIDAK** — model `Tenant` sendiri tidak memakai `TenantScope` (aman di-resolve tanpa
+scope). Komentar `TenantContext.php:81`.
 
-**Q62. Perbandingan Outlet — SalesDailyRollup punya kolom outlet_id?**
-**Jawab:** Ya. Rollup di-partisi per `tenant_id` + `outlet_id` (agar bisa group by outlet). `SalesDailyRollup` model (Fase 3) punya `outlet_id`.
+**42.** Ya. `$cacheKey = "menu:tenant:{$outlet->tenant_id}:outlet:".($outlet->id ?? 'global')`.
+`PublicOrderController.php:62`.
 
-**Q63. Arus Kas — gabung order+refund+sesi dalam 1 view?**
-**Jawab:** `ArusKas/Index` (`:136`, plan `arus_kas`) — desain gabung `orders` (masuk) + `refund` (keluar) + `cashier_sessions` (opening/closing). Tenant-scoped via rollup.
+**43. (TRAP)** **TIDAK bocor.** Key menyertakan `tenant_id`, jadi cache terisolasi per-tenant.
+`PublicOrderController.php:62` — aman.
 
-**Q64. Arus Kas 1 tahun 300 outlet — pagination?**
-**Jawab:** FE harus paginate (BE `cashier_sessions`/`refunds` query via `TenantScope`). Belum ada paginate eksplisit (gap).
+**44.** `TenantScope::bypass($callback)` mem-bind `tenant.id` jadi `null` sementara, menjalankan
+callback di `try`, lalu **otomatis restore** di `finally` (bind ulang id lama atau unset).
+`TenantScope.php:63-80`.
 
-**Q65. Laporan ekspor Excel — server memory atau queue?**
-**Jawab:** Tidak ada endpoint ekspor di `routes/web.php` saat ini (hanya view). Jika diimplementasi, **HARUS** queue job (Redis) + notif, bukan sync (gap, cegah memory spike).
+**45.** Command/job wajib memanggil `app(TenantContext::class)->setTenantId($id)` (atau
+`setFromUser` di test). `TenantContext.php:52-59` (komentar `49-51`).
 
-**Q66. Semua laporan di-lock tenant_id via TenantScope + findOutletForTenant?**
-**Jawab:** Ya. `OwnerDashboardController` pakai `$ctx->id()`; `KdsController` pakai `Order::byTenant(...)`. Tidak ada laporan yang bisa cross-tenant (isolation hijau di test).
-
-**Q67. Perbandingan Outlet hanya owner — 403 atau hidden UI?**
-**Jawab:** **403 di BE**. `routes/web.php:134-135` `plan:perbandingan_outlet` middleware → manager tanpa plan dapat 403 (bukan sekadar hidden). Aman.
-
-**Q68. sales:rollup gagal — fallback query mentah atau kosong?**
-**Jawab:** Jika rollup gagal, `salesSummary` baca `sales_daily_rollups` kosong → laporan kosong (TIDAK fallback ke `orders`). Degrade (bukan 500), tapi data hilang. Perlu alert scheduler (gap monitoring).
-
-**Q69. Laporan per-kategori menu — join menu_items+categories aman?**
-**Jawab:** Rollup menyimpan `category_id` aggregate → tidak join mentah tiap request. Aman di scale. Jika FE minta per-kategori, baca dari rollup (bukan join `orders`×`menu_items`).
-
-**Q70. Rate-limit ekspor laporan — cegah DoS?**
-**Jawab:** Tidak ada endpoint ekspor (Q65). Jika dibuat, tambah `throttle:10,1` (sama dgn subscription `:36`). Gap.
+**46.** Karena `tenant_id` **eksplisit dikirim** di `create(['tenant_id'=>$tenantId, ...])` dan
+`withoutGlobalScope` menonaktifkan syarat container-binding. `PublicOrderController.php:151-158`.
 
 ---
 
-## F. PENGATURAN (Q71–Q88)
+## BAGIAN 3 — Public e-Menu / Customer View (47–66)
 
-**Q71. Pusat pengaturan: Pengaturan Outlet (UI) atau outlet_settings DB?**
-**Jawab:** **`outlet_settings` DB adalah canonical** (bukan cuma UI). `OutletSettingsController::index` (`:48-108`) baca via `SettingsService->forOutlet($id)` + `forTenant($id)`. UI hanya render. Jadi pusat = DB `outlet_settings` + `tenant_settings`.
+**47.** `Inertia::render('BukuMenuDigital/CustomerView', ['slug' => $slug])` — **hanya** prop `'slug'`.
+`routes/web.php:51`.
 
-**Q72. operating_hours JSON — per-outlet atau inherit tenant?**
-**Jawab:** **Per-outlet**. `updateJam` (`:190-216`) simpan ke `outlet_settings.operating_hours` per `outlet_id` (`:210`). Tiap outlet beda jam (`:101` baca dari `$outletSettings`).
+**48. (TRAP)** Dari **URL path**, bukan prop. `CustomerView.tsx:124`:
+`const outletSlug = window.location.pathname.split('/m/')[1]...`. Prop `'slug'` dari
+Inertia praktis tidak dipakai untuk slug (hanya `screen_mode` yang dibaca dari prop di `:111`).
 
-**Q73. geo_radius_meters — per-outlet atau global tenant?**
-**Jawab:** **Per-outlet**. `updateLokasi` (`:140-157`) simpan `geo_radius_meters` ke `outlets` per `outlet_id` (`:154`). Tiap outlet radius sendiri (untuk validasi PIN dine-in GPS).
+**49. (TRAP)** **SERVER-driven.** `const screenMode = (page.props.screen_mode) || lsScreenMode`
+(`CustomerView.tsx:111`); API mengembalikan `outlet_settings.screen_mode`
+(`PublicOrderController.php:78`). `localStorage` hanya fallback bila kosong/offline
+(`CustomerView.tsx:162-167` menyimpan ke localStorage agar konsisten).
 
-**Q74. Diskon & Pajak — ikat outlet_id atau global tenant?**
-**Jawab:** **Pajak = global tenant** (`updatePajak` `:163-184` simpan ke `tenant_settings`), **Diskon = per-outlet** (rencana, `DiskonPajak/Index` placeholder `:126`). `tax_type` (PBJT/PPN) di-level tenant (semua outlet sama pajak).
+**50.** Fallback `'nano-banana'`. `PublicOrderController.php:78`.
 
-**Q75. Upload logo tenant — Cloudinary atau public/images lokal?**
-**Jawab:** `Pengaturan Outlet` (`:103`) baca `outlet.logo_path` — **tidak** di-upload ke Cloudinary di kode saat ini (masih `logo_path` lokal, sesuai invarian "logo di public/images"). Foto **menu** sudah Cloudinary; logo **belum** (gap: harus pindah Cloudinary sesuai invarian).
+**51.** `localStorage.setItem('outlet_screen_mode', data.screen_mode)` dan
+`setItem('tenant_layout', data.tenant_layout ?? data.screen_mode)`. `CustomerView.tsx:165-166`.
 
-**Q76. QR Code Meja 300×50=15000 QR — on-demand atau pre-generated?**
-**Jawab:** **On-demand/lazy**. `QRCodeMeja/Index` generate `QRCodeSVG` di FE saat render (tidak pre-generate di BE). 15000 QR di-generate di browser saat user buka halaman (berat, tapi lazy per halaman).
+**52.** `` `/api/menu${outletSlug ? `/${encodeURIComponent(outletSlug)}` : ''}` ``. `CustomerView.tsx:141`.
 
-**Q77. QR Code Meja MENU_BASE_URL kosong → fallback localhost?**
-**Jawab:** **YA, bug historical**. Jika `MENU_BASE_URL` (`.env`) kosong, `buildMenuUrl` fallback ke `window.location.origin` (= localhost:8000 di PC owner) → phone tamu tidak bisa akses. Harus isi `MENU_BASE_URL` (domain VPS) sebelum generate QR (catatan session lalu).
+**53.** `Route::get('/api/menu/{slug}', [PublicOrderController::class, 'getPublicMenu'])`.
+`routes/web.php:53`.
 
-**Q78. Printer Config — per outlet_id di outlet_settings?**
-**Jawab:** `PrinterConfig/Index` (`:128`) + `/api/receipt-config` (`:186-187`). `ReceiptConfig` model punya `outlet_id` → config printer **per-outlet** di `outlet_settings`/`receipt_configs`.
+**54.** `outlet{id,name,slug,latitude,longitude,geo_radius_meters}`, `screen_mode`,
+`tenant_layout`, `menu`. `PublicOrderController.php:80-92`.
 
-**Q79. Antrean Cetak — Redis queue atau block request?**
-**Jawab:** `PrintJobMonitor/Index` (`:129`) + `/api/print-jobs` (`:184`). Jika `QUEUE_CONNECTION=redis`, cetak struk di-queue (tidak block kasir). Di dev (sync) block — di prod Redis async.
+**55.** Selalu `'nano-banana'`. `PublicOrderController.php:90`.
 
-**Q80. Printer offline — retry backoff atau job dibuang?**
-**Jawab:** Tidak ada mekanisme retry eksplisit di `PrintController` (perlu cek). Default Laravel queue: `queue:work --tries=3` (retry 3x). Job tidak dibuang (kalau Redis up). Gap: backoff eksponensial khusus printer.
+**56.** `now()->addMinutes(10)` → **10 menit**. `PublicOrderController.php:65`.
 
-**Q81. TTS — API eksternal per call atau cache?**
-**Jawab:** `TTSSettings/Index` (`:130`) setting; notif dapur TTS panggil API (Groq/Google TTS) **per call** (tidak cache). Di 300 order/menit = 300 call eksternal (cost). Rekomendasi: cache audio per template (gap).
+**57.** `forGuestMenu($outlet->id)` membatasi item menu hanya milik outlet tersebut.
+`PublicOrderController.php:68` (definisi scope ada di MenuItem model).
 
-**Q82. WhatsApp API — token per-tenant atau global?**
-**Jawab:** `WhatsAppIntegration/Index` (`:152`, plan `wa_notif`) — token/provider config per-tenant (di `tenant_settings` atau `outlet_settings`). Isolasi per tenant (sesuai multi-tenant).
+**58.** Mengembalikan **string kosong `''`**. `menuUrl.ts:2-3`.
 
-**Q83. WhatsApp — rate-limited per tenant?**
-**Jawab:** Tidak ada rate-limit eksplisit di route (`:152` tanpa throttle). Provider (Twilio/Meta) biasanya batasi. Rekomendasi: `throttle:60,1` per tenant (gap).
+**59.** Query param **`t`** = `encodeURIComponent(table)`. `menuUrl.ts:8-11`.
 
-**Q84. Owner rename slug — tetap global-unique?**
-**Jawab:** **YA**. Invarian slug global-unique (migration `2026_07_10_000001`, update `unique('slug')`). `OutletSlug.php` generator collision-free + idempoten. Rename harus jaga uniqueness (Q29).
+**60. (TRAP)** **TIDAK** — `?t=<meja>` **bukan** bagian cache key. Menu di-cache per-outlet;
+komentar eksplisit di `menuUrl.ts:7-8` ("Bukan bagian dari cache key menu (menu per-outlet)").
 
-**Q85. Diskon & Pajak placeholder — route ada meski komponen kosong?**
-**Jawab:** **YA**. `routes/web.php:126` `Route::get('/diskon-pajak', ...)` terdaftar, render `DiskonPajak/Index` (placeholder). Route ada, isi kosong.
+**61.** `MainLayout.tsx:213`: `user?.role === 'owner' ? 'owner' : (activeKaryawan?.role ?? user?.role ?? 'kasir')`.
 
-**Q86. Owner ubah tax_rate — retroaktif ke order lama atau baru?**
-**Jawab:** `updatePajak` (`:163`) simpan ke `tenant_settings` → berlaku **order baru** (saat checkout baca `tax_rate` aktif). Order lama sudah tersimpan `tax_amount` di `orders` (tidak berubah). Retroaktif = tidak.
+**62.** `visibleNav = nav.map(g => ({...g, items: g.items.filter(i => i.roles.includes(activeRole))})).filter(g => g.roles.includes(activeRole) && g.items.length>0)`.
+`MainLayout.tsx:216-218`.
 
-**Q87. QR Code Meja "Cetak Semua" 15000 meja — window.print atau server PDF?**
-**Jawab:** FE `QRCodeMeja` pakai `window.print()` (browser). 15000 meja = DOM 15000 SVG → browser crash. Butuh server-side PDF (queue job) untuk scale (gap).
+**63.** Mengembalikan `'allowed'`. `RoleGuard.tsx:22-25`.
 
-**Q88. Semua Pengaturan di-gate RequiresPlan?**
-**Jawab:** Sebagian. `pengaturan-outlet` (`:160`) **TANPA** plan (semua plan). Yang di-gate: `whatsapp` (wa_notif `:152`), `printer` (tidak di-gate! `:128` tanpa plan — gap, harusnya pro), `tts` (tanpa plan — gap).
+**64.** Regex `/^.+_.+_auth_ok$/` (token session kriptografis dari StaffLogin). `RoleGuard.tsx:65`.
 
----
+**65.** `'cashier'` → `'kasir'` (juga `kitchen/dapur`, `waiter/pelayan`, dll.).
+`RoleGuard.tsx:46-54`.
 
-## G. OWNER VIEW (Q89–Q100)
-
-**Q89. Data Karyawan — ikat tenant_id + outlet_id? Bulk-assign?**
-**Jawab:** `OutletSettingsController::createKaryawan` (`:323-348`) `User::create(['tenant_id'=>$ctx->id(), 'outlet_id'=>$validated['outlet_id']])` → **tenant + outlet scoped**. Bulk-assign belum ada (1 per 1). (Gap bulk.)
-
-**Q90. Data Karyawan simpan PIN — hash atau plaintext?**
-**Jawab:** **Hash** (`Hash::make` `:343`). `DEFAULT_EMPLOYEES` seeder pakai PIN plaintext di seeder (untuk dev), tapi DB `users.password` = bcrypt hash. Login `storeStaff` pakai `Hash::check` (ROLE_LOGIN_NOTES).
-
-**Q91. Owner 300 outlet — bulk-assign karyawan atau 1 per 1?**
-**Jawab:** **1 per 1** (`createKaryawan` `:323`). Tidak ada bulk API. Di 300 outlet, owner capek. Rekomendasi: bulk endpoint (gap).
-
-**Q92. Peringatan Stok — agregat Dasbor Stok atau outlet tertentu?**
-**Jawab:** `Owner/InventoryAlerts` (`:112`) — agregat lintas outlet untuk owner (baca `DashboardInventory` data). FE filter per outlet (placeholder).
-
-**Q93. Google Review — Places API, token di outlets.google_place_id?**
-**Jawab:** **YA**. `GoogleReviewController::index` (`:39`) baca `$outlet->google_place_id`. `saveSettings` (`:105-132`) resolve link Maps → `PlaceIdResolver::resolve` → simpan di `outlets.google_place_id` (migration `2026_07_12_100000`). Per-outlet, bukan per-tenant.
-
-**Q94. Google Review reply LOKAL — UI jelaskan batasan?**
-**Jawab:** **YA, dijelaskan**. `reply` (`:189-215`) pesan: *"Silakan salin & tempel ke Google Maps untuk mempublikasikan"* (`:212`). Places read-only → reply LOKAL (tidak post ke Google). UI transparan.
-
-**Q95. Google Review cache Redis — key tenant_id+outlet_id?**
-**Jawab:** **HARUS**. `fetchReviewsFromPlaceId($placeId, $outlet->id, $user->tenant_id)` (`:44`) — key cache harus `tenant_id+outlet_id+place_id` agar tidak leak lintas tenant. Jika key hanya `place_id`, tenant A baca review tenant B (bug). Perlu verifikasi `GoogleBusinessProfileService` cache key (gap verifikasi).
-
-**Q96. Pengaturan Owner — Mode Screen UI di-read useTenantSettings (localStorage)?**
-**Jawab:** **YA**. `Owner/Settings` (`:110`) atur tema; `useTenantSettings` FE baca `localStorage('outlet_screen_mode')`. 5 mode: terang/gelap/glassmorphic/nano-banana/krem (DESIGN.md §7).
-
-**Q97. Pengaturan Owner tema — DB atau hanya localStorage?**
-**Jawab:** **localStorage** (FE `useTenantSettings`). Tidak ada kolom `theme` di `tenant_settings`/`outlet_settings` (BE tidak persist). Ganti device = tema reset (gap: harus persist ke DB).
-
-**Q98. Data Karyawan role cashier vs kasir — RoleGuard normalize?**
-**Jawab:** **YA**. `RoleGuard` normalisasi `cashier↔kasir`, `kitchen↔dapur`, `waiter↔pelayan` (ROLE_LOGIN_NOTES). Cegah false "Akses Ditolak" saat `tenant_employees` persist English value.
-
-**Q99. Google Review butuh GOOGLE_PLACES_API_KEY + GROQ_API_KEY — global atau per-tenant?**
-**Jawab:** **GLOBAL** (1 key di `.env`, semua tenant share). Ini **TIDAK** isolasi per-tenant (sesuai catatan: 1 global key = no per-tenant isolation, butuh billing terpisah di 5000 tenant). Risk: quota 1 key dibagi 5000 tenant → limit. Rekomendasi: per-tenant key (gap monetisasi).
-
-**Q100. Owner ubah Pengaturan Owner (tema) — langsung ke semua outlet atau hanya diakses?**
-**Jawab:** `localStorage('outlet_screen_mode')` **per-outlet** (browser device). Jika owner ubah di outlet A, outlet B (device lain) tidak berubah sampai diakses & di-set ulang. Tidak global tenant (karena localStorage, Q97).
+**66. (TRAP)** Tetap valid lewat **redirect 301 ke slug baru**. `getPublicMenu` mengecek
+`where('old_slug', $slug)` lalu `redirect()->to("/m/{$outlet->slug}", 301)`.
+`PublicOrderController.php:47-55`. `Outlet::setNameAttribute` menyimpan `old_slug` saat slug
+diubah (`Outlet.php:68-71`).
 
 ---
 
-## RINGKASAN TEMUAN (GAP / RISIKO SCALE)
+## BAGIAN 4 — QR Meja (67–86)
 
-| # | Temuan | Severity | Rekomendasi |
-|---|--------|----------|-------------|
-| Q5/Q20/Q34 | Menu/Outlet tanpa paginasi (5000 item) | 🔴 Tinggi | `paginate()` + server-side filter |
-| Q7/Q10 | KDS/Monitor tidak filter `outlet_id` | 🟠 Menengah | Tambah param `outlet_id` di BE |
-| Q11 | KDS polling (bukan WebSocket) | 🟠 Menengah | SSE/WebSocket di scale |
-| Q22 | Upload foto tanpa limit quota | 🟠 Menengah | Validasi size/count per tenant |
-| Q23/Q87 | Sync Cloudinary / window.print 15000 | 🟠 Menengah | Queue job + server PDF |
-| Q29/Q84 | Rename slug = QR lama invalid | 🟡 Rendah | Auto-redirect slug lama |
-| Q75 | Logo tenant masih lokal (bukan Cloudinary) | 🟠 Menengah | Pindah ke Cloudinary (invarian) |
-| Q95 | Cache review key harus tenant-scoped | 🔴 Tinggi | Verifikasi key `tenant+outlet+place` |
-| Q99 | 1 global Places/Groq key | 🟠 Menengah | Per-tenant key (billing) |
-| Q97 | Tema hanya localStorage (hilang ganti device) | 🟡 Rendah | Persist ke `outlet_settings` |
+**67. (TRAP)** `baseUrl = (props.menu_base_url) || window.location.origin`.
+`QRCodeMeja.tsx:57`. Bila `MENU_BASE_URL` kosong → fallback ke **origin browser**
+(mis. `localhost`). QR lalu menunjuk ke `localhost` → **HP tamu tidak bisa menjangkaunya**
+(broken). Jadi env `MENU_BASE_URL` wajib di-set ke domain publik.
 
-**Konklusi:** Arsitektur multi-tenant (TenantScope/TenantContext) **SUDAH BENAR** untuk isolasi. Pusat pengaturan **ADA** di `Pengaturan Outlet` (DB `outlet_settings`). Gap utama = **paginasi/scale pada menu & KDS**, **cache key tenant-scoping**, dan **Cloudinary untuk logo** (belum konsisten dgn invarian foto menu).
+**68.** `allowedRoles={['owner', 'manager', 'admin']}`. `QRCodeMeja.tsx:287-289`.
+
+**69.** `buildMenuUrl(baseUrl, selectedOutlet.slug, label)` dari `lib/menuUrl`. `QRCodeMeja.tsx:67`.
+
+**70.** Default `'A1\nA2\nB1\nB2\nC1'`. `QRCodeMeja.tsx:48`.
+
+**71.** Maksimal **200** meja per cetak: `.slice(0, 200)`. `QRCodeMeja.tsx:64`.
+
+**72.** `qrcode.react` → komponen `QRCodeSVG`. `QRCodeMeja.tsx:10,228`.
+
+**73.** `fetch('/api/outlet-tables/${outletId}', ...)`. `BukuMenuDigital/Index.tsx:121`.
+
+**74.** Ya. `const baseUrl = (props.menu_base_url) || (typeof window !== 'undefined' ? window.location.origin : '')`.
+`BukuMenuDigital/Index.tsx:112`.
+
+**75.** **TIDAK** disimpan plaintext — PIN **di-derive** ulang dari seed deterministik.
+Komentar `OutletTable.php:28-35`.
+
+**76.** `hash('sha256', "restoku:tablepin:{$outletId}:{$label}")`, ambil 4 digit terakhir,
+`str_pad(...,4,'0',STR_PAD_LEFT)`. `OutletTable.php:41-47`.
+
+**77.** Ya — **deterministik & stabil** per `(outlet_id, label)`, dan **TIDAK disimpan** di DB
+(hanya kolom `pin_hash`). `OutletTable.php:32-47`.
+
+**78.** Kolom `pin_hash` (hash). `OutletTable.php:11` (fillable `'pin_hash'`).
+
+**79.** Ya. `'pin_hash' => Hash::make(OutletTable::derivePin($outlet->id, $label))`.
+`OutletTableController.php:82` (juga `:126, :204`).
+
+**80.** Dari accessor `getPinAttribute()` (`OutletTable.php:32`), dikembalikan di map
+`'pin' => $t->pin`. `OutletTableController.php:42`.
+
+**81. (TRAP)** **Bebas** diisi owner (textarea bebas: A1, 01, Meja 7, ...). Format
+`A1–A9/B1–B3` hanyalah **contoh default**, tidak di-hardcode. Komentar
+`QRCodeMeja.tsx:47` ("Label meja bebas owner") dan placeholder textarea `:177`.
+
+**82.** `qr_type` hanya `in:qr,logo,frame`. `OutletTableController.php:65` (juga `:111`).
+
+**83.** **Dilewati (skipped)**, bukan gagal total — `$skipped++` + `continue`, dan laporkan
+jumlah skipped/errors. `OutletTableController.php:181-198`.
+
+**84.** `resolveOutlet(int $outletId, int $tenantId)` → `where('id',$outletId)->where('tenant_id',$tenantId)`.
+`OutletTableController.php:238-244` (dipakai di store/update/destroy/bulk).
+
+**85.** `/api/guest/daily-pin?slug=...`. `CustomerView.tsx:175`.
+
+**86. (TRAP)** **SALAH.** Satu global API key **TIDAK** mengisolasi tenant. Bukti:
+`GoogleBusinessProfileService::keyForTenant()` membaca key **per-tenant** dari `TenantSetting`
+dengan fallback ke config global (`lines 357-368`), dan cache key menyertakan
+`tenant_id`+`outlet_id` (`line 209`). Isolasi multi-tenant butuh per-tenant key + billing
++ queue + throttle terpisah.
+
+---
+
+## BAGIAN 5 — Google Reviews (87–100)
+
+**87.** Langsung mengembalikan Place ID yang cocok: `preg_match('/ChIJ[A-Za-z0-9_\-]+/', $input, $m)` → `return $m[0]`.
+`PlaceIdResolver.php:37-40`.
+
+**88.** Mengekstrak `@lat,lng` atau `!3d lat !4d lng`, lalu memanggil `reverseGeocode($lat,$lng)`.
+`PlaceIdResolver.php:42-54`.
+
+**89.** `reverseGeocode()` memanggil **Geocoding API** via
+`config('google-business-profile.geocode_api_base')` dengan key `config('google-business-profile.places_api_key')`.
+`PlaceIdResolver.php:61-68`.
+
+**90.** Mengembalikan `'ChIJmVwPLWhdaC4RzzPOd0s88Qk'`. `PlaceIdResolver.php:33`.
+
+**91.** `source = $placeId ? 'places' : 'local'`. Bila outlet punya `google_place_id` → `'places'`
+(`GoogleReviewController.php:39-40, 57-65`); bila tidak → `'local'` (`lines 89-98`).
+
+**92.** `'source' => 'places'` di-set dalam `updateOrCreate` atribut review.
+`GoogleBusinessProfileService.php:288`.
+
+**93. (TRAP)** **Places API** (Place Details by Place ID) — BUKAN Business Profile OAuth.
+`fetchReviewsFromPlaceId` memanggil `places_api_base` + `key` (`GoogleBusinessProfileService.php:255-272`).
+(OAuth GBP memang ada di `GoogleBusinessProfileService`, tapi alur tampilan review publik
+mengandalkan Place ID + Places API.)
+
+**94.** Menerima `'google_place_link'` (wajib), lalu `(new PlaceIdResolver)->resolve(...)` untuk
+mendapatkan Place ID, dan menyimpannya ke `outlet.google_place_id`. `GoogleReviewController.php:105-131`.
+
+**95.** Fallback: `config(['ai.default' => 'gemini'])` lalu panggil ulang `RestokuAiAssistant::make()->prompt(...)`.
+`GoogleReviewController.php:166-173`.
+
+**96.** Ya — `if ($review->tenant_id !== auth()->user()->tenant_id) return 404`.
+`generateAiReply` di `GoogleReviewController.php:143`; `reply` di `:198`.
+
+**97.** Ya. `booted()` → `static::addGlobalScope(new TenantScope)`. `GoogleReview.php:23-32`.
+
+**98.** `$cacheKey = "gbp_reviews_places_{$tenantId}_{$outletId}_{$placeId}"` — mencakup
+tenant, outlet, DAN place. `GoogleBusinessProfileService.php:209`.
+
+**99.** Ya. `keyForTenant()` membaca `$setting->{$field}` dari `TenantSetting` (where tenant_id),
+dengan fallback ke `$globalFallback` (config global). `GoogleBusinessProfileService.php:357-368`.
+
+**100. (TRAP)** **TIDAK bocor.** Cache key menyertakan **tenant_id DAN outlet_id**, sehingga dua tenant
+yang kebetulan memakai Place ID sama mendapat cache terpisah. Komentar Q95 di
+`GoogleBusinessProfileService.php:207-209`.
