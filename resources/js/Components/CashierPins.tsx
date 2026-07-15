@@ -62,7 +62,7 @@ export default function CashierPins() {
         const loadTables = async () => {
             try {
                 const res = await fetch(`/api/outlet-tables/${outletId}`, {
-                    headers: { Accept: 'application/json', 'X-Inertia': 'false' },
+                    headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 });
                 if (!res.ok) {
                     if (alive) setTblErr(true);
