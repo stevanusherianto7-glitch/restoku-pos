@@ -9,6 +9,7 @@ interface Attendance {
     present: number;
     late: number;
     absent: number;
+    leave: number;
 }
 
 interface Props {
@@ -36,6 +37,7 @@ export default function Kehadiran({ attendance, is_stub }: Props) {
                             <th className="pb-3 font-medium">Hadir</th>
                             <th className="pb-3 font-medium">Terlambat</th>
                             <th className="pb-3 font-medium">Absen</th>
+                            <th className="pb-3 font-medium">Izin</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -47,8 +49,16 @@ export default function Kehadiran({ attendance, is_stub }: Props) {
                                 <td className="py-3 text-emerald-400">{a.present} hari</td>
                                 <td className="py-3 text-amber-400">{a.late} hari</td>
                                 <td className="py-3 text-red-400">{a.absent} hari</td>
+                                <td className="py-3 text-slate-400">{a.leave ?? 0} hari</td>
                             </tr>
                         ))}
+                        {attendance.length === 0 && (
+                            <tr>
+                                <td colSpan={5} className="py-6 text-center text-slate-500">
+                                    Belum ada data absensi.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </Glass>

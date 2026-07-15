@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
+use App\Models\CashierSession;
+use App\Models\Order;
 use App\Models\OrderArchive;
+use App\Models\ShiftSchedule;
 use App\Services\OrderArchiveService;
 use App\Services\OwnerDashboardService;
 use App\Services\RedisHealthService;
@@ -130,84 +134,162 @@ class OwnerDashboardController extends Controller
     }
 
     /**
-     * L2C: Laporan Shift & Kasir — sesi kasir (STUB, tabel cashier_sessions belum ada).
+     * L3: Laporan Shift & Kasir — sesi kasir dari cashier_sessions (data nyata).
      */
     public function laporanShift(Request $request)
     {
-        $shifts = [
-            ['cashier' => 'Budi', 'opened_at' => now()->subHours(6)->format('H:i'), 'closed_at' => null, 'transactions' => 42, 'status' => 'open'],
-            ['cashier' => 'Siti', 'opened_at' => now()->subHours(5)->format('H:i'), 'closed_at' => now()->subHour()->format('H:i'), 'transactions' => 38, 'status' => 'closed'],
-        ];
+        $tenantId = $this->ctx->id();
+
+        $shifts = CashierSession::where('tenant_id', $tenantId)
+            ->with('user')
+            ->orderByDesc('opened_at')
+            ->get()
+            ->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'cashier' => $s->user?->name ?? 'Kasir #'.$s->user_id,
+                    'opened_at' => $s->opened_at?->format('H:i'),
+                    'closed_at' => $s->closed_at?->format('H:i'),
+                    'transactions' => $s->transaction_count,
+                    'total_sales' => (float) $s->total_sales,
+                    'status' => $s->closed_at ? 'closed' : 'open',
+                ];
+            })
+            ->all();
 
         return Inertia::render('LaporanShift/Index', [
             'shifts' => $shifts,
-            'is_stub' => true,
+            'is_stub' => false,
         ]);
     }
 
     /**
-     * L2E: Laporan Meja — revenue per meja (STUB, agregasi dari orders belum ada per-meja).
+     * L3: Laporan Meja — revenue per meja dari orders (data nyata, aggregate table_number).
      */
     public function laporanMeja(Request $request)
     {
-        $tables = [
-            ['table' => 'A1', 'orders' => 24, 'revenue' => 1850000],
-            ['table' => 'A2', 'orders' => 19, 'revenue' => 1420000],
-            ['table' => 'B1', 'orders' => 12, 'revenue' => 980000],
-        ];
+        $tenantId = $this->ctx->id();
+
+        $tables = Order::byTenant($tenantId)
+            ->where('status', Order::STATUS_SELESAI)
+            ->whereNotNull('table_number')
+            ->selectRaw('table_number, COUNT(*) as orders, SUM(total) as revenue')
+            ->groupBy('table_number')
+            ->orderByDesc('revenue')
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'table' => $t->table_number,
+                    'orders' => (int) $t->orders,
+                    'revenue' => (float) $t->revenue,
+                ];
+            })
+            ->all();
 
         return Inertia::render('LaporanMeja/Index', [
             'tables' => $tables,
-            'is_stub' => true,
+            'is_stub' => false,
         ]);
     }
 
     /**
-     * L2E: Transaksi Void — daftar void dengan alasan (STUB).
+     * L3: Transaksi Void — orders dengan payment_status='void' + item + alasan (data nyata).
      */
     public function laporanVoid(Request $request)
     {
-        $voids = [
-            ['id' => 1, 'item' => 'Es Teh Manis', 'reason' => 'Salah input', 'cashier' => 'Budi', 'amount' => 8000],
-            ['id' => 2, 'item' => 'Nasi Goreng', 'reason' => 'Customer batal', 'cashier' => 'Siti', 'amount' => 25000],
-        ];
+        $tenantId = $this->ctx->id();
+
+        $voids = Order::byTenant($tenantId)
+            ->where('payment_status', 'void')
+            ->with(['items' => function ($q) {
+                $q->select('id', 'order_id', 'item_name', 'quantity', 'subtotal');
+            }, 'createdBy'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($o) {
+                $first = $o->items->first();
+
+                return [
+                    'id' => $o->id,
+                    'item' => $first?->item_name ?? '—',
+                    'qty' => $first?->quantity ?? 0,
+                    'reason' => $o->void_reason ?? 'Tanpa alasan',
+                    'cashier' => $o->createdBy?->name ?? 'Kasir',
+                    'amount' => (float) ($first?->subtotal ?? $o->total),
+                    'voided_at' => $o->created_at?->format('Y-m-d H:i'),
+                ];
+            })
+            ->all();
 
         return Inertia::render('LaporanVoid/Index', [
             'voids' => $voids,
-            'is_stub' => true,
+            'is_stub' => false,
         ]);
     }
 
     /**
-     * L2F: Kehadiran — rekap absensi per karyawan (STUB).
+     * L3: Kehadiran — rekap absensi per karyawan dari attendances (data nyata).
      */
     public function kehadiran(Request $request)
     {
-        $attendance = [
-            ['name' => 'Budi', 'present' => 21, 'late' => 2, 'absent' => 1],
-            ['name' => 'Siti', 'present' => 22, 'late' => 0, 'absent' => 0],
-            ['name' => 'Anisa', 'present' => 19, 'late' => 3, 'absent' => 3],
-        ];
+        $tenantId = $this->ctx->id();
+
+        $attendance = Attendance::where('tenant_id', $tenantId)
+            ->with('user')
+            ->get()
+            ->groupBy('user_id')
+            ->map(function ($rows) {
+                $user = $rows->first()->user;
+
+                return [
+                    'name' => $user?->name ?? 'Karyawan #'.$rows->first()->user_id,
+                    'present' => $rows->where('status', 'present')->count(),
+                    'late' => $rows->where('status', 'late')->count(),
+                    'absent' => $rows->where('status', 'absent')->count(),
+                    'leave' => $rows->where('status', 'leave')->count(),
+                ];
+            })
+            ->values()
+            ->all();
 
         return Inertia::render('Owner/Kehadiran', [
             'attendance' => $attendance,
-            'is_stub' => true,
+            'is_stub' => false,
         ]);
     }
 
     /**
-     * L2F: Jadwal Shift — jadwal mingguan (STUB).
+     * L3: Jadwal Shift — jadwal mingguan dari shift_schedules (data nyata).
      */
     public function jadwalShift(Request $request)
     {
-        $schedule = [
-            ['name' => 'Budi', 'mon' => '08-16', 'tue' => '08-16', 'wed' => 'Libur', 'thu' => '08-16', 'fri' => 'Libur', 'sat' => '10-18', 'sun' => 'Libur'],
-            ['name' => 'Siti', 'mon' => 'Libur', 'tue' => '16-24', 'wed' => '16-24', 'thu' => 'Libur', 'fri' => '16-24', 'sat' => 'Libur', 'sun' => '16-24'],
-        ];
+        $tenantId = $this->ctx->id();
+
+        $schedule = ShiftSchedule::where('tenant_id', $tenantId)
+            ->with('user')
+            ->get()
+            ->groupBy('user_id')
+            ->map(function ($rows) {
+                $user = $rows->first()->user;
+                $byDay = $rows->keyBy('day_of_week');
+                $days = [];
+                foreach (range(0, 6) as $d) {
+                    $s = $byDay->get($d);
+                    $days[] = $s ? $s->shift_start->format('H:i').'-'.$s->shift_end->format('H:i') : 'Libur';
+                }
+
+                return [
+                    'name' => $user?->name ?? 'Karyawan #'.$rows->first()->user_id,
+                    'mon' => $days[0], 'tue' => $days[1], 'wed' => $days[2],
+                    'thu' => $days[3], 'fri' => $days[4], 'sat' => $days[5], 'sun' => $days[6],
+                ];
+            })
+            ->values()
+            ->all();
 
         return Inertia::render('Owner/JadwalShift', [
             'schedule' => $schedule,
-            'is_stub' => true,
+            'is_stub' => false,
         ]);
     }
 }

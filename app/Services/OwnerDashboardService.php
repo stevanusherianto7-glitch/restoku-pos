@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\CashierSession;
+use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Outlet;
@@ -242,9 +244,7 @@ class OwnerDashboardService
     }
 
     /**
-     * [L1] Tipe transaksi Dine-In / Take Away / Delivery.
-     * Order saat ini belum punya kolom order_type -> stub deterministik
-     * (akan diganti query nyata setelah migration order_type di Lapisan 2).
+     * [L3] Tipe transaksi Dine-In / Take Away / Delivery — query nyata dari orders.order_type.
      */
     public function getTransactionTypes(int $tenantId, string $dateRange = 'today'): array
     {
@@ -252,18 +252,29 @@ class OwnerDashboardService
         $this->applyDateRange($ordersQuery, $dateRange);
         $total = $ordersQuery->count();
 
-        // STUB: distribusi 60/30/10 (dine_in / take_away / delivery) — ganti dengan
-        // ->where('order_type', ...) setelah kolom order_type tersedia.
-        $dineIn = (int) round($total * 0.6);
-        $takeAway = (int) round($total * 0.3);
-        $delivery = max(0, $total - $dineIn - $takeAway);
+        $counts = $ordersQuery
+            ->selectRaw('order_type, COUNT(*) as cnt')
+            ->groupBy('order_type')
+            ->pluck('cnt', 'order_type')
+            ->all();
 
-        return [
-            ['type' => 'Dine-In', 'count' => $dineIn, 'percentage' => $total > 0 ? round(($dineIn / $total) * 100, 1) : 0],
-            ['type' => 'Take Away', 'count' => $takeAway, 'percentage' => $total > 0 ? round(($takeAway / $total) * 100, 1) : 0],
-            ['type' => 'Delivery', 'count' => $delivery, 'percentage' => $total > 0 ? round(($delivery / $total) * 100, 1) : 0],
-            'is_stub' => true,
+        $map = [
+            'dine_in' => 'Dine-In',
+            'take_away' => 'Take Away',
+            'delivery' => 'Delivery',
         ];
+
+        $result = [];
+        foreach ($map as $key => $label) {
+            $c = (int) ($counts[$key] ?? 0);
+            $result[] = [
+                'type' => $label,
+                'count' => $c,
+                'percentage' => $total > 0 ? round(($c / $total) * 100, 1) : 0,
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -271,29 +282,52 @@ class OwnerDashboardService
      * MenuItem saat ini belum punya kolom stok -> STUB deterministik
      * (ganti query nyata setelah migration stock di Lapisan 2).
      */
+    /**
+     * [L3] Alert stok kritis — query nyata dari menu_items (track_stock aktif & stock <= threshold).
+     */
     public function getStockAlerts(int $tenantId): array
     {
-        // STUB data agar widget memiliki bentuk nyata & terlihat oleh owner.
-        return [
-            ['name' => 'Minyak Goreng', 'type' => 'expired', 'detail' => 'Kadaluarsa 2 hari', 'severity' => 'high'],
-            ['name' => 'Daging Sapi', 'type' => 'low', 'detail' => 'Sisa 1.2 kg', 'severity' => 'high'],
-            ['name' => 'Telur Ayam', 'type' => 'low', 'detail' => 'Sisa 0.8 kg', 'severity' => 'medium'],
-            ['name' => 'Tepung Terigu', 'type' => 'low', 'detail' => 'Sisa 2.5 kg', 'severity' => 'low'],
-        ];
+        $items = MenuItem::query()
+            ->where('track_stock', true)
+            ->whereColumn('stock', '<=', 'stock_threshold')
+            ->orderBy('stock')
+            ->get(['id', 'name', 'stock', 'stock_threshold', 'unit_type']);
+
+        return $items->map(function ($item) {
+            $severity = $item->stock <= 0 ? 'high' : ($item->stock <= ($item->stock_threshold / 2) ? 'medium' : 'low');
+
+            return [
+                'name' => $item->name,
+                'type' => $item->stock <= 0 ? 'out_of_stock' : 'low',
+                'detail' => $item->stock <= 0
+                    ? 'Habis'
+                    : 'Sisa '.$item->stock.($item->unit_type ? ' '.$item->unit_type : ''),
+                'severity' => $severity,
+                'stock' => $item->stock,
+                'threshold' => $item->stock_threshold,
+            ];
+        })->values()->all();
     }
 
     /**
-     * [L1] Performa shift kasir hari ini — STUB (belum ada tabel cashier_sessions).
-     * Bentuk: daftar sesi buka/tutup + total transaksi + petugas.
+     * [L3] Performa shift kasir — query nyata dari cashier_sessions.
      */
     public function getShiftPerformance(int $tenantId): array
     {
+        $sessions = CashierSession::where('tenant_id', $tenantId)
+            ->with('user')
+            ->orderByDesc('opened_at')
+            ->get();
+
+        $open = $sessions->where('closed_at', null);
+        $activeCashiers = $open->map(fn ($s) => $s->user?->name ?? 'Kasir #'.$s->user_id)->values()->all();
+
         return [
-            'open_shifts' => 2,
-            'closed_shifts' => 1,
-            'active_cashiers' => ['Budi (Kasir 1)', 'Siti (Kasir 2)'],
-            'total_transactions_today' => 0, // diisi dari metrics bila perlu
-            'is_stub' => true,
+            'open_shifts' => $open->count(),
+            'closed_shifts' => $sessions->whereNotNull('closed_at')->count(),
+            'active_cashiers' => $activeCashiers,
+            'total_transactions_today' => (int) $sessions->sum('transaction_count'),
+            'is_stub' => false,
         ];
     }
 

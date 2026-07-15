@@ -80,7 +80,6 @@ interface ShiftPerformance {
     closed_shifts: number;
     active_cashiers: string[];
     total_transactions_today: number;
-    is_stub?: boolean;
 }
 
 interface Props {
@@ -520,28 +519,23 @@ export default function OwnerDashboard({
                     </h3>
                     <p className="text-xs text-slate-400 mb-4">Dine-In / Take Away / Delivery.</p>
                     <div className="space-y-4">
-                        {transactionTypes
-                            .filter((t) => !('is_stub' in t))
-                            .map((t, i) => {
-                                const colors = ['bg-emerald-400', 'bg-blue-400', 'bg-purple-400'];
-                                return (
-                                    <div key={i}>
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span className="text-slate-300">{t.type}</span>
-                                            <span className="text-white font-medium">{t.percentage}%</span>
-                                        </div>
-                                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full ${colors[i % 3]}`}
-                                                style={{ width: `${t.percentage}%` }}
-                                            />
-                                        </div>
+                        {transactionTypes.map((t, i) => {
+                            const colors = ['bg-emerald-400', 'bg-blue-400', 'bg-purple-400'];
+                            return (
+                                <div key={i}>
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <span className="text-slate-300">{t.type}</span>
+                                        <span className="text-white font-medium">{t.percentage}%</span>
                                     </div>
-                                );
-                            })}
-                        {transactionTypes.some((t) => 'is_stub' in t) && (
-                            <p className="text-[10px] text-slate-500 italic">* Estimasi (belum ada kolom order_type)</p>
-                        )}
+                                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full ${colors[i % 3]}`}
+                                            style={{ width: `${t.percentage}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </Glass>
             </div>
@@ -640,11 +634,6 @@ export default function OwnerDashboard({
                                     ))}
                                 </div>
                             </div>
-                            {shiftPerformance.is_stub && (
-                                <p className="text-[10px] text-slate-500 italic">
-                                    * Data stub (tabel cashier_sessions belum ada)
-                                </p>
-                            )}
                         </div>
                     )}
                 </Glass>

@@ -96,5 +96,8 @@ class DatabaseSeeder extends Seeder
 
         // 7. Backfill meja per outlet (untuk verifikasi kehadiran tamu)
         $this->call(OutletTableSeeder::class);
+
+        // 8. [L3] Seed laporan nyata: cashier_sessions, attendances, shift_schedules, stok
+        $this->call(LaporanSeeder::class);
     }
 }

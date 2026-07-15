@@ -1,14 +1,16 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import { Glass } from '../../Components/Shared';
+import { Glass, formatRupiah as formatRp } from '../../Components/Shared';
 import { UsersIcon, ClockIcon } from '../../Components/icons';
 
 interface Shift {
+    id: number;
     cashier: string;
     opened_at: string | null;
     closed_at: string | null;
     transactions: number;
+    total_sales: number;
     status: string;
 }
 
@@ -37,18 +39,20 @@ export default function LaporanShift({ shifts, is_stub }: Props) {
                             <th className="pb-3 font-medium">Buka</th>
                             <th className="pb-3 font-medium">Tutup</th>
                             <th className="pb-3 font-medium">Transaksi</th>
+                            <th className="pb-3 font-medium">Total Sales</th>
                             <th className="pb-3 font-medium">Status</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                        {shifts.map((s, i) => (
-                            <tr key={i} className="hover:bg-white/[0.02]">
+                        {shifts.map((s) => (
+                            <tr key={s.id} className="hover:bg-white/[0.02]">
                                 <td className="py-3 font-medium text-white flex items-center gap-2">
                                     <UsersIcon className="size-4 text-purple-400" /> {s.cashier}
                                 </td>
                                 <td className="py-3 text-slate-300">{s.opened_at ?? '-'}</td>
                                 <td className="py-3 text-slate-300">{s.closed_at ?? '-'}</td>
                                 <td className="py-3 text-slate-300">{s.transactions}</td>
+                                <td className="py-3 text-emerald-400">{formatRp(s.total_sales)}</td>
                                 <td className="py-3">
                                     <span
                                         className={`px-2 py-1 rounded-md text-xs font-medium ${s.status === 'open' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-400'}`}
@@ -58,6 +62,13 @@ export default function LaporanShift({ shifts, is_stub }: Props) {
                                 </td>
                             </tr>
                         ))}
+                        {shifts.length === 0 && (
+                            <tr>
+                                <td colSpan={6} className="py-6 text-center text-slate-500">
+                                    Belum ada sesi kasir.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </Glass>

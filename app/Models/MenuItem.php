@@ -22,7 +22,16 @@ class MenuItem extends Model
         'is_popular' => 'boolean',
         'sort_order' => 'integer',
         'modifiers' => 'json',
+        'stock' => 'integer',
+        'stock_threshold' => 'integer',
+        'track_stock' => 'boolean',
     ];
+
+    // [L3] Alert stok: true kalau tracking aktif & stok <= threshold.
+    public function getIsLowStockAttribute(): bool
+    {
+        return $this->track_stock && $this->stock <= $this->stock_threshold;
+    }
 
     protected static function booted(): void
     {
