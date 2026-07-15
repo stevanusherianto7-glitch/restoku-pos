@@ -44,8 +44,9 @@ class AppServiceProvider extends ServiceProvider
         // Redirect middleware 'auth' ke halaman login staf.
         Authenticate::redirectUsing(fn () => '/login');
 
-        // Cegah cURL error 60 (SSL certificate verification) pada lingkungan pengembangan lokal (Windows PHP CLI)
-        if ($this->app->isLocal()) {
+        // Cegah cURL error 60 (SSL certificate verification) pada lingkungan pengembangan lokal (Windows PHP CLI).
+        // HANYA saat DISABLE_SSL_VERIFY=true (default false = SSL tetap aktif di prod).
+        if (env('DISABLE_SSL_VERIFY', false)) {
             Http::globalOptions(['verify' => false]);
         }
 
@@ -56,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
             if (empty($groqKey) || str_contains($groqKey, 'placeholder') || str_contains($groqKey, 'your-groq-api-key') || str_contains($groqKey, 'your_groq_api_key')) {
                 // Gunakan Gemini sebagai fallback jika key Gemini valid
                 $geminiKey = config('ai.providers.gemini.key');
-                if (!empty($geminiKey) && !str_contains($geminiKey, 'placeholder')) {
+                if (! empty($geminiKey) && ! str_contains($geminiKey, 'placeholder')) {
                     config(['ai.default' => 'gemini']);
                 }
             }
@@ -65,12 +66,10 @@ class AppServiceProvider extends ServiceProvider
             if (empty($deepseekKey) || str_contains($deepseekKey, 'placeholder') || str_contains($deepseekKey, 'your-deepseek-api-key') || str_contains($deepseekKey, 'your_deepseek_api_key')) {
                 // Gunakan Gemini sebagai fallback jika key Gemini valid
                 $geminiKey = config('ai.providers.gemini.key');
-                if (!empty($geminiKey) && !str_contains($geminiKey, 'placeholder')) {
+                if (! empty($geminiKey) && ! str_contains($geminiKey, 'placeholder')) {
                     config(['ai.default' => 'gemini']);
                 }
             }
         }
     }
-
-
 }

@@ -58,7 +58,8 @@ class OwnerDashboardService
             }
 
             $revenue = (float) $outletOrders->sum('total');
-            $profit = $revenue * 0.35; // Standard 35% net margin benchmark
+            $cogsPct = (float) config('resto-benchmarks.cogs', 0.35);
+            $profit = $revenue * $cogsPct; // benchmark net margin
 
             $leaderboard[] = [
                 'id' => $outlet->id,
@@ -128,8 +129,10 @@ class OwnerDashboardService
         }
 
         $grossProfit = (float) $ordersQuery->sum('total');
-        $cogs = $grossProfit * 0.35; // Standard 35% COGS benchmark
-        $operationalExpenses = $grossProfit * 0.20; // 20% OpEx benchmark
+        $cogsPct = (float) config('resto-benchmarks.cogs', 0.35);
+        $opexPct = (float) config('resto-benchmarks.opex', 0.20);
+        $cogs = $grossProfit * $cogsPct; // benchmark COGS
+        $operationalExpenses = $grossProfit * $opexPct; // benchmark OpEx
         $netProfit = $grossProfit - $cogs - $operationalExpenses;
 
         return [
@@ -157,8 +160,10 @@ class OwnerDashboardService
         $this->applyDateRange($ordersQuery, $dateRange);
 
         $gross = (float) $ordersQuery->sum('total');
-        $cogs = $gross * 0.35;          // 35% COGS benchmark
-        $operational = $gross * 0.20;   // 20% OpEx benchmark
+        $cogsPct = (float) config('resto-benchmarks.cogs', 0.35);
+        $opexPct = (float) config('resto-benchmarks.opex', 0.20);
+        $cogs = $gross * $cogsPct;          // benchmark COGS
+        $operational = $gross * $opexPct;   // benchmark OpEx
         $net = $gross - $cogs - $operational;
         $marginPct = $gross > 0 ? (($gross - $cogs) / $gross) * 100 : 0;
 
