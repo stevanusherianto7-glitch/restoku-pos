@@ -8,12 +8,11 @@ use App\Models\Outlet;
 use App\Models\OutletSetting;
 use App\Models\PrintJob;
 use App\Models\ReceiptConfig;
-use App\Models\Reservation;
 use App\Models\Scopes\TenantScope;
 use App\Services\GuestOrderService;
+use App\Services\ReservationService;
 use App\Services\TenantContext;
 use App\Services\TenantReadConnection;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +25,8 @@ class OrderController extends Controller
     public function __construct(
         private TenantContext $ctx,
         private TenantReadConnection $readConn,
-        private GuestOrderService $guestOrderService
+        private GuestOrderService $guestOrderService,
+        private ReservationService $reservationService
     ) {}
 
     /**
@@ -372,18 +372,10 @@ class OrderController extends Controller
      */
     public function getReservations(Request $request)
     {
-        // Endpoint publik — butuh outlet_id untuk identifikasi tenant (BUG-006 pattern)
         $request->validate(['outlet_id' => 'required|integer|exists:outlets,id']);
 
-        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
-            ->select('id', 'tenant_id')
-            ->findOrFail($request->input('outlet_id'));
-
-        $reservations = Reservation::withoutGlobalScope(TenantScope::class)
-            ->where('tenant_id', $outlet->tenant_id)
-            ->orderBy('date')
-            ->orderBy('time')
-            ->get();
+        // S-13: delegasikan ke ReservationService.
+        $reservations = $this->reservationService->listForOutlet((int) $request->input('outlet_id'));
 
         return response()->json(['reservations' => $reservations]);
     }
@@ -405,25 +397,8 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
-            ->select('id', 'tenant_id')
-            ->findOrFail($validated['outlet_id']);
-
-        $tenantId = $outlet->tenant_id;
-
-        $reservation = Reservation::withoutGlobalScope(TenantScope::class)->create([
-            'tenant_id' => $tenantId,
-            'outlet_id' => $outlet->id,
-            'reservation_code' => Reservation::generateCode($tenantId),
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'date' => $validated['date'],
-            'time' => $validated['time'],
-            'guests' => $validated['guests'],
-            'type' => $validated['type'],
-            'notes' => $validated['notes'] ?? null,
-            'status' => 'pending',
-        ]);
+        // S-13: delegasikan ke ReservationService.
+        $reservation = $this->reservationService->create($validated);
 
         return response()->json([
             'success' => true,
@@ -444,16 +419,13 @@ class OrderController extends Controller
             'status' => ['required', 'string', 'in:'.implode(',', self::RESERVATION_STATUSES)],
         ]);
 
-        // Ambil dengan TenantScope aktif — secara otomatis memfilter ke tenant yang login
-        $reservation = Reservation::where('reservation_code', $id)->firstOrFail();
-
-        // BUG-008 FIX: TenantScope sudah memastikan kepemilikan tenant.
-        // Defense-in-depth: verifikasi eksplisit sebagai lapisan kedua.
-        if ($reservation->tenant_id !== $this->ctx->id()) {
-            abort(403, 'Anda tidak berhak mengubah reservasi ini.');
-        }
-
-        $reservation->update(['status' => $request->input('status')]);
+        // S-13: delegasikan ke ReservationService (validasi + ownership di sana).
+        $reservation = $this->reservationService->updateStatus(
+            $id,
+            $request->input('status'),
+            $this->ctx->id(),
+            self::RESERVATION_STATUSES
+        );
 
         return response()->json([
             'success' => true,

@@ -58,16 +58,17 @@ class GeminiAiController extends Controller
         } catch (\Exception $e) {
             Log::warning('[Gemini AI] Primary provider failed: '.$e->getMessage().'. Attempting fallback to gemini.');
             try {
-                config(['ai.default' => 'gemini']);
-                
-                $response = RestokuAiAssistant::make()->prompt($prompt);
-                
+                // S-17 FIX: JANGAN mutate global config(['ai.default'=>...]) — itu race-condition
+                // antar tenant/request (state global mutable per-proses). Gunakan provider per-call.
+                $response = RestokuAiAssistant::make()->prompt($prompt, [], 'gemini');
+
                 return response()->json([
                     'status' => 'success',
                     'reply' => (string) $response,
                 ]);
             } catch (\Exception $fallbackException) {
                 Log::error('[Gemini AI] Fallback to gemini also failed: '.$fallbackException->getMessage());
+
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Maaf, Asisten AI sedang sibuk atau mengalami kendala koneksi.',
