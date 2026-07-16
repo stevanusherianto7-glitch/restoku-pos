@@ -38,6 +38,7 @@ function haversine(lat1: number, lng1: number, lat2: number, lng2: number): numb
 export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl = '/api/guest/verify' }: Props) {
     const [tablePin, setTablePin] = useState('');
     const [dailyPin, setDailyPin] = useState('');
+    const [dailyPinAuto, setDailyPinAuto] = useState(false);
     const [status, setStatus] = useState<Status>('idle');
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
@@ -91,6 +92,33 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
         const adjusted = accuracy > 20 ? radius * 1.5 : radius;
         setGpsStatus(dist <= adjusted ? 'ok' : 'fail');
     }
+
+    // Auto-isi PIN Harian dari server (public, tanpa auth). Tamu tinggal masukkan PIN Meja dari waiter.
+    // State publik harus server-driven — jangan simpan di localStorage per-origin.
+    useEffect(() => {
+        let alive = true;
+        const load = async () => {
+            try {
+                const res = await fetch('/api/guest/daily-pin', {
+                    headers: { Accept: 'application/json' },
+                });
+                if (!res.ok) return;
+                const d = await res.json();
+                if (alive && d.pin && /^\d{4}$/.test(String(d.pin))) {
+                    setDailyPin(String(d.pin));
+                    setDailyPinAuto(true);
+                }
+            } catch {
+                /* biarkan tamu isi manual */
+            }
+        };
+        load();
+        const t = setInterval(load, 60_000); // refresh tiap menit (PIN harian berganti)
+        return () => {
+            alive = false;
+            clearInterval(t);
+        };
+    }, [slug]);
 
     async function handleVerify() {
         setError('');
@@ -241,14 +269,24 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
             </div>
 
             {/* PIN Harian */}
-            <label className="block text-xs font-bold text-[#3A2A1E] mb-1">PIN Harian Restoran</label>
+            <label className="block text-xs font-bold text-[#3A2A1E] mb-1">
+                PIN Harian Restoran
+                {dailyPinAuto && (
+                    <span className="ml-1.5 rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-emerald-700">
+                        OTOMATIS
+                    </span>
+                )}
+            </label>
             <div className="relative mb-3">
                 <LockIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8676]" />
                 <input
                     inputMode="numeric"
                     maxLength={4}
                     value={dailyPin}
-                    onChange={(e) => setDailyPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    onChange={(e) => {
+                        setDailyPin(e.target.value.replace(/\D/g, '').slice(0, 4));
+                        setDailyPinAuto(false); // tamu override manual
+                    }}
                     placeholder="••••"
                     className="w-full rounded-xl border border-[#EFE2D6] bg-white py-3 pl-9 pr-3 text-center text-lg font-bold tracking-[0.5em] text-[#3A2A1E] focus:border-[#FF5B35] focus:outline-none"
                 />
