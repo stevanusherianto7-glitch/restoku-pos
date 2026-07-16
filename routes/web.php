@@ -52,6 +52,13 @@ Route::get('/m/{slug}', fn (string $slug) => Inertia::render('BukuMenuDigital/Cu
 // API buku menu publik (read-only, by slug outlet) — untuk CustomerView
 Route::get('/api/menu/{slug}', [PublicOrderController::class, 'getPublicMenu']);
 
+// Antrean pembayaran kasir: order sudah disajikan (siap_bayar).
+// HARUS didefinisikan SEBELUM '/api/orders/{id}' (getOrderStatus) agar route static
+// menang — kalau didefinisikan setelahnya, Laravel match '{id}=payment-queue'
+// ke getOrderStatus (butuh outlet_id) -> 422, antrean kasir rusak.
+Route::get('/api/orders/payment-queue', [KdsController::class, 'paymentQueue'])
+    ->middleware(['auth', 'tenant']);
+
 // Guest order endpoints (BUG-006 FIX: tenant diidentifikasi via outlet_id, bukan req body)
 // C2 (Security Audit): throttle wajib — endpoint publik CSRF-exempt rentan spam/DoS.
 Route::post('/api/orders', [PublicOrderController::class, 'submitOrder'])->middleware('throttle:30,1');
@@ -148,8 +155,6 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/api/kds/stream', [KdsController::class, 'stream']);
     // Layar Bar (minuman): order destination=bar sedang diproses.
     Route::get('/api/bar/orders', [KdsController::class, 'barOrders']);
-    // Antrean pembayaran kasir: order sudah disajikan (siap_bayar).
-    Route::get('/api/orders/payment-queue', [KdsController::class, 'paymentQueue']);
 
     Route::get('/qrcode-meja', fn () => Inertia::render('QRCodeMeja/Index'));
 

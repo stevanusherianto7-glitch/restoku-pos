@@ -212,4 +212,47 @@ class KdsControllerTest extends TestCase
             'status' => Order::STATUS_SIAP_SAJIKAN,
         ]);
     }
+
+    public function test_payment_queue_shows_siap_bayar_orders(): void
+    {
+        Order::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id,
+            'order_code' => 'PAY-001',
+            'table_number' => 'Meja 30',
+            'source' => 'pos',
+            'status' => Order::STATUS_SIAP_BAYAR,
+        ]);
+
+        $response = $this->actingAs($this->staff)
+            ->getJson('/api/orders/payment-queue');
+
+        $response->assertStatus(200);
+        $ids = collect($response->json('orders'))->pluck('id');
+        $this->assertContains('PAY-001', $ids);
+    }
+
+    public function test_payment_queue_reflects_status_change_immediately_no_cache_stale(): void
+    {
+        $order = Order::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id,
+            'order_code' => 'PAY-002',
+            'table_number' => 'Meja 31',
+            'source' => 'pos',
+            'status' => Order::STATUS_SIAP_BAYAR,
+        ]);
+
+        // Poll ke-1: order ada di antrean.
+        $first = $this->actingAs($this->staff)->getJson('/api/orders/payment-queue');
+        $first->assertStatus(200);
+        $this->assertContains('PAY-002', collect($first->json('orders'))->pluck('id'));
+
+        // Kasir memproses (keluar dari siap_bayar).
+        $order->update(['status' => Order::STATUS_SELESAI]);
+
+        // Poll ke-2 (tanpa jeda >cache TTL): harus LANGSUNG kosong — tidak stale 5s.
+        // Dulu Cache::remember(5) membuat order tetap muncul di poll ke-2 -> flicker.
+        $second = $this->actingAs($this->staff)->getJson('/api/orders/payment-queue');
+        $second->assertStatus(200);
+        $this->assertNotContains('PAY-002', collect($second->json('orders'))->pluck('id'));
+    }
 }

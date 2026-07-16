@@ -69,17 +69,16 @@ class KdsController extends Controller
     public function paymentQueue(Request $request)
     {
         $outletKey = $request->filled('outlet_id') ? (int) $request->input('outlet_id') : 'all';
-        $cacheKey = 'kds-pay:'.auth()->user()->tenant_id.':'.$outletKey;
 
-        $orders = Cache::remember($cacheKey, 5, function () use ($request) {
-            $query = Order::where('status', Order::STATUS_SIAP_BAYAR)->with('items.menuItem.category');
+        // TIDAK pakai Cache::remember — antrean kasir realtime; cache 5s tanpa
+        // invalidation saat status berubah menyebabkan flicker hilang-muncul di layar kasir.
+        $query = Order::where('status', Order::STATUS_SIAP_BAYAR)->with('items.menuItem.category');
 
-            if ($request->filled('outlet_id')) {
-                $query->where('outlet_id', (int) $request->input('outlet_id'));
-            }
+        if ($request->filled('outlet_id')) {
+            $query->where('outlet_id', (int) $request->input('outlet_id'));
+        }
 
-            return $query->orderBy('updated_at')->get();
-        });
+        $orders = $query->orderBy('updated_at')->get();
 
         $list = $orders->map(fn ($order) => [
             'id' => $order->order_code,
