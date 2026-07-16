@@ -232,6 +232,19 @@ class KdsController extends Controller
         $item->cook_status = $target;
         $item->save();
 
+        // FNB-003: bila SELURUH item sudah siap_sajikan → order naik ke layar Waiter/Bar.
+        if ($target === OrderItem::COOK_SIAP_SAJIKAN) {
+            $order = $item->order;
+            $allReady = $order
+                && $order->items()
+                    ->where('cook_status', '!=', OrderItem::COOK_SIAP_SAJIKAN)
+                    ->where('cook_status', '!=', OrderItem::COOK_SELESAI)
+                    ->count() === 0;
+            if ($allReady && $order->status !== Order::STATUS_SIAP_SAJIKAN) {
+                $order->update(['status' => Order::STATUS_SIAP_SAJIKAN]);
+            }
+        }
+
         return response()->json(['success' => true, 'cook_status' => $item->cook_status]);
     }
 

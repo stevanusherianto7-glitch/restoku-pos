@@ -75,20 +75,65 @@ describe('KDS/Index', () => {
         await waitFor(() => expect(screen.getByText('Akses Ditolak')).toBeInTheDocument());
     });
 
-    it('advances item cook status via PUT', async () => {
-        const putMock = vi
-            .fn()
-            .mockResolvedValue({ ok: true, json: async () => ({ success: true, cook_status: 'sedang_dimasak' }) });
+    it('shows correct advance button per cook_step', async () => {
+        const grouped2 = {
+            'Antrian Masuk': [
+                {
+                    id: 'ORD-STEP2',
+                    table: 'Meja A1',
+                    status: 'Sedang Dimasak',
+                    tone: 'blue',
+                    time: 10,
+                    items: [
+                        {
+                            id: 'IT-2',
+                            name: 'Soto',
+                            qty: 1,
+                            notes: null,
+                            cook_status: 'sedang_dimasak',
+                            cook_label: 'sedang dimasak',
+                            cook_step: 2,
+                        },
+                    ],
+                },
+            ],
+            Diterima: [],
+            'Sedang Dimasak': [],
+            'Selesai Masak': [],
+            'Siap Sajikan': [],
+        };
         vi.stubGlobal('fetch', (input: any, init?: any) => {
-            if (String(input).includes('/order-items/') && init?.method === 'PUT') return putMock();
+            if (String(input).includes('/api/reservations')) return Promise.resolve({ ok: true, json: async () => [] });
+            return Promise.resolve({ ok: true, json: async () => ({ grouped: grouped2 }) });
+        });
+        render(<KDS />);
+        // step 2 (sedang_dimasak) → tombol next = "SELESAI MASAK"
+        await waitFor(() => expect(screen.getByText(/SELESAI MASAK/i)).toBeInTheDocument());
+        // label meja dinormalisasi: "Meja A1" → "A1"
+        expect(screen.getByText('A1')).toBeInTheDocument();
+    });
+
+    it('advances item cook status via PUT', async () => {
+        const putCalls: any[] = [];
+        vi.stubGlobal('fetch', (input: any, init?: any) => {
+            if (String(input).includes('/order-items/') && init?.method === 'PUT') {
+                putCalls.push({ input, init });
+                return Promise.resolve({
+                    ok: true,
+                    json: async () => ({ success: true, cook_status: 'sedang_dimasak' }),
+                });
+            }
             if (String(input).includes('/api/reservations')) return Promise.resolve({ ok: true, json: async () => [] });
             // fetchOrders setelah PUT → /api/orders
             return Promise.resolve({ ok: true, json: async () => ({ grouped }) });
         });
         render(<KDS />);
-        await waitFor(() => expect(screen.getByText('SEDANG DIMASAK')).toBeInTheDocument());
-        fireEvent.click(screen.getByText('SEDANG DIMASAK'));
-        await waitFor(() => expect(putMock).toHaveBeenCalled());
+        await waitFor(() => expect(screen.getByRole('button', { name: /SEDANG DIMASAK/i })).toBeInTheDocument());
+        fireEvent.click(screen.getByRole('button', { name: /SEDANG DIMASAK/i }));
+        await waitFor(() => expect(putCalls.length).toBeGreaterThan(0));
+        // PUT body harus berisi status underscore yg valid utk backend
+        const calledBody = JSON.parse(putCalls[0].init.body);
+        expect(calledBody.status).toBe('sedang_dimasak');
     });
 
     it('toggles TTS sound', async () => {

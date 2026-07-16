@@ -118,12 +118,27 @@ class OrderItemCookTest extends TestCase
         ]);
     }
 
-    public function test_endpoint_rejects_illegal_cook(): void
+    public function test_all_items_siap_sajikan_promotes_order(): void
     {
-        $item = $this->makeItem(OrderItem::COOK_SELESAI);
+        // 2 item di order yang sama
+        $i1 = $this->makeItem(OrderItem::COOK_SIAP_SAJIKAN);
+        $i2 = $this->makeItem(OrderItem::COOK_SEDANG_DIMASAK);
 
+        // advance i2 sampai siap_sajikan lewat endpoint
         $this->actingAs($this->kitchen)
-            ->putJson("/api/order-items/{$item->id}/cook-status", ['status' => 'dikonfirmasi'])
-            ->assertStatus(422);
+            ->putJson("/api/order-items/{$i2->id}/cook-status", ['status' => 'sedang dimasak'])
+            ->assertStatus(200);
+        $this->actingAs($this->kitchen)
+            ->putJson("/api/order-items/{$i2->id}/cook-status", ['status' => 'selesai masak'])
+            ->assertStatus(200);
+        $this->actingAs($this->kitchen)
+            ->putJson("/api/order-items/{$i2->id}/cook-status", ['status' => 'siap sajikan'])
+            ->assertStatus(200);
+
+        // kedua item siap_sajikan → order harus naik ke layar Waiter/Bar
+        $this->assertDatabaseHas('orders', [
+            'id' => $this->order->id,
+            'status' => Order::STATUS_SIAP_SAJIKAN,
+        ]);
     }
 }

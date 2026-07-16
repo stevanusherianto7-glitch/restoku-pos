@@ -244,7 +244,7 @@ function KDSContent() {
                                             <div className="mb-4 flex justify-between items-start">
                                                 <div>
                                                     <b className="text-6xl font-bold tracking-tight block text-slate-100">
-                                                        {o.table}
+                                                        {(o.table || '').replace(/^meja\s+/i, '').toUpperCase()}
                                                     </b>
                                                     <p className="text-xl opacity-70 mt-2 font-medium">{o.id}</p>
                                                     <div className="mt-3">
@@ -269,17 +269,23 @@ function KDSContent() {
                                             </div>
                                             <div className="space-y-3 text-3xl font-medium mt-6 border-t border-white/10 pt-4">
                                                 {o.items.map((it) => {
+                                                    // cook_status internal pakai underscore (cocok dgn backend);
+                                                    // cook_step integer (1-5) dikirim API sbg sumber kebenaran.
                                                     const cookSteps = [
                                                         'dikonfirmasi',
-                                                        'sedang dimasak',
-                                                        'selesai masak',
-                                                        'siap sajikan',
+                                                        'sedang_dimasak',
+                                                        'selesai_masak',
+                                                        'siap_sajikan',
                                                         'selesai',
                                                     ];
                                                     const cur =
-                                                        cookSteps.indexOf(it.cook_status) >= 0
-                                                            ? cookSteps.indexOf(it.cook_status)
-                                                            : 0;
+                                                        typeof it.cook_step === 'number' &&
+                                                        it.cook_step >= 1 &&
+                                                        it.cook_step <= 5
+                                                            ? it.cook_step - 1
+                                                            : cookSteps.indexOf(it.cook_status) >= 0
+                                                              ? cookSteps.indexOf(it.cook_status)
+                                                              : 0;
                                                     const nextLabel =
                                                         cur < cookSteps.length - 1 ? cookSteps[cur + 1] : null;
                                                     return (
@@ -354,7 +360,7 @@ function KDSContent() {
                                                                     className="mt-3 w-full rounded-xl bg-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/30 border border-[var(--color-primary)]/30 py-3 text-xl font-bold text-[var(--color-primary)] transition-colors flex items-center justify-center gap-2 active:scale-95 duration-200"
                                                                 >
                                                                     <ChefHatIcon className="size-5" />{' '}
-                                                                    {nextLabel.toUpperCase()}
+                                                                    {nextLabel.replace(/_/g, ' ').toUpperCase()}
                                                                 </button>
                                                             )}
                                                         </div>
