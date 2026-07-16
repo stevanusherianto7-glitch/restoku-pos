@@ -171,10 +171,12 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
 
     const fetchServedQueue = async () => {
         try {
-            const response = await fetch('/api/cashier-queue');
+            const response = await fetch('/api/cashier-queue', {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
             if (response.ok) {
                 const data = await response.json();
-                setServedQueue(data.queue || []);
+                setServedQueue(Array.isArray(data?.queue) ? data.queue : []);
             }
         } catch (err) {
             console.error('Gagal mengambil antrean pembayaran', err);
@@ -188,7 +190,8 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
     }, []);
 
     const calculateOrderTotal = (order: any) => {
-        return order.items
+        const items = Array.isArray(order?.items) ? order.items : [];
+        return items
             .filter((itemStr: string) => !itemStr.startsWith('+'))
             .reduce((sum: number, itemStr: string) => {
                 const match = itemStr.match(/^(\d+)x\s+(.+)$/);
@@ -494,14 +497,14 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
                             ) : (
                                 /* ── Tab Antrean Meja Siap Bayar ── */
                                 <div className="h-full overflow-y-auto pr-1">
-                                    {servedQueue.length === 0 ? (
+                                    {!Array.isArray(servedQueue) || servedQueue.length === 0 ? (
                                         <div className="h-full flex flex-col items-center justify-center text-slate-600">
                                             <SparklesIcon className="size-10 mb-3 opacity-30" />
                                             <p className="text-sm">Belum ada meja yang siap bayar</p>
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-2 gap-3 auto-rows-max">
-                                            {servedQueue.map((order) => {
+                                            {(Array.isArray(servedQueue) ? servedQueue : []).map((order) => {
                                                 const isTakeAway = order.table.toLowerCase().includes('takeaway');
                                                 return (
                                                     <button
