@@ -145,6 +145,11 @@ Ketahuan HANYA setelah Playwright render sesi kasir (bukan dari nebak).
 **Exception:** `BukuMenuDigital/Index.tsx` fetch publik pakai `X-Inertia: false` (konteks e-Menu publik).
 Tapi di full Inertia app (`/pos`, `/kds`, `/waiter-bar`) **SELALU** pakai `X-Requested-With`.
 
+**Cache + Array (root cause flicker):** endpoint yg di-poll frontend (`/api/cashier-queue`)
+pakai `Cache::remember` → saat cache HIT, collection ter-deserialize jadi **OBJECT** (bukan
+sequential array) → `Array.isArray` gagal → flicker isi↔kosong.
+FIX backend: `array_values($q->toArray())` (selalu sequential array di JSON).
+
 ---
 
 ## 🔵 DO — VERIFIKASI SHAPE API PAKAI SESSION SEAGAR
