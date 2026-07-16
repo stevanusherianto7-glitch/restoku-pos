@@ -3,17 +3,39 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\MenuSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\HasTenantSetup;
 
 class PosKatalogVerifyTest extends TestCase
 {
+    use HasTenantSetup, RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Bangun tenant+outlet+owner, lalu seed menu asli (foto Cloudinary).
+        $this->setupTenantEnvironment('pro');
+        $this->seed(MenuSeeder::class);
+
+        // Manager (staff) untuk login ke POS / Katalog.
+        $this->manager = User::create([
+            'tenant_id' => $this->testTenant->id,
+            'outlet_id' => $this->testOutlet->id,
+            'name' => 'Test Manager',
+            'email' => 'manager@tenant.com',
+            'password' => bcrypt('password'),
+            'role' => 'manager',
+        ]);
+    }
+
     public function test_pos_and_katalog_render_with_cloudinary_photos(): void
     {
-        $manager = User::where('role', 'manager')->first();
-        $this->assertNotNull($manager);
+        $this->assertNotNull($this->manager);
 
         // POS Kasir harus 200 dan membawa posMenu dengan foto Cloudinary.
-        $pos = $this->actingAs($manager)->get('/pos');
+        $pos = $this->actingAs($this->manager)->get('/pos');
         $pos->assertStatus(200);
         $posContent = $pos->getContent();
         // URL di-JSON-encode sebagai https:\/\/... jadi cek pattern dwdaydzsh.
@@ -26,7 +48,7 @@ class PosKatalogVerifyTest extends TestCase
         $this->assertEquals(count($posNames), count(array_unique($posNames)), 'POS tidak boleh ada nama duplikat');
 
         // Katalog Menu harus 200 dan menuItems unik + foto Cloudinary.
-        $kat = $this->actingAs($manager)->get('/katalog-menu');
+        $kat = $this->actingAs($this->manager)->get('/katalog-menu');
         $kat->assertStatus(200);
         $katContent = $kat->getContent();
         $katCount = substr_count($katContent, 'dwdaydzsh');
