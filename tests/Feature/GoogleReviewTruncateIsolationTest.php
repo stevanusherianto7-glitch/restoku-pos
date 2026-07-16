@@ -27,6 +27,10 @@ class GoogleReviewTruncateIsolationTest extends TestCase
     {
         parent::setUp();
 
+        // Paksa service pakai Places API (bukan SerpAPI) — .env dev punya
+        // SERPAPI_KEY asli yang akan menembak serpapi.com (tidak di-fake test).
+        config(['google-business-profile.serpapi_key' => '']);
+
         $tenantA = Tenant::create(['name' => 'Tenant A', 'brand_name' => 'A', 'email' => 'a@test.com', 'phone' => '081']);
         $tenantB = Tenant::create(['name' => 'Tenant B', 'brand_name' => 'B', 'email' => 'b@test.com', 'phone' => '082']);
 

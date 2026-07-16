@@ -28,14 +28,18 @@ class OrderStateMachineTest extends TestCase
         ]);
     }
 
-    /** Forward transitions yang diizinkan per TRANSITIONS. */
+    /** Forward transitions yang diizinkan per TRANSITIONS (5-tahap ketat). */
     public function test_forward_transitions_allowed(): void
     {
         $order = $this->makeOrder(Order::STATUS_ANTRIAN_MASUK);
-        $this->assertTrue($order->canTransitionTo(Order::STATUS_SEDANG_DIMASAK));
-        $this->assertTrue($order->canTransitionTo(Order::STATUS_SIAP_SAJIKAN));
-        $this->assertTrue($order->canTransitionTo(Order::STATUS_SIAP_BAYAR));
+        // antrian_masuk hanya boleh -> diterima (atau dibatalkan).
+        $this->assertTrue($order->canTransitionTo(Order::STATUS_DITERIMA));
         $this->assertTrue($order->canTransitionTo(Order::STATUS_DIBATALKAN));
+        // TIDAK boleh loncat tahap (guard S-07).
+        $this->assertFalse($order->canTransitionTo(Order::STATUS_SEDANG_DIMASAK));
+        $this->assertFalse($order->canTransitionTo(Order::STATUS_SIAP_SAJIKAN));
+        $this->assertFalse($order->canTransitionTo(Order::STATUS_SIAP_BAYAR));
+        $this->assertFalse($order->canTransitionTo(Order::STATUS_SELESAI));
     }
 
     /** Transisi mundur (siap_bayar -> antrian_masuk) HARUS ditolak. */
@@ -74,15 +78,15 @@ class OrderStateMachineTest extends TestCase
         $order->transitionTo(Order::STATUS_ANTRIAN_MASUK);
     }
 
-    /** transitionTo() apply + persist transisi legal. */
+    /** transitionTo() apply + persist transisi legal (per-tahap). */
     public function test_transition_to_applies_legal(): void
     {
         $order = $this->makeOrder(Order::STATUS_ANTRIAN_MASUK);
-        $order->transitionTo(Order::STATUS_SEDANG_DIMASAK);
+        $order->transitionTo(Order::STATUS_DITERIMA);
 
         $this->assertDatabaseHas('orders', [
             'id' => $order->id,
-            'status' => Order::STATUS_SEDANG_DIMASAK,
+            'status' => Order::STATUS_DITERIMA,
         ]);
     }
 }

@@ -193,6 +193,9 @@ class GoogleReviewControllerEdgeTest extends TestCase
     {
         $this->outlet->update(['google_place_id' => 'ChIJTest123']);
 
+        // Paksa service pakai Places API (bukan SerpAPI) — SerpAPI butuh key
+        // eksternal & tidak di-fake di test ini. Places path di-fake di bawah.
+        config(['google-business-profile.serpapi_key' => '']);
         config(['google-business-profile.places_api_key' => 'test-key']);
         Http::fake([
             'maps.googleapis.com/maps/api/place/details/*' => Http::response([

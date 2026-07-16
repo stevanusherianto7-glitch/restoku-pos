@@ -138,7 +138,11 @@ class GoogleBusinessProfileServiceTest extends TestCase
     public function test_fetch_reviews_from_place_id_calls_places_api(): void
     {
         config(['google-business-profile.places_api_key' => 'test-key']);
+        // Paksa Places path (bukan SerpAPI) — .env dev punya SERPAPI_KEY asli
+        // yang akan nembak serpapi.com (tidak di-fake test ini).
+        config(['google-business-profile.serpapi_key' => '']);
         Http::fake([
+            'serpapi.com/*' => Http::response(['error' => 'blocked'], 403),
             'maps.googleapis.com/maps/api/place/details/*' => Http::response([
                 'status' => 'OK',
                 'result' => [
@@ -180,7 +184,9 @@ class GoogleBusinessProfileServiceTest extends TestCase
     public function test_fetch_reviews_from_place_id_throws_on_non_ok(): void
     {
         config(['google-business-profile.places_api_key' => 'test-key']);
+        config(['google-business-profile.serpapi_key' => '']);
         Http::fake([
+            'serpapi.com/*' => Http::response(['error' => 'blocked'], 403),
             'maps.googleapis.com/maps/api/place/details/*' => Http::response([
                 'status' => 'INVALID_REQUEST',
                 'error_message' => 'bad place',
@@ -303,6 +309,8 @@ class GoogleBusinessProfileServiceTest extends TestCase
     {
         Http::fake([
             'mybusinessaccountmanagement.googleapis.com/*' => Http::response(['accounts' => []]),
+            'businessprofile.googleapis.com/*' => Http::response(['error' => 'unauthorized'], 403),
+            'serpapi.com/*' => Http::response(['error' => 'blocked'], 403),
         ]);
 
         $service = new GoogleBusinessProfileService;
@@ -314,6 +322,18 @@ class GoogleBusinessProfileServiceTest extends TestCase
     public function test_resolve_account_uses_config_override(): void
     {
         config(['google-business-profile.account_id' => 'override-account-123']);
+
+        // Fake semua host eksternal (test ini tidak memanggil Http::fake sebelumnya
+        // -> tanpa ini request ke businessprofile bocor ke network nyata).
+        Http::fake([
+            'mybusinessaccountmanagement.googleapis.com/*' => Http::response(['accounts' => [['name' => 'accounts/999']]]),
+            'businessprofile.googleapis.com/*' => Http::response([
+                'locations' => [
+                    ['name' => 'accounts/override-account-123/locations/loc1', 'title' => 'X', 'storefrontAddress' => ['addressLines' => ['Y']]],
+                ],
+            ]),
+            'serpapi.com/*' => Http::response(['error' => 'blocked'], 403),
+        ]);
 
         $service = new GoogleBusinessProfileService;
         $locations = $service->listLocations($this->token);

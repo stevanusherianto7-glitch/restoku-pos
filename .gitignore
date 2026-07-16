@@ -50,3 +50,4 @@ Thumbs.db
 /tests/Browser/console/
 coverage/
 qr_demo_bandung/
+cacert.pem

@@ -124,9 +124,11 @@ class AuthenticatedMutationTest extends TestCase
 
     public function test_authenticated_staff_can_update_order_status(): void
     {
+        // Order status awal antrian_masuk. Kirim tahap BERIKUTNYA yang legal
+        // (Diterima), BUKAN loncat ke Selesai (akan 422 per guard S-07).
         $response = $this->actingAs($this->staffA)
             ->putJson("/api/orders/{$this->orderA->order_code}/status", [
-                'status' => 'Selesai',
+                'status' => 'Diterima',
             ]);
 
         $response->assertStatus(200)
@@ -134,7 +136,7 @@ class AuthenticatedMutationTest extends TestCase
 
         $this->assertDatabaseHas('orders', [
             'id' => $this->orderA->id,
-            'status' => Order::STATUS_SIAP_BAYAR,
+            'status' => Order::STATUS_DITERIMA,
         ]);
     }
 
