@@ -36,7 +36,7 @@ test.describe('CustomerView / Buku Menu Digital', () => {
         expect(errors, errors.join('\n')).toHaveLength(0);
     });
 
-    test('CV2 — alur landing -> welcome -> app menampilkan GuestVerifyGate', async ({ page }) => {
+    test('CV2 — alur landing -> welcome -> app -> cart menampilkan GuestVerifyGate', async ({ page }) => {
         await page.goto(MENU_URL);
 
         // landing -> welcome
@@ -47,8 +47,12 @@ test.describe('CustomerView / Buku Menu Digital', () => {
         await page.getByText(/Lanjut/i).click();
         await expect(page.getByText(/Mulai Pesan Sekarang/i)).toBeVisible({ timeout: 5000 });
 
-        // howto -> app (buka GuestVerifyGate verifikasi kehadiran)
+        // howto -> app (stage menu)
         await page.getByText(/Mulai Pesan Sekarang/i).click();
+        await expect(page.getByText('Ayam Goreng Penyet Semarang')).toBeVisible({ timeout: 5000 });
+
+        // GuestVerifyGate di-render di tab Keranjang (cart), bukan di menu.
+        await page.getByTestId('cart-tab').click();
         await expect(page.getByText('VERIFIKASI KEHADIRAN')).toBeVisible({ timeout: 5000 });
 
         // Field PIN Harian Restoran ada (autofill dari endpoint publik BE)
@@ -67,6 +71,10 @@ test.describe('CustomerView / Buku Menu Digital', () => {
         await expect(page.getByText('Meja A1')).toBeVisible({ timeout: 5000 });
         await page.getByText(/Lanjut/i).click();
         await page.getByText(/Mulai Pesan Sekarang/i).click();
+        await expect(page.getByText('Ayam Goreng Penyet Semarang')).toBeVisible({ timeout: 5000 });
+
+        // Buka tab Keranjang -> GuestVerifyGate
+        await page.getByTestId('cart-tab').click();
         await expect(page.getByText('VERIFIKASI KEHADIRAN')).toBeVisible({ timeout: 5000 });
 
         // Daily PIN otomatis terisi dari /api/guest/daily-pin (badge OTOMATIS muncul)

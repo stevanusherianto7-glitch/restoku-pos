@@ -150,7 +150,7 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
         let alive = true;
         const load = async () => {
             try {
-                const res = await fetch('/api/guest/daily-pin', {
+                const res = await fetch(`/api/guest/daily-pin?slug=${encodeURIComponent(slug)}`, {
                     headers: { Accept: 'application/json' },
                 });
                 if (!res.ok) return;
