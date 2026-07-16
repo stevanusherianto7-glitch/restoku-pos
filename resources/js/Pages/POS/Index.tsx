@@ -24,7 +24,7 @@ import {
 import { ReceiptPreview } from '../../Components/POS/ReceiptPreview';
 import { CashierSession } from '../../Components/POS/CashierSession';
 import { RoleGuard } from '../../Components/RoleGuard';
-import DailyPinBadge from '../../Components/DailyPinBadge';
+import { formatCurrency } from '../../lib/formatters';
 
 // ─── Menu Catalog ─────────────────────────────────────────────────────────────
 // Menu diambil dari DB (prop `posMenu`) — bukan hardcode. Foto menu sudah
@@ -455,7 +455,6 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
                                     />
                                 </div>
                             </div>
-                            <DailyPinBadge />
                         </div>
 
                         <div className="grid grid-cols-4 gap-5 auto-rows-max content-start flex-1 overflow-y-auto pr-2 pb-4">

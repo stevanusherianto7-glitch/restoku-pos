@@ -11,7 +11,6 @@ import {
     CreditCardIcon,
     GlassWaterIcon,
 } from '../../Components/icons';
-import DailyPinBadge from '../../Components/DailyPinBadge';
 
 interface Order {
     id: string;
@@ -79,7 +78,6 @@ export default function MonitorPesanan() {
                         >
                             <GlassWaterIcon className="size-3.5 text-amber-400" /> Monitor Minuman (Waiter/Bar)
                         </Link>
-                        <DailyPinBadge />
                         <button
                             onClick={handleRefresh}
                             className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-slate-200 rounded-xl text-xs font-bold transition-all"
