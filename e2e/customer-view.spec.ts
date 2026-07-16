@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test';
  */
 
 const SLUG = 'pawon-salam-bandung';
-const MENU_URL = `/m/${SLUG}`;
+const MENU_URL = `/m/${SLUG}?t=A1`;
 
 test.describe('CustomerView / Buku Menu Digital', () => {
     test('CV1 — menu tampil dengan foto Cloudinary', async ({ page }) => {
