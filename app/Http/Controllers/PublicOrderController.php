@@ -26,7 +26,9 @@ class PublicOrderController extends Controller
 {
     private const KDS_STATUS_LABELS = [
         Order::STATUS_ANTRIAN_MASUK => 'Antrian Masuk',
+        Order::STATUS_DITERIMA => 'Diterima',
         Order::STATUS_SEDANG_DIMASAK => 'Sedang Dimasak',
+        Order::STATUS_SELESAI_MASAK => 'Selesai Masak',
         Order::STATUS_SIAP_SAJIKAN => 'Siap Sajikan',
     ];
 
@@ -230,11 +232,25 @@ class PublicOrderController extends Controller
             'drink_served_at' => $order->drink_served_at,
             'has_food' => $order->hasFood(),
             'has_drink' => $order->hasDrink(),
+            'items' => $order->items->map(function ($item) {
+                $step = method_exists($item, 'cookStep') ? $item->cookStep() : 1;
+
+                return [
+                    'name' => $item->item_name,
+                    'qty' => $item->quantity,
+                    'notes' => $item->notes,
+                    'cook_status' => $item->cook_status ?? 'dikonfirmasi',
+                    'cook_label' => OrderItem::COOK_LABELS[$item->cook_status] ?? 'dikonfirmasi',
+                    'cook_step' => $step,
+                ];
+            })->all(),
             'step' => match ($order->status) {
                 Order::STATUS_ANTRIAN_MASUK => 1,
+                Order::STATUS_DITERIMA => 1,
                 Order::STATUS_SEDANG_DIMASAK => 2,
-                Order::STATUS_SIAP_SAJIKAN => 3,
-                Order::STATUS_SIAP_BAYAR, Order::STATUS_SELESAI => 4,
+                Order::STATUS_SELESAI_MASAK => 3,
+                Order::STATUS_SIAP_SAJIKAN => 4,
+                Order::STATUS_SIAP_BAYAR, Order::STATUS_SELESAI => 5,
                 default => 1,
             },
         ]);

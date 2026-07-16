@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -14,7 +15,9 @@ class KdsController extends Controller
 {
     private const KDS_STATUS_LABELS = [
         Order::STATUS_ANTRIAN_MASUK => 'Antrian Masuk',
+        Order::STATUS_DITERIMA => 'Diterima',
         Order::STATUS_SEDANG_DIMASAK => 'Sedang Dimasak',
+        Order::STATUS_SELESAI_MASAK => 'Selesai Masak',
         Order::STATUS_SIAP_SAJIKAN => 'Siap Sajikan',
     ];
 
@@ -138,7 +141,19 @@ class KdsController extends Controller
                     'status' => $label,
                     'tone' => $this->toneForStatus($order->status),
                     'time' => max(1, (int) $order->created_at->diffInMinutes(now())),
-                    'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}".($item->notes ? " ({$item->notes})" : ''))->all(),
+                    'items' => $order->items->map(function ($item) {
+                        $step = method_exists($item, 'cookStep') ? $item->cookStep() : 1;
+
+                        return [
+                            'id' => $item->id,
+                            'name' => $item->item_name,
+                            'qty' => $item->quantity,
+                            'notes' => $item->notes,
+                            'cook_status' => $item->cook_status ?? OrderItem::COOK_DIKONFIRMASI,
+                            'cook_label' => OrderItem::COOK_LABELS[$item->cook_status] ?? 'dikonfirmasi',
+                            'cook_step' => $step,
+                        ];
+                    })->all(),
                     'food_served_at' => $order->food_served_at,
                     'drink_served_at' => $order->drink_served_at,
                     'has_food' => $order->hasFood(),
@@ -156,7 +171,7 @@ class KdsController extends Controller
     public function updateOrderStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string|in:Antrian Masuk,Sedang Dimasak,Siap Sajikan,Selesai',
+            'status' => 'required|string|in:Antrian Masuk,Diterima,Sedang Dimasak,Selesai Masak,Siap Sajikan,Selesai',
         ]);
 
         $order = Order::byTenant(auth()->user()->tenant_id)
@@ -180,6 +195,44 @@ class KdsController extends Controller
         $order->update(['status' => $target]);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * FNB-003: advance cook_status 1 tahap per-item.
+     * Kru klik tombol (dikonfirmasi→sedang dimasak→...) → item maju 1 step.
+     */
+    public function updateItemCookStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string',
+        ]);
+
+        $input = strtolower(trim($request->input('status')));
+        $target = null;
+        foreach (OrderItem::COOK_LABELS as $key => $label) {
+            if (strtolower($label) === $input || $key === $input) {
+                $target = $key;
+                break;
+            }
+        }
+        if (! $target) {
+            abort(422, "Status cook tidak valid: {$input}");
+        }
+
+        $item = OrderItem::withoutGlobalScopes()
+            ->where('tenant_id', auth()->user()->tenant_id)
+            ->with('order')
+            ->findOrFail($id);
+        $this->authorize('update', $item->order);
+
+        if (! $item->canCookTransitionTo($target)) {
+            abort(422, "Transisi cook ilegal: {$item->cook_status} -> {$target}");
+        }
+
+        $item->cook_status = $target;
+        $item->save();
+
+        return response()->json(['success' => true, 'cook_status' => $item->cook_status]);
     }
 
     /**

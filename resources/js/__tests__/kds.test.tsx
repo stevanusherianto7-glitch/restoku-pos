@@ -5,7 +5,7 @@ import KDS from '../Pages/KDS/Index';
 const mockUsePage = vi.hoisted(() => vi.fn());
 vi.mock('@inertiajs/react', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@inertiajs/react')>();
-    return { ...actual, Head: ({ children }: { children: React.ReactNode }) => <>{children}</>, usePage: mockUsePage };
+    return { ...actual, Head: ({ children }: { children: any }) => <>{children}</>, usePage: mockUsePage };
 });
 
 const setAuth = (role: string) => {
@@ -20,10 +20,22 @@ const grouped = {
             status: 'Antrian Masuk',
             tone: 'amber',
             time: 5,
-            items: ['2x Nasi Goreng', '+ pedas'],
+            items: [
+                {
+                    id: 'IT-1',
+                    name: 'Nasi Goreng',
+                    qty: 2,
+                    notes: 'pedas',
+                    cook_status: 'dikonfirmasi',
+                    cook_label: 'dikonfirmasi',
+                    cook_step: 1,
+                },
+            ],
         },
     ],
+    Diterima: [],
     'Sedang Dimasak': [],
+    'Selesai Masak': [],
     'Siap Sajikan': [],
 };
 
@@ -31,7 +43,12 @@ beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
     setAuth('owner');
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ grouped }) }));
+    vi.stubGlobal('fetch', (input: any, init?: any) => {
+        if (String(input).includes('/api/reservations')) {
+            return Promise.resolve({ ok: true, json: async () => [] });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({ grouped }) });
+    });
     // jsdom lacks speechSynthesis; stub it
     Object.defineProperty(window, 'speechSynthesis', { value: { speak: vi.fn() }, configurable: true });
 });
@@ -58,16 +75,19 @@ describe('KDS/Index', () => {
         await waitFor(() => expect(screen.getByText('Akses Ditolak')).toBeInTheDocument());
     });
 
-    it('updates order status via PUT', async () => {
-        const putMock = vi.fn().mockResolvedValue({ ok: true });
+    it('advances item cook status via PUT', async () => {
+        const putMock = vi
+            .fn()
+            .mockResolvedValue({ ok: true, json: async () => ({ success: true, cook_status: 'sedang_dimasak' }) });
         vi.stubGlobal('fetch', (input: any, init?: any) => {
-            if (String(input).includes('/status') && init?.method === 'PUT') return putMock();
+            if (String(input).includes('/order-items/') && init?.method === 'PUT') return putMock();
+            if (String(input).includes('/api/reservations')) return Promise.resolve({ ok: true, json: async () => [] });
             // fetchOrders setelah PUT → /api/orders
             return Promise.resolve({ ok: true, json: async () => ({ grouped }) });
         });
         render(<KDS />);
-        await waitFor(() => expect(screen.getByText('MULAI MASAK')).toBeInTheDocument());
-        fireEvent.click(screen.getByText('MULAI MASAK'));
+        await waitFor(() => expect(screen.getByText('SEDANG DIMASAK')).toBeInTheDocument());
+        fireEvent.click(screen.getByText('SEDANG DIMASAK'));
         await waitFor(() => expect(putMock).toHaveBeenCalled());
     });
 

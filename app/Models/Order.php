@@ -18,7 +18,11 @@ class Order extends Model
     // konsisten dipakai di controller, bukan string bebas seperti sebelumnya.
     public const STATUS_ANTRIAN_MASUK = 'antrian_masuk';
 
+    public const STATUS_DITERIMA = 'diterima';
+
     public const STATUS_SEDANG_DIMASAK = 'sedang_dimasak';
+
+    public const STATUS_SELESAI_MASAK = 'selesai_masak';
 
     public const STATUS_SIAP_SAJIKAN = 'siap_sajikan';
 
@@ -40,14 +44,19 @@ class Order extends Model
      */
     public const TRANSITIONS = [
         self::STATUS_ANTRIAN_MASUK => [
+            self::STATUS_DITERIMA,
+            self::STATUS_DIBATALKAN,
+        ],
+        self::STATUS_DITERIMA => [
             self::STATUS_SEDANG_DIMASAK,
-            self::STATUS_SIAP_SAJIKAN,
-            self::STATUS_SIAP_BAYAR,
             self::STATUS_DIBATALKAN,
         ],
         self::STATUS_SEDANG_DIMASAK => [
+            self::STATUS_SELESAI_MASAK,
+            self::STATUS_DIBATALKAN,
+        ],
+        self::STATUS_SELESAI_MASAK => [
             self::STATUS_SIAP_SAJIKAN,
-            self::STATUS_SIAP_BAYAR,
             self::STATUS_DIBATALKAN,
         ],
         self::STATUS_SIAP_SAJIKAN => [

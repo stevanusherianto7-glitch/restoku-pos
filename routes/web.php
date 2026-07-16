@@ -229,6 +229,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::put('/api/orders/{id}/status', [KdsController::class, 'updateOrderStatus']);
     // FNB-001: waiter tandai 1 bagian (food/drink) sudah disajikan.
     Route::put('/api/orders/{id}/serve-part', [KdsController::class, 'servePart']);
+    // FNB-003: advance cook_status per-item (dikonfirmasi→sedang dimasak→...).
+    Route::put('/api/order-items/{id}/cook-status', [KdsController::class, 'updateItemCookStatus']);
 
     // ── Cashier API ────────────────────────────────────────────────────────
     Route::get('/api/cashier-queue', [CashierController::class, 'getCashierQueue']);

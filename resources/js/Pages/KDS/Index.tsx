@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, cardToneMap, type Tone } from '../../Components/Shared';
@@ -13,7 +13,7 @@ import {
     ShieldAlertIcon,
 } from '../../Components/icons';
 
-type KdsOrder = { id: string; table: string; status: string; tone: Tone; time: number; items: string[] };
+type KdsOrder = { id: string; table: string; status: string; tone: Tone; time: number; items: any[] };
 
 const AUTHORIZED_ROLES = ['kitchen', 'waiter', 'manager', 'owner'];
 
@@ -80,7 +80,9 @@ function KDSContent() {
     const [isTtsEnabled, setIsTtsEnabled] = useState(true);
     const [groupedOrders, setGroupedOrders] = useState<Record<string, KdsOrder[]>>({
         'Antrian Masuk': [],
+        Diterima: [],
         'Sedang Dimasak': [],
+        'Selesai Masak': [],
         'Siap Sajikan': [],
     });
 
@@ -120,6 +122,20 @@ function KDSContent() {
         return () => clearInterval(interval);
     }, [isTtsEnabled]);
 
+    const updateItemCook = async (itemId: string, nextLabel: string) => {
+        try {
+            const response = await fetch(`/api/order-items/${itemId}/cook-status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: nextLabel }),
+            });
+            if (response.ok) {
+                fetchOrders();
+            }
+        } catch (err) {
+            console.error('Failed to update item cook status', err);
+        }
+    };
     const updateStatus = async (orderId: string, nextStatus: string) => {
         try {
             const response = await fetch(`/api/orders/${orderId}/status`, {
@@ -137,14 +153,18 @@ function KDSContent() {
 
     const getAggregatedItems = () => {
         const counts: Record<string, number> = {};
-        const allOrders = [...(groupedOrders['Antrian Masuk'] || []), ...(groupedOrders['Sedang Dimasak'] || [])];
+        const allOrders = [
+            ...(groupedOrders['Antrian Masuk'] || []),
+            ...(groupedOrders['Diterima'] || []),
+            ...(groupedOrders['Sedang Dimasak'] || []),
+            ...(groupedOrders['Selesai Masak'] || []),
+        ];
 
         allOrders.forEach((o) => {
-            o.items.forEach((itemStr: string) => {
-                if (itemStr.startsWith('+')) return; // Skip notes
-                const match = itemStr.match(/^(\d+)x\s+(.+)$/);
-                const qty = match ? parseInt(match[1]) : 1;
-                const name = match ? match[2].trim() : itemStr.trim();
+            (o.items || []).forEach((it: any) => {
+                const name = it?.name || (typeof it === 'string' ? it.replace(/^\+\s*/, '') : '');
+                const qty = typeof it === 'string' ? parseInt((it.match(/^(\d+)x\s+/) || [])[1]) || 1 : it?.qty || 1;
+                if (!name) return; // skip notes / kosong
                 counts[name] = (counts[name] || 0) + qty;
             });
         });
@@ -153,8 +173,11 @@ function KDSContent() {
     };
 
     const columns = [
-        { title: 'Antrian Masuk', tone: 'amber' as Tone, status: 'Antrian Masuk', nextStatus: 'Sedang Dimasak' },
-        { title: 'Sedang Dimasak', tone: 'blue' as Tone, status: 'Sedang Dimasak', nextStatus: 'Selesai' },
+        { title: 'Antrian Masuk', tone: 'amber' as Tone, status: 'Antrian Masuk', nextStatus: 'Diterima' },
+        { title: 'Diterima', tone: 'amber' as Tone, status: 'Diterima', nextStatus: 'Sedang Dimasak' },
+        { title: 'Sedang Dimasak', tone: 'blue' as Tone, status: 'Sedang Dimasak', nextStatus: 'Selesai Masak' },
+        { title: 'Selesai Masak', tone: 'blue' as Tone, status: 'Selesai Masak', nextStatus: 'Siap Sajikan' },
+        { title: 'Siap Sajikan', tone: 'emerald' as Tone, status: 'Siap Sajikan', nextStatus: 'Selesai' },
     ];
 
     return (
@@ -244,47 +267,100 @@ function KDSContent() {
                                                     {o.time}'
                                                 </span>
                                             </div>
-                                            <div className="space-y-2 text-3xl font-medium mt-6 border-t border-white/10 pt-4">
-                                                {o.items.map((item, i) => {
-                                                    const isNote = item.startsWith('+');
+                                            <div className="space-y-3 text-3xl font-medium mt-6 border-t border-white/10 pt-4">
+                                                {o.items.map((it) => {
+                                                    const cookSteps = [
+                                                        'dikonfirmasi',
+                                                        'sedang dimasak',
+                                                        'selesai masak',
+                                                        'siap sajikan',
+                                                        'selesai',
+                                                    ];
+                                                    const cur =
+                                                        cookSteps.indexOf(it.cook_status) >= 0
+                                                            ? cookSteps.indexOf(it.cook_status)
+                                                            : 0;
+                                                    const nextLabel =
+                                                        cur < cookSteps.length - 1 ? cookSteps[cur + 1] : null;
                                                     return (
-                                                        <p
-                                                            key={i}
-                                                            className={
-                                                                isNote
-                                                                    ? 'text-2xl opacity-70 font-normal italic pl-4'
-                                                                    : 'text-slate-200'
-                                                            }
+                                                        <div
+                                                            key={it.id}
+                                                            className="rounded-xl bg-black/20 border border-white/10 p-3"
                                                         >
-                                                            {item}
-                                                        </p>
+                                                            <div className="flex items-center justify-between gap-3">
+                                                                <p className="text-2xl font-bold text-slate-100">
+                                                                    {it.qty}x {it.name}
+                                                                    {it.notes ? (
+                                                                        <span className="text-base font-normal italic opacity-60">
+                                                                            {' '}
+                                                                            ({it.notes})
+                                                                        </span>
+                                                                    ) : null}
+                                                                </p>
+                                                                <span className="text-sm font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300">
+                                                                    {it.cook_label}
+                                                                </span>
+                                                            </div>
+                                                            {/* 5-tahap tracker per-item */}
+                                                            <div className="flex items-center justify-between mt-3 px-1">
+                                                                {cookSteps.map((s, i) => {
+                                                                    const n = i + 1;
+                                                                    const st =
+                                                                        n < cur + 1
+                                                                            ? 'done'
+                                                                            : n === cur + 1
+                                                                              ? 'on'
+                                                                              : 'off';
+                                                                    const cls =
+                                                                        st === 'done'
+                                                                            ? 'bg-emerald-500 text-white'
+                                                                            : st === 'on'
+                                                                              ? 'bg-[var(--color-primary)] text-white animate-pulse'
+                                                                              : 'bg-white/10 text-slate-500';
+                                                                    return (
+                                                                        <Fragment key={s}>
+                                                                            <div className="flex flex-col items-center gap-1">
+                                                                                <div
+                                                                                    className={`size-7 rounded-full ${cls} grid place-items-center text-[11px] font-extrabold`}
+                                                                                >
+                                                                                    {n}
+                                                                                </div>
+                                                                                <span
+                                                                                    className={`text-[8px] font-bold uppercase tracking-wide ${st === 'done' ? 'text-emerald-400' : st === 'on' ? 'text-[var(--color-primary)]' : 'text-slate-500'}`}
+                                                                                >
+                                                                                    {s}
+                                                                                </span>
+                                                                            </div>
+                                                                            {n < 5 && (
+                                                                                <div
+                                                                                    className="h-0.5 flex-1 mx-1 -mt-4"
+                                                                                    style={{
+                                                                                        background:
+                                                                                            n < cur + 1
+                                                                                                ? '#0F8A4D'
+                                                                                                : n === cur + 1
+                                                                                                  ? 'var(--color-primary)'
+                                                                                                  : 'rgba(255,255,255,0.1)',
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </Fragment>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                            {nextLabel && (
+                                                                <button
+                                                                    onClick={() => updateItemCook(it.id, nextLabel)}
+                                                                    className="mt-3 w-full rounded-xl bg-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/30 border border-[var(--color-primary)]/30 py-3 text-xl font-bold text-[var(--color-primary)] transition-colors flex items-center justify-center gap-2 active:scale-95 duration-200"
+                                                                >
+                                                                    <ChefHatIcon className="size-5" />{' '}
+                                                                    {nextLabel.toUpperCase()}
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     );
                                                 })}
                                             </div>
-                                            {tone === 'emerald' && (
-                                                <button
-                                                    onClick={() => updateStatus(o.id, nextStatus)}
-                                                    className="mt-6 w-full rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 py-4 text-2xl font-bold text-emerald-200 transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
-                                                >
-                                                    <CheckCheckIcon className="size-6" /> KONFIRMASI SAJIKAN
-                                                </button>
-                                            )}
-                                            {tone === 'blue' && (
-                                                <button
-                                                    onClick={() => updateStatus(o.id, nextStatus)}
-                                                    className="mt-6 w-full rounded-xl bg-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/30 border border-[var(--color-primary)]/30 py-4 text-2xl font-bold text-[var(--color-primary)] transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
-                                                >
-                                                    <UtensilsIcon className="size-6" /> SELESAI MASAK
-                                                </button>
-                                            )}
-                                            {tone === 'amber' && (
-                                                <button
-                                                    onClick={() => updateStatus(o.id, nextStatus)}
-                                                    className="mt-6 w-full rounded-xl bg-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/30 border border-[var(--color-primary)]/30 py-4 text-2xl font-bold text-[var(--color-primary)] transition-colors flex items-center justify-center gap-3 active:scale-95 duration-200"
-                                                >
-                                                    <ChefHatIcon className="size-6" /> MULAI MASAK
-                                                </button>
-                                            )}
                                         </div>
                                     ))}
                                 </div>

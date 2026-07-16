@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import {
     SearchIcon,
@@ -1572,7 +1572,13 @@ export default function CustomerView() {
                         </div>
                     </div>
                     {orders.map((o) => {
-                        const steps = ['Konfirmasi', 'Dimasak', 'Siap', 'Disajikan'];
+                        const steps = [
+                            'Dikonfirmasi',
+                            'Sedang Dimasak',
+                            'Selesai Masak',
+                            'Siap Saji',
+                            'Sudah Disajikan',
+                        ];
                         const isFood = o.destination !== 'bar';
                         const routeLabel = isFood ? '🍳 Rute: Dapur (KDS)' : '🥤 Rute: Bar (Waiter)';
                         const routeCls = isFood ? 'bg-[#FCE3D6] text-[#C9431F]' : 'bg-[#EAF2FB] text-[#1666C9]';
@@ -1589,50 +1595,83 @@ export default function CustomerView() {
                                 <p className="text-[10px] font-bold text-[#9B8D7E] mt-0.5">
                                     DURASI PROSES: {o.duration}
                                 </p>
-                                {/* 4-step tracker dengan pulse di step aktif/selesai */}
-                                <div className="flex items-center justify-between mt-3 px-1">
-                                    {steps.map((s, i) => {
-                                        const n = i + 1;
-                                        const state = n < o.step ? 'done' : n === o.step ? 'on' : 'off';
-                                        const bubCls =
-                                            state === 'done'
-                                                ? 'bg-[#0F8A4D] text-white rs-step-done'
-                                                : state === 'on'
-                                                  ? 'bg-[#FF5B35] text-white rs-step-on'
-                                                  : 'bg-[#EFE7DD] text-[#9B8D7E]';
+                                {/* Per-item 5-tahap tracker (FNB-003) */}
+                                <div className="mt-3 space-y-2">
+                                    {(Array.isArray(o.items) ? o.items : []).map((it, idx) => {
+                                        const itemSteps = [
+                                            'Dikonfirmasi',
+                                            'Sedang Dimasak',
+                                            'Selesai Masak',
+                                            'Siap Saji',
+                                            'Sudah Disajikan',
+                                        ];
+                                        const cookStep = it.cook_step ?? 1;
                                         return (
-                                            <React.Fragment key={s}>
-                                                <div className="flex flex-col items-center gap-1">
-                                                    <div
-                                                        className={`size-7 rounded-full ${bubCls} grid place-items-center text-[11px] font-extrabold`}
-                                                    >
-                                                        {n}
-                                                    </div>
-                                                    <span
-                                                        className={`text-[9px] font-extrabold tracking-wide ${state === 'done' ? 'text-[#0F8A4D]' : state === 'on' ? 'text-[#FF5B35]' : 'text-[#9B8D7E]'}`}
-                                                    >
-                                                        {s.toUpperCase()}
-                                                    </span>
+                                            <div
+                                                key={it.id ?? idx}
+                                                className="bg-[#FAF5EE] border border-[#EFE2D4] rounded-xl p-2.5"
+                                            >
+                                                <p className="text-[11px] font-extrabold text-[#1A1410] mb-1.5">
+                                                    {it.qty ?? 1}x {it.name}
+                                                    {it.notes ? (
+                                                        <span className="font-normal text-[#9B8D7E]">
+                                                            {' '}
+                                                            ({it.notes})
+                                                        </span>
+                                                    ) : null}
+                                                </p>
+                                                <div className="flex items-center justify-between px-0.5">
+                                                    {itemSteps.map((s, i) => {
+                                                        const n = i + 1;
+                                                        const state =
+                                                            n < cookStep ? 'done' : n === cookStep ? 'on' : 'off';
+                                                        const bubCls =
+                                                            state === 'done'
+                                                                ? 'bg-[#0F8A4D] text-white rs-step-done'
+                                                                : state === 'on'
+                                                                  ? 'bg-[#FF5B35] text-white rs-step-on'
+                                                                  : 'bg-[#EFE7DD] text-[#9B8D7E]';
+                                                        return (
+                                                            <Fragment key={s}>
+                                                                <div className="flex flex-col items-center gap-1">
+                                                                    <div
+                                                                        className={`size-6 rounded-full ${bubCls} grid place-items-center text-[10px] font-extrabold`}
+                                                                    >
+                                                                        {n}
+                                                                    </div>
+                                                                    <span
+                                                                        className={`text-[8px] font-extrabold tracking-wide ${state === 'done' ? 'text-[#0F8A4D]' : state === 'on' ? 'text-[#FF5B35]' : 'text-[#9B8D7E]'}`}
+                                                                    >
+                                                                        {s.toUpperCase()}
+                                                                    </span>
+                                                                </div>
+                                                                {n < 5 && (
+                                                                    <div
+                                                                        className="h-0.5 flex-1 mx-1 -mt-4"
+                                                                        style={{
+                                                                            background:
+                                                                                n < cookStep
+                                                                                    ? '#0F8A4D'
+                                                                                    : n === cookStep
+                                                                                      ? '#FF5B35'
+                                                                                      : '#EFE7DD',
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </Fragment>
+                                                        );
+                                                    })}
                                                 </div>
-                                                {n < 4 && (
-                                                    <div
-                                                        className="h-0.5 flex-1 mx-1 -mt-4"
-                                                        style={{
-                                                            background:
-                                                                n < o.step
-                                                                    ? '#0F8A4D'
-                                                                    : n === o.step
-                                                                      ? '#FF5B35'
-                                                                      : '#EFE7DD',
-                                                        }}
-                                                    />
-                                                )}
-                                            </React.Fragment>
+                                            </div>
                                         );
                                     })}
                                 </div>
                                 <div className="flex items-end justify-between mt-3 pt-3 border-t border-[#EFE2D4]">
-                                    <p className="text-[13px] font-extrabold text-[#1A1410]">{o.items}</p>
+                                    <p className="text-[13px] font-extrabold text-[#1A1410]">
+                                        {(Array.isArray(o.items) ? o.items : [])
+                                            .map((it) => `${it.qty ?? 1}x ${it.name}`)
+                                            .join(', ')}
+                                    </p>
                                     <span className="text-[14px] font-extrabold text-[#0F8A4D]">
                                         {formatRupiah(o.total)}
                                     </span>

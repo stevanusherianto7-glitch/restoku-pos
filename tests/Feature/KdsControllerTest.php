@@ -97,12 +97,19 @@ class KdsControllerTest extends TestCase
             'status' => Order::STATUS_ANTRIAN_MASUK,
         ]);
 
-        $response = $this->actingAs($this->kitchen)
-            ->putJson('/api/orders/KDS-010/status', [
-                'status' => 'Sedang Dimasak',
-            ]);
+        // Alur 5-stage: antrian_masuk -> diterima -> sedang_dimasak
+        $this->actingAs($this->kitchen)
+            ->putJson('/api/orders/KDS-010/status', ['status' => 'Diterima'])
+            ->assertStatus(200)->assertJson(['success' => true]);
 
-        $response->assertStatus(200)->assertJson(['success' => true]);
+        $this->assertDatabaseHas('orders', [
+            'order_code' => 'KDS-010',
+            'status' => Order::STATUS_DITERIMA,
+        ]);
+
+        $this->actingAs($this->kitchen)
+            ->putJson('/api/orders/KDS-010/status', ['status' => 'Sedang Dimasak'])
+            ->assertStatus(200)->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('orders', [
             'order_code' => 'KDS-010',
@@ -197,7 +204,7 @@ class KdsControllerTest extends TestCase
             'order_code' => 'KDS-040',
             'table_number' => 'Meja 20',
             'source' => 'pos',
-            'status' => Order::STATUS_SEDANG_DIMASAK,
+            'status' => Order::STATUS_SELESAI_MASAK,
         ]);
 
         $response = $this->actingAs($this->kitchen)
