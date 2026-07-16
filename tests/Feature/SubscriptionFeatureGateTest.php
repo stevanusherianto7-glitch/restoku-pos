@@ -8,7 +8,7 @@ use Tests\Traits\HasTenantSetup;
 
 class SubscriptionFeatureGateTest extends TestCase
 {
-    use RefreshDatabase, HasTenantSetup;
+    use HasTenantSetup, RefreshDatabase;
 
     public function test_basic_plan_cannot_access_pro_feature(): void
     {
@@ -23,8 +23,8 @@ class SubscriptionFeatureGateTest extends TestCase
         $jsonResponse = $this->actingAs($this->testOwner)->getJson('/perbandingan-outlet');
         $jsonResponse->assertStatus(402);
         $jsonResponse->assertJson([
-            'error'         => 'upgrade_required',
-            'current_plan'  => 'basic',
+            'error' => 'upgrade_required',
+            'current_plan' => 'basic',
             'required_plan' => 'pro',
         ]);
     }
@@ -35,14 +35,24 @@ class SubscriptionFeatureGateTest extends TestCase
 
         $response = $this->actingAs($this->testOwner)->get('/perbandingan-outlet');
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('PerbandinganOutlet/Index')
+        $response->assertInertia(fn ($page) => $page->component('PerbandinganOutlet/Index')
         );
     }
 
-    public function test_pro_plan_cannot_access_enterprise_feature(): void
+    public function test_pro_plan_can_access_kds(): void
     {
+        // KDS adalah operational core → turun ke plan 'pro' (keputusan bisnis).
         $this->setupTenantEnvironment('pro');
+
+        $response = $this->actingAs($this->testOwner)->get('/kds');
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page->component('KDS/Index')
+        );
+    }
+
+    public function test_basic_plan_cannot_access_kds(): void
+    {
+        $this->setupTenantEnvironment('basic');
 
         $response = $this->actingAs($this->testOwner)->get('/kds');
         $response->assertRedirect('/dashboard');
@@ -50,20 +60,19 @@ class SubscriptionFeatureGateTest extends TestCase
         $jsonResponse = $this->actingAs($this->testOwner)->getJson('/kds');
         $jsonResponse->assertStatus(402);
         $jsonResponse->assertJson([
-            'error'         => 'upgrade_required',
-            'current_plan'  => 'pro',
-            'required_plan' => 'enterprise',
+            'error' => 'upgrade_required',
+            'current_plan' => 'basic',
+            'required_plan' => 'pro',
         ]);
     }
 
-    public function test_enterprise_plan_can_access_enterprise_feature(): void
+    public function test_enterprise_plan_can_access_kds(): void
     {
         $this->setupTenantEnvironment('enterprise');
 
         $response = $this->actingAs($this->testOwner)->get('/kds');
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('KDS/Index')
+        $response->assertInertia(fn ($page) => $page->component('KDS/Index')
         );
     }
 }

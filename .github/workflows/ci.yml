@@ -154,7 +154,7 @@ jobs:
           sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=redis/' .env
           php artisan key:generate
           mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs
-          php artisan migrate --force
+          php artisan migrate --force --seed
 
       - name: Run PHPUnit with coverage gate
         # --min = fail bila coverage < 70% (gate regresi)

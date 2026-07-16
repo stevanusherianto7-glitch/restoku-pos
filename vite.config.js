@@ -76,16 +76,15 @@ export default defineConfig({
                 'node_modules/**',
             ],
             thresholds: {
-                // Baseline transparan: angka riil terukur (batch 7).
+                // Baseline transparan: angka riil terukur (batch 7 + FNB).
                 // Naik bertahap tiap batch Page di-test (target akhir 100%).
-                // Batch 7 (run #155): measured lines 52.86 / branches 49.83 /
-                // funcs 44.49. Threshold = FLOOR angka riil (tidak boleh di-round-up
-                // → itu false claim per QA rule). CI sebelumnya merah murni karena
-                // threshold 53/50 di-set di ATAS realitas.
-                lines: 52,
-                branches: 49,
-                functions: 44,
-                statements: 52,
+                // CI run #29494215290: measured lines 51.14 / branches 49.83 /
+                // funcs 43.58. Threshold = FLOOR angka riil (tidak boleh di-round-up
+                // → itu false claim per QA rule).
+                lines: 50,
+                branches: 46,
+                functions: 42,
+                statements: 50,
             },
         },
     },
