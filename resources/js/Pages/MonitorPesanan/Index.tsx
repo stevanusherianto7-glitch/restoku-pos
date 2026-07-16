@@ -172,13 +172,24 @@ export default function MonitorPesanan() {
                                         {/* Items List */}
                                         <div className="space-y-2 border-y border-white/5 py-4 my-4 max-h-48 overflow-y-auto pr-1">
                                             {order.items.map((item, idx) => {
-                                                const isNote = item.startsWith('+');
+                                                // items bisa STRING (legacy) atau OBJECT (refactor 5-stage)
+                                                const isObj = item && typeof item === 'object';
+                                                const isNote = isObj
+                                                    ? !!item.notes &&
+                                                      typeof item.notes === 'string' &&
+                                                      item.notes.startsWith('+')
+                                                    : typeof item === 'string' && item.startsWith('+');
+                                                const label = isObj
+                                                    ? isNote
+                                                        ? item.notes
+                                                        : `${item.qty > 1 ? item.qty + 'x ' : ''}${item.name}`
+                                                    : item;
                                                 return (
                                                     <div
                                                         key={idx}
                                                         className={`text-xs ${isNote ? 'text-amber-400 italic pl-3' : 'text-slate-200'}`}
                                                     >
-                                                        {item}
+                                                        {label}
                                                     </div>
                                                 );
                                             })}

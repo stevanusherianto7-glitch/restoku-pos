@@ -259,7 +259,18 @@ function WaiterBarContent() {
 
                                 <div className="space-y-2 text-2xl font-medium mt-6 border-t border-white/10 pt-4">
                                     {o.items.map((item, i) => {
-                                        const isNote = item.startsWith('+');
+                                        // items bisa STRING (legacy "2x Ayam (note)") atau OBJECT (refactor 5-stage)
+                                        const isObj = item && typeof item === 'object';
+                                        const isNote = isObj
+                                            ? !!item.notes &&
+                                              typeof item.notes === 'string' &&
+                                              item.notes.startsWith('+')
+                                            : typeof item === 'string' && item.startsWith('+');
+                                        const label = isObj
+                                            ? isNote
+                                                ? item.notes
+                                                : `${item.qty > 1 ? item.qty + 'x ' : ''}${item.name}`
+                                            : item;
                                         return (
                                             <p
                                                 key={i}
@@ -269,7 +280,7 @@ function WaiterBarContent() {
                                                         : 'text-slate-200'
                                                 }
                                             >
-                                                {item}
+                                                {label}
                                             </p>
                                         );
                                     })}
