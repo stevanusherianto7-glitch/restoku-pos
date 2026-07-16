@@ -176,7 +176,11 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
             });
             if (response.ok) {
                 const data = await response.json();
-                setServedQueue(Array.isArray(data?.queue) ? data.queue : []);
+                // Guard: queue HARUS sequential array. Cache::remember bisa
+                // mengembalikan object -> Array.isArray gagal -> flicker.
+                const q = data?.queue;
+                const arr = Array.isArray(q) ? q : q && typeof q === 'object' ? Object.values(q) : [];
+                setServedQueue(arr);
             }
         } catch (err) {
             console.error('Gagal mengambil antrean pembayaran', err);

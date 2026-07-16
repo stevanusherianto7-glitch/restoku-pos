@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -31,6 +32,11 @@ class CashierController extends Controller
                     'items' => $order->items->map(fn ($item) => "{$item->quantity}x {$item->item_name}")->all(),
                 ])->values();
         });
+
+        // Pastikan queue SELALU sequential array (bukan object) di JSON.
+        // Cache::remember bisa mengembalikan collection ter-deserialize sebagai
+        // object -> frontend Array.isArray gagal -> kartu flicker isi<->kosong.
+        $queue = array_values($queue instanceof Collection ? $queue->toArray() : (array) $queue);
 
         return response()->json([
             'success' => true,
