@@ -148,6 +148,7 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
     const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
     const [orderTableName, setOrderTableName] = useState<string | null>(null);
     const [servedQueue, setServedQueue] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<'menu' | 'queue'>('menu');
 
     // Ad-hoc item states
     const [adHocName, setAdHocName] = useState('');
@@ -372,141 +373,190 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
                     </div>
                 )}
                 <div className="grid grid-cols-[1fr_400px] gap-5 items-stretch flex-1 min-h-0 h-full overflow-hidden">
-                    {/* ── Menu Grid ── */}
-                    <Glass className="p-4 flex flex-col h-full max-h-full overflow-y-auto min-h-0">
-                        {/* Served Orders Payment Queue */}
-                        {servedQueue.length > 0 && (
-                            <div className="mb-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4">
-                                <div className="flex items-center justify-between mb-3">
-                                    <h4 className="text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
-                                        <SparklesIcon className="size-3.5 text-emerald-400" /> Antrean Meja Siap Bayar
-                                        (QR)
-                                    </h4>
-                                    <span className="text-[10px] text-slate-500">
-                                        Klik meja untuk memproses tagihan
-                                    </span>
-                                </div>
-                                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-                                    {servedQueue.map((order) => {
-                                        const isTakeAway = order.table.toLowerCase().includes('takeaway');
-                                        return (
-                                            <button
-                                                key={order.id}
-                                                type="button"
-                                                onClick={() => handleLoadServedOrder(order)}
-                                                className="bg-white/5 border border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/10 text-left p-3 rounded-xl transition-all min-w-[150px] shrink-0 flex flex-col justify-between"
-                                            >
-                                                <div>
-                                                    <div className="font-extrabold text-xs text-white truncate">
-                                                        {isTakeAway ? '🛍️ ' : '🍽️ '}
-                                                        {order.table}
-                                                    </div>
-                                                    <div className="text-[8px] text-slate-500 mt-1 uppercase font-bold tracking-wider">
-                                                        Rincian Menu:
-                                                    </div>
-                                                    <div className="text-[9px] text-slate-300 mt-0.5 space-y-0.5 border-t border-white/5 pt-1 max-w-[135px]">
-                                                        {order.items
-                                                            .filter((i) => !i.startsWith('+'))
-                                                            .map((it: string, idx: number) => (
-                                                                <div
-                                                                    key={idx}
-                                                                    className="truncate select-none font-medium leading-snug"
-                                                                >
-                                                                    {it}
-                                                                </div>
-                                                            ))}
-                                                    </div>
-                                                </div>
-                                                <div className="mt-3 flex flex-col gap-1.5">
-                                                    <span
-                                                        className={`self-start text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide border ${isTakeAway ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border-[var(--color-primary)]/20'}`}
-                                                    >
-                                                        {isTakeAway ? 'Take Away' : 'Dine In'}
-                                                    </span>
-                                                    <div className="text-xs font-bold text-emerald-400 font-mono">
-                                                        {formatRupiah(calculateOrderTotal(order))}
-                                                    </div>
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="flex justify-between items-center mb-5 gap-3 flex-wrap">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                {['Semua', 'Makanan', 'Minuman', 'Pelengkap'].map((cat) => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setActiveCategory(cat)}
-                                        className={`rounded-lg text-sm font-medium px-3 py-1.5 transition-colors ${activeCategory === cat ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                    {/* ── Menu / Antrean Tabs ── */}
+                    <Glass className="p-4 flex flex-col h-full max-h-full min-h-0">
+                        {/* Tab Navigasi: Display Menu | Antrean Meja Siap Bayar */}
+                        <div className="flex gap-2 mb-4 shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('menu')}
+                                className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-bold transition-colors flex items-center justify-center gap-2 ${
+                                    activeTab === 'menu'
+                                        ? 'bg-[var(--color-primary)] text-white'
+                                        : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/10'
+                                }`}
+                            >
+                                <UtensilsIcon className="size-4" /> Display Menu
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('queue')}
+                                className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-bold transition-colors flex items-center justify-center gap-2 ${
+                                    activeTab === 'queue'
+                                        ? 'bg-emerald-500 text-slate-950'
+                                        : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/10'
+                                }`}
+                            >
+                                <SparklesIcon className="size-4" /> Antrean Siap Bayar
+                                {servedQueue.length > 0 && (
+                                    <span
+                                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${activeTab === 'queue' ? 'bg-slate-950/20 text-slate-950' : 'bg-emerald-500/15 text-emerald-400'}`}
                                     >
-                                        {cat}
-                                    </button>
-                                ))}
-                                <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 focus-within:border-white/20 transition-colors">
-                                    <SearchIcon className="size-4 text-slate-400" />
-                                    <input
-                                        placeholder="Cari menu..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="bg-transparent text-sm outline-none w-40 text-slate-200 placeholder:text-slate-400"
-                                    />
-                                </div>
-                            </div>
+                                        {servedQueue.length}
+                                    </span>
+                                )}
+                            </button>
                         </div>
 
-                        <div className="grid grid-cols-4 gap-5 auto-rows-max content-start flex-1 overflow-y-auto pr-2 pb-4">
-                            {filteredMenu.map((product) => {
-                                const inCart = cart.items.find((i) => i.id === product.id);
-                                return (
-                                    <button
-                                        key={product.id}
-                                        type="button"
-                                        onClick={() => cart.addItem(product)}
-                                        className={`rounded-2xl border overflow-hidden cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 group text-left relative flex flex-col justify-between ${
-                                            isNanoBanana
-                                                ? 'border-amber-500/20 bg-[#030712]/90 hover:border-amber-500/60 hover:shadow-[0_8px_30px_rgba(234,179,8,0.25)] hover:bg-[#030712]'
-                                                : 'border-white/5 bg-white/[0.02] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-white/20 hover:bg-white/[0.04]'
-                                        }`}
-                                    >
-                                        {inCart && (
-                                            <div
-                                                className={`absolute top-2 right-2 z-10 size-5 rounded-full text-[10px] font-bold flex items-center justify-center shadow-lg ${
-                                                    isNanoBanana
-                                                        ? 'bg-amber-500 text-slate-950 ring-2 ring-[#030712]'
-                                                        : 'bg-[var(--color-primary)]/100 text-white'
-                                                }`}
-                                            >
-                                                {inCart.quantity}
+                        <div className="flex-1 min-h-0 overflow-hidden">
+                            {activeTab === 'menu' ? (
+                                <>
+                                    {/* ── Menu Grid (Tab Display Menu) ── */}
+                                    <div className="flex flex-col h-full min-h-0">
+                                        <div className="flex justify-between items-center mb-5 gap-3 flex-wrap">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                {['Semua', 'Makanan', 'Minuman', 'Pelengkap'].map((cat) => (
+                                                    <button
+                                                        key={cat}
+                                                        onClick={() => setActiveCategory(cat)}
+                                                        className={`rounded-lg text-sm font-medium px-3 py-1.5 transition-colors ${activeCategory === cat ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                                                    >
+                                                        {cat}
+                                                    </button>
+                                                ))}
+                                                <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 focus-within:border-white/20 transition-colors">
+                                                    <SearchIcon className="size-4 text-slate-400" />
+                                                    <input
+                                                        placeholder="Cari menu..."
+                                                        value={searchQuery}
+                                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                                        className="bg-transparent text-sm outline-none w-40 text-slate-200 placeholder:text-slate-400"
+                                                    />
+                                                </div>
                                             </div>
-                                        )}
-                                        <div className="h-28 w-full relative overflow-hidden bg-slate-900 border-b border-white/5 flex items-center justify-center">
-                                            <ProductImage
-                                                src={'image' in product ? product.image || null : null}
-                                                alt={product.name}
-                                                variant="full"
-                                                className="w-full h-full object-cover rounded-none transition-transform duration-300 group-hover:scale-105"
-                                            />
                                         </div>
-                                        <div className="p-3">
-                                            <p className="font-semibold text-sm text-slate-200 leading-tight truncate">
-                                                {product.name}
-                                            </p>
-                                            <p
-                                                className={`font-mono text-xs mt-1.5 font-bold ${isNanoBanana ? 'text-amber-400' : 'text-emerald-400'}`}
-                                            >
-                                                {formatRupiah(product.price)}
-                                            </p>
+
+                                        <div className="grid grid-cols-4 gap-5 auto-rows-max content-start h-full overflow-y-auto pr-2 pb-4">
+                                            {filteredMenu.map((product) => {
+                                                const inCart = cart.items.find((i) => i.id === product.id);
+                                                return (
+                                                    <button
+                                                        key={product.id}
+                                                        type="button"
+                                                        onClick={() => cart.addItem(product)}
+                                                        className={`rounded-2xl border overflow-hidden cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 group text-left relative flex flex-col justify-between ${
+                                                            isNanoBanana
+                                                                ? 'border-amber-500/20 bg-[#030712]/90 hover:border-amber-500/60 hover:shadow-[0_8px_30px_rgba(234,179,8,0.25)] hover:bg-[#030712]'
+                                                                : 'border-white/5 bg-white/[0.02] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-white/20 hover:bg-white/[0.04]'
+                                                        }`}
+                                                    >
+                                                        {inCart && (
+                                                            <div
+                                                                className={`absolute top-2 right-2 z-10 size-5 rounded-full text-[10px] font-bold flex items-center justify-center shadow-lg ${
+                                                                    isNanoBanana
+                                                                        ? 'bg-amber-500 text-slate-950 ring-2 ring-[#030712]'
+                                                                        : 'bg-[var(--color-primary)]/100 text-white'
+                                                                }`}
+                                                            >
+                                                                {inCart.quantity}
+                                                            </div>
+                                                        )}
+                                                        <div className="h-28 w-full relative overflow-hidden bg-slate-900 border-b border-white/5 flex items-center justify-center">
+                                                            <ProductImage
+                                                                src={'image' in product ? product.image || null : null}
+                                                                alt={product.name}
+                                                                variant="full"
+                                                                className="w-full h-full object-cover rounded-none transition-transform duration-300 group-hover:scale-105"
+                                                            />
+                                                        </div>
+                                                        <div className="p-3">
+                                                            <p className="font-semibold text-sm text-slate-200 leading-tight truncate">
+                                                                {product.name}
+                                                            </p>
+                                                            <p
+                                                                className={`font-mono text-xs mt-1.5 font-bold ${isNanoBanana ? 'text-amber-400' : 'text-emerald-400'}`}
+                                                            >
+                                                                {formatRupiah(product.price)}
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                            {filteredMenu.length === 0 && (
+                                                <div className="col-span-4 flex flex-col items-center justify-center h-40 text-slate-500">
+                                                    <SearchIcon className="size-8 mb-2 opacity-40" />
+                                                    <p className="text-sm">Tidak ada menu ditemukan</p>
+                                                </div>
+                                            )}
                                         </div>
-                                    </button>
-                                );
-                            })}
-                            {filteredMenu.length === 0 && (
-                                <div className="col-span-4 flex flex-col items-center justify-center h-40 text-slate-500">
-                                    <SearchIcon className="size-8 mb-2 opacity-40" />
-                                    <p className="text-sm">Tidak ada menu ditemukan</p>
+                                    </div>
+                                </>
+                            ) : (
+                                /* ── Tab Antrean Meja Siap Bayar ── */
+                                <div className="h-full overflow-y-auto pr-1">
+                                    {servedQueue.length === 0 ? (
+                                        <div className="h-full flex flex-col items-center justify-center text-slate-600">
+                                            <SparklesIcon className="size-10 mb-3 opacity-30" />
+                                            <p className="text-sm">Belum ada meja yang siap bayar</p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-2 gap-3 auto-rows-max">
+                                            {servedQueue.map((order) => {
+                                                const isTakeAway = order.table.toLowerCase().includes('takeaway');
+                                                return (
+                                                    <button
+                                                        key={order.id}
+                                                        type="button"
+                                                        onClick={() => handleLoadServedOrder(order)}
+                                                        className="bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/10 text-left p-4 rounded-2xl transition-all flex flex-col justify-between gap-3"
+                                                    >
+                                                        <div>
+                                                            <div className="flex items-center justify-between gap-2">
+                                                                <div className="font-extrabold text-lg text-white truncate">
+                                                                    {isTakeAway ? '🛍️ ' : '🍽️ '}
+                                                                    {order.table}
+                                                                </div>
+                                                                <span
+                                                                    className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide border ${isTakeAway ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] border-[var(--color-primary)]/20'}`}
+                                                                >
+                                                                    {isTakeAway ? 'Take Away' : 'Dine In'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="text-[10px] text-slate-500 mt-1 uppercase font-bold tracking-wider">
+                                                                Rincian Menu:
+                                                            </div>
+                                                            <div className="text-xs text-slate-300 mt-1 space-y-0.5 border-t border-white/5 pt-1">
+                                                                {(Array.isArray(order.items) ? order.items : [])
+                                                                    .filter((i: any) =>
+                                                                        typeof i === 'string'
+                                                                            ? !i.startsWith('+')
+                                                                            : true,
+                                                                    )
+                                                                    .map((it: any, idx: number) => (
+                                                                        <div
+                                                                            key={idx}
+                                                                            className="truncate select-none font-medium leading-snug"
+                                                                        >
+                                                                            {typeof it === 'string'
+                                                                                ? it
+                                                                                : `${it.qty > 1 ? it.qty + 'x ' : ''}${it.name}`}
+                                                                        </div>
+                                                                    ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-sm font-bold text-emerald-400 font-mono">
+                                                                {formatRupiah(calculateOrderTotal(order))}
+                                                            </div>
+                                                            <span className="text-[10px] text-emerald-400 font-bold">
+                                                                Klik untuk proses →
+                                                            </span>
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const mockUsePage = vi.hoisted(() => vi.fn());
 const mockUseTenantSettings = vi.hoisted(() => vi.fn());
@@ -112,10 +112,48 @@ describe('POS/Index', () => {
         expect(screen.getByText(/Nasi Goreng/i)).toBeInTheDocument();
     });
 
-    it('filters menu by category', () => {
+    it('has two tab navigations: Display Menu and Antrean Siap Bayar', () => {
         render(<POSPage posMenu={MENU} />);
-        fireEvent.click(screen.getByText('Minuman'));
-        expect(screen.getByText(/Es Teh/i)).toBeInTheDocument();
-        expect(screen.queryByText(/Nasi Goreng/i)).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Display Menu/i })).toBeInTheDocument();
+        const queueTab = screen.getByRole('button', { name: /Antrean Siap Bayar/i });
+        expect(queueTab).toBeInTheDocument();
+        // default tab = menu (Nasi Goreng tampil)
+        expect(screen.getByText(/Nasi Goreng/i)).toBeInTheDocument();
+        // klik tab antrean → menu grid disembunyi, tampil pesan kosong antrean
+        fireEvent.click(queueTab);
+        expect(screen.getByText(/Belum ada meja yang siap bayar/i)).toBeInTheDocument();
+    });
+
+    it('shows served queue tables in Antrean tab', async () => {
+        const queue = [
+            {
+                id: 'ORD-1',
+                table: 'A1',
+                status: 'Siap Bayar',
+                tone: 'emerald',
+                time: 5,
+                items: ['2x Nasi Goreng', '1x Es Teh'],
+            },
+        ];
+        vi.stubGlobal(
+            'fetch',
+            vi.fn((input: any) => {
+                const url = String(input);
+                if (url.includes('/api/cashier-queue') && !url.includes('/api/cashier-queue/')) {
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ queue }) });
+                }
+                if (url.includes('/api/orders/')) {
+                    return Promise.resolve({
+                        ok: true,
+                        json: () => Promise.resolve({ order: { items: [] }, items: [] }),
+                    });
+                }
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+            }) as any,
+        );
+        render(<POSPage posMenu={MENU} />);
+        fireEvent.click(screen.getByRole('button', { name: /Antrean Siap Bayar/i }));
+        await waitFor(() => expect(screen.getByText(/A1/)).toBeInTheDocument());
+        expect(screen.getByText(/2x Nasi Goreng/)).toBeInTheDocument();
     });
 });
