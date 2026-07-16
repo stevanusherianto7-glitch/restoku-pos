@@ -100,8 +100,9 @@ describe('BukuMenuDigital/CustomerView', () => {
         await act(async () => {
             await new Promise((r) => setTimeout(r, 50));
         });
-        // landing modal
-        expect(screen.getByText(/Cita rasa Jawa/i)).toBeInTheDocument();
+        // landing modal: brand logo (alt "Restoku") + footer "© 2025 Restoku App"
+        expect(screen.getByAltText(/Restoku/i)).toBeInTheDocument();
+        expect(screen.getByText(/© 2025 Restoku App/i)).toBeInTheDocument();
         await act(async () => {
             fireEvent.click(screen.getByText(/Masuk ke Menu/i));
         });

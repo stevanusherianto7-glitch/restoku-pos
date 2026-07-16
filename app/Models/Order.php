@@ -28,6 +28,11 @@ class Order extends Model
 
     public const STATUS_DIBATALKAN = 'dibatalkan';
 
+    // Tujuan order (routing layar dapur vs bar).
+    public const DEST_KDS = 'kds';   // ada item makanan → Dapur/KDS
+
+    public const DEST_BAR = 'bar';   // murni minuman → Bar/Waiter
+
     /**
      * S-07 — State machine order.
      * Transisi yang diizinkan. Status akhir (selesai/dibatalkan) bersifat terminal.
@@ -155,6 +160,40 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * FNB-001: deteksi tipe item dalam 1 order utuh.
+     * OrderItem tidak menyimpan type → baca lewat menuItem.category.type.
+     */
+    public function hasFood(): bool
+    {
+        return $this->items->contains(
+            fn ($i) => ($i->menuItem?->category?->type ?? MenuCategory::TYPE_FOOD) === MenuCategory::TYPE_FOOD
+        );
+    }
+
+    public function hasDrink(): bool
+    {
+        return $this->items->contains(
+            fn ($i) => ($i->menuItem?->category?->type ?? MenuCategory::TYPE_FOOD) === MenuCategory::TYPE_BEVERAGE
+        );
+    }
+
+    /**
+     * Semua bagian yang ada sudah disajikan waiter.
+     * allServed wajib sebelum order boleh masuk kasir (siap_bayar).
+     */
+    public function allServed(): bool
+    {
+        if ($this->hasFood() && ! $this->food_served_at) {
+            return false;
+        }
+        if ($this->hasDrink() && ! $this->drink_served_at) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OutletTable extends Model
 {
     protected $fillable = [
-        'tenant_id', 'outlet_id', 'label', 'pin_hash',
+        'tenant_id', 'outlet_id', 'label', 'pin_hash', 'last_scan_token',
         'latitude', 'longitude', 'is_queue', 'qr_type',
     ];
 

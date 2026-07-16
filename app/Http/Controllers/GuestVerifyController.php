@@ -75,17 +75,61 @@ class GuestVerifyController extends Controller
             }
         }
 
-        // Signed short-lived token (15 menit)
+        // Session-based verification: tamu <-> meja terikat untuk SATU kedatangan.
+        // Saat tamu BARU memindai QR meja yang sama, token ini di-regenerate ->
+        // meninvalidasi sesi tamu sebelumnya (bukan timer wall-clock).
+        $sessionToken = \Str::random(32);
+        $table->last_scan_token = $sessionToken;
+        $table->save();
+
+        // Signed token (masih ada exp sebagai safety net, tapi expiry utama
+        // ditentukan oleh perubahan last_scan_token di meja ini).
         $token = Crypt::encryptString(json_encode([
             'outlet_id' => $outlet->id,
             'table' => $label,
-            'exp' => now()->addMinutes(15)->timestamp,
+            'session' => $sessionToken,
+            'exp' => now()->addHours(6)->timestamp,
         ]));
 
         return response()->json([
             'ok' => true,
             'token' => $token,
-            'expires_at' => now()->addMinutes(15)->toIso8601String(),
+            'table_session' => $sessionToken,
+            'expires_at' => now()->addHours(6)->toIso8601String(),
+        ]);
+    }
+
+    /**
+     * Publik: cek session token aktif untuk meja tertentu.
+     * FE poll endpoint ini; kalau token berubah (tamu baru scan QR) -> verify kedaluwarsa.
+     */
+    public function tableSession(Request $request): JsonResponse
+    {
+        $slug = $request->query('slug') ?? '';
+        $table = $request->query('table') ?? '';
+        if (! $slug || ! $table) {
+            return response()->json(['error' => 'slug and table required'], 422);
+        }
+
+        $outlet = Outlet::withoutGlobalScope(TenantScope::class)
+            ->where('slug', $slug)
+            ->first();
+
+        if (! $outlet) {
+            return response()->json(['error' => 'outlet_not_found'], 404);
+        }
+
+        $t = OutletTable::withoutGlobalScope(TenantScope::class)
+            ->where('outlet_id', $outlet->id)
+            ->whereRaw('LOWER(label) = ?', [strtolower(trim($table))])
+            ->first();
+
+        if (! $t) {
+            return response()->json(['error' => 'table_not_found'], 422);
+        }
+
+        return response()->json([
+            'table_session' => $t->last_scan_token,
         ]);
     }
 

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Restoku — Status Pesanan Tamu (Mockup, gaya Kedai Elvera)</title>
+<style>
+  :root{
+    --cabe:#FF5B35; --cabe-d:#C9431F; --emas:#F59E0B;
+    --hijau:#0F8A4D; --hijau-l:#E7F6EE;
+    --krem:#FAF5EE; --krem2:#FCE3D6; --cokelat:#7C4A2D;
+    --text:#3A2A1E; --muted:#9B8D7E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,'Segoe UI',sans-serif;}
+  body{background:#1c1410;display:flex;justify-content:center;padding:24px;}
+  .phone{width:390px;background:var(--krem);border-radius:28px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+  /* Header */
+  .hdr{display:flex;align-items:center;gap:10px;padding:16px 18px 12px;background:#fff;border-bottom:1px solid var(--krem2);}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--cabe),var(--emas));display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px;}
+  .hdrtxt h1{font-size:15px;font-weight:900;color:var(--text);}
+  .hdrtxt p{font-size:11px;color:var(--muted);}
+  .halal{margin-left:auto;width:34px;height:34px;border-radius:50%;background:var(--hijau-l);display:grid;place-items:center;color:var(--hijau);font-size:18px;}
+  /* Sub header */
+  .sub{display:flex;align-items:center;padding:12px 18px;}
+  .sub h2{font-size:15px;font-weight:800;color:var(--text);}
+  .sub .right{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--hijau);box-shadow:0 0 0 4px var(--hijau-l);}
+  .iconbtn{width:30px;height:30px;border-radius:9px;background:var(--krem2);display:grid;place-items:center;color:var(--cokelat);}
+  /* Order card */
+  .card{margin:8px 14px 14px;background:#fff;border-radius:18px;padding:14px;box-shadow:0 4px 16px rgba(124,74,45,.08);}
+  .card+.card{margin-top:0;}
+  .ostatus{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--cabe);}
+  .oid{margin-left:auto;font-size:10px;font-weight:700;color:var(--muted);}
+  .dur{font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;}
+  /* Stepper */
+  .steps{display:flex;align-items:center;justify-content:space-between;margin:14px 4px 6px;}
+  .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
+  .bub{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;color:#fff;}
+  .bub.on{background:var(--cabe);}
+  .bub.done{background:var(--hijau);}
+  .bub.off{background:var(--krem2);color:var(--muted);}
+  .lbl{font-size:9px;font-weight:800;letter-spacing:.3px;color:var(--muted);}
+  .lbl.on{color:var(--cabe);}
+  .lbl.done{color:var(--hijau);}
+  .lnk{height:3px;flex:1;background:var(--krem2);}
+  /* Pulse animation untuk step aktif (sedang berjalan) */
+  @keyframes pulseRing{
+    0%{box-shadow:0 0 0 0 rgba(255,91,53,.55);}
+    70%{box-shadow:0 0 0 8px rgba(255,91,53,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,91,53,0);}
+  }
+  @keyframes pulseDone{
+    0%{box-shadow:0 0 0 0 rgba(15,138,77,.45);}
+    70%{box-shadow:0 0 0 6px rgba(15,138,77,0);}
+    100%{box-shadow:0 0 0 0 rgba(15,138,77,0);}
+  }
+  .bub.on{animation:pulseRing 1.4s infinite;}
+  .bub.done{animation:pulseDone 1.8s infinite;}
+  @media (prefers-reduced-motion: reduce){
+    .bub.on,.bub.done{animation:none;}
+  }
+  .lnk.done{background:var(--hijau);}
+  /* Items */
+  .item{display:flex;justify-content:space-between;font-size:13px;color:var(--text);padding:7px 0;border-top:1px dashed var(--krem2);margin-top:8px;}
+  .price{font-weight:800;color:var(--hijau);}
+  .total{display:flex;justify-content:space-between;font-size:13px;font-weight:900;margin-top:6px;}
+  .total .price{font-size:15px;}
+  .dest{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:10px;font-weight:800;padding:4px 9px;border-radius:8px;}
+  .dest.kds{background:var(--krem2);color:var(--cabe);}
+  .dest.bar{background:#EAF2FB;color:#1666C9;}
+  /* CTA */
+  .cta{margin:6px 14px 22px;background:var(--cabe);color:#fff;border:none;border-radius:14px;width:calc(100% - 28px);padding:14px;font-size:14px;font-weight:800;}
+  .note{font-size:10px;color:var(--muted);text-align:center;padding:0 24px 20px;line-height:1.5;}
+  .tag{position:absolute;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <!-- Header: brand + meja + HALAL -->
+    <div class="hdr">
+      <div class="logo">R</div>
+      <div class="hdrtxt">
+        <h1>Kedai Elvera 57</h1>
+        <p>Meja A2 · Scan &amp; Order</p>
+      </div>
+      <div class="halal">☪</div>
+    </div>
+
+    <!-- Sub header -->
+    <div class="sub">
+      <h2>Status Pesanan</h2>
+      <div class="right">
+        <span class="dot"></span> Auto Aktif
+        <div class="iconbtn">⟳</div>
+      </div>
+    </div>
+
+    <!-- Order 1: makanan -> KDS, masih KONFIRMASI -->
+    <div class="card">
+      <div class="ostatus">🍴 Menunggu Konfirmasi <span class="oid">ORD-0716-01</span></div>
+      <div class="dur">DURASI PROSES: 2 MNT</div>
+      <div class="steps">
+        <div class="step"><div class="bub on">1</div><div class="lbl on">KONFIRMASI</div></div>
+        <div class="lnk"></div>
+        <div class="step"><div class="bub off">2</div><div class="lbl">DIMASAK</div></div>
+        <div class="lnk"></div>
+        <div class="step"><div class="bub off">3</div><div class="lbl">SIAP</div></div>
+        <div class="lnk"></div>
+        <div class="step"><div class="bub off">4</div><div class="lbl">DISAJIKAN</div></div>
+      </div>
+      <div class="item"><span>Bakmi Goreng Jawa ×1</span><span class="price">Rp 24.000</span></div>
+      <div class="item"><span>Es Teh Manis ×1</span><span class="price">Rp 8.000</span></div>
+      <div class="total"><span>Total</span><span class="price">Rp 32.000</span></div>
+      <span class="dest kds">🍳 Rute: Dapur (KDS)</span>
+    </div>
+
+    <!-- Order 2: murni minuman -> BAR, sudah SIAP -->
+    <div class="card">
+      <div class="ostatus" style="color:var(--hijau)">✓ Siap Disajikan <span class="oid">ORD-0716-02</span></div>
+      <div class="dur">DURASI PROSES: 1 MNT</div>
+      <div class="steps">
+        <div class="step"><div class="bub done">1</div><div class="lbl done">KONFIRMASI</div></div>
+        <div class="lnk done"></div>
+        <div class="step"><div class="bub done">2</div><div class="lbl done">DIMASAK</div></div>
+        <div class="lnk done"></div>
+        <div class="step"><div class="bub on">3</div><div class="lbl on">SIAP</div></div>
+        <div class="lnk"></div>
+        <div class="step"><div class="bub off">4</div><div class="lbl">DISAJIKAN</div></div>
+      </div>
+      <div class="item"><span>Es Jeruk Percis ×2</span><span class="price">Rp 20.000</span></div>
+      <div class="total"><span>Total</span><span class="price">Rp 20.000</span></div>
+      <span class="dest bar">🥤 Rute: Bar (Waiter)</span>
+    </div>
+
+    <button class="cta">Pesan Menu Lainnya</button>
+    <p class="note">Saat status berubah jadi <b>DISAJIKAN</b> (waiter sajikan ke meja), pesanan masuk antrean pembayaran di layar Kasir.</p>
+  </div>
+</body>
+</html>

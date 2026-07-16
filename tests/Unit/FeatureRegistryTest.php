@@ -27,7 +27,7 @@ class FeatureRegistryTest extends TestCase
         $this->assertTrue(FeatureRegistry::planHasFeature('pro', 'multi_outlet'));
         $this->assertTrue(FeatureRegistry::planHasFeature('pro', 'ppn_tax'));
         $this->assertTrue(FeatureRegistry::planHasFeature('pro', 'wa_notif'));
-        $this->assertFalse(FeatureRegistry::planHasFeature('pro', 'kds'));
+        $this->assertTrue(FeatureRegistry::planHasFeature('pro', 'kds'));
         $this->assertFalse(FeatureRegistry::planHasFeature('pro', 'white_label'));
     }
 
@@ -46,7 +46,7 @@ class FeatureRegistryTest extends TestCase
 
     public function test_minimum_plan_for_returns_correct_plan(): void
     {
-        $this->assertEquals('enterprise', FeatureRegistry::minimumPlanFor('kds'));
+        $this->assertEquals('pro', FeatureRegistry::minimumPlanFor('kds'));
         $this->assertEquals('enterprise', FeatureRegistry::minimumPlanFor('white_label'));
         $this->assertEquals('pro', FeatureRegistry::minimumPlanFor('multi_outlet'));
         $this->assertEquals('pro', FeatureRegistry::minimumPlanFor('ppn_tax'));

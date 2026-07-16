@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -137,6 +138,7 @@ class PublicOrderController extends Controller
             ->where('tenant_id', $tenantId)
             ->where('is_available', true)
             ->whereIn('id', $menuItemIds)
+            ->with('category:id,type')
             ->get()
             ->keyBy('id');
 
@@ -147,7 +149,11 @@ class PublicOrderController extends Controller
             ], 422);
         }
 
-        $order = DB::transaction(function () use ($validated, $tenantId, $menuItems, $outlet) {
+        // Routing order-level: ada makanan (food) → KDS, murni minuman (beverage) → Bar.
+        $hasFood = $menuItems->contains(fn ($m) => ($m->category?->type ?? MenuCategory::TYPE_FOOD) === MenuCategory::TYPE_FOOD);
+        $destination = $hasFood ? Order::DEST_KDS : Order::DEST_BAR;
+
+        $order = DB::transaction(function () use ($validated, $tenantId, $menuItems, $outlet, $destination) {
             $order = Order::withoutGlobalScope(TenantScope::class)->create([
                 'tenant_id' => $tenantId,
                 'outlet_id' => $outlet->id,
@@ -155,6 +161,7 @@ class PublicOrderController extends Controller
                 'table_number' => str_starts_with($validated['table'], 'Meja') ? $validated['table'] : 'Meja '.$validated['table'],
                 'source' => 'guest_qr',
                 'status' => Order::STATUS_ANTRIAN_MASUK,
+                'destination' => $destination,
             ]);
 
             $subtotal = 0;
@@ -207,6 +214,7 @@ class PublicOrderController extends Controller
         $order = Order::withoutGlobalScope(TenantScope::class)
             ->where('tenant_id', $outlet->tenant_id)
             ->where('order_code', $id)
+            ->with('items.menuItem.category')
             ->first();
 
         if (! $order) {
@@ -217,6 +225,18 @@ class PublicOrderController extends Controller
             'success' => true,
             'status' => self::KDS_STATUS_LABELS[$order->status] ?? $order->status,
             'tone' => $this->toneForStatus($order->status),
+            'destination' => $order->destination,
+            'food_served_at' => $order->food_served_at,
+            'drink_served_at' => $order->drink_served_at,
+            'has_food' => $order->hasFood(),
+            'has_drink' => $order->hasDrink(),
+            'step' => match ($order->status) {
+                Order::STATUS_ANTRIAN_MASUK => 1,
+                Order::STATUS_SEDANG_DIMASAK => 2,
+                Order::STATUS_SIAP_SAJIKAN => 3,
+                Order::STATUS_SIAP_BAYAR, Order::STATUS_SELESAI => 4,
+                default => 1,
+            },
         ]);
     }
 

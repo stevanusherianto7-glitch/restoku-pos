@@ -14,6 +14,10 @@ class MenuCategory extends Model
 
     protected $guarded = ['id'];
 
+    public const TYPE_FOOD = 'food';
+
+    public const TYPE_BEVERAGE = 'beverage';
+
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',

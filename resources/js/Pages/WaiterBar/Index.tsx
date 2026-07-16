@@ -8,6 +8,7 @@ import {
     Volume2Icon,
     VolumeXIcon,
     GlassWaterIcon,
+    UtensilsIcon,
     BellRingIcon,
     ShieldAlertIcon,
 } from '../../Components/icons';
@@ -125,44 +126,39 @@ function WaiterBarContent() {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch('/api/orders');
-            if (response.ok) {
-                const data = await response.json();
-                const activeKdsOrders: KdsOrder[] = data.orders || [];
+            // Tarik order "Siap Sajikan" dari DUA sumber:
+            //  - /api/orders        → KDS (makanan, dest=kds) status siap_sajikan
+            //  - /api/bar/orders     → Bar (minuman, dest=bar) status siap_sajikan
+            const [kdsRes, barRes] = await Promise.all([fetch('/api/orders'), fetch('/api/bar/orders')]);
 
-                // Filter orders that contain drink items (Minuman)
-                // Standard drinks are: Es Teh Manis, Es Jeruk Peras, Kopi Susu Aren, Kopi Susu, Kopi Hitam, Es Jeruk, Jus Alpukat
-                const drinkKeywords = ['teh', 'jeruk', 'kopi', 'jus', 'es', 'water', 'drink', 'minum'];
+            const collect = (res: Response): any[] => {
+                if (!res.ok) return [];
+                return res.json().then((data: any) => {
+                    const grouped = data.grouped ?? {};
+                    const flat: any[] = [];
+                    Object.values(grouped).forEach((list: any) => flat.push(...list));
+                    return flat;
+                });
+            };
 
-                const drinkOrders = activeKdsOrders
-                    .map((o) => {
-                        const drinkItems = o.items.filter((itemStr) => {
-                            if (itemStr.startsWith('+')) return false; // Chef notes
-                            const cleanItem = itemStr.toLowerCase();
-                            return drinkKeywords.some((keyword) => cleanItem.includes(keyword));
-                        });
+            const [kdsOrders, barOrdersData] = await Promise.all([collect(kdsRes), collect(barRes)]);
+            const merged = [...kdsOrders, ...barOrdersData];
 
-                        // Keep notes if there are drink items
-                        const notes = o.items.filter((itemStr) => itemStr.startsWith('+'));
+            // Hanya tampilkan yang status-nya "Siap Sajikan" (sudah masak, tinggal antar ke meja)
+            const readyToServe = merged.filter((o) => {
+                const s = (o.status || '').toString().toLowerCase();
+                return s.includes('siap sajikan') || s === 'siap_sajikan';
+            });
 
-                        return {
-                            ...o,
-                            items: [...drinkItems, ...notes],
-                        };
-                    })
-                    // Only show orders that have actual drink items in them
-                    .filter((o) => o.items.length > o.items.filter((i) => i.startsWith('+')).length);
+            setOrders(readyToServe as KdsOrder[]);
 
-                setOrders(drinkOrders);
-
-                // Play sound if new drink order entered the queue
-                if (drinkOrders.length > prevOrdersCount.current) {
-                    playNotificationSound();
-                }
-                prevOrdersCount.current = drinkOrders.length;
+            // Play sound if new order entered the queue
+            if (readyToServe.length > prevOrdersCount.current) {
+                playNotificationSound();
             }
+            prevOrdersCount.current = readyToServe.length;
         } catch (err) {
-            console.error('Gagal mengambil data orderan minuman', err);
+            console.error('Gagal mengambil data orderan', err);
         }
     };
 
@@ -172,18 +168,18 @@ function WaiterBarContent() {
         return () => clearInterval(interval);
     }, [isAudioEnabled]);
 
-    const handleServeDrinks = async (orderId: string) => {
+    const handleServePart = async (orderId: string, part: 'food' | 'drink') => {
         try {
-            const response = await fetch(`/api/orders/${orderId}/status`, {
+            const response = await fetch(`/api/orders/${orderId}/serve-part`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Selesai' }),
+                body: JSON.stringify({ part }),
             });
             if (response.ok) {
                 fetchOrders();
             }
         } catch (err) {
-            console.error('Failed to complete drink orders', err);
+            console.error('Failed to mark part served', err);
         }
     };
 
@@ -221,10 +217,10 @@ function WaiterBarContent() {
                             </div>
                             <div>
                                 <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider">
-                                    ORDERAN MINUMAN MASUK!
+                                    PESANAN SIAP SAJIKAN!
                                 </h3>
                                 <p className="text-xs text-slate-400 mt-0.5">
-                                    Segera siapkan minuman dan antarkan ke meja pelanggan.
+                                    Segera antarkan makanan & minuman ke meja pelanggan.
                                 </p>
                             </div>
                         </div>
@@ -239,8 +235,10 @@ function WaiterBarContent() {
                         <div className="size-20 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mb-4">
                             <GlassWaterIcon className="size-10 text-slate-600" />
                         </div>
-                        <p className="text-base font-bold text-slate-400">Antrean Minuman Kosong</p>
-                        <p className="text-xs text-slate-500 mt-1">Belum ada orderan minuman masuk dari pelanggan.</p>
+                        <p className="text-base font-bold text-slate-400">Antrean Kosong</p>
+                        <p className="text-xs text-slate-500 mt-1">
+                            Belum ada pesanan yang siap sajikan dari dapur/bar.
+                        </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-start font-mono">
@@ -277,12 +275,45 @@ function WaiterBarContent() {
                                     })}
                                 </div>
 
-                                <button
-                                    onClick={() => handleServeDrinks(o.id)}
-                                    className="mt-6 w-full rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 py-4 text-xl font-bold text-amber-200 transition-colors flex items-center justify-center gap-2 active:scale-95 duration-200"
-                                >
-                                    <CheckCheckIcon className="size-5" /> SAJIKAN MINUMAN
-                                </button>
+                                {o.status &&
+                                (o.status.toLowerCase().includes('siap sajikan') || o.status === 'siap_sajikan') ? (
+                                    <div className="mt-6 space-y-3">
+                                        {o.has_drink && (
+                                            <button
+                                                onClick={() => handleServePart(o.id, 'drink')}
+                                                disabled={!!o.drink_served_at}
+                                                className={
+                                                    o.drink_served_at
+                                                        ? 'w-full rounded-xl bg-emerald-500/15 border border-emerald-500/30 py-4 text-xl font-bold text-emerald-300 flex items-center justify-center gap-2'
+                                                        : 'w-full rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 py-4 text-xl font-bold text-amber-200 transition-colors flex items-center justify-center gap-2 active:scale-95 duration-200 animate-pulse'
+                                                }
+                                            >
+                                                <GlassWaterIcon className="size-5" />
+                                                {o.drink_served_at
+                                                    ? 'MINUMAN SUDAH DISAJIKAN'
+                                                    : 'SUDAH SAJIKAN MINUMAN'}
+                                            </button>
+                                        )}
+                                        {o.has_food && (
+                                            <button
+                                                onClick={() => handleServePart(o.id, 'food')}
+                                                disabled={!!o.food_served_at}
+                                                className={
+                                                    o.food_served_at
+                                                        ? 'w-full rounded-xl bg-emerald-500/15 border border-emerald-500/30 py-4 text-xl font-bold text-emerald-300 flex items-center justify-center gap-2'
+                                                        : 'w-full rounded-xl bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 py-4 text-xl font-bold text-orange-200 transition-colors flex items-center justify-center gap-2 active:scale-95 duration-200'
+                                                }
+                                            >
+                                                <UtensilsIcon className="size-5" />
+                                                {o.food_served_at ? 'MAKANAN SUDAH DISAJIKAN' : 'SUDAH SAJIKAN MAKANAN'}
+                                            </button>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="mt-6 w-full rounded-xl bg-white/5 border border-white/10 py-4 text-center text-lg font-semibold text-slate-400">
+                                        Sedang Diproses di Dapur
+                                    </div>
+                                )}
                             </Glass>
                         ))}
                     </div>

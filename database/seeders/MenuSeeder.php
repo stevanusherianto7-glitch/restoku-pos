@@ -79,12 +79,17 @@ class MenuSeeder extends Seeder
             ->where('is_active', 1)
             ->get();
 
-        // Kategori per-tenant.
+        // Kategori per-tenant. type: Makanan/Camilan = food, Minuman = beverage.
+        $catDefs = [
+            'Makanan' => ['order' => 1, 'type' => MenuCategory::TYPE_FOOD],
+            'Minuman' => ['order' => 2, 'type' => MenuCategory::TYPE_BEVERAGE],
+            'Camilan' => ['order' => 3, 'type' => MenuCategory::TYPE_FOOD],
+        ];
         $cats = [];
-        foreach (['Makanan' => 1, 'Minuman' => 2, 'Camilan' => 3] as $name => $order) {
+        foreach ($catDefs as $name => $def) {
             $cats[$name] = MenuCategory::firstOrCreate(
                 ['tenant_id' => $tenant->id, 'name' => $name],
-                ['sort_order' => $order]
+                ['sort_order' => $def['order'], 'type' => $def['type']]
             )->id;
         }
 

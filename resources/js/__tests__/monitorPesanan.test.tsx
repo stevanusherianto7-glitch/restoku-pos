@@ -17,21 +17,25 @@ const setAuth = (role: string) => {
     mockUsePage.mockImplementation(() => ({ props: { outlet: { name: 'Cabang A' }, auth: { user: { role } } } }));
 };
 
-// fetch mock cerdas: MainLayout fetch /api/reservations (butuh array .filter); Page fetch /api/orders (grouped)
-const makeFetch = (ordersGrouped: any) => {
+// fetch mock cerdas: MainLayout fetch /api/reservations (butuh array .filter);
+// Page fetch /api/orders/payment-queue (orders: [...] siap_bayar)
+const makeFetch = (ordersList: any) => {
     return vi.fn((input: any) => {
         const url = String(input);
         if (url.includes('/api/reservations')) return Promise.resolve({ ok: true, json: async () => [] });
-        if (url.includes('/api/orders'))
-            return Promise.resolve({ ok: true, json: async () => ({ grouped: ordersGrouped }) });
+        if (url.includes('/api/orders/payment-queue'))
+            return Promise.resolve({
+                ok: true,
+                json: async () => ({ grouped: { 'Siap Bayar': ordersList }, orders: ordersList }),
+            });
         return Promise.resolve({ ok: true, json: async () => ({}) });
     });
 };
 
-const sampleGrouped = {
-    dine_in: [{ id: 'ORD-1', table: 'A1', status: 'Baru', tone: 'amber', time: 3, items: ['Nasi Goreng'] }],
-    take_away: [{ id: 'ORD-2', table: 'TakeAway #1', status: 'Baru', tone: 'emerald', time: 1, items: ['Es Teh'] }],
-};
+const sampleOrders = [
+    { id: 'ORD-1', table: 'A1', status: 'Siap Bayar', tone: 'emerald', time: 3, items: ['Nasi Goreng'] },
+    { id: 'ORD-2', table: 'TakeAway #1', status: 'Siap Bayar', tone: 'emerald', time: 1, items: ['Es Teh'] },
+];
 
 beforeEach(() => {
     localStorage.clear();
@@ -41,14 +45,14 @@ beforeEach(() => {
 
 describe('MonitorPesanan/Index', () => {
     it('renders orders from grouped API', async () => {
-        vi.stubGlobal('fetch', makeFetch(sampleGrouped));
+        vi.stubGlobal('fetch', makeFetch(sampleOrders));
         render(<MonitorPesanan />);
         await waitFor(() => expect(screen.getByText('ORD-1')).toBeInTheDocument());
         expect(screen.getByText('ORD-2')).toBeInTheDocument();
     });
 
     it('filters dine_in only', async () => {
-        vi.stubGlobal('fetch', makeFetch(sampleGrouped));
+        vi.stubGlobal('fetch', makeFetch(sampleOrders));
         render(<MonitorPesanan />);
         await waitFor(() => expect(screen.getByText('ORD-1')).toBeInTheDocument());
         fireEvent.click(screen.getAllByRole('button', { name: /Makan Di Sini \(Dine In\)/ })[0]);
@@ -57,13 +61,13 @@ describe('MonitorPesanan/Index', () => {
     });
 
     it('shows empty state when no orders', async () => {
-        vi.stubGlobal('fetch', makeFetch({}));
+        vi.stubGlobal('fetch', makeFetch([]));
         render(<MonitorPesanan />);
         await waitFor(() => expect(screen.getByText('Belum Ada Pesanan Masuk')).toBeInTheDocument());
     });
 
     it('refreshes on button click', async () => {
-        const fetchMock = makeFetch(sampleGrouped);
+        const fetchMock = makeFetch(sampleOrders);
         vi.stubGlobal('fetch', fetchMock);
         render(<MonitorPesanan />);
         await waitFor(() => expect(screen.getByText('ORD-1')).toBeInTheDocument());

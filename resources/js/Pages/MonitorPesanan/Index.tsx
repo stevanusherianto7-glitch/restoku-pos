@@ -29,12 +29,12 @@ export default function MonitorPesanan() {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch('/api/orders');
+            const response = await fetch('/api/orders/payment-queue');
             if (response.ok) {
                 const data = await response.json();
-                // Flatten the grouped orders back into a flat array
-                const flatOrders: Order[] = [];
-                if (data.grouped) {
+                // payment-queue mengembalikan { grouped: { 'Siap Bayar': [...] }, orders: [...] }
+                const flatOrders: Order[] = data.orders ?? [];
+                if (flatOrders.length === 0 && data.grouped) {
                     Object.values(data.grouped).forEach((groupList: any) => {
                         flatOrders.push(...groupList);
                     });
@@ -69,8 +69,8 @@ export default function MonitorPesanan() {
         <MainLayout>
             <Head title="Monitor Pesanan - Kasir" />
             <Screen
-                title="Monitor Pesanan Masuk (QR)"
-                description="Pantau pesanan digital mandiri oleh tamu dari meja (Dine In) maupun Take Away."
+                title="Antrean Pembayaran Kasir"
+                description="Pesanan yang sudah disajikan waiter ke meja (siap bayar). Akan tetap di layar ini sampai kasir memproses pembayaran."
                 action={
                     <div className="flex items-center gap-3">
                         <Link

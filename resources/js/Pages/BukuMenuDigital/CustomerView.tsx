@@ -104,7 +104,13 @@ const FALLBACK_ITEMS: MenuItem[] = [
 ];
 
 export default function CustomerView() {
-    const { tenantName, renderLogo, tenantLayout: lsTenantLayout, screenMode: lsScreenMode } = useTenantSettings();
+    const {
+        tenantName,
+        renderLogo,
+        tenantImage,
+        tenantLayout: lsTenantLayout,
+        screenMode: lsScreenMode,
+    } = useTenantSettings();
     // SERVER-DRIVEN tema: prop dari getPublicMenu (outlet_settings.screen_mode).
     // localStorage (useTenantSettings) hanya fallback kalau prop kosong/offline.
     const page = usePage();
@@ -127,13 +133,13 @@ export default function CustomerView() {
     const [activeCategory, setActiveCategory] = useState('Makanan');
     const [searchQuery, setSearchQuery] = useState('');
     const [cart, setCart] = useState<Record<number, number>>({});
-    const [isWaOptIn, setIsWaOptIn] = useState(true);
     const [detailItem, setDetailItem] = useState<MenuItem | null>(null);
     const [orderSuccess, setOrderSuccess] = useState(false);
     const [activeTab, setActiveTab] = useState<'menu' | 'cart' | 'reservasi' | 'galeri'>('menu');
 
     // Fase 1: menu nyata dari API (graceful fallback ke FALLBACK_ITEMS saat kosong/belum load)
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [outletId, setOutletId] = useState<number | null>(null);
     const [, setMenuLoading] = useState(true);
 
     useEffect(() => {
@@ -150,6 +156,9 @@ export default function CustomerView() {
                 }));
                 if (data?.outlet?.name) {
                     setOutletName(data.outlet.name);
+                }
+                if (data?.outlet?.id) {
+                    setOutletId(Number(data.outlet.id));
                 }
                 if (data?.outlet) {
                     setOutletGeo({
@@ -198,6 +207,11 @@ export default function CustomerView() {
     const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
     const [orderStatus, setOrderStatus] = useState<string | null>(null);
     const [orderTone, setOrderTone] = useState<string>('amber');
+    // FNB-001: progres penyajian per kategori (1 order utuh → 2 mini-tracker).
+    const [orderHasFood, setOrderHasFood] = useState<boolean>(false);
+    const [orderHasDrink, setOrderHasDrink] = useState<boolean>(false);
+    const [orderFoodServed, setOrderFoodServed] = useState<boolean>(false);
+    const [orderDrinkServed, setOrderDrinkServed] = useState<boolean>(false);
 
     // ─── Screenshot clone flow (stub FE-first) ───────────────────────────
     // Stage: landind modal → welcome/meja → cara-memasan → app (tabs).
@@ -215,6 +229,7 @@ export default function CustomerView() {
         items: string;
         total: number;
         step: number; // 1=Konfirmasi 2=Dimasak 3=Siap 4=Disajikan
+        destination?: 'kds' | 'bar'; // rute: Dapur vs Bar
     };
     const [orders, setOrders] = useState<OrderStub[]>([
         {
@@ -225,6 +240,7 @@ export default function CustomerView() {
             items: 'Soto Ayam Semarang x1',
             total: 30800,
             step: 1,
+            destination: 'kds',
         },
         {
             id: 'ORD-MQZOAZPI-EBDG',
@@ -234,6 +250,7 @@ export default function CustomerView() {
             items: 'Soto Ayam Semarang x1',
             total: 28000,
             step: 3,
+            destination: 'bar',
         },
     ]);
 
@@ -524,10 +541,16 @@ export default function CustomerView() {
                     const data = await response.json();
                     setOrderStatus(data.status);
                     setOrderTone(data.tone);
+                    setOrderHasFood(!!data.has_food);
+                    setOrderHasDrink(!!data.has_drink);
+                    setOrderFoodServed(!!data.food_served_at);
+                    setOrderDrinkServed(!!data.drink_served_at);
                 } else if (response.status === 404) {
                     // Completed / Served!
                     setOrderStatus('Selesai');
                     setOrderTone('emerald');
+                    setOrderFoodServed(true);
+                    setOrderDrinkServed(true);
                 }
             } catch (err) {
                 console.error('Gagal memantau status pesanan', err);
@@ -579,17 +602,20 @@ export default function CustomerView() {
             alert('Silakan verifikasi kehadiran (GPS + PIN) terlebih dahulu sebelum mengirim pesanan.');
             return;
         }
-
-        // Generate formatted items list for KDS
-        const itemsList = Object.entries(cart).map(([idStr, qty]) => {
-            const item = menuItems.find((i) => i.id === parseInt(idStr));
-            return `${qty}x ${item?.name}`;
-        });
-
-        // Add Chef Notes to KDS items list as a sub-note
-        if (chefNotes.trim()) {
-            itemsList.push(`+ Catatan: ${chefNotes.trim()}`);
+        if (!outletId) {
+            alert('Data outlet belum siap. Muat ulang halaman lalu coba lagi.');
+            return;
         }
+
+        // Payload sesuai PublicOrderController::submitOrder — items terstruktur, bukan string.
+        // chefNotes (order-level) ditempel ke item pertama karena BE menyimpan notes per-item.
+        const cartEntries = Object.entries(cart).filter(([, qty]) => qty > 0);
+        const note = chefNotes.trim();
+        const items = cartEntries.map(([idStr, qty], idx) => ({
+            menu_item_id: parseInt(idStr),
+            quantity: qty,
+            notes: idx === 0 && note ? note : undefined,
+        }));
 
         try {
             const displayTable =
@@ -601,27 +627,35 @@ export default function CustomerView() {
 
             const response = await fetch('/api/orders', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
                 body: JSON.stringify({
+                    outlet_id: outletId,
                     table: displayTable,
-                    items: itemsList,
+                    items,
                     verify_token: verifyToken,
                 }),
             });
-            if (response.ok) {
-                const data = await response.json();
+            const data = await response.json().catch(() => null);
+            if (response.ok && data?.success) {
                 setActiveOrderId(data.order.id);
                 setOrderStatus(data.order.status);
-                setOrderTone(data.order.tone);
+                setOrderTone(data.order.tone ?? 'info');
                 setOrderSuccess(true);
-            } else if (response.status === 422) {
-                // Token expired / invalid → minta verify ulang
+            } else if (response.status === 422 && /verifikasi|token/i.test(data?.message ?? '')) {
+                // HANYA token verifikasi yang bermasalah → minta verify ulang.
                 setGuestVerified(false);
                 setVerifyToken('');
                 alert('Verifikasi kehadiran kedaluwarsa. Silakan verifikasi ulang.');
+            } else {
+                alert(data?.message ?? 'Gagal mengirim pesanan. Coba lagi.');
             }
         } catch (err) {
             console.error('Gagal melakukan checkout pesanan', err);
+            alert('Gagal terhubung ke server. Coba lagi.');
         }
     };
     const handleReservationSubmit = async (e: React.FormEvent) => {
@@ -662,29 +696,19 @@ export default function CustomerView() {
         <div className={activeTheme.outer}>
             <Head title={`E-Menu - ${outletName}`} />
 
+            {/* Pulse animation untuk step progres status pesanan */}
+            <style>{`
+                @keyframes rsPulseRing{0%{box-shadow:0 0 0 0 rgba(255,91,53,.55)}70%{box-shadow:0 0 0 8px rgba(255,91,53,0)}100%{box-shadow:0 0 0 0 rgba(255,91,53,0)}}
+                @keyframes rsPulseDone{0%{box-shadow:0 0 0 0 rgba(15,138,77,.45)}70%{box-shadow:0 0 0 6px rgba(15,138,77,0)}100%{box-shadow:0 0 0 0 rgba(15,138,77,0)}}
+                .rs-step-on{animation:rsPulseRing 1.4s infinite}
+                .rs-step-done{animation:rsPulseDone 1.8s infinite}
+                @media (prefers-reduced-motion: reduce){.rs-step-on,.rs-step-done{animation:none}}
+            `}</style>
+
             {/* Dynamic Sticky Header Area */}
             <div
                 className={`${appStage === 'app' ? `sticky top-0 z-40 ${headerBg} ${headerBorder}` : 'fixed inset-x-0 top-0 -z-10 opacity-0 pointer-events-none'} flex flex-col shrink-0`}
             >
-                {/* Operating Hours Alert Banner */}
-                {!isOutletOpen && (
-                    <div className="bg-rose-500/20 border-b border-rose-500/30 px-4 py-3 flex items-center gap-3 text-rose-300">
-                        <Clock3Icon className="size-5 shrink-0 text-rose-400 animate-pulse" />
-                        <div className="text-xs">
-                            <p className="font-bold">Pemesanan Online Ditutup</p>
-                            <p className="text-[11px] opacity-90">
-                                {outletScheduleMsg || 'Restoran sedang di luar jam operasional.'}
-                            </p>
-                        </div>
-                    </div>
-                )}
-                {isOutletOpen && outletScheduleMsg && (
-                    <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-2 flex items-center gap-2 text-emerald-300 text-[11px]">
-                        <Clock3Icon className="size-3.5 shrink-0 text-emerald-400" />
-                        <span>{outletScheduleMsg}</span>
-                    </div>
-                )}
-
                 {/* Brand Info & Tabs */}
                 <header
                     className={`${activeTheme.header} !static !bg-transparent !border-b-0 !shadow-none !px-4 !py-3 !flex-col !items-stretch gap-3`}
@@ -815,17 +839,8 @@ export default function CustomerView() {
                     <div
                         className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
                     >
-                        <div>
-                            <p className={`text-[9px] font-bold tracking-[0.22em] ${modalStyle.accentText} uppercase`}>
-                                Sejak 2025 · Nusantara
-                            </p>
-                            <h2
-                                className={`font-serif text-2xl mt-2 leading-tight font-extrabold ${modalStyle.textTitle}`}
-                            >
-                                Cita rasa Jawa,
-                                <br />
-                                <span className={`italic ${modalStyle.accentText}`}>disajikan modern.</span>
-                            </h2>
+                        <div className="flex justify-center">
+                            <img src="/images/restoku_logo.png" alt="Restoku" className="h-9 w-auto select-none" />
                         </div>
                         <div className={`h-px ${modalStyle.divider} my-1`} />
                         <p className={`text-xs ${modalStyle.textDesc} leading-relaxed`}>
@@ -860,7 +875,7 @@ export default function CustomerView() {
                         >
                             Masuk ke Menu →
                         </button>
-                        <p className={`text-center text-[9px] ${modalStyle.textDesc}`}>© 2025 {outletName}</p>
+                        <p className={`text-center text-[9px] ${modalStyle.textDesc}`}>© 2025 Restoku App</p>
                     </div>
                 </div>
             )}
@@ -870,9 +885,32 @@ export default function CustomerView() {
                     <div
                         className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
                     >
+                        {/* IDENTITAS TENANT — hero prominent setelah landing (identitas aplikasi) */}
                         <div className="flex w-full items-center justify-between gap-3">
-                            <div className="grid size-12 place-items-center overflow-hidden rounded-full bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-md">
-                                {renderLogo('size-7 text-white')}
+                            <div className="flex items-center gap-3 min-w-0">
+                                {tenantImage ? (
+                                    <div className="size-14 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-md">
+                                        <img src={tenantImage} alt={outletName} className="size-full object-cover" />
+                                    </div>
+                                ) : (
+                                    <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-md">
+                                        <span className="text-lg font-black leading-none px-1 text-center">
+                                            {outletName.slice(0, 2).toUpperCase()}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="min-w-0">
+                                    <p
+                                        className={`text-[9px] font-bold tracking-[0.22em] uppercase ${modalStyle.accentText}`}
+                                    >
+                                        Selamat Datang di
+                                    </p>
+                                    <h2
+                                        className={`font-serif text-xl leading-tight font-extrabold ${modalStyle.textTitle} truncate`}
+                                    >
+                                        {outletName}
+                                    </h2>
+                                </div>
                             </div>
                             <img
                                 src="/images/halal-indonesia.svg"
@@ -880,15 +918,35 @@ export default function CustomerView() {
                                 className="h-10 w-auto shrink-0 select-none"
                             />
                         </div>
-                        <h2 className={`text-xl font-extrabold leading-tight ${modalStyle.textTitle}`}>
-                            Selamat Datang di
-                            <br />
-                            <span className={modalStyle.accentText}>{outletName}!</span>
-                        </h2>
                         <p className={`text-[11px] ${modalStyle.textDesc} leading-relaxed`}>
                             Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
                             MSG. Selamat menikmati!
                         </p>
+                        {/* Notice operasional: Buka/Tutup (dipindah dari header menu ke welcome modal) */}
+                        {!isOutletOpen ? (
+                            <div
+                                className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center gap-2 border border-rose-500/30`}
+                            >
+                                <Clock3Icon className="size-4 shrink-0 text-rose-400" />
+                                <div className="text-left">
+                                    <p className={`text-[11px] font-extrabold ${modalStyle.accentText}`}>
+                                        Pemesanan Online Ditutup
+                                    </p>
+                                    <p className={`text-[10px] ${modalStyle.textDesc}`}>
+                                        {outletScheduleMsg || 'Restoran sedang di luar jam operasional.'}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            outletScheduleMsg && (
+                                <div
+                                    className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center gap-2 border border-emerald-500/20`}
+                                >
+                                    <Clock3Icon className="size-4 shrink-0 text-emerald-400" />
+                                    <span className={`text-[10px] ${modalStyle.textDesc}`}>{outletScheduleMsg}</span>
+                                </div>
+                            )
+                        )}
                         <div
                             className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center justify-between text-left border`}
                         >
@@ -912,7 +970,7 @@ export default function CustomerView() {
                             >
                                 PILIH TIPE PESANAN
                             </p>
-                            <div className="flex gap-3">
+                            <div className={`flex gap-3`}>
                                 <button
                                     onClick={() => setOrderType('dine_in')}
                                     className={`flex-1 rounded-2xl py-3 text-white font-extrabold border-[3px] transition-all flex flex-col items-center justify-center ${
@@ -1515,38 +1573,50 @@ export default function CustomerView() {
                     </div>
                     {orders.map((o) => {
                         const steps = ['Konfirmasi', 'Dimasak', 'Siap', 'Disajikan'];
+                        const isFood = o.destination !== 'bar';
+                        const routeLabel = isFood ? '🍳 Rute: Dapur (KDS)' : '🥤 Rute: Bar (Waiter)';
+                        const routeCls = isFood ? 'bg-[#FCE3D6] text-[#C9431F]' : 'bg-[#EAF2FB] text-[#1666C9]';
                         return (
-                            <div key={o.id} className="bg-white border border-[#EFE2D4] rounded-2xl p-3.5 shadow-sm">
+                            <div key={o.id} className="bg-white border border-[#EFE2D4] rounded-2xl p-4 shadow-sm">
                                 <div className="flex items-center justify-between">
                                     <p
-                                        className={`text-[12.5px] font-extrabold ${o.status === 'ready' ? 'text-[#C9431F]' : 'text-[#A8521F]'}`}
+                                        className={`text-[13px] font-extrabold flex items-center gap-1.5 ${o.status === 'ready' ? 'text-[#0F8A4D]' : 'text-[#C9431F]'}`}
                                     >
-                                        {o.status === 'ready' ? '🍴 ' : '⟳ '} {o.label}
+                                        {o.status === 'ready' ? '✓ ' : '🍴 '} {o.label}
                                     </p>
                                     <span className="text-[10px] font-bold text-[#9B8D7E]">{o.id}</span>
                                 </div>
                                 <p className="text-[10px] font-bold text-[#9B8D7E] mt-0.5">
                                     DURASI PROSES: {o.duration}
                                 </p>
-                                <div className="flex items-center gap-1 mt-2.5">
+                                {/* 4-step tracker dengan pulse di step aktif/selesai */}
+                                <div className="flex items-center justify-between mt-3 px-1">
                                     {steps.map((s, i) => {
                                         const n = i + 1;
-                                        const cls =
-                                            n < o.step
-                                                ? 'bg-[#0F8A4D] text-white'
-                                                : n === o.step
-                                                  ? 'bg-[#FF5B35] text-white'
+                                        const state = n < o.step ? 'done' : n === o.step ? 'on' : 'off';
+                                        const bubCls =
+                                            state === 'done'
+                                                ? 'bg-[#0F8A4D] text-white rs-step-done'
+                                                : state === 'on'
+                                                  ? 'bg-[#FF5B35] text-white rs-step-on'
                                                   : 'bg-[#EFE7DD] text-[#9B8D7E]';
                                         return (
-                                            <div key={s} className="flex items-center">
-                                                <div
-                                                    className={`size-6 rounded-full ${cls} grid place-items-center text-[11px] font-extrabold`}
-                                                >
-                                                    {n}
+                                            <React.Fragment key={s}>
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <div
+                                                        className={`size-7 rounded-full ${bubCls} grid place-items-center text-[11px] font-extrabold`}
+                                                    >
+                                                        {n}
+                                                    </div>
+                                                    <span
+                                                        className={`text-[9px] font-extrabold tracking-wide ${state === 'done' ? 'text-[#0F8A4D]' : state === 'on' ? 'text-[#FF5B35]' : 'text-[#9B8D7E]'}`}
+                                                    >
+                                                        {s.toUpperCase()}
+                                                    </span>
                                                 </div>
                                                 {n < 4 && (
                                                     <div
-                                                        className="h-0.5 w-3.5"
+                                                        className="h-0.5 flex-1 mx-1 -mt-4"
                                                         style={{
                                                             background:
                                                                 n < o.step
@@ -1557,53 +1627,53 @@ export default function CustomerView() {
                                                         }}
                                                     />
                                                 )}
-                                            </div>
+                                            </React.Fragment>
                                         );
                                     })}
                                 </div>
-                                <div className="flex justify-between text-[10px] font-bold text-[#9B8D7E] mt-1">
-                                    {steps.map((s) => (
-                                        <span key={s}>{s}</span>
-                                    ))}
-                                </div>
-                                <div className="flex items-end justify-between mt-2 pt-2 border-t border-[#EFE2D4]">
-                                    <div>
-                                        <p className="text-[13px] font-extrabold text-[#1A1410]">{o.items}</p>
-                                        <p className="text-[11px] text-[#7A6F63]">{formatRupiah(o.total)}</p>
-                                    </div>
+                                <div className="flex items-end justify-between mt-3 pt-3 border-t border-[#EFE2D4]">
+                                    <p className="text-[13px] font-extrabold text-[#1A1410]">{o.items}</p>
                                     <span className="text-[14px] font-extrabold text-[#0F8A4D]">
                                         {formatRupiah(o.total)}
                                     </span>
                                 </div>
+                                {o.id === activeOrderId && (orderHasFood || orderHasDrink) && (
+                                    <div className="mt-3 pt-3 border-t border-[#EFE2D4] space-y-2">
+                                        {orderHasDrink && (
+                                            <div className="flex items-center gap-2 text-[11px] font-bold">
+                                                <span
+                                                    className={`size-2 rounded-full ${orderDrinkServed ? 'bg-[#0F8A4D]' : 'bg-[#FF5B35] animate-pulse'}`}
+                                                />
+                                                <span
+                                                    className={orderDrinkServed ? 'text-[#0F8A4D]' : 'text-[#C9431F]'}
+                                                >
+                                                    🥤 Minuman{' '}
+                                                    {orderDrinkServed ? 'Sudah Disajikan' : 'Disajikan ke Meja…'}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {orderHasFood && (
+                                            <div className="flex items-center gap-2 text-[11px] font-bold">
+                                                <span
+                                                    className={`size-2 rounded-full ${orderFoodServed ? 'bg-[#0F8A4D]' : 'bg-[#FF5B35]'}`}
+                                                />
+                                                <span className={orderFoodServed ? 'text-[#0F8A4D]' : 'text-[#C9431F]'}>
+                                                    🍳 Makanan{' '}
+                                                    {orderFoodServed ? 'Sudah Disajikan' : 'Disajikan ke Meja…'}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                <span
+                                    className={`inline-flex items-center gap-1.5 mt-3 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg ${routeCls}`}
+                                >
+                                    {routeLabel}
+                                </span>
                             </div>
                         );
                     })}
                 </main>
-            )}
-
-            {/* WhatsApp receipt Delivery Card */}
-            {cartTotalItems > 0 && !orderSuccess && (
-                <div className="absolute bottom-20 inset-x-4 z-40 bg-slate-900/60 backdrop-blur-md p-4 rounded-3xl border border-white/10 flex items-center justify-between shadow-2xl">
-                    <div className="flex items-center gap-3">
-                        <div className="size-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                            <MessageCircleIcon className="size-4.5 text-emerald-400" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-white">Kirim struk ke WA?</p>
-                            <p className="text-[9px] text-slate-400 leading-tight">
-                                Dapatkan updates & status pesanan realtime.
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setIsWaOptIn(!isWaOptIn)}
-                        className={`w-10 h-6 rounded-full transition-all duration-300 p-0.5 ${
-                            isWaOptIn ? 'bg-emerald-500 flex justify-end' : 'bg-white/10 flex justify-start'
-                        }`}
-                    >
-                        <div className="size-5 bg-white rounded-full shadow-sm" />
-                    </button>
-                </div>
             )}
 
             {/* Floating Checkout Button */}

@@ -46,19 +46,31 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
     const [gpsStatus, setGpsStatus] = useState<'pending' | 'ok' | 'fail'>('pending');
     const [distance, setDistance] = useState<number | null>(null);
     const timer = useRef<number | null>(null);
+    const busyRef = useRef(false); // hard lock anti double-submit
+    const pollStarted = useRef(false); // pastikan hanya 1 poll interval
 
-    // Restore sesi (tamu tidak verify tiap render)
+    // Restore sesi (tamu tidak verify tiap render).
+    // Expiry sesi ditentukan oleh table_session (bukan timer wall-clock):
+    // saat tamu BARU memindai QR meja yang SAMA, token meja berubah -> sesi ini invalid.
     useEffect(() => {
+        let pollTimer: number | null = null;
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 const p = JSON.parse(saved);
-                if (p.slug === slug && p.table === tableLabel && p.exp > Date.now()) {
-                    setStatus('ok');
-                    onVerified(p.token);
-                    return;
+                if (p.slug === slug && p.table === tableLabel) {
+                    // Safety net: token tetap punya exp 6 jam (anti stuck di DB lama).
+                    if (p.exp && p.exp <= Date.now()) {
+                        localStorage.removeItem(STORAGE_KEY);
+                    } else {
+                        setStatus('ok');
+                        onVerified(p.token);
+                        startSessionPoll(p.table_session);
+                        return;
+                    }
+                } else {
+                    localStorage.removeItem(STORAGE_KEY);
                 }
-                localStorage.removeItem(STORAGE_KEY);
             }
         } catch {
             /* ignore */
@@ -78,8 +90,47 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
         }
         return () => {
             if (timer.current) window.clearTimeout(timer.current);
+            if (pollTimer) window.clearInterval(pollTimer);
         };
     }, [slug, tableLabel]);
+
+    // Poll session token meja: kalau berubah (tamu baru scan), sesi ini kedaluwarsa.
+    // Cross-check ke localStorage LIVE (bukan closure stale) agar race double-verify
+    // (2 token berbeda dari 2 klik cepat) tidak memicu false-invalidate.
+    function startSessionPoll(mySession: string | undefined) {
+        if (!mySession || pollStarted.current) return;
+        pollStarted.current = true;
+        const poll = async () => {
+            try {
+                const res = await fetch(
+                    `/api/guest/table-session?slug=${encodeURIComponent(slug)}&table=${encodeURIComponent(tableLabel ?? 'A1')}`,
+                    { headers: { Accept: 'application/json' } },
+                );
+                if (!res.ok) return;
+                const d = await res.json();
+                const cur = (() => {
+                    try {
+                        return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+                    } catch {
+                        return null;
+                    }
+                })();
+                // Invalidate HANYA kalau DB punya token BARU (non-null) yang beda dari sesi tersimpan.
+                // Kalau DB null (meja belum di-scan ulang / reset), anggap sesi masih valid —
+                // cegah false-invalidate saat DB di-reset tapi localStorage tamu masih ada.
+                if (d.table_session && cur && d.table_session !== cur.table_session) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    setStatus('fail');
+                    setError('Verifikasi kehadiran kedaluwarsa (meja diakses tamu lain). Silakan verifikasi ulang.');
+                    if (pollTimer) window.clearInterval(pollTimer);
+                }
+            } catch {
+                /* biarkan poll lanjut */
+            }
+        };
+        poll();
+        pollTimer = window.setInterval(poll, 10_000);
+    }
 
     function evaluateGps(lat: number, lng: number, accuracy: number) {
         if (!geo || geo.latitude === null || geo.longitude === null) {
@@ -122,6 +173,8 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
 
     async function handleVerify() {
         setError('');
+        if (busyRef.current) return; // anti double-submit race
+        busyRef.current = true;
         if (!tablePin || tablePin.length !== 4 || !dailyPin || dailyPin.length !== 4) {
             setError('Masukkan PIN Meja dan PIN Harian (masing-masing 4 digit).');
             return;
@@ -150,10 +203,17 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
             if (data.ok && data.token) {
                 localStorage.setItem(
                     STORAGE_KEY,
-                    JSON.stringify({ slug, table: tableLabel, token: data.token, exp: Date.now() + 15 * 60 * 1000 }),
+                    JSON.stringify({
+                        slug,
+                        table: tableLabel,
+                        token: data.token,
+                        table_session: data.table_session,
+                        exp: Date.now() + 6 * 60 * 60 * 1000, // safety net 6 jam
+                    }),
                 );
                 setStatus('ok');
                 onVerified(data.token);
+                startSessionPoll(data.table_session);
             } else {
                 setStatus('fail');
                 const reason = data.reason;
@@ -174,6 +234,7 @@ export function GuestVerifyGate({ slug, tableLabel, geo, onVerified, verifyUrl =
             setError('Gagal terhubung ke server. Coba lagi.');
         } finally {
             setBusy(false);
+            busyRef.current = false;
         }
     }
 

@@ -65,6 +65,7 @@ Route::get('/api/outlet-operating-hours', [PublicOrderController::class, 'getOut
 Route::post('/api/guest/verify', [GuestVerifyController::class, 'verify'])->middleware('throttle:30,1');
 // Publik: PIN harian restoran untuk tamu (verifikasi kehadiran di kedai, by slug)
 Route::get('/api/guest/daily-pin', [GuestVerifyController::class, 'dailyPin']);
+Route::get('/api/guest/table-session', [GuestVerifyController::class, 'tableSession']);
 
 /*
 |--------------------------------------------------------------------------
@@ -142,9 +143,13 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/waiter-bar', fn () => Inertia::render('WaiterBar/Index'));
     Route::get('/monitor-reservasi', fn () => Inertia::render('MonitorReservasi/Index'));
     Route::get('/diskon-pajak', fn () => Inertia::render('DiskonPajak/Index'));
-    // Q11: endpoint polling ringan KDS (filter outlet_id) — FE panggil tiap N detik.
+    // Q11: daftar orders KDS (filter outlet_id) — FE panggil tiap N detik.
     // (Pengganti SSE/WebSocket: tanpa upgrade infra, scale-safe via outlet_id.)
     Route::get('/api/kds/stream', [KdsController::class, 'stream']);
+    // Layar Bar (minuman): order destination=bar sedang diproses.
+    Route::get('/api/bar/orders', [KdsController::class, 'barOrders']);
+    // Antrean pembayaran kasir: order sudah disajikan (siap_bayar).
+    Route::get('/api/orders/payment-queue', [KdsController::class, 'paymentQueue']);
 
     Route::get('/qrcode-meja', fn () => Inertia::render('QRCodeMeja/Index'));
 
@@ -217,6 +222,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // ── KDS API ─────────────────────────────────────────────────────────────
     Route::get('/api/orders', [KdsController::class, 'getKdsOrders']);
     Route::put('/api/orders/{id}/status', [KdsController::class, 'updateOrderStatus']);
+    // FNB-001: waiter tandai 1 bagian (food/drink) sudah disajikan.
+    Route::put('/api/orders/{id}/serve-part', [KdsController::class, 'servePart']);
 
     // ── Cashier API ────────────────────────────────────────────────────────
     Route::get('/api/cashier-queue', [CashierController::class, 'getCashierQueue']);

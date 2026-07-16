@@ -39,12 +39,12 @@ class FeatureRegistry
      */
     public const FEATURE_LOCKS = [
         // ── Enterprise features (exclusive) ───────────────────────────────
-        'kds' => 'enterprise',
         'white_label' => 'enterprise',
         'priority_support' => 'enterprise',
         'unlimited_outlet' => 'enterprise',
 
         // ── Pro features ──────────────────────────────────────────────────────
+        'kds' => 'pro',
         'multi_outlet' => 'pro',
         'wa_notif' => 'pro',
         'laporan_excel' => 'pro',
@@ -83,7 +83,7 @@ class FeatureRegistry
             'multi_outlet', 'catatan_pesanan', 'laporan_excel',
             'perbandingan_outlet', 'arus_kas', 'staf_shift',
             'stok_opname', 'pembelian_vendor', 'dashboard_inventory',
-            'inventory', 'cashier_session', 'refund_void',
+            'inventory', 'cashier_session', 'refund_void', 'kds',
         ],
         'enterprise' => [
             // Semua fitur pro
@@ -95,9 +95,9 @@ class FeatureRegistry
             'multi_outlet', 'catatan_pesanan', 'laporan_excel',
             'perbandingan_outlet', 'arus_kas', 'staf_shift',
             'stok_opname', 'pembelian_vendor', 'dashboard_inventory',
-            'inventory', 'cashier_session', 'refund_void',
+            'inventory', 'cashier_session', 'refund_void', 'kds',
             // Enterprise-exclusive
-            'unlimited_outlet', 'kds', 'white_label', 'priority_support',
+            'unlimited_outlet', 'white_label', 'priority_support',
         ],
     ];
 
