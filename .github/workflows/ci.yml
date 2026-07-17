@@ -127,7 +127,7 @@ jobs:
           ini-values: "pcov.directory=app"
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: composer-${{ hashFiles('composer.lock') }}
@@ -200,7 +200,7 @@ jobs:
           coverage: none
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: composer-${{ hashFiles('composer.lock') }}
