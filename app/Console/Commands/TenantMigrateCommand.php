@@ -7,6 +7,7 @@ use App\Services\TenantConnection;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Fase 2 — Jalankan migrasi ke tiap schema tenant.
@@ -55,14 +56,20 @@ class TenantMigrateCommand extends Command
                 continue;
             }
 
-            // Daftarkan koneksi tenant_{id}
+            // Daftarkan koneksi tenant_{id} (clone dari tenant_template)
             $conn->resolveForTenant($tenant->id);
+
+            // Buat schema fisik kalau belum ada (Postgres).
+            // Di prod ini WAJIB — migrate akan gagal kalau schema tidak ada.
+            DB::connection('tenant_template')->statement(
+                "CREATE SCHEMA IF NOT EXISTS \"{$schema}\""
+            );
 
             $this->info("Migrating schema: {$schema}");
             Artisan::call('migrate', [
                 '--database' => $schema,
                 '--path' => 'database/migrations/tenant',
-                '--force' => $this->option('force') ?? true,
+                '--force' => true,
             ]);
             $this->line(Artisan::output());
         }
