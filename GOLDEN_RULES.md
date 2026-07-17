@@ -1,7 +1,34 @@
-# Restoku — Golden Rules (DO'S & DONT'S)
+# Restoku — GOLDEN RULES v3.0
+### *Aturan besi tim Restoku. Dibaca SEBELUM bilang "done" / "selesai" / "verified".*
 
-> Aturan besi tim Restoku. Digunakan sebagai gate SEBELUM bilang "done"/"selesai"/"verified".
-> Setiap pelanggaran = bug yang lolos ke production (terbukti di sesi 2026-07-15, diperkuat 2026-07-17).
+> Setiap aturan di sini lahir dari bug nyata yang lolos ke production atau hampir lolos.
+> Pelanggaran = bug production. Bukan sekedar rekomendasi — ini **WAJIB**.
+> *Dokumen ini hidup. Setiap pelanggaran baru = tambah 1 baris.*
+
+**Versi:** 3.0 | **Terakhir diperbarui:** 2026-07-17
+**Sumber:** Sesi 2026-07-15 + 2026-07-17 + Audit Menyeluruh 2026-07-17
+
+---
+
+## 📜 DAFTAR ISI
+
+1. [THE #1 RULE — Jangan Klaim Kosong](#-the-1-rule--jangan-klaim-kosong-buktikan)
+2. [Render di Browser Sungguhan](#-render-di-browser-sungguhan-bukan-cuma-build)
+3. [Verifikasi Lintas Origin](#-verifikasi-lintas-origin-untuk-public-ui)
+4. [Server-Driven State untuk Public UI](#-server-driven-state-untuk-public-ui)
+5. [Import Helper Sebelum Pakai](#-import-helper-sebelum-pakai)
+6. [Multi-Tenancy — TenantScope Wajib](#-multi-tenancy--tenantscope-wajib) ← **BARU**
+7. [Code Quality Frontend](#-code-quality-frontend) ← **BARU**
+8. [Data Estimasi Wajib Diberi Label](#-data-estimasi-wajib-diberi-label) ← **BARU**
+9. [Inertia Fetch — Header + Array Guard](#-inertia-fetch--header--array-guard)
+10. [Verifikasi Shape API](#-verifikasi-shape-api-via-session-segar)
+11. [API Contract & Response Format](#-api-contract--response-format) ← **BARU**
+12. [Single Responsibility — Jangan God Files](#-single-responsibility--jangan-god-files) ← **BARU**
+13. [Keamanan & Secrets](#-keamanan--secrets)
+14. [MENU_BASE_URL & Deployment](#-menu_base_url--deployment)
+15. [Test Coverage](#-test-coverage--bukan-angka-kosong)
+16. [Checklist Sebelum Done](#-checklist-sebelum-done-fe--public-ui)
+17. [Hutang Teknis Aktif](#-hutang-teknis-aktif) ← **BARU**
 
 ---
 
@@ -15,10 +42,11 @@ adalah pelanggaran fatal. Bukti = output tool sungguhan (curl/Playwright/test), 
 
 | DONT'T ❌ | DO ✅ |
 |---|---|
-| Bilang "build hijau, jadi beres" | Jalankan verifikasi, tempel output asli |
+| Bilang "done" tanpa artefak | Jalankan verifikasi, tempel output asli |
 | Bilang "tema sudah sama di HP & desktop" tanpa render | Render BENAR-BENAR di kedua origin, screenshot + console capture |
 | Bilang "0 error" tanpa jalanin browser | Capture `pageerror` + `console.error` via Playwright |
 | Percaya stale flag / cache lama | Re-run command di turn ini, buat artifact segar |
+| Klaim angka laba/rugi akurat tanpa data nyata | Sertakan flag `is_estimate` di response + tampilkan badge di UI |
 
 ---
 
@@ -101,26 +129,93 @@ if (data?.screen_mode) {
 | Pakai `usePage()` tanpa `import { usePage } from '@inertiajs/react'` | Import DULU, lalu pakai |
 | Pakai `<Pencil>` padahal nama `PencilIcon` | Cek `Components/icons.tsx`, import nama persis |
 | Percaya build hijau | Render browser = ketahuan ReferenceError |
+| Import dari `Components/Shared` untuk kode baru | Import langsung dari `Components/shared/Button`, `lib/formatters`, dsb. |
+
+> **Catatan:** `Components/Shared.tsx` adalah **compatibility shim** yang akan dihapus. Kode baru WAJIB import dari path baru.
 
 ---
 
-## 🟢 DO — TEST COVERAGE = BUKAN ANGKA KOSONG
+## 🔵 DO — MULTI-TENANCY: TENANTSCOPE WAJIB
 
-| DONT'T ❌ | DO ✅ |
+Restoku adalah **shared-database, multi-tenant**. Satu bug isolasi = data tenant lain bocor = GDPR violation.
+
+| DON'T ❌ | DO ✅ |
 |---|---|
-| Klaim "100% pass" tanpa `--coverage` | Jalanin `vitest run --coverage`, laporkan ANGKA riil |
-| Exclude file dari threshold lalu hitung ke % | Sebut eksplisit file yang di-exclude |
-| Round-up / sembunyi branch gagal | Sebut line/branch yang belum ter-cover |
+| Query langsung `Model::where(...)` tanpa scope | Selalu via model yang punya `TenantScope` global scope |
+| Pakai `Auth::user()->tenant_id` tersebar di controller | Inject `TenantContext` + pakai `$ctx->id()` |
+| `withoutGlobalScope(TenantScope::class)` sembarangan | Hanya di service terpercaya, SELALU tambahkan filter `tenant_id` eksplisit |
+| Tambah model baru tanpa `UsesTenantConnection` trait | Semua model tenant-scoped WAJIB pakai trait ini |
+| `TenantContext::id()` dipanggil sebelum middleware | Pastikan route masuk dalam group `['auth', 'tenant']` |
+| Lupa filter `tenant_id` di artisan command/queue job | Command wajib panggil `$ctx->setTenantId($id)` sebelum query apapun |
+
+**Model yang wajib pakai TenantScope:**
+`MenuItem, MenuCategory, Order, OrderItem, Outlet, User, Reservation, GoogleReview, ReceiptConfig, PrintJob, AuditLog, SalesDailyRollup, SalesMonthlyRollup, OrderArchive`
 
 ---
 
-## 🟢 DO — HANDLE SECRETS DENGAN BENAR
+## 🔵 DO — CODE QUALITY FRONTEND
 
-| DONT'T ❌ | DO ✅ |
+Temuan dari Audit 2026-07-17. God Component dan hardcoded mock data adalah sumber bug terbesar.
+
+| DON'T ❌ | DO ✅ |
 |---|---|
-| Tulis API key/secret ke `.env` lewat chat | User yang ketik langsung ke `.env` |
-| Cloudinary `cloudinary://key:secret@name` di disk | Public-only: `cloudinary://@dwdaydzsh` (secret TIDAK di disk) |
-| Commit `.env` | `.env` gitignored — jangan `git add` |
+| File > 300 baris dengan logika + render + data | Pisah: `Page/Index.tsx` (layout), `components/`, `hooks/` |
+| Hardcode data dummy langsung di komponen | Pisah ke `lib/mock/<namaDomain>.ts`, beri flag `USE_REAL_API` |
+| 2+ definisi komponen dalam 1 file | 1 file = 1 komponen utama |
+| `any` type di TypeScript untuk data API | Definisikan interface di `Types/index.ts`, gunakan konsisten |
+| `featureLocks[i.name]` — key = display name | Gunakan ID stabil/slug, bukan display name yang bisa berubah |
+| Tidak ada skeleton loader di halaman async | Gunakan `<SkeletonCard>` / `<SkeletonTable>` dari `Components/shared/` |
+| 2 halaman untuk hal yang sama (Index.tsx + OwnerDashboard.tsx) | Konsolidasikan ke 1 halaman/route yang jelas |
+
+**Batas ukuran file:**
+| Tipe File | Max Baris |
+|-----------|-----------|
+| Page component | 200 baris |
+| Sub-component | 150 baris |
+| Hook | 100 baris |
+| Controller | 5 public method |
+
+**Refactor pattern wajib untuk dashboard:**
+```
+Pages/Dashboard/
+├── Index.tsx           ← hanya wiring props + layout (max 100 baris)
+├── components/
+│   ├── RevenueChart.tsx
+│   ├── KpiCard.tsx
+│   └── ProductTable.tsx
+└── hooks/
+    └── useDashboardData.ts  ← fetch + transform data
+```
+
+---
+
+## 🔵 DO — DATA ESTIMASI WAJIB DIBERI LABEL
+
+Backend menggunakan benchmark industri (COGS 35%, OpEx 20%) untuk estimasi laba. Data ini BUKAN data nyata.
+
+| DON'T ❌ | DO ✅ |
+|---|---|
+| Tampilkan angka laba/rugi tanpa keterangan | Tambahkan badge `~ Estimasi` di semua KPI keuangan |
+| `is_estimate: true` dari backend diabaikan UI | UI HARUS cek `is_estimate` dan render label visual |
+| Gunakan benchmark global untuk semua tenant | Simpan `cogs_benchmark` + `opex_benchmark` di `tenant_settings` |
+
+```tsx
+// Wajib di setiap KPI keuangan:
+{metrics.is_estimate && (
+  <span className="text-[10px] text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">
+    ~ Estimasi
+  </span>
+)}
+```
+
+```php
+// Backend: selalu sertakan flag
+return [
+    'net_profit'   => $net,
+    'is_estimate'  => true,   // ← WAJIB, UI harus render label
+    'note'         => 'COGS dan OpEx berdasarkan benchmark industri (35%/20%).',
+];
+```
 
 ---
 
@@ -208,22 +303,68 @@ Install cloudflared: download `cloudflared-windows-amd64.exe` dari GitHub releas
 
 ## 📋 CHECKLIST SEBELUM "DONE" (FE / Public UI)
 
+### Gate Syntax & Build
 - [ ] `npx eslint <file>` → 0 errors
 - [ ] `php -l <controller>` → No syntax errors
 - [ ] `npm run build` → GREEN
-- [ ] **Playwright render localhost** → `0 pageerror`, elemen muncul
-- [ ] **Playwright render cloudflare** → `0 pageerror`, elemen muncul, TAMPILAN SAMA
+
+### Gate Runtime Verification
+- [ ] **Playwright render localhost** → `0 pageerror`, elemen kritis muncul
+- [ ] **Playwright render cloudflare** → `0 pageerror`, TAMPILAN SAMA dengan localhost
 - [ ] localStorage pre-seed terbalik → override server terbukti
 - [ ] Screenshot visual di-`vision_analyze` → konfirmasi tema/bukan error
-- [ ] `php artisan test` relevant filter → PASS
-- [ ] `vitest run` (relevant) → PASS — laporkan angka riil, sebut file di-exclude
+
+### Gate API & Data
 - [ ] **Setiap `fetch` internal Inertia pakai header `X-Requested-With` + `Accept: application/json`**
 - [ ] **Setiap `.map`/`.filter` ke data `fetch` di-guard `Array.isArray`**
 - [ ] **Shape API diverifikasi via session segar** (bukan cookie kadaluarsa)
-- [ ] Public tunnel = **cloudflared** (bukan ngrok) — `MENU_BASE_URL` + `APP_URL` = URL tunnel tsb
+- [ ] Jika ada `is_estimate: true` → UI menampilkan badge `~ Estimasi`
+
+### Gate Multi-Tenancy
+- [ ] Model baru: sudah pakai `UsesTenantConnection` trait?
+- [ ] Endpoint baru: dalam group `['auth', 'tenant']`?
+- [ ] `withoutGlobalScope` baru: ada filter `tenant_id` eksplisit?
+
+### Gate Testing
+- [ ] `php artisan test` relevant filter → PASS
+- [ ] `vitest run` (relevant) → PASS — laporkan angka riil, sebut file di-exclude
+- [ ] Endpoint baru ada test isolasi multi-tenant (2 tenant, row=0 dari tenant lain)
+
+### Gate Code Quality
+- [ ] File tidak melebihi batas ukuran (200 baris page, 150 sub-component, 5 method controller)
+- [ ] Tidak ada `any` type baru di TypeScript untuk data API kritis
+- [ ] Kode baru import dari path baru, bukan dari `Components/Shared` shim
+- [ ] Mock data yang baru tidak disematkan langsung di komponen (pisah ke `lib/mock/`)
+
+### Gate Deployment
+- [ ] Public tunnel = **cloudflared** (bukan ngrok)
+- [ ] `MENU_BASE_URL` + `APP_URL` = URL tunnel aktif
 - [ ] (Kalau ubah `MENU_BASE_URL`) restart `php artisan serve`, verify `curl /login | grep menu_base_url`
-- [ ] Commit dengan pesan berisi BUKTI (bukan klaim)
+
+### Gate Final
+- [ ] Commit message berisi BUKTI: contoh `"fix: kasir queue crash [verified: 0 pageerror, screenshot attached]"`
 
 ---
 
-*Dokumen ini hidup. Setiap pelanggaran yang lolos = tambah 1 baris di sini.*
+## 📌 HUTANG TEKNIS AKTIF
+
+Temuan yang belum di-fix — wajib diselesaikan sebelum production launch:
+
+| ID | Temuan | Severity | File | Status |
+|----|--------|----------|------|--------|
+| T-01 | `GeminiAiController` belum sanitasi prompt injection | 🔴 HIGH | `GeminiAiController.php` | OPEN |
+| T-02 | Redis monitoring (Prometheus/Grafana) belum setup | 🟡 MEDIUM | VPS/infra | OPEN |
+| T-03 | `Dashboard/Index.tsx` god component 1.349 baris | 🔴 HIGH | `Pages/Dashboard/Index.tsx` | OPEN |
+| T-04 | 2 dashboard owner (Index.tsx vs OwnerDashboard.tsx) tidak konsisten | 🔴 HIGH | kedua file | OPEN |
+| T-05 | `Components/Shared.tsx` shim belum dimigrasikan | 🟡 MEDIUM | `Components/Shared.tsx` | OPEN |
+| T-06 | `OwnerDashboardController` menangani 12 endpoint (SRP violation) | 🟡 MEDIUM | `OwnerDashboardController.php` | OPEN |
+| T-07 | `is_estimate: true` tidak ditampilkan ke UI | 🔴 HIGH | `OwnerDashboard.tsx`, `Index.tsx` | ✅ CLOSED (fix 2026-07-17, commit 047e4fe, badge `~Estimasi`) |
+| T-08 | `featureLocks` pakai display name sebagai key (bisa silently break) | 🟡 MEDIUM | `MainLayout.tsx` | OPEN |
+| T-09 | Tidak ada `<SkeletonCard>` / `<SkeletonTable>` di halaman async | 🟢 LOW | semua halaman laporan | OPEN |
+| T-10 | `any` type di `MainLayout.tsx` untuk data reservasi L198 | 🟡 MEDIUM | `MainLayout.tsx` | ✅ CLOSED (fix H-3 2026-07-17, `Types/reservation.ts` + cast `as Reservation[]`) |
+
+*Tutup setiap item dengan PR + bukti fix (screenshot/test output) + tanggal.*
+
+---
+
+*Dokumen ini hidup. Setiap pelanggaran yang lolos ke production = tambah 1 baris di sini.*
