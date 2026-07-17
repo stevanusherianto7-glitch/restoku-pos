@@ -55,10 +55,12 @@ return new class extends Migration
             ) PARTITION BY RANGE (created_at);
         SQL);
 
-        // Index (termasuk partition key untuk pruning)
+        // Index (termasuk partition key untuk pruning + constraint unik Postgres).
+        // Postgres melarang UNIQUE INDEX pada partitioned table jika tidak include
+        // kolom partition key (created_at). Maka unique = (tenant_id, order_code, created_at).
         DB::statement('CREATE INDEX orders_tenant_status_idx ON orders (tenant_id, status)');
         DB::statement('CREATE INDEX orders_tenant_outlet_created_idx ON orders (tenant_id, outlet_id, created_at)');
-        DB::statement('CREATE UNIQUE INDEX orders_tenant_code_unique ON orders (tenant_id, order_code)');
+        DB::statement('CREATE UNIQUE INDEX orders_tenant_code_unique ON orders (tenant_id, order_code, created_at)');
     }
 
     private function columns(Blueprint $table): void

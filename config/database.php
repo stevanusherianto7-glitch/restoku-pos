@@ -136,6 +136,7 @@ return [
             'url'      => env('DB_URL'),
             'host'     => env('DB_HOST', '127.0.0.1'),
             'port'     => env('DB_PORT', '5432'),
+            'database' => env('DB_DATABASE', 'restoku'), // sama dgn shared DB; isolasi via search_path
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'charset'  => 'utf8',

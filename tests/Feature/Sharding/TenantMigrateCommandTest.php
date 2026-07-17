@@ -20,8 +20,8 @@ class TenantMigrateCommandTest extends TestCase
         $this->requiresSharding();
 
         // Buat 2 tenant (di shared schema sys/default)
-        $t1 = Tenant::create(['name' => 'T1 '.uniqid(), 'brand_name' => 'T1', 'email' => 't1@t.com', 'phone' => '1']);
-        $t2 = Tenant::create(['name' => 'T2 '.uniqid(), 'brand_name' => 'T2', 'email' => 't2@t.com', 'phone' => '2']);
+        $t1 = Tenant::create(['name' => 'T1 '.uniqid(), 'brand_name' => 'T1', 'email' => 't1-'.uniqid().'@t.com', 'phone' => '1']);
+        $t2 = Tenant::create(['name' => 'T2 '.uniqid(), 'brand_name' => 'T2', 'email' => 't2-'.uniqid().'@t.com', 'phone' => '2']);
 
         // Jalankan command (butuh sharding aktif — guard di handle())
         \Artisan::call('tenant:migrate', ['--force' => true]);
@@ -44,7 +44,7 @@ class TenantMigrateCommandTest extends TestCase
     {
         $this->requiresSharding();
 
-        Tenant::create(['name' => 'Dry '.uniqid(), 'brand_name' => 'Dry', 'email' => 'dry@t.com', 'phone' => '9']);
+        Tenant::create(['name' => 'Dry '.uniqid(), 'brand_name' => 'Dry', 'email' => 'dry-'.uniqid().'@t.com', 'phone' => '9']);
 
         \Artisan::call('tenant:migrate', ['--dry' => true, '--force' => true]);
         $output = \Artisan::output();

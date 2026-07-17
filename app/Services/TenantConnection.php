@@ -104,16 +104,12 @@ class TenantConnection
         $config = $template;
         if ($driver === 'pgsql') {
             // Postgres: isolasi via search_path (schema terpisah dalam 1 DB).
-            // Laravel ConnectionFactory WAJIB key 'database' (ConnectionFactory:83),
-            // jadi isi dengan nama DB yang sama dengan template (shared DB restoku_sys).
-            $config['database'] = $template['database'] ?? 'restoku_sys';
+            // DB SAMA dengan shared (restoku/restoku_sys); isolasi lewat schema.
+            // Laravel PostgresConnector.configureSearchPath() otomatis menjalankan
+            // "set search_path to <schema>" saat koneksi dibuka (lihat
+            // vendor/laravel/framework/.../PostgresConnector.php:46,152).
+            $config['database'] = $template['database'] ?? 'restoku';
             $config['search_path'] = $schema;
-            // DETERMINISTIK: set search_path saat PDO connect via attribute driver pgsql.
-            // Ini bypass connector Laravel yang flaky saat koneksi didaftarkan dinamis
-            // lalu dibuka lewat Artisan::call('migrate') (bukti: CI error 3F000).
-            if (defined('PDO::PGSQL_ATTR_SET_SEARCH_PATH')) {
-                $config['options'][\PDO::PGSQL_ATTR_SET_SEARCH_PATH] = $schema;
-            }
         } else {
             // MySQL: database terpisah per tenant
             $config['database'] = $schema;

@@ -8,6 +8,7 @@ use App\Models\Outlet;
 use App\Models\Tenant;
 use App\Services\TenantConnection;
 use App\Services\TenantContext;
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -91,16 +92,20 @@ class TenantShardingTest extends TestCase
 
         /** @var TenantConnection $conn */
         $conn = app(TenantConnection::class);
+        /** @var Migrator $migrator */
+        $migrator = app('migrator');
 
-        // Siapkan 2 schema tenant + migrate
+        // Siapkan 2 schema tenant + migrate (Migrator LANGSUNG, bukan Artisan::call)
         foreach ([1, 2] as $tid) {
-            DB::statement("CREATE SCHEMA IF NOT EXISTS tenant_{$tid}");
+            DB::connection('tenant_template')->statement("DROP SCHEMA IF EXISTS tenant_{$tid} CASCADE");
+            DB::connection('tenant_template')->statement("CREATE SCHEMA tenant_{$tid}");
             $conn->resolveForTenant($tid);
-            \Artisan::call('migrate', [
-                '--database' => "tenant_{$tid}",
-                '--path' => 'database/migrations/tenant',
-                '--force' => true,
-            ]);
+            $migrator->setConnection("tenant_{$tid}");
+            DB::connection("tenant_{$tid}")->statement(
+                'CREATE TABLE IF NOT EXISTS migrations ('.
+                'id serial primary key, migration varchar(255) not null, batch integer not null)'
+            );
+            $migrator->run([database_path('migrations/tenant')]);
         }
 
         // Tulis outlet lewat koneksi tenant_1, pastikan tenant_2 kosong

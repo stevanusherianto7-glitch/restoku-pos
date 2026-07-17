@@ -86,80 +86,14 @@ return new class extends Migration
             $table->index(['track_stock', 'stock', 'stock_threshold']);
         });
 
-        Schema::create('orders', function (Blueprint $table) use ($isPgsql) {
-            if (! $isPgsql) {
-                $table->id();
-                $table->unsignedBigInteger('tenant_id')->nullable()->index();
-                $table->unsignedBigInteger('outlet_id')->nullable()->index();
-                $table->unsignedBigInteger('created_by')->nullable();
-                $table->string('order_code');
-                $table->string('table_number')->nullable();
-                $table->string('source')->default('pos');
-                $table->string('status', 32)->default('antrian_masuk');
-                $table->string('destination')->default('kds');
-                $table->decimal('subtotal', 14, 2)->default(0);
-                $table->decimal('discount_amount', 14, 2)->default(0);
-                $table->decimal('tax_amount', 14, 2)->default(0);
-                $table->decimal('service_charge_amount', 14, 2)->default(0);
-                $table->decimal('total', 14, 2)->default(0);
-                $table->string('payment_status', 16)->default('unpaid');
-                $table->string('payment_method')->nullable();
-                $table->timestamp('paid_at')->nullable();
-                $table->text('notes')->nullable();
-                $table->string('void_reason')->nullable();
-                $table->timestamp('cancelled_at')->nullable();
-                $table->timestamp('food_served_at')->nullable();
-                $table->timestamp('drink_served_at')->nullable();
-                $table->timestamps();
-                $table->unique(['tenant_id', 'order_code']);
-                $table->index(['tenant_id', 'status']);
-                $table->index(['tenant_id', 'outlet_id', 'status']);
-                $table->index(['tenant_id', 'payment_status']);
-                $table->index(['tenant_id', 'table_number']);
-                return;
-            }
-
-            // Postgres: declarative partitioning by range (created_at)
-            DB::statement(<<<'SQL'
-                CREATE TABLE orders (
-                    id bigserial,
-                    tenant_id bigint NULL,
-                    outlet_id bigint NULL,
-                    created_by bigint NULL,
-                    order_code varchar(255) NOT NULL,
-                    table_number varchar(255) NULL,
-                    source varchar(255) NOT NULL DEFAULT 'pos',
-                    status varchar(32) NOT NULL DEFAULT 'antrian_masuk',
-                    destination varchar(255) NOT NULL DEFAULT 'kds',
-                    subtotal numeric(14,2) NOT NULL DEFAULT 0,
-                    discount_amount numeric(14,2) NOT NULL DEFAULT 0,
-                    tax_amount numeric(14,2) NOT NULL DEFAULT 0,
-                    service_charge_amount numeric(14,2) NOT NULL DEFAULT 0,
-                    total numeric(14,2) NOT NULL DEFAULT 0,
-                    payment_status varchar(16) NOT NULL DEFAULT 'unpaid',
-                    payment_method varchar(255) NULL,
-                    paid_at timestamp NULL,
-                    notes text NULL,
-                    void_reason varchar(255) NULL,
-                    cancelled_at timestamp NULL,
-                    food_served_at timestamp NULL,
-                    drink_served_at timestamp NULL,
-                    created_at timestamp NULL,
-                    updated_at timestamp NULL,
-                    PRIMARY KEY (id, created_at)
-                ) PARTITION BY RANGE (created_at);
-            SQL);
-            DB::statement('CREATE INDEX orders_tenant_status_idx ON orders (tenant_id, status)');
-            DB::statement('CREATE INDEX orders_tenant_outlet_status_idx ON orders (tenant_id, outlet_id, status)');
-            DB::statement('CREATE INDEX orders_tenant_payment_status_idx ON orders (tenant_id, payment_status)');
-            DB::statement('CREATE INDEX orders_tenant_table_number_idx ON orders (tenant_id, table_number)');
-            DB::statement('CREATE UNIQUE INDEX orders_tenant_code_unique ON orders (tenant_id, order_code)');
-        });
-
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tenant_id')->nullable()->index();
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            // FK ke orders ter-partisi: PK orders = (id, created_at) -> reference harus include keduanya.
+            $table->unsignedBigInteger('order_id');
+            $table->timestamp('order_created_at')->nullable();
+            $table->foreign(['order_id', 'order_created_at'], 'order_items_order_fk')
+                  ->references(['id', 'created_at'])->on('orders')->onDelete('cascade');
             $table->foreignId('menu_item_id')->nullable()->constrained('menu_items')->onDelete('set null');
             $table->string('item_name');
             $table->unsignedInteger('quantity')->default(1);
@@ -447,7 +381,6 @@ return new class extends Migration
             $table->text('meta');
             $table->timestamps();
             $table->index(['conversation_id', 'user_id', 'updated_at']);
-            $table->index(['user_id']);
         });
     }
 

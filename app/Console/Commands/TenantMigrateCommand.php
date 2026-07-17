@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Tenant;
 use App\Services\TenantConnection;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\DB;
  *   php artisan tenant:migrate --dry      # list schema tanpa jalan
  *
  * Strategi: clone koneksi 'tenant_template' menjadi 'tenant_{id}',
- * set search_path (Postgres) / database (MySQL), lalu jalankan migrate.
+ * set search_path (Postgres) / database (MySQL), lalu jalankan migrasi
+ * via Migrator LANGSUNG (bukan Artisan::call — Artisan::call me-reset
+ * Config::set runtime sehingga search_path hilang -> "no schema" error).
  */
 class TenantMigrateCommand extends Command
 {
@@ -47,6 +49,8 @@ class TenantMigrateCommand extends Command
 
         /** @var TenantConnection $conn */
         $conn = app(TenantConnection::class);
+        /** @var Migrator $migrator */
+        $migrator = app('migrator');
 
         foreach ($tenants as $tenant) {
             $schema = 'tenant_'.$tenant->id;
@@ -66,12 +70,16 @@ class TenantMigrateCommand extends Command
             );
 
             $this->info("Migrating schema: {$schema}");
-            Artisan::call('migrate', [
-                '--database' => $schema,
-                '--path' => 'database/migrations/tenant',
-                '--force' => true,
-            ]);
-            $this->line(Artisan::output());
+            // Migrator LANGSUNG (config runtime survive) — jangan Artisan::call.
+            $migrator->setConnection($schema);
+            // Buat tabel migrations di schema target secara eksplisit (deterministik).
+            DB::connection($schema)->statement(
+                'CREATE TABLE IF NOT EXISTS migrations ('.
+                'id serial primary key, migration varchar(255) not null, batch integer not null)'
+            );
+            $migrator->run([database_path('migrations/tenant')]);
+            // Laravel 12 Migrator tidak punya getNotes(); output migrasi sudah
+            // dicatat ke repository. Cukup lanjut (idempoten via tabel migrations).
         }
 
         $this->info('Selesai.');

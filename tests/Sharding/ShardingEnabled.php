@@ -3,6 +3,7 @@
 namespace Tests\Sharding;
 
 use App\Services\TenantConnection;
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
@@ -31,22 +32,41 @@ trait ShardingEnabled
     }
 
     /**
-     * Buat N schema tenant fisik + migrate via TenantConnection.
-     * Mengembalikan array tenant id yang dibuat.
+     * Buat N schema tenant fisik + migrate via Migrator LANGSUNG.
+     * (Jangan Artisan::call — me-reset Config::set runtime -> search_path hilang.)
+     * Mono memperhatikan cleanup: schema di-DROP di akhir tiap test.
      */
     protected function provisionTenantSchemas(array $tenantIds): void
     {
         /** @var TenantConnection $conn */
         $conn = app(TenantConnection::class);
+        /** @var Migrator $migrator */
+        $migrator = app('migrator');
 
         foreach ($tenantIds as $tid) {
-            DB::statement("CREATE SCHEMA IF NOT EXISTS tenant_{$tid}");
+            // Bersihkan dulu (idempoten antar-run) — WAJIB pakai koneksi pgsql (tenant_template),
+            // bukan default (sqlite di test) supaya DROP benar-benar ke Postgres.
+            DB::connection('tenant_template')->statement("DROP SCHEMA IF EXISTS tenant_{$tid} CASCADE");
+            DB::connection('tenant_template')->statement("CREATE SCHEMA tenant_{$tid}");
             $conn->resolveForTenant($tid);
-            \Artisan::call('migrate', [
-                '--database' => "tenant_{$tid}",
-                '--path' => 'database/migrations/tenant',
-                '--force' => true,
-            ]);
+            $migrator->setConnection("tenant_{$tid}");
+            // Buat tabel migrations di schema target secara eksplisit (deterministik,
+            // tidak bergantung pada migrator->install() yang bisa salah schema).
+            DB::connection("tenant_{$tid}")->statement(
+                'CREATE TABLE IF NOT EXISTS migrations ('.
+                'id serial primary key, migration varchar(255) not null, batch integer not null)'
+            );
+            $migrator->run([database_path('migrations/tenant')]);
+        }
+    }
+
+    /**
+     * Drop schema fisik (cleanup) — panggil di tearDown test.
+     */
+    protected function dropTenantSchemas(array $tenantIds): void
+    {
+        foreach ($tenantIds as $tid) {
+            DB::statement("DROP SCHEMA IF EXISTS tenant_{$tid} CASCADE");
         }
     }
 }

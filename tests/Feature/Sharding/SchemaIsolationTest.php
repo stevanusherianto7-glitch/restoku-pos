@@ -4,6 +4,7 @@ namespace Tests\Feature\Sharding;
 
 use App\Services\TenantConnection;
 use App\Services\TenantContext;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Tests\Sharding\ShardingEnabled;
 use Tests\TestCase;
@@ -17,6 +18,14 @@ use Tests\TestCase;
 class SchemaIsolationTest extends TestCase
 {
     use ShardingEnabled;
+
+    protected function tearDown(): void
+    {
+        if (Config::get('database.default') === 'pgsql' && Config::get('database.sharding_enabled')) {
+            $this->dropTenantSchemas([1, 2]);
+        }
+        parent::tearDown();
+    }
 
     public function test_data_terisolasi_secara_fisik_antar_schema(): void
     {

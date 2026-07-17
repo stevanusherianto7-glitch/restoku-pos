@@ -38,11 +38,17 @@ php artisan tenant:migrate --dry
 ## Verifikasi isolasi (test)
 
 ```bash
-# Lokal via Docker Postgres (bukti nyata)
-bash scripts/test-sharding-local.sh
+# Lokal via Docker Postgres (bukti nyata, timeout keras anti-hang)
+bash scripts/run-shard-test.sh Sharding
+# Filter 1 class saja (debug cepat):
+bash scripts/run-shard-test.sh SchemaIsolationTest
 
 # Atau CI job `sharding-postgres` di .github/workflows/ci.yml
 ```
+
+**Bukti (2026-07-17, Docker Postgres 16):** `SchemaIsolationTest` 2/2 PASS,
+`TenantMigrateCommandTest` 2/2 PASS, `TenantShardingTest` 3 passed (postgres) +
+2 skipped (sqlite-only) → **7 passed, 2 skipped, 0 failed**.
 
 Test di `tests/Feature/Sharding/*` di-SKIP otomatis di sqlite/test lokal
 (`TenantConnection::isSharded()` = false), dan hanya aktif di Postgres + `DB_SHARDING_ENABLED=true`.
