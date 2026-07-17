@@ -19,6 +19,7 @@ import { useTenantSettings, TenantBrandLockup } from '../Components/Shared';
 import GeminiCopilotWidget from '../Components/POS/GeminiCopilotWidget';
 import { useSubscription } from '../Hooks/useSubscription';
 import type { SharedProps } from '../Types';
+import type { Reservation } from '../Types';
 
 // --- Role Types ---
 type Role = 'kasir' | 'kitchen' | 'waiter' | 'manager' | 'owner';
@@ -195,8 +196,8 @@ function Sidebar({ isCollapsed, setIsCollapsed }: { isCollapsed: boolean; setIsC
                 const res = await fetch('/api/reservations');
                 if (res.ok) {
                     const data = await res.json();
-                    const pending = data.filter(
-                        (r: any) => r.status === 'Menunggu Konfirmasi' || r.status === 'pending',
+                    const pending = (data as unknown as Reservation[]).filter(
+                        (r) => r.status === 'Menunggu Konfirmasi' || r.status === 'pending',
                     );
                     setPendingReservationsCount(pending.length);
                 }

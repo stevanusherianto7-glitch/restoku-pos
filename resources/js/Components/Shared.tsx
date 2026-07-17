@@ -13,6 +13,12 @@
 //
 // TODO: Gradually migrate all consumers to the new import paths, then
 //       delete this file entirely.
+// PROGRESS TRACKING (audit 2026-07-17): real exports di bawah (PlanBadge,
+// FeatureLock, hashPin/verifyPin, DEFAULT_EMPLOYEES, useTenantSettings,
+// TenantBrandLockup, RestokuLogo/Wordmark, getOutletTaxConfig) masih live &
+// dikonsumsi banyak halaman. Target: pindahkan ke Components/shared/, lib/,
+// Hooks/ lalu delete — BUKAN sekadar re-export. Blokir delete sebelum semua
+// consumer di-grep & di-migrate (risk break build). Status: shim + live exports.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export { Button } from './shared/Button';

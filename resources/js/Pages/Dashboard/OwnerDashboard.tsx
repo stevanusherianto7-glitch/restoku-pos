@@ -179,6 +179,10 @@ export default function OwnerDashboard({
     ];
 
     // [L1] Row KPI baru — Laba Kotor / Bersih / Margin / Biaya Ops.
+    // C-3 (audit 2026-07-17): semua angka laba/margin/opex adalah ESTIMASI
+    // (backend hitung COGS/OpEx dari benchmark industri tetap, is_estimate:true).
+    // Wajib tampilkan badge '~Estimasi' agar owner tidak salah ambil keputusan.
+    const isProfitEstimate = profitMetrics?.is_estimate === true;
     const profitKpis = profitMetrics
         ? [
               {
@@ -189,6 +193,7 @@ export default function OwnerDashboard({
                   color: 'text-emerald-400',
                   bg: 'bg-emerald-400/10',
                   border: 'border-emerald-400/20',
+                  estimate: isProfitEstimate,
               },
               {
                   label: 'Laba Bersih',
@@ -198,6 +203,7 @@ export default function OwnerDashboard({
                   color: 'text-blue-400',
                   bg: 'bg-blue-400/10',
                   border: 'border-blue-400/20',
+                  estimate: isProfitEstimate,
               },
               {
                   label: 'Margin Kotor',
@@ -207,6 +213,7 @@ export default function OwnerDashboard({
                   color: 'text-amber-400',
                   bg: 'bg-amber-400/10',
                   border: 'border-amber-400/20',
+                  estimate: isProfitEstimate,
               },
               {
                   label: 'Biaya Operasional',
@@ -216,6 +223,7 @@ export default function OwnerDashboard({
                   color: 'text-red-400',
                   bg: 'bg-red-400/10',
                   border: 'border-red-400/20',
+                  estimate: isProfitEstimate,
               },
           ]
         : [];
@@ -322,6 +330,12 @@ export default function OwnerDashboard({
                                         {kpi.trend}
                                     </span>
                                 </div>
+                                {kpi.estimate && (
+                                    <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                                        <AlertCircleIcon className="size-3" />
+                                        ~Estimasi
+                                    </span>
+                                )}
                             </div>
                         </Glass>
                     ))}

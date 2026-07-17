@@ -25,4 +25,5 @@ export type {
     AttendanceStatus,
 } from './staff';
 export type { Outlet, Table, InventoryItem, DailySummary, Plan } from './outlet';
+export type { Reservation, ReservationStatus } from './reservation';
 export type { SharedProps } from './inertia';
