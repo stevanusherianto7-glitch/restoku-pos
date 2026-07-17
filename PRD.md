@@ -78,7 +78,9 @@ sistem cashier — namun dengan **arsitektur SaaS multi-tenant** yang lebih kuat
 - Isolasi via `tenant_id` + `TenantScope` (global scope) + `TenantContext` (singleton per request) + `EnsureTenantContext` middleware.
 - Guest (tamu) di-resolusi lewat `outlet_id` → outlet punya `tenant_id`.
 - **Fase 2 code-ready + TERUJI**: `TenantConnection` + `UsesTenantConnection` trait (**15 model**) — schema-per-tenant **AKTIF & teruji di CI Postgres** (job `sharding-postgres`), fallback shared-schema di sqlite/test lokal. `TenantConnection::isSharded()` return `false` saat driver `sqlite`. Prasyarat aktivasi prod: VPS + Postgres.
-- **Status**: isolasi sudah benar & teruji (test `GoogleReviewTruncateIsolationTest`, `MenuIsolationTest`).
+- **Ulasan Google = Places API** (bukan Business Profile OAuth, yang gated/quota-0). `PlaceIdResolver::resolve(link Maps)` → `outlets.google_place_id` → fetch live + cache Redis 24j. Reply LOKAL via Groq (3 template hardcoded dihapus; `generateAiReply` return error kalau Groq gagal). Prasyarat: `GOOGLE_PLACES_API_KEY` + `GROQ_API_KEY`.
+- **Login Owner**: rencana `Masuk dengan Google` via Laravel Socialite (owner lupa password → Gmail, bukan reset email). Plan drafted; Socialite NOT installed. `.env MAIL_MAILER=log` → email-reset tidak bisa kirim, jadi OAuth = recovery path preferensi.
+- **Status**: isolasi sudah benar & teruji (test `GoogleReviewTruncateIsolationTest`, `MenuIsolationTest`, `SchemaIsolationTest`).
 
 ### 6.2 Target — Skala 5.000 Tenant
 - Redis session wajib (`SESSION_DRIVER=redis`), read replica aktif (`TenantReadConnection`).
@@ -141,13 +143,16 @@ Fitur-fitur berikut diprioritaskan untuk kesetaraan dengan platform UR-Hub:
 
 ### 7.4 Modul KDS (Kitchen Display System)
 
-- Route `/kds`, plan gate `enterprise`.
-- Real-time order queue untuk dapur.
-- Multi-course support (makanan + minuman pisah antrian).
+- Route `/kds`, plan gate `pro` (operational core, BUKAN enterprise).
+- Real-time order queue untuk dapur, **tampilkan ITEM (bukan cuma order)** dengan tracker per-item 5-step.
+- **Per-item cook_status** (`order_items.cook_status`): `dikonfirmasi → sedang dimasak → selesai masak → siap sajikan → selesai`. Tombol advance 1 step per klik.
+- Order `siap_sajikan` = semua item-nya `selesai_masak`.
+- Pulse di step aktif (cabe) / selesai (hijau), guard `prefers-reduced-motion`.
 
 ### 7.5 Modul Waiter & Waiter Bar
 
 - Route `/waiter` + `/waiter-bar`.
+- **Routing order-level**: 1 pesanan utuh → KDS kalau ada item makanan, ATAU Bar kalau MURNI minuman (`menu_categories.type` = food|beverage).
 - Serve order per item, TTS (Text-to-Speech) notifikasi pesanan baru.
 - Fetch polling `/api/orders` + `/api/bar/orders` dengan header `X-Requested-With` wajib.
 
@@ -156,6 +161,8 @@ Fitur-fitur berikut diprioritaskan untuk kesetaraan dengan platform UR-Hub:
 - **Read-only**, tanpa auth. Akses via `/m/{slug}?t={meja}`.
 - Data nyata dari `/api/menu/{slug}` — fallback graceful ke `FALLBACK_ITEMS`.
 - Foto menu: `photo_url` dari Cloudinary.
+- **Tracker per-item 5-step** ke tamu: tiap menu item punya node `dikonfirmasi → sedang dimasak → selesai masak → siap sajikan → selesai` (sinkron dengan KDS). Pulse di step aktif (cabe) / selesai (hijau), guard `prefers-reduced-motion`.
+- **Tema server-driven**: `screen_mode` dari `outlet_settings` (default `nano-banana`), BUKAN localStorage per-origin (cegah HP vs desktop beda tampilan).
 - **Seeder**: 32 menu asli (Makanan/Minuman/Camilan) per tenant — di-seed 1×, BUKAN loop per-outlet.
 
 ### 7.7 Modul Staf & SDM
@@ -248,8 +255,9 @@ Fitur-fitur berikut diprioritaskan untuk kesetaraan dengan platform UR-Hub:
 | `tenants` | `id`, `brand_name`, `plan`, settings JSON | 1 tenant = 1 bisnis |
 | `outlets` | `tenant_id`, **`slug`** (unique global), `name`, `is_active`, `operating_hours` JSON, lat/long | auto-outlet-default saat tenant dibuat |
 | `users` | `tenant_id`, `outlet_id`, `role`, `pin` (hash) | owner/kasir/staff |
-| `orders` | `tenant_id`, `outlet_id`, `table_number`, items JSON | write-heavy; Fase 2 partisi by date |
-| `reservations` | `tenant_id`, `outlet_id`, … | guest, CSRF-exempt + throttle |
+| `orders` | `tenant_id`, `outlet_id`, `table_number`, items JSON, `status` (string, 5-state+), `destination` (kds|bar) | write-heavy; Fase 2 partisi by date; status machine di `Order.php` |
+| `order_items` | `order_id`, `menu_item_id`, `cook_status` (5-step per-item), `food/drink_served_at` | tracker per-item sinkron KDS/CustomerView |
+| `outlets` | `tenant_id`, **`slug`** (unique global), `name`, `is_active`, `operating_hours` JSON, lat/long, **`google_place_id`** | auto-outlet-default saat tenant dibuat; `google_place_id` dari PlaceIdResolver |
 | `google_reviews` | `tenant_id`, `outlet_id`, `reviewer_photo` | dari API Google |
 | `outlet_settings` | per-outlet config (printer, struk, screen_mode) | `resolveSettings()` fallback |
 | `menu_categories` | `tenant_id`, `name`, `sort_order` | Makanan/Minuman/Camilan/... |

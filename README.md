@@ -105,6 +105,26 @@ Tenant diidentifikasi **dari `outlet_id`** yang dikirim tamu — bukan dari requ
 | `pro` | Shift, sesi kasir, laporan lengkap |
 | `enterprise` | KDS, inventaris, AI copilot |
 
+> **Catatan fitur-gate**: KDS/dapur, ordering, e-menu adalah **baseline** (bukan enterprise). `kds` dulu `enterprise` → di-downgrade ke `pro` karena operational core.
+
+### 3.5 Alur Status Order 5-Tahap (KDS / Bar / CustomerView)
+
+Setiap **order** punya status overall 5-step; setiap **item** (`order_items.cook_status`) punya tracker 5-step sendiri (lihat `Order.php` const `STATUS_*`):
+
+```
+ORDER LEVEL (overall):
+  antrian_masuk → diterima → sedang_dimasak → selesai_masak → siap_sajikan → siap_bayar → selesai
+  (dibatalkan = terminal, bisa dari tahap mana pun)
+
+ITEM LEVEL (per-menu, cook_status):
+  dikonfirmasi → sedang dimasak → selesai masak → siap sajikan → selesai
+```
+
+- **Routing order**: 1 pesanan utuh → KDS kalau ada item makanan, ATAU Bar kalau murni minuman (`menu_categories.type` = food|beverage).
+- **KDS** tampilkan ITEM (bukan cuma order) + tombol advance per-step.
+- **CustomerView** tampilkan tracker per-item ke tamu (5 node, pulse di step aktif cabe / selesai hijau, guard `prefers-reduced-motion`).
+- Transisi legal di-enforce di `Order.php` (tanpa guard, `siap_bayar` bisa mundur ke `antrian_masuk` = bug).
+
 ---
 
 ## 4. Struktur Direktori
@@ -250,6 +270,16 @@ Request
 - `GET /api/menu/{slug}` — menu publik (cached Redis 10 menit)
 - `GET /m/{slug}` — buku menu digital
 
+### 6.1 Ulasan Google (Real-time via Places API)
+
+Review tamu diambil **live dari Google Places API** (by Place ID outlet), BUKAN Business Profile OAuth (jalur OAuth gated/quota-0).
+
+- Tenant tempel **link Maps** → `PlaceIdResolver::resolve()` ekstrak Place ID (`ChIJ` / `@lat,lng,z` / `!3d!4d` / reverse-geocode).
+- Tersimpan di `outlets.google_place_id` → fetch live + cache Redis 24j.
+- **Reply LOKAL** (Places read-only, tidak bisa post ke Google) via Groq wajib (`RestokuAiAssistant`); 3 template hardcoded Budi/Siti/Anisa dihapus; `generateAiReply` return `status:error` kalau Groq gagal (NO silent fallback).
+- `google_reviews.source` = `places` | `local` | `none`. Filter "Belum Dibalas" = `reply_text IS NULL`.
+- Prasyarat live: `GOOGLE_PLACES_API_KEY` + `GROQ_API_KEY` di `.env`.
+
 ---
 
 ## 7. Design System
@@ -359,6 +389,7 @@ Sidebar dikontrol di `MainLayout.tsx` dengan `featureLocks` per subscription pla
 | **6 — Fitur Placeholder** | ⏳ Backlog | Arus Kas, Inventaris, Perbandingan Outlet |
 | **7 — Monitoring** | ⏳ Backlog | Prometheus/Grafana Redis, alert VPS |
 | **8 — Security Hardening** | 🔴 **OPEN** | Sanitasi prompt injection Gemini AI |
+| **9 — OAuth Google Login** | ⏳ Planned | `Masuk dengan Google` via Socialite (owner lupa password → Gmail, bukan reset email). Plan drafted, Socialite NOT installed |
 
 ---
 

@@ -51,7 +51,7 @@ flowchart TD
     subgraph K1["👨‍🍳 Kasir & KDS (web)"]
         OR3 --> K1G["KDS: GET /api/orders<br/>(antrian realtime)"]
         K1G --> K1U["KDS: PUT /api/orders/{id}/status<br/>updateOrderStatus"]
-        K1U --> K2["Status: baru→diproses→siap→selesai"]
+        K1U --> K2["Order 5-stage: antrian_masuk→diterima→sedang_dimasak→selesai_masak→siap_sajikan→siap_bayar→selesai | Item per-item: dikonfirmasi→sedang dimasak→selesai masak→siap sajikan→selesai"]
     end
 
     %% ============ 6. STAF SHIFT ============

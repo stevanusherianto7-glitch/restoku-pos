@@ -6,20 +6,18 @@
 > pre-flight check LOKAL yang SUDAH dibuktikan (lihat bagian "Pre-flight di lokal").
 
 ## Pre-flight di lokal (SUDAH dibuktikan, real evidence)
-- [x] Backend test: **420 passed (993 assertions)** (`php artisan test`) — 7 failure = cURL
-  error 60 (SSL ke Google API eksternal di sandbox lokal, bukan bug aplikasi).
-- [x] Frontend test: **229 passed (233 total)** (`npx vitest run`) — 4 failure = dependency
-  network/SSL sama (Google Places/Groq eksternal).
-- [x] **Psalm SAST**: `vendor/bin/psalm` exit 0, SARIF 0 alert (`psalm-baseline.xml` allowlist).
+- [x] Backend test: **469 passed, 5 skipped, 0 failed** (`php artisan test`) — baseline 2026-07-17.
+- [x] Frontend test: **242 passed** (`npm run test`) — scope terpilih.
+- [x] **Psalm SAST**: `vendor/bin/psalm` exit 0, SARIF 0 alert.
 - [x] Build: **success** (`npm run build`)
 - [x] Routes publik/owner terdaftar: `api/menu/{slug}`, `api/orders`, `api/pos/menu`,
   `api/owner/sales-summary`, `api/owner/archived-orders`, `/m/{slug}`, `/pos`, `/katalog-menu`
 - [x] Scheduler: `sales:rollup` (01:00), `orders:archive` (1/02:00) terdaftar
-- [x] `tenant:migrate --dry` jalan (schema-per-tenant resolver OK)
+- [x] `tenant:migrate --dry` jalan (schema-per-tenant resolver OK) + **CI `sharding-postgres` GREEN** (9 bug fix, commit `eb1395e`)
 - [x] `config:cache` / `config:clear` OK
 - [x] Commands: `tenant:migrate`, `tenant:backfill`, `sales:rollup`, `orders:archive` terdaftar
-- [x] CI: `ci.yml` 8 jobs GREEN (Secret Scan, PHP SAST/Psalm, PHPUnit, Vitest, Vite Build,
-  Playwright x4) — lihat status di GitHub Actions repo.
+- [x] CI: `ci.yml` 10 jobs GREEN (Secret Scan, PHP SAST/Psalm, PHPUnit, Vitest, Vite Build,
+  Playwright x4, **Schema-per-Tenant Postgres**). CodeQL by design failure (repo private free).
 
 ## Langkah deploy di VPS (Forge opsional, atau manual)
 
@@ -37,6 +35,9 @@ DB_SHARDING_ENABLED=true
 DB_DATABASE=restoku
 DB_HOST=127.0.0.1
 CLOUDINARY_URL=cloudinary://KEY:SECRET@CLOUD
+GOOGLE_PLACES_API_KEY=           # ulasan Google live (Places API by Place ID)
+GROQ_API_KEY=                    # AI reply ulasan (wajib, no silent fallback)
+MENU_BASE_URL=https://DOMAIN    # untuk QR generator (jangan localhost!)
 SESSION_DRIVER=redis
 CACHE_STORE=redis
 QUEUE_CONNECTION=redis
@@ -103,3 +104,9 @@ redis-cli ping   # PONG
 
 ## Blockers
 - 0 blocker kode. Prasyarat: VPS akses + Postgres + Redis + Cloudinary key (di luar scope session ini).
+
+## Dev tunnel lokal (phone testing sebelum VPS)
+- Untuk scan QR dari HP asli saat pre-VPS: `scripts/dev-cloudflared-live.sh` (cloudflared quick tunnel, bukan ngrok/ERR_NGROK_334).
+- Set `MENU_BASE_URL` di `.env` = URL tunnel, restart `php artisan serve`, refresh dashboard sebelum regenerate QR.
+- Kalau `MENU_BASE_URL` kosong → QR fallback `window.location.origin` (localhost) → HP tidak bisa reach = "route error" tapi sebenarnya URL salah.
+- Windows Firewall blokir inbound `:8000` → pakai cloudflared (bukan LAN mode).

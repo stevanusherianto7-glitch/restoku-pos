@@ -3,11 +3,13 @@
 ## Login endpoints
 - **Owner**: `/owner/login` — email + password.
   - `owner@example.com` / `password`
+  - **Rencana**: `Masuk dengan Google` via Laravel Socialite (`/oauth/google` + `/oauth/google/callback`). Owner lupa password → redirect ke Gmail, bukan reset email. Socialite NOT installed (plan drafted). `.env MAIL_MAILER=log` → reset email tidak bisa kirim, jadi OAuth = recovery path.
 - **Staff (Kasir/Kitchen/Waiter/Manager)**: `/login` — **PIN pad 6 digit** (bukan email).
   - Kasir: `123456`  (role `kasir`)
   - Kitchen: `111111` (role `kitchen`)
   - Waiter: `654321`  (role `waiter`)
   - Manager: `999999` (role `manager`)
+- **Tamu (e-Menu)**: tanpa auth. Verifikasi kehadiran via **PIN Meja** (per-outlet, `OutletTable::getPinAttribute`) + **PIN Harian** (`/api/guest/daily-pin`). GPS di-skip kalau `latitude=null`.
 
 ## Role alias normalization
 `RoleGuard` normalizes aliases so `cashier` (English, stored by PengaturanOutlet

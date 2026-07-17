@@ -362,6 +362,9 @@ Temuan yang belum di-fix — wajib diselesaikan sebelum production launch:
 | T-08 | `featureLocks` pakai display name sebagai key (bisa silently break) | 🟡 MEDIUM | `MainLayout.tsx` | OPEN |
 | T-09 | Tidak ada `<SkeletonCard>` / `<SkeletonTable>` di halaman async | 🟢 LOW | semua halaman laporan | OPEN |
 | T-10 | `any` type di `MainLayout.tsx` untuk data reservasi L198 | 🟡 MEDIUM | `MainLayout.tsx` | ✅ CLOSED (fix H-3 2026-07-17, `Types/reservation.ts` + cast `as Reservation[]`) |
+| T-11 | Sharding Fase 2 (schema-per-tenant) | 🔴 HIGH→✅ | `TenantConnection.php`, migrasi `tenant/*` | ✅ CLOSED (2026-07-17, commit `eb1395e`): 9 bug fix, CI `sharding-postgres` GREEN, 7 passed/2 skipped Docker Postgres. Aktif saat `DB_SHARDING_ENABLED=true` + Postgres |
+
+> **T-03 / T-04 status**: DEFERRED (bukan OPEN-critical). Refaktor god-component `Dashboard/Index.tsx` **DITUNDA** sampai data nyata API siap (user: "biarkan staged, tunggu data nyata"). Badge estimasi (T-07) sudah CLOSED — KPI tetap tampil estimasi saat `is_estimate: true`.
 
 *Tutup setiap item dengan PR + bukti fix (screenshot/test output) + tanggal.*
 

@@ -11,6 +11,10 @@ Di-adaptasi dari template **Halo** (uiverse.io) dengan override brand Restoku.
 - Font: **Inter** (Halo) + **Poppins** (display Restoku) + JetBrains/DejaVu Mono.
 - Radius: harmonisasi Halo (6/10/16/24) dengan Restoku (14 default).
 
+**Screen modes (theme selectable, default e-Menu = `nano-banana`):** `terang` / `gelap` / `glassmorphic` / `nano-banana` (dark + amber/orange, default e-Menu) / `krem` (Krem Hangat, gradient krem-peach `#fff3e0→#ffe6c0→#ffd99f`). Semua selectable di `outlet_settings.screen_mode` — jangan hardcode.
+
+**Brand palette Restoku:** cabe `#FF5B35` · emas `#F59E0B` · krem `#FAF5EE/#FFF3EC/#FCE3D6` · cokelat `#7C4A2D/#D97706`.
+
 ## 1. Color Tokens
 
 | Token | Nilai | Role |

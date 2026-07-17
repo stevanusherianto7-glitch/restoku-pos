@@ -87,3 +87,5 @@ lewat `visibleNav` — hanya grup & item yang role-nya punya akses yang tampil.
 - Setiap grup bisa di-collapse/expand; saat sidebar collapse (lebar 80px) hanya ikon yang
   tampil, grup "Utama" dapat dot merah notif reservasi pending.
 - Source of truth: `resources/js/Layouts/MainLayout.tsx` (`nav: NavGroup[]`, `Sidebar`).
+- **OAuth Google login**: route `/oauth/google` + `/oauth/google/callback` SUDAH terdaftar di `routes/web.php` (OAuthController). Tampilan tombol "Masuk dengan Google" belum di-render di `OwnerLogin.tsx` (plan drafted, socialite terpasang).
+- **Google Review**: `/owner/google-reviews` (live via Google Places API, `PlaceIdResolver`).
