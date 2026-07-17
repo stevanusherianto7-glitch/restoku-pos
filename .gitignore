@@ -51,3 +51,4 @@ Thumbs.db
 coverage/
 qr_demo_bandung/
 cacert.pem
+.env.bak

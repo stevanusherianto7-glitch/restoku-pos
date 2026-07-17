@@ -103,7 +103,10 @@ class TenantConnection
         $driver = $template['driver'] ?? 'pgsql';
         $config = $template;
         if ($driver === 'pgsql') {
-            // Postgres: schema via search_path
+            // Postgres: isolasi via search_path (schema terpisah dalam 1 DB).
+            // Laravel ConnectionFactory WAJIB key 'database' (ConnectionFactory:83),
+            // jadi isi dengan nama DB yang sama dengan template (shared DB restoku_sys).
+            $config['database'] = $template['database'] ?? 'restoku_sys';
             $config['search_path'] = $schema;
         } else {
             // MySQL: database terpisah per tenant

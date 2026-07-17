@@ -10,6 +10,7 @@ use App\Services\TenantConnection;
 use App\Services\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
@@ -19,14 +20,24 @@ use Tests\TestCase;
  * TenantScope menyaring (backward-compatible, Fase 1 test tidak break).
  *
  * Di Postgres prod: sharding=true → model query ke schema tenant_{id}.
+ * Test yang mengasumsikan satu environment di-guard masing-masing.
  */
 class TenantShardingTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function isPgsqlSharded(): bool
+    {
+        return Config::get('database.default') === 'pgsql'
+            && Config::get('database.sharding_enabled');
+    }
+
     public function test_sharding_nonaktif_di_sqlite(): void
     {
-        // Test lokal pakai sqlite → sharding harus false (fallback shared).
+        // Hanya valid di environment non-sharded (sqlite/test lokal).
+        if ($this->isPgsqlSharded()) {
+            $this->markTestSkipped('Di Postgres sharding AKTIF — test ini hanya untuk sqlite fallback.');
+        }
         $conn = app(TenantConnection::class);
         $this->assertFalse($conn->isSharded(), 'Di sqlite, sharding harus non-aktif (fallback).');
     }
@@ -43,6 +54,9 @@ class TenantShardingTest extends TestCase
 
     public function test_model_tetap_terisolasi_via_tenant_scope_di_sqlite(): void
     {
+        if ($this->isPgsqlSharded()) {
+            $this->markTestSkipped('TenantScope fallback hanya divalidasi di sqlite. Di Postgres isolasi via schema fisik (lihat SchemaIsolationTest).');
+        }
         $tenantA = Tenant::create(['name' => 'A', 'brand_name' => 'A', 'email' => 'a@t.com', 'phone' => '1']);
         $tenantB = Tenant::create(['name' => 'B', 'brand_name' => 'B', 'email' => 'b@t.com', 'phone' => '2']);
         Outlet::create(['tenant_id' => $tenantA->id, 'name' => 'OA', 'address' => 'x']);
@@ -63,5 +77,45 @@ class TenantShardingTest extends TestCase
     {
         app(TenantContext::class)->reset();
         $this->assertFalse(app(TenantContext::class)->isInitialized());
+    }
+
+    /**
+     * Di Postgres, model dengan UsesTenantConnection harus benar-benar
+     * query ke schema tenant_{id} (bukan koneksi default).
+     */
+    public function test_model_query_ke_schema_terpisah_di_postgres(): void
+    {
+        if (! $this->isPgsqlSharded()) {
+            $this->markTestSkipped('Hanya berlaku di Postgres + sharding aktif.');
+        }
+
+        /** @var TenantConnection $conn */
+        $conn = app(TenantConnection::class);
+
+        // Siapkan 2 schema tenant + migrate
+        foreach ([1, 2] as $tid) {
+            DB::statement("CREATE SCHEMA IF NOT EXISTS tenant_{$tid}");
+            $conn->resolveForTenant($tid);
+            \Artisan::call('migrate', [
+                '--database' => "tenant_{$tid}",
+                '--path' => 'database/migrations/tenant',
+                '--force' => true,
+            ]);
+        }
+
+        // Tulis outlet lewat koneksi tenant_1, pastikan tenant_2 kosong
+        DB::connection('tenant_1')->table('outlets')->insert([
+            'tenant_id' => 1, 'name' => 'O1', 'slug' => 'o1-'.uniqid(),
+            'is_active' => true, 'geo_radius_meters' => 50,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // Set ctx tenant 1 → Outlet (pakai UsesTenantConnection) harus lihat 1
+        app(TenantContext::class)->setTenantId(1);
+        $this->assertSame(1, Outlet::count());
+        // Set ctx tenant 2 → harus 0 (isolasi fisik)
+        app(TenantContext::class)->setTenantId(2);
+        $this->assertSame(0, Outlet::count());
+        app(TenantContext::class)->reset();
     }
 }

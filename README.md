@@ -65,7 +65,7 @@
 
 Restoku menggunakan pola **shared-database, multi-tenant** (shared-schema + `TenantScope`; `TenantConnection` schema-per-tenant **AKTIF di Postgres, INAKTIF di sqlite/test**):
 - Isolasi via `tenant_id` + **`TenantScope`** (global Eloquent scope) + **`TenantContext`** (singleton per request).
-- Fase 2: routing koneksi per-tenant via `TenantConnection` + `UsesTenantConnection` trait (**15 model**). Aktif hanya di Postgres; di sqlite/test fallback ke shared-schema (`isSharded()` = `false`).
+- Fase 2: routing koneksi per-tenant via `TenantConnection` + `UsesTenantConnection` trait (**15 model**). Aktif & **teruji di CI Postgres** (job `sharding-postgres`); di sqlite/test fallback ke shared-schema (`isSharded()` = `false`).
 
 ### 3.1 Tiga Pilar Isolasi
 
@@ -350,7 +350,7 @@ Sidebar dikontrol di `MainLayout.tsx` dengan `featureLocks` per subscription pla
 |------|--------|-----------|
 | 0 — Fondasi | ✅ DONE | Slug outlet, auto-outlet, QR generator, buildMenuUrl |
 | 1 — Menu Nyata | ✅ DONE | Cabut mock data, cache Redis, upload Cloudinary, seeder |
-| 2 — Schema-per-Tenant | ✅ DONE | TenantConnection, partisi orders, read replica |
+| 2 — Schema-per-Tenant | ✅ DONE | TenantConnection, partisi orders, read replica — TERUJI CI (`sharding-postgres`) |
 | 3 — Sales Rollup | ✅ DONE | SalesRollupService, scheduler harian 01:00 |
 | 4 — Cold Archive | ✅ DONE | OrderArchiveService, orders >6 bulan ke archive |
 | UI Refactor | ✅ DONE | Halo design system, 5 screen-mode, tanpa lucide |

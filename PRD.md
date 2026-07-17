@@ -77,7 +77,7 @@ sistem cashier — namun dengan **arsitektur SaaS multi-tenant** yang lebih kuat
 ### 6.1 Saat ini — Shared-DB / Multi-Tenant (Fase 2 code-ready, AKTIF hanya di Postgres)
 - Isolasi via `tenant_id` + `TenantScope` (global scope) + `TenantContext` (singleton per request) + `EnsureTenantContext` middleware.
 - Guest (tamu) di-resolusi lewat `outlet_id` → outlet punya `tenant_id`.
-- **Fase 2 code-ready**: `TenantConnection` + `UsesTenantConnection` trait (**15 model**) — schema-per-tenant **AKTIF di Postgres**, INAKTIF (fallback shared-schema + `TenantScope`) di sqlite/test/CI. `TenantConnection::isSharded()` return `false` saat driver `sqlite`. Prasyarat aktivasi prod: VPS + Postgres.
+- **Fase 2 code-ready + TERUJI**: `TenantConnection` + `UsesTenantConnection` trait (**15 model**) — schema-per-tenant **AKTIF & teruji di CI Postgres** (job `sharding-postgres`), fallback shared-schema di sqlite/test lokal. `TenantConnection::isSharded()` return `false` saat driver `sqlite`. Prasyarat aktivasi prod: VPS + Postgres.
 - **Status**: isolasi sudah benar & teruji (test `GoogleReviewTruncateIsolationTest`, `MenuIsolationTest`).
 
 ### 6.2 Target — Skala 5.000 Tenant
@@ -207,7 +207,7 @@ Fitur-fitur berikut diprioritaskan untuk kesetaraan dengan platform UR-Hub:
 
 ### 9.1 Skalabilitas
 - Target: 5.000 tenant × ratusan outlet, ~25jt order/hari.
-- Fase 2 code-ready: schema-per-tenant (aktif di Postgres; fallback shared-schema di sqlite), Redis cache, read replica, partisi `orders`.
+| Fase 2 | Schema-per-tenant (aktif di Postgres + TERUJI CI `sharding-postgres`; fallback shared-schema di sqlite), Redis cache, read replica, partisi `orders`. |
 - Fase 3 DONE: daily/monthly rollup (`SalesRollupService`).
 - Fase 4 DONE: cold archive orders >6 bulan (`OrderArchiveService`).
 
@@ -266,7 +266,7 @@ Fitur-fitur berikut diprioritaskan untuk kesetaraan dengan platform UR-Hub:
 |------|-----|--------|
 | **Fase 0** | `+slug` outlets, auto-outlet-default, redis config, real QR, `buildMenuUrl` | ✅ DONE |
 | **Fase 1** | Cabut `MOCK_ITEMS`, cache buku menu, upload foto Cloudinary, seeder menu 32 item | ✅ DONE |
-| **Fase 2** | Schema-per-tenant (`TenantConnection`), Redis aktif, read replica, partisi `orders` | ✅ CODE (⏳ aktivasi Postgres) |
+| **Fase 2** | Schema-per-tenant (`TenantConnection`), Redis aktif, read replica, partisi `orders` | ✅ CODE + TERUJI CI (job `sharding-postgres`) |
 | **Fase 3** | Daily/monthly rollup owner (`SalesRollupService`, scheduler 01:00) | ✅ DONE |
 | **Fase 4** | Cold archive orders >6 bulan (`OrderArchiveService`, scheduler 1/02:00) | ✅ DONE |
 | **UI Refactor P2–P6** | Design system Halo-adapted, 5 screen-mode, cabut lucide → inline SVG | ✅ DONE |

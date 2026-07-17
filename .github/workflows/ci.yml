@@ -169,7 +169,66 @@ jobs:
           retention-days: 14
 
   # ─────────────────────────────────────────────────────────────
-  # Job 2: Frontend Vitest + npm audit
+  # Job 5: Schema-per-Tenant isolation (Postgres) — Fase 2 proof
+  #   Mengaktifkan isolasi schema-fisik di CI. Skip di sqlite lokal.
+  #   Bukti runtime code-path TenantConnection::isSharded()=true.
+  # ─────────────────────────────────────────────────────────────
+  sharding-postgres:
+    name: "Schema-per-Tenant (Postgres)"
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: restoku
+        ports: [ "5432:5432" ]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: dom, curl, libxml, mbstring, zip, pdo, pgsql, pdo_pgsql, bcmath
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare CI environment (Postgres + sharding)
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs
+
+      - name: Run schema-per-tenant isolation tests
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: restoku
+          DB_USERNAME: postgres
+          DB_PASSWORD: secret
+          DB_SHARDING_ENABLED: "true"
+        run: |
+          php artisan migrate --force
+          php artisan test --filter=Sharding
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 6: Frontend Vitest + npm audit
   # ─────────────────────────────────────────────────────────────
   vitest:
     name: "Vitest"
