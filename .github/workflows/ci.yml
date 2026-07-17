@@ -31,7 +31,7 @@ jobs:
     name: "Secret Scan"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0  # gitleaks butuh full history utk scan commit lama
 
@@ -63,7 +63,7 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up PHP 8.4
         uses: shivammathur/setup-php@v2
@@ -110,7 +110,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Download Vite build artifact
         uses: actions/download-artifact@v4
@@ -190,7 +190,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up PHP 8.4
         uses: shivammathur/setup-php@v2
@@ -235,7 +235,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -276,7 +276,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -316,7 +316,7 @@ jobs:
         browser: [chromium, firefox, webkit, "Mobile Chrome"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up PHP 8.4
         uses: shivammathur/setup-php@v2
