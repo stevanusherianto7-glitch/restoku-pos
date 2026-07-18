@@ -29,8 +29,8 @@ class GuestVerifyController extends Controller
             'table' => 'required|string|max:50',
             'table_pin' => 'required|string|size:4',
             'daily_pin' => 'required|string|size:4',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
             'accuracy' => 'nullable|numeric',
         ]);
 

@@ -179,4 +179,50 @@ class GuestVerifyControllerTest extends TestCase
 
         $resp->assertNotFound();
     }
+
+    /**
+     * PRE-PRODUCTION CHECK: outlet tanpa koordinat (latitude/longitude = null,
+     * mis. Pawon Salam) → GPS di-skip, verify TETAP sukses tanpa kirim lat/lng.
+     * Bukti bahwa alur lokasi bisa di-test & degradasi aman saat koordinat belum diisi.
+     */
+    public function test_verify_succeeds_when_outlet_has_no_coordinates_gps_skipped(): void
+    {
+        // Force outlet tanpa koordinat (dev mode / belum set geo).
+        $this->testOutlet->update(['latitude' => null, 'longitude' => null]);
+        $this->makeTable('A1');
+        $daily = (new DailyPinService)->getOrGenerate($this->testOutlet->id);
+        $tablePin = OutletTable::derivePin($this->testOutlet->id, 'A1');
+
+        $resp = $this->postJson('/api/guest/verify', [
+            'slug' => $this->testOutlet->slug,
+            'table' => 'A1',
+            'table_pin' => $tablePin,
+            'daily_pin' => $daily,
+            // TIDAK kirim lat/lng → harus tetap OK karena GPS skipped.
+        ]);
+
+        $resp->assertOk();
+        $resp->assertJson(['ok' => true]);
+    }
+
+    /**
+     * PRE-PRODUCTION CHECK: PIN meja termuat di endpoint owner/waiter
+     * (/api/outlet-tables/{outlet}) sehingga bisa diuji display & cetak.
+     */
+    public function test_outlet_table_pin_exposed_for_owner_waiter_display(): void
+    {
+        $table = $this->makeTable('A1');
+        $expectedPin = OutletTable::derivePin($this->testOutlet->id, 'A1');
+
+        $resp = $this->actingAs($this->testOwner)
+            ->getJson("/api/outlet-tables/{$this->testOutlet->id}");
+
+        $resp->assertOk();
+        $resp->assertJsonFragment([
+            'label' => 'A1',
+            'pin' => $expectedPin,
+        ]);
+        // PIN deterministik & bisa di-derive ulang (tidak disimpan plaintext).
+        $this->assertSame($expectedPin, $table->pin);
+    }
 }
