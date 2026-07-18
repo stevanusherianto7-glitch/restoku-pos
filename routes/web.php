@@ -15,6 +15,7 @@ use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\PublicOrderController;
+use App\Services\SubscriptionConfig;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,11 +24,31 @@ use Inertia\Inertia;
 | Public routes — tidak butuh login
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn () => Inertia::render('LandingPage/Index'));
+Route::get('/', function () {
+    $plans = [];
+    foreach (config('subscription.order', []) as $plan) {
+        $plans[] = [
+            'key' => $plan,
+            'name' => config("subscription.plans.$plan.name"),
+            'price_idr' => config("subscription.plans.$plan.price_idr"),
+            'tagline' => config("subscription.plans.$plan.tagline"),
+            'features' => SubscriptionConfig::allFeatures($plan),
+            'extra_features' => SubscriptionConfig::extraFeatures($plan),
+            'inherits' => SubscriptionConfig::inherits($plan),
+            'popular' => config("subscription.plans.$plan.popular"),
+        ];
+    }
+
+    return Inertia::render('LandingPage/Index', ['plans' => $plans]);
+});
 
 // ── Subscription checkout (publik, tanpa login) ─────────────────────────────
 // Simulasi trial 14 hari (PRD non-goal: no payment gateway bawaan).
+use App\Http\Controllers\BiayaOperasionalController;
 use App\Http\Controllers\SubscriptionController;
+use App\Jobs\ExportQrPdf;
+use App\Models\Outlet;
+use Illuminate\Http\Request;
 
 Route::get('/subscribe/{plan}', [SubscriptionController::class, 'show'])
     ->name('subscribe.show');
@@ -131,8 +152,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('/owner/kehadiran', [OwnerDashboardController::class, 'kehadiran'])->name('owner.kehadiran');
     Route::get('/owner/jadwal-shift', [OwnerDashboardController::class, 'jadwalShift'])->name('owner.jadwal-shift');
     // Keuangan grup: Biaya Operasional (controller + migration expenses sendiri)
-    Route::get('/biaya-operasional', [App\Http\Controllers\BiayaOperasionalController::class, 'index'])->name('biaya-operasional.index');
-    Route::post('/biaya-operasional', [App\Http\Controllers\BiayaOperasionalController::class, 'store'])->name('biaya-operasional.store');
+    Route::get('/biaya-operasional', [BiayaOperasionalController::class, 'index'])->name('biaya-operasional.index');
+    Route::post('/biaya-operasional', [BiayaOperasionalController::class, 'store'])->name('biaya-operasional.store');
 
     // ── Meja outlet (PIN untuk display owner/waiter + CRUD nyata) ──────────
     Route::get('/api/outlet-tables/{outlet}', [OutletTableController::class, 'index'])->middleware('throttle:60,1');
@@ -160,9 +181,10 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     // Q87: daftar outlet terpaginasikan untuk cetak QR skala besar (300×50=15000).
     // FE render per-batch (mis. 50/print-page) alih-alih 15000 node sekaligus.
-    Route::get('/api/outlets/paginated', function (\Illuminate\Http\Request $request) {
+    Route::get('/api/outlets/paginated', function (Request $request) {
         $perPage = min((int) $request->input('per_page', 50), 200);
-        return \App\Models\Outlet::select('id', 'name', 'slug')
+
+        return Outlet::select('id', 'name', 'slug')
             ->orderBy('id')
             ->paginate($perPage, ['*'], 'page', (int) $request->input('page', 1));
     });
@@ -170,10 +192,11 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::put('/api/outlet-settings/screen-mode', [OutletSettingsController::class, 'updateScreenMode']);
 
     // Q87: trigger export QR per-batch (queue) untuk skala 15000 QR.
-    Route::post('/api/qr-codes/export', function (\Illuminate\Http\Request $request) {
+    Route::post('/api/qr-codes/export', function (Request $request) {
         $page = (int) $request->input('page', 1);
         $perPage = min((int) $request->input('per_page', 50), 200);
-        \App\Jobs\ExportQrPdf::dispatch(auth()->id() ?? 1, $page, $perPage);
+        ExportQrPdf::dispatch(auth()->id() ?? 1, $page, $perPage);
+
         return response()->json(['success' => true, 'queued' => true]);
     });
 

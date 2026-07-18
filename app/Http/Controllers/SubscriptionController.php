@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subscription;
+use App\Services\SubscriptionConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,7 +33,9 @@ class SubscriptionController extends Controller
             'name' => $cfg['name'],
             'price_idr' => $cfg['price_idr'],
             'tagline' => $cfg['tagline'],
-            'features' => $cfg['features'],
+            'features' => SubscriptionConfig::allFeatures($plan),
+            'extra_features' => SubscriptionConfig::extraFeatures($plan),
+            'inherits' => SubscriptionConfig::inherits($plan),
             'popular' => $cfg['popular'],
         ]);
     }

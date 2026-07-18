@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title inertia>{{ config('app.name', 'Restoku POS') }}</title>
     @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/main.tsx'])
+    @vite(['resources/js/main.tsx'])
     @inertiaHead
 </head>
 <body class="antialiased">

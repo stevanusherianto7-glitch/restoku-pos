@@ -5,11 +5,16 @@ return [
     'trial_days' => 14,
 
     // Definisi paket — single source of truth untuk landing page & checkout.
+    // Struktur BERTINGKAT: tiap tier di atas mewarisi fitur tier di bawahnya.
+    //   - `features`  = fitur TAMBAHAN di tier ini (extra di atas inherits).
+    //   - `inherits`  = tier di bawahnya yang diwarisi seluruh fiturnya.
+    //   `all_features` (lihat app/Services/SubscriptionConfig.php) = flatten inherits + extra.
     'plans' => [
         'basic' => [
-            'name'     => 'Basic',
+            'name' => 'Basic',
             'price_idr' => 149000,
-            'tagline'  => 'Untuk bisnis kuliner pemula',
+            'tagline' => 'Untuk bisnis kuliner pemula',
+            'inherits' => null,
             'features' => [
                 '1 Outlet',
                 'Fitur POS Inti',
@@ -17,12 +22,13 @@ return [
                 'Buku Menu Digital',
                 'Laporan Standar',
             ],
-            'popular'  => false,
+            'popular' => false,
         ],
         'pro' => [
-            'name'     => 'Pro',
+            'name' => 'Pro',
             'price_idr' => 399000,
-            'tagline'  => 'Untuk restoran menengah ke atas',
+            'tagline' => 'Untuk restoran menengah ke atas',
+            'inherits' => 'basic',
             'features' => [
                 'Hingga 3 Outlet',
                 'Integrasi GoFood & Grab',
@@ -30,12 +36,13 @@ return [
                 'Laporan Keuangan Ekspor',
                 'Manajemen Karyawan',
             ],
-            'popular'  => true,
+            'popular' => true,
         ],
         'enterprise' => [
-            'name'     => 'Enterprise',
+            'name' => 'Enterprise',
             'price_idr' => 999000,
-            'tagline'  => 'Untuk franchise & bisnis besar',
+            'tagline' => 'Untuk franchise & bisnis besar',
+            'inherits' => 'pro',
             'features' => [
                 'Outlet Tidak Terbatas',
                 'Kitchen Display System (KDS)',
@@ -43,7 +50,7 @@ return [
                 'Dedicated Account Manager',
                 'Custom API Integration',
             ],
-            'popular'  => false,
+            'popular' => false,
         ],
     ],
 
