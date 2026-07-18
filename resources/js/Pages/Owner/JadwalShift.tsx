@@ -52,7 +52,7 @@ export default function JadwalShift({ schedule, is_stub }: Props) {
                                     <CalendarIcon className="size-4 text-blue-400" /> {s.name}
                                 </td>
                                 {DAYS.map((d) => {
-                                    const v = (s as any)[d];
+                                    const v = (s as Record<string, string>)[d];
                                     const isOff = v === 'Libur';
                                     return (
                                         <td key={d} className="py-3 text-center">

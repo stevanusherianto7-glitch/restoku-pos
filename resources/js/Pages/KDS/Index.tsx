@@ -13,7 +13,7 @@ import {
     ShieldAlertIcon,
 } from '../../Components/icons';
 
-type KdsOrder = { id: string; table: string; status: string; tone: Tone; time: number; items: any[] };
+type KdsOrder = { id: string; table: string; status: string; tone: Tone; time: number; items: OrderItem[] };
 
 const AUTHORIZED_ROLES = ['kitchen', 'waiter', 'manager', 'owner'];
 
@@ -161,7 +161,7 @@ function KDSContent() {
         ];
 
         allOrders.forEach((o) => {
-            (o.items || []).forEach((it: any) => {
+            (o.items || []).forEach((it: OrderItem) => {
                 const name = it?.name || (typeof it === 'string' ? it.replace(/^\+\s*/, '') : '');
                 const qty = typeof it === 'string' ? parseInt((it.match(/^(\d+)x\s+/) || [])[1]) || 1 : it?.qty || 1;
                 if (!name) return; // skip notes / kosong

@@ -41,6 +41,8 @@ type PosMenuItem = {
     is_popular?: boolean;
 };
 
+type PosOrder = { items: string[] };
+
 function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenuItem[] } }) {
     const { screenMode } = useTenantSettings();
     const isNanoBanana = screenMode === 'nano-banana';
@@ -54,7 +56,7 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
     // ── Tax Config dari Inertia Shared Props ──────────────────────────────────
     // MIGRASI dari localStorage ke usePage().props.outlet_settings
     // Fallback ke localStorage untuk backward-compat sementara komponen lain dimigrasikan
-    const { outlet_settings } = usePage<any>().props;
+    const { outlet_settings } = usePage<{ outlet_settings?: OutletSettings }>().props;
     const taxConfig = (() => {
         // Primary: baca dari Inertia shared props (di-supply oleh HandleInertiaRequests)
         if (outlet_settings) {
@@ -147,7 +149,7 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
 
     const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
     const [orderTableName, setOrderTableName] = useState<string | null>(null);
-    const [servedQueue, setServedQueue] = useState<any[]>([]);
+    const [servedQueue, setServedQueue] = useState<PosOrder[]>([]);
     const [activeTab, setActiveTab] = useState<'menu' | 'queue'>('menu');
 
     // Ad-hoc item states
@@ -193,7 +195,7 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
         return () => clearInterval(interval);
     }, []);
 
-    const calculateOrderTotal = (order: any) => {
+    const calculateOrderTotal = (order: PosOrder) => {
         const items = Array.isArray(order?.items) ? order.items : [];
         return items
             .filter((itemStr: string) => !itemStr.startsWith('+'))
@@ -209,7 +211,7 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
             }, 0);
     };
 
-    const handleLoadServedOrder = (order: any) => {
+    const handleLoadServedOrder = (order: PosOrder) => {
         // Map items to cart items
         const cartItems = order.items
             .filter((itemStr: string) => !itemStr.startsWith('+'))
@@ -534,12 +536,12 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
                                                             </div>
                                                             <div className="text-xs text-slate-300 mt-1 space-y-0.5 border-t border-white/5 pt-1">
                                                                 {(Array.isArray(order.items) ? order.items : [])
-                                                                    .filter((i: any) =>
+                                                                    .filter((i: string) =>
                                                                         typeof i === 'string'
                                                                             ? !i.startsWith('+')
                                                                             : true,
                                                                     )
-                                                                    .map((it: any, idx: number) => (
+                                                                    .map((it: string, idx: number) => (
                                                                         <div
                                                                             key={idx}
                                                                             className="truncate select-none font-medium leading-snug"

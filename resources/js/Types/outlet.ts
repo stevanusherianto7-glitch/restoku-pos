@@ -55,3 +55,22 @@ export interface DailySummary {
     topItems: Array<{ name: string; sold: number; revenue: number }>;
     paymentBreakdown: Record<string, number>;
 }
+
+export type QrKind = 'frame' | 'sticker' | 'stand';
+
+export interface ApiTable {
+    id: string;
+    label: string;
+    pin: string;
+    is_queue: boolean;
+    qr_type: QrKind;
+}
+
+export interface OperatingHour {
+    day: number; // 0=Sunday … 6=Saturday
+    open: string; // "HH:mm"
+    close: string; // "HH:mm"
+    is_closed: boolean;
+}
+
+export type VoidPolicy = 'audit_full' | 'zero_out' | 'manager_only';

@@ -352,7 +352,7 @@ Temuan yang belum di-fix — wajib diselesaikan sebelum production launch:
 
 | ID | Temuan | Severity | File | Status |
 |----|--------|----------|------|--------|
-| T-01 | `GeminiAiController` belum sanitasi prompt injection | 🔴 HIGH | `GeminiAiController.php` | OPEN |
+| T-01 | `GeminiAiController` belum sanitasi prompt injection | ~~🔴 HIGH~~ | `GeminiAiController.php` | **✅ CLOSED 2026-07-18** |
 | T-02 | Redis monitoring (Prometheus/Grafana) belum setup | 🟡 MEDIUM | VPS/infra | OPEN |
 | T-03 | `Dashboard/Index.tsx` god component 1.349 baris | 🔴 HIGH | `Pages/Dashboard/Index.tsx` | OPEN |
 | T-04 | 2 dashboard owner (Index.tsx vs OwnerDashboard.tsx) tidak konsisten | 🔴 HIGH | kedua file | OPEN |
@@ -362,7 +362,11 @@ Temuan yang belum di-fix — wajib diselesaikan sebelum production launch:
 | T-08 | `featureLocks` pakai display name sebagai key (bisa silently break) | 🟡 MEDIUM | `MainLayout.tsx` | OPEN |
 | T-09 | Tidak ada `<SkeletonCard>` / `<SkeletonTable>` di halaman async | 🟢 LOW | semua halaman laporan | OPEN |
 | T-10 | `any` type di `MainLayout.tsx` untuk data reservasi L198 | 🟡 MEDIUM | `MainLayout.tsx` | ✅ CLOSED (fix H-3 2026-07-17, `Types/reservation.ts` + cast `as Reservation[]`) |
-| T-11 | Sharding Fase 2 (schema-per-tenant) | 🔴 HIGH→✅ | `TenantConnection.php`, migrasi `tenant/*` | ✅ CLOSED (2026-07-17, commit `eb1395e`): 9 bug fix, CI `sharding-postgres` GREEN, 7 passed/2 skipped Docker Postgres. Aktif saat `DB_SHARDING_ENABLED=true` + Postgres |
+| T-11 | ESLint 27 warnings (audit claim) | 🟡 MEDIUM | berbagai Pages + tests | **❌ SALAH** — real 0 err / 0 warn (committed tree eslint 0/0). Counter-check 2026-07-18. |
+| T-12 | `/kds`, `/laporan-penjualan`, `/staf-shift` — route tanpa controller (no initial data) | 🟡 MEDIUM | `routes/web.php` | OPEN |
+| T-13 | `CustomerView.tsx` god component 2.071 baris | 🔴 HIGH | `Pages/BukuMenuDigital/CustomerView.tsx` | OPEN |
+| T-14 | `PengaturanOutlet/Index.tsx` 2.257 baris | 🟡 MEDIUM | `Pages/PengaturanOutlet/Index.tsx` | OPEN |
+| T-15 | 26+ occurrences `any` type di Pages TSX | 🟡 MEDIUM | berbagai Pages | **✅ CLOSED 2026-07-19**: 0 `any` di Pages (migrasi ke interface `Staff`/`Outlet`/`MenuItem`/`OrderItem`/`ApiTable`/`OperatingHour`/`VoidPolicy`/`ScreenMode`/`StaffRole`/`PosOrder`/`WebkitWindow`/`Record<string,string>`). Build hijau + vitest 242/242. |
 
 > **T-03 / T-04 status**: DEFERRED (bukan OPEN-critical). Refaktor god-component `Dashboard/Index.tsx` **DITUNDA** sampai data nyata API siap (user: "biarkan staged, tunggu data nyata"). Badge estimasi (T-07) sudah CLOSED — KPI tetap tampil estimasi saat `is_estimate: true`.
 

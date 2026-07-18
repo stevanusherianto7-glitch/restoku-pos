@@ -123,7 +123,7 @@ function BukuMenuDigitalInner() {
             });
             if (!res.ok) throw new Error('Gagal memuat meja');
             const data = await res.json();
-            const rows: ApiTable[] = (data.tables ?? []).map((t: any) => ({
+            const rows: ApiTable[] = (data.tables ?? []).map((t: ApiTable) => ({
                 id: t.id,
                 label: t.label,
                 pin: t.pin,
@@ -132,7 +132,7 @@ function BukuMenuDigitalInner() {
             }));
             setApiTables(rows);
             setSelectedTable(rows[0]?.label ?? '');
-        } catch (e: any) {
+        } catch (e: unknown) {
             setTableError(e?.message ?? 'Gagal memuat meja');
             setApiTables([]);
         } finally {
@@ -222,7 +222,7 @@ function BukuMenuDigitalInner() {
             }
             await loadTables(selectedOutletId);
             setModalOpen(false);
-        } catch (e: any) {
+        } catch (e: unknown) {
             setTableError(e?.message ?? 'Gagal menyimpan meja');
         } finally {
             setSaving(false);
@@ -240,7 +240,7 @@ function BukuMenuDigitalInner() {
             });
             if (!res.ok) throw new Error('Gagal menghapus meja');
             await loadTables(selectedOutletId);
-        } catch (e: any) {
+        } catch (e: unknown) {
             setTableError(e?.message ?? 'Gagal menghapus meja');
         } finally {
             setSaving(false);
@@ -295,7 +295,7 @@ function BukuMenuDigitalInner() {
             }
             await loadTables(selectedOutletId);
             setTableError(msg);
-        } catch (e: any) {
+        } catch (e: unknown) {
             setTableError(e?.message ?? 'Gagal mengimpor CSV');
         } finally {
             setSaving(false);

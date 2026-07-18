@@ -12,6 +12,11 @@ import {
     BellRingIcon,
     ShieldAlertIcon,
 } from '../../Components/icons';
+
+interface WebkitWindow extends Window {
+    webkitAudioContext: typeof AudioContext;
+}
+
 import DailyPinBadge from '../../Components/DailyPinBadge';
 
 type KdsOrder = {
@@ -87,7 +92,7 @@ function WaiterBarContent() {
         if (!isAudioEnabled) return;
         try {
             if (!audioContextRef.current) {
-                audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+                audioContextRef.current = new (window.AudioContext || (window as WebkitWindow).webkitAudioContext)();
             }
             const ctx = audioContextRef.current;
             if (ctx.state === 'suspended') {
@@ -131,12 +136,12 @@ function WaiterBarContent() {
             //  - /api/bar/orders     → Bar (minuman, dest=bar) status siap_sajikan
             const [kdsRes, barRes] = await Promise.all([fetch('/api/orders'), fetch('/api/bar/orders')]);
 
-            const collect = (res: Response): any[] => {
+            const collect = (res: Response): OrderItem[] => {
                 if (!res.ok) return [];
-                return res.json().then((data: any) => {
+                return res.json().then((data: { grouped?: Record<string, OrderItem[]> }) => {
                     const grouped = data.grouped ?? {};
-                    const flat: any[] = [];
-                    Object.values(grouped).forEach((list: any) => flat.push(...list));
+                    const flat: OrderItem[] = [];
+                    Object.values(grouped).forEach((list: OrderItem[]) => flat.push(...list));
                     return flat;
                 });
             };

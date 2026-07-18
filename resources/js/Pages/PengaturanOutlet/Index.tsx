@@ -29,8 +29,10 @@ import {
 import { RoleGuard } from '../../Components/RoleGuard';
 import { runLocalGeocoder } from '../../lib/geocoder';
 import { TAB_SLUGS, SLUG_TO_TAB } from '../../lib/outletTabs';
+import { applyScreenMode, isScreenMode } from '../../lib/screenMode';
 import { serializeStruk, parseStruk } from '../../lib/strukConfig';
-import { applyScreenMode, isScreenMode, type ScreenMode } from '../../lib/screenMode';
+import type { Outlet, VoidPolicy } from '../../Types/outlet';
+import type { Staff } from '../../Types/staff';
 
 function PengaturanOutletInner() {
     const [activeTab, setActiveTab] = useState('Profil Outlet');
@@ -48,17 +50,25 @@ function PengaturanOutletInner() {
         saveEmployees,
         persistScreenMode,
     } = useTenantSettings();
-    const { tenant, outlet, employees: dbEmployees } = usePage<any>().props;
+    const {
+        tenant,
+        outlet,
+        employees: dbEmployees,
+    } = usePage<{
+        tenant?: unknown;
+        outlet?: Outlet;
+        employees?: Staff[];
+    }>().props;
     const [nameInput, setNameInput] = useState(tenantName);
     const [logoInput, setLogoInput] = useState(tenantLogo);
     const [imageInput, setImageInput] = useState<string | null>(tenantImage);
-    const authUser = (usePage<any>().props as any)?.auth?.user;
+    const authUser: { name?: string } | undefined = usePage<{ auth?: { user?: { name?: string } } }>().props.auth?.user;
     const [ownerInput, setOwnerInput] = useState(
         staffOwner && staffOwner !== 'LALU GUSTI' ? staffOwner : (authUser?.name ?? ''),
     );
 
     // CRUD States for Staff List
-    const [employeesList, setEmployeesList] = useState<any[]>(dbEmployees || employees);
+    const [employeesList, setEmployeesList] = useState<Staff[]>(dbEmployees || employees);
     const [newEmpName, setNewEmpName] = useState('');
     const [newEmpEmail, setNewEmpEmail] = useState('');
     const [newEmpPassword, setNewEmpPassword] = useState('');
@@ -336,7 +346,7 @@ function PengaturanOutletInner() {
                     setNewEmpEmail('');
                     setNewEmpPassword('');
                 },
-                onError: (err: any) => {
+                onError: (err: unknown) => {
                     alert('Gagal menambah karyawan: ' + JSON.stringify(err));
                 },
             },
@@ -349,11 +359,11 @@ function PengaturanOutletInner() {
         if (!window.confirm(`Hapus "${emp.name}" dari daftar karyawan?`)) return;
         router.delete(`/api/outlet-settings/karyawan/${id}`, {
             preserveScroll: true,
-            onError: (err: any) => alert('Gagal menghapus karyawan: ' + JSON.stringify(err)),
+            onError: (err: unknown) => alert('Gagal menghapus karyawan: ' + JSON.stringify(err)),
         });
     };
 
-    const handleStartEdit = (emp: any) => {
+    const handleStartEdit = (emp: Staff) => {
         setEditingId(emp.id);
         setEditName(emp.name);
         setEditEmail(emp.email || '');
@@ -378,7 +388,7 @@ function PengaturanOutletInner() {
             {
                 preserveScroll: true,
                 onSuccess: () => setEditingId(null),
-                onError: (err: any) => alert('Gagal mengupdate karyawan: ' + JSON.stringify(err)),
+                onError: (err: unknown) => alert('Gagal mengupdate karyawan: ' + JSON.stringify(err)),
             },
         );
     };
@@ -471,7 +481,7 @@ function PengaturanOutletInner() {
                     setSaveSuccessMsg(true);
                     setTimeout(() => setSaveSuccessMsg(false), 3000);
                 },
-                onError: (err: any) => {
+                onError: (err: unknown) => {
                     console.error('Gagal menyimpan ke database:', err);
                     alert(
                         '⚠️ Pengaturan tersimpan secara lokal, namun gagal sync ke server database: ' +
@@ -667,7 +677,9 @@ function PengaturanOutletInner() {
                                                             />
                                                             <select
                                                                 value={editRole}
-                                                                onChange={(e) => setEditRole(e.target.value as any)}
+                                                                onChange={(e) =>
+                                                                    setEditRole(e.target.value as StaffRole)
+                                                                }
                                                                 className={inputClass}
                                                             >
                                                                 <option value="cashier">KASIR (CASHIER)</option>
@@ -780,7 +792,7 @@ function PengaturanOutletInner() {
                                                 />
                                                 <select
                                                     value={newEmpRole}
-                                                    onChange={(e) => setNewEmpRole(e.target.value as any)}
+                                                    onChange={(e) => setNewEmpRole(e.target.value as StaffRole)}
                                                     className={inputClass}
                                                 >
                                                     <option value="" disabled>
@@ -946,7 +958,7 @@ function PengaturanOutletInner() {
                                             <button
                                                 key={opt.id}
                                                 type="button"
-                                                onClick={() => handleScreenModeChange(opt.id as any)}
+                                                onClick={() => handleScreenModeChange(opt.id as ScreenMode)}
                                                 className={optionBtnClass(screenMode === opt.id)}
                                             >
                                                 <div
@@ -1016,7 +1028,7 @@ function PengaturanOutletInner() {
                                         ].map((opt) => (
                                             <button
                                                 key={opt.id}
-                                                onClick={() => saveLayout(opt.id as any)}
+                                                onClick={() => saveLayout(opt.id as ScreenMode)}
                                                 className={optionBtnClass(tenantLayout === opt.id)}
                                             >
                                                 {/* Theme mini preview block */}
@@ -1388,7 +1400,7 @@ function PengaturanOutletInner() {
                                             </label>
                                             <select
                                                 value={voidPolicy}
-                                                onChange={(e) => setVoidPolicy(e.target.value as any)}
+                                                onChange={(e) => setVoidPolicy(e.target.value as VoidPolicy)}
                                                 className={`w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors shadow-sm font-medium ${isLight ? 'border border-emerald-400 bg-emerald-50/50 text-emerald-950 focus:border-emerald-600 focus:bg-white' : 'border border-emerald-500/30 bg-[#0c0c0c] text-emerald-300 focus:border-emerald-500'}`}
                                             >
                                                 <option value="audit_full">

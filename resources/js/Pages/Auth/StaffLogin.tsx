@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { DeleteIcon } from '../../Components/icons';
 import { RestokuWordmark, verifyPin, DEFAULT_EMPLOYEES } from '../../Components/Shared';
+import type { Staff } from '../../Types/staff';
 
 export default function StaffLogin() {
     const [pin, setPin] = useState('');
@@ -12,12 +13,12 @@ export default function StaffLogin() {
     // ── Daftar Karyawan dari Inertia Shared Props ──────────────────────────
     // MIGRASI dari localStorage ke usePage().props.login_employees
     // login_employees di-share oleh HandleInertiaRequests HANYA di halaman /login
-    const { login_employees } = usePage<{ login_employees?: any[] }>().props;
+    const { login_employees } = usePage<{ login_employees?: Staff[] }>().props;
 
     // Fallback: localStorage untuk backward-compat jika props kosong (incognito/cache)
-    const [employeesList] = useState<any[]>(() => {
+    const [employeesList] = useState<Staff[]>(() => {
         // Helper: filter karyawan yang memiliki pin valid (bukan null/undefined)
-        const filterValid = (arr: any[]) =>
+        const filterValid = (arr: Staff[]) =>
             Array.isArray(arr) ? arr.filter((e) => e && typeof e.pin === 'string' && e.pin.length > 0) : [];
 
         if (Array.isArray(login_employees) && login_employees.length > 0) {
@@ -72,7 +73,7 @@ export default function StaffLogin() {
                   : DEFAULT_EMPLOYEES;
 
             (async () => {
-                let matched: any = null;
+                let matched: Staff | null = null;
                 // Try props list first, then fall back to DEFAULT_EMPLOYEES.
                 for (const list of [primaryList, DEFAULT_EMPLOYEES]) {
                     if (!Array.isArray(list) || list.length === 0) continue;

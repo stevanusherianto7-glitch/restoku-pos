@@ -34,7 +34,7 @@ export default function MonitorPesanan() {
                 // payment-queue mengembalikan { grouped: { 'Siap Bayar': [...] }, orders: [...] }
                 const flatOrders: Order[] = data.orders ?? [];
                 if (flatOrders.length === 0 && data.grouped) {
-                    Object.values(data.grouped).forEach((groupList: any) => {
+                    Object.values(data.grouped).forEach((groupList: Order[]) => {
                         flatOrders.push(...groupList);
                     });
                 }

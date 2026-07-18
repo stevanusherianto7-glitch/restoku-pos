@@ -148,7 +148,7 @@ export default function CustomerView() {
         fetch(apiUrl)
             .then((r) => (r.ok ? r.json() : null))
             .then((data) => {
-                const items: MenuItem[] = (data?.menu ?? []).map((m: any) => ({
+                const items: MenuItem[] = (data?.menu ?? []).map((m: MenuItem) => ({
                     ...m,
                     // API returns category as {id,name}; UI filter expects string name.
                     category: m.category?.name ?? m.category ?? '',
@@ -259,7 +259,7 @@ export default function CustomerView() {
     const [outletScheduleMsg, setOutletScheduleMsg] = useState<string | null>(null);
 
     // Evaluasi apakah outlet buka berdasarkan jadwal
-    const evaluateSchedule = (schedule: any[]) => {
+    const evaluateSchedule = (schedule: OperatingHour[]) => {
         if (!Array.isArray(schedule)) return;
         const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const now = new Date();
