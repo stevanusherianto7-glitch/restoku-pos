@@ -68,19 +68,21 @@ export default function CustomerView() {
                 renderLogo={data.renderLogo}
             />
 
-            <WelcomeModal
-                stage={data.appStage === 'app' ? 'landing' : data.appStage}
-                onStageChange={data.setAppStage}
-                outletName={data.outletName}
-                tenantImage={data.tenantImage}
-                isOutletOpen={data.isOutletOpen}
-                outletScheduleMsg={data.outletScheduleMsg}
-                tableNumber={data.tableNumber}
-                orderType={data.orderType}
-                setOrderType={data.setOrderType}
-                isNanoBanana={data.isNanoBanana}
-                isDarkTheme={isDarkTheme}
-            />
+            {data.appStage !== 'app' && (
+                <WelcomeModal
+                    stage={data.appStage}
+                    onStageChange={data.setAppStage}
+                    outletName={data.outletName}
+                    tenantImage={data.tenantImage}
+                    isOutletOpen={data.isOutletOpen}
+                    outletScheduleMsg={data.outletScheduleMsg}
+                    tableNumber={data.tableNumber}
+                    orderType={data.orderType}
+                    setOrderType={data.setOrderType}
+                    isNanoBanana={data.isNanoBanana}
+                    isDarkTheme={isDarkTheme}
+                />
+            )}
 
             {data.activeTab === 'menu' && (
                 <main className="flex-1 px-4 pb-28 space-y-4 overflow-y-auto">
