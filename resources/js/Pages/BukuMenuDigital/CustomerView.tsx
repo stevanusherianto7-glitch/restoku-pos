@@ -3,10 +3,8 @@ import { Head, usePage } from '@inertiajs/react';
 import {
     SearchIcon,
     MessageCircleIcon,
-    ShoppingBagIcon,
     PlusIcon,
     MinusIcon,
-    CheckIcon,
     SparklesIcon,
     ShoppingCartIcon,
     HelpCircleIcon,
@@ -22,6 +20,8 @@ import { useTenantSettings } from '../../Components/Shared';
 import { GuestVerifyGate } from '../../Components/GuestVerifyGate';
 import { evaluateSchedule } from '../../lib/evaluateSchedule';
 import { MenuDetailSheet } from './components/MenuDetailSheet';
+import { CartPanel } from './components/CartPanel';
+import { OrderTrackingModal } from './components/OrderTrackingModal';
 
 export interface MenuItem {
     id: number;
@@ -1160,143 +1160,26 @@ export default function CustomerView() {
             )}
 
             {activeTab === 'cart' && (
-                /* Redesigned Premium Cart Tab */
-                <main className="flex-1 p-5 pb-28 flex flex-col justify-between">
-                    <div className="space-y-4">
-                        <h2 className="text-base font-extrabold text-white flex items-center gap-2 mb-2">
-                            <ShoppingBagIcon className="size-5 text-emerald-400" /> Ringkasan Pesanan
-                        </h2>
-
-                        {/* Anti-fraud: verifikasi kehadiran tamu (GPS + PIN) */}
-                        <GuestVerifyGate
-                            slug={outletSlug}
-                            tableLabel={tableNumber}
-                            geo={outletGeo}
-                            onVerified={(token: string) => {
-                                setVerifyToken(token);
-                                setGuestVerified(true);
-                            }}
-                        />
-
-                        {cartTotalItems > 0 ? (
-                            <div className="space-y-3 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
-                                {/* Dine In / Take Away Segmented Selector */}
-                                <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 mb-4">
-                                    <button
-                                        onClick={() => setOrderType('dine_in')}
-                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                                            orderType === 'dine_in'
-                                                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/10'
-                                                : 'text-slate-400 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        Dine In
-                                    </button>
-                                    <button
-                                        onClick={() => setOrderType('take_away')}
-                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                                            orderType === 'take_away'
-                                                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/10'
-                                                : 'text-slate-400 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        Take Away
-                                    </button>
-                                </div>
-
-                                {Object.entries(cart).map(([idStr, qty]) => {
-                                    const id = parseInt(idStr);
-                                    const item = menuItems.find((i) => i.id === id);
-                                    if (!item) return null;
-                                    return (
-                                        <div
-                                            key={id}
-                                            className="flex items-center gap-3 bg-white/[0.02] p-3 rounded-2xl border border-white/5"
-                                        >
-                                            <ProductImage
-                                                src={item.image}
-                                                alt={item.name}
-                                                variant="small"
-                                                className="size-12 rounded-xl object-cover"
-                                            />
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="text-xs font-bold text-white truncate">{item.name}</h4>
-                                                <p className="text-[10px] text-emerald-400 font-mono mt-0.5">
-                                                    {formatRupiah(item.price)}
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-0.5">
-                                                <button
-                                                    onClick={() => removeFromCart(id)}
-                                                    className="size-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold"
-                                                >
-                                                    <MinusIcon className="size-2.5" />
-                                                </button>
-                                                <span className="w-6 text-center text-xs font-bold text-white">
-                                                    {qty}
-                                                </span>
-                                                <button
-                                                    onClick={() => addToCart(id)}
-                                                    className="size-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold"
-                                                >
-                                                    <PlusIcon className="size-2.5" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-
-                                {/* Chef Notes Textarea */}
-                                <div className="space-y-2 mt-4">
-                                    <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                        Catatan untuk Chef / Dapur (opsional)
-                                    </label>
-                                    <textarea
-                                        placeholder="contoh: Tanpa bawang, kuah pisah, extra pedas, dll."
-                                        value={chefNotes}
-                                        onChange={(e) => setChefNotes(e.target.value)}
-                                        className="w-full h-16 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all resize-none placeholder:text-slate-600"
-                                    />
-                                </div>
-
-                                {/* Bill details */}
-                                <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-4 space-y-2 mt-4">
-                                    <div className="flex justify-between text-xs text-slate-400">
-                                        <span>Subtotal</span>
-                                        <span className="font-mono text-slate-300">{formatRupiah(cartTotalPrice)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-xs text-slate-400">
-                                        <span>Pajak Restoran PBJT (10%)</span>
-                                        <span className="font-mono text-slate-300">
-                                            {formatRupiah(cartTotalPrice * 0.1)}
-                                        </span>
-                                    </div>
-                                    <div className="h-px bg-white/5 my-2" />
-                                    <div className="flex justify-between text-sm font-bold text-white">
-                                        <span>Total Pembayaran</span>
-                                        <span className="font-mono text-emerald-400">
-                                            {formatRupiah(cartTotalPrice * 1.1)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="py-24 text-center text-slate-500">
-                                <ShoppingCartIcon className="size-16 mx-auto text-slate-700 mb-3" />
-                                <p className="text-sm font-bold">Keranjang Anda Kosong</p>
-                                <p className="text-xs text-slate-500 mt-1">
-                                    Kembali ke tab menu untuk memilih hidangan terbaik kami.
-                                </p>
-                                <button
-                                    onClick={() => setActiveTab('menu')}
-                                    className="mt-5 px-5 py-2.5 bg-emerald-500 text-slate-950 rounded-xl text-xs font-bold hover:bg-emerald-400 shadow-lg shadow-emerald-500/10"
-                                >
-                                    Lihat Daftar Menu
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </main>
+                <CartPanel
+                    outletSlug={outletSlug}
+                    tableNumber={tableNumber}
+                    outletGeo={outletGeo}
+                    onVerified={(token: string) => {
+                        setVerifyToken(token);
+                        setGuestVerified(true);
+                    }}
+                    cartTotalItems={cartTotalItems}
+                    cart={cart}
+                    menuItems={menuItems}
+                    addToCart={addToCart}
+                    removeFromCart={removeFromCart}
+                    orderType={orderType}
+                    setOrderType={setOrderType}
+                    chefNotes={chefNotes}
+                    setChefNotes={setChefNotes}
+                    cartTotalPrice={cartTotalPrice}
+                    setActiveTab={setActiveTab}
+                />
             )}
 
             {activeTab === 'reservasi' && (
@@ -1723,132 +1606,18 @@ export default function CustomerView() {
                 </div>
             )}
 
-            {/* Premium Success & Real-Time Tracking Modal */}
             {orderSuccess && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div className="bg-[#FAF5EE] border border-amber-900/10 rounded-3xl p-6 w-[92%] max-w-sm flex flex-col items-center text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-[#1A1410]">
-                        <div
-                            className={`size-16 rounded-full flex items-center justify-center mb-4 shadow-md transition-all ${
-                                orderTone === 'amber'
-                                    ? 'bg-amber-500/10 border-amber-500/20 text-amber-500 shadow-amber-500/5'
-                                    : orderTone === 'blue'
-                                      ? 'bg-blue-500/10 border-blue-500/20 text-blue-500 shadow-blue-500/5'
-                                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 shadow-emerald-500/5'
-                            }`}
-                        >
-                            {orderStatus === 'Siap Sajikan' || orderStatus === 'Selesai' ? (
-                                <CheckIcon className="size-8 stroke-[3]" />
-                            ) : (
-                                <span className="size-6 rounded-full border-4 border-t-transparent animate-spin border-current" />
-                            )}
-                        </div>
-                        <h3 className="text-base font-extrabold text-[#1A1410] mb-1">
-                            {orderStatus === 'Antrian Masuk'
-                                ? 'Menunggu Konfirmasi'
-                                : orderStatus === 'Sedang Dimasak'
-                                  ? 'Sedang Dimasak'
-                                  : orderStatus === 'Siap Sajikan'
-                                    ? 'Pesanan Siap Sajikan!'
-                                    : 'Pesanan Selesai!'}
-                        </h3>
-                        <p className="text-xs text-[#7A6F63] leading-relaxed mb-4">
-                            {orderStatus === 'Antrian Masuk'
-                                ? 'Dapur sedang meninjau pesanan Anda.'
-                                : orderStatus === 'Sedang Dimasak'
-                                  ? 'Koki sedang meracik hidangan lezat Anda.'
-                                  : orderStatus === 'Siap Sajikan'
-                                    ? 'Pelayan kami sedang mengantarkan hidangan ke meja Anda.'
-                                    : 'Terima kasih! Silakan nikmati hidangan lezat Anda.'}
-                        </p>
-
-                        {/* Real-time Status Tracker */}
-                        <div className="w-full bg-[#FFF3EC] border border-[#FF5B35]/10 p-4 rounded-2xl mb-4 text-left space-y-3">
-                            <div className="flex justify-between items-center">
-                                <span className="text-[9px] uppercase font-bold text-[#7A6F63] tracking-wider">
-                                    Status Pesanan
-                                </span>
-                                <span
-                                    className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
-                                        orderTone === 'amber'
-                                            ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
-                                            : orderTone === 'blue'
-                                              ? 'bg-blue-500/10 text-blue-600 border border-blue-500/20'
-                                              : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                                    }`}
-                                >
-                                    {orderStatus}
-                                </span>
-                            </div>
-
-                            {/* Progress Bar Visualizer */}
-                            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
-                                <div
-                                    className={`h-full transition-all duration-500 ${
-                                        orderStatus === 'Antrian Masuk'
-                                            ? 'w-1/3 bg-amber-500'
-                                            : orderStatus === 'Sedang Dimasak'
-                                              ? 'w-2/3 bg-blue-500'
-                                              : 'w-full bg-emerald-500'
-                                    }`}
-                                />
-                            </div>
-
-                            <div className="flex justify-between text-[8px] font-bold text-[#8A7D70] uppercase tracking-wider">
-                                <span
-                                    className={orderStatus === 'Antrian Masuk' ? 'text-amber-600 font-extrabold' : ''}
-                                >
-                                    Antrian
-                                </span>
-                                <span
-                                    className={orderStatus === 'Sedang Dimasak' ? 'text-blue-600 font-extrabold' : ''}
-                                >
-                                    Dimasak
-                                </span>
-                                <span
-                                    className={
-                                        orderStatus === 'Siap Sajikan' || orderStatus === 'Selesai'
-                                            ? 'text-emerald-600 font-extrabold'
-                                            : ''
-                                    }
-                                >
-                                    Saji
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="w-full bg-white border border-amber-900/10 p-3 rounded-2xl mb-4 text-left">
-                            <div className="flex justify-between">
-                                <div>
-                                    <p className="text-[9px] uppercase font-bold text-[#7A6F63] tracking-wider">
-                                        Nomor Meja
-                                    </p>
-                                    <p className="text-sm font-extrabold text-[#FF5B35] mt-0.5">
-                                        {tableNumber ? `Meja ${tableNumber}` : 'Meja 1'}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-[9px] uppercase font-bold text-[#7A6F63] tracking-wider text-right">
-                                        Order ID
-                                    </p>
-                                    <p className="text-xs font-bold text-[#1A1410] mt-0.5 text-right">
-                                        {activeOrderId}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={() => {
-                                setOrderSuccess(false);
-                                setCart({});
-                                setActiveTab('menu');
-                            }}
-                            className="w-full py-3.5 bg-[#FF5B35] hover:bg-[#E04E2B] text-white rounded-xl text-xs font-black cursor-pointer border-none shadow-md shadow-[#FF5B35]/25"
-                        >
-                            Pesan Menu Lainnya
-                        </button>
-                    </div>
-                </div>
+                <OrderTrackingModal
+                    orderStatus={orderStatus}
+                    orderTone={orderTone}
+                    tableNumber={tableNumber}
+                    activeOrderId={activeOrderId}
+                    onClose={() => {
+                        setOrderSuccess(false);
+                        setCart({});
+                        setActiveTab('menu');
+                    }}
+                />
             )}
 
             {detailItem && (
