@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useCustomerViewData } from '../../hooks/useCustomerViewData';
+import { useCustomerViewData } from '../../Hooks/useCustomerViewData';
 import { buildTheme } from '../../lib/customerViewTheme';
 import { HelpCircleIcon } from '../../Components/icons';
 import { MenuDetailSheet } from './components/MenuDetailSheet';
