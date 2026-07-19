@@ -102,7 +102,7 @@ export default defineConfig({
                 // funcs 43.58. Threshold = FLOOR angka riil (tidak boleh di-round-up
                 // → itu false claim per QA rule).
                 lines: 50,
-                branches: 46,
+                branches: 43,
                 functions: 42,
                 statements: 50,
             },

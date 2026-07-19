@@ -156,4 +156,39 @@ describe('POS/Index', () => {
         await waitFor(() => expect(screen.getByText(/A1/)).toBeInTheDocument());
         expect(screen.getByText(/2x Nasi Goreng/)).toBeInTheDocument();
     });
+
+    it('handles queue tables with null table or takeaway table name safely', async () => {
+        const queue = [
+            {
+                id: 'ORD-T1',
+                table: 'Meja TakeAway 1',
+                status: 'Siap Bayar',
+                tone: 'emerald',
+                time: 3,
+                items: ['1x Es Teh'],
+            },
+            {
+                id: 'ORD-T2',
+                table: null as any,
+                status: 'Siap Bayar',
+                tone: 'emerald',
+                time: 4,
+                items: ['1x Nasi Goreng'],
+            },
+        ];
+        vi.stubGlobal(
+            'fetch',
+            vi.fn((input: any) => {
+                const url = String(input);
+                if (url.includes('/api/cashier-queue')) {
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ queue }) });
+                }
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+            }) as any,
+        );
+        render(<POSPage posMenu={MENU} />);
+        fireEvent.click(screen.getByRole('button', { name: /Antrean Siap Bayar/i }));
+        await waitFor(() => expect(screen.getByText(/Take Away/i)).toBeInTheDocument());
+        expect(screen.getByText(/1x Nasi Goreng/)).toBeInTheDocument();
+    });
 });
