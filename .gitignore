@@ -45,6 +45,11 @@ Thumbs.db
 /database/*.sqlite
 /database/*.sqlite-journal
 
+# Committed binaries that should NOT be in version control (D-2/D-3 audit 2026-07-19)
+# Static analysis / composer installers: download in CI, jangan commit.
+*.phar
+/composer-setup.php
+
 # Test artifacts (Playwright / coverage)
 /playwright-report/
 /tests/Browser/console/
