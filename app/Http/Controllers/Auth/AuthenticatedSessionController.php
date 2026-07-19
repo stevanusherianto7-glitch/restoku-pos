@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Scopes\TenantScope;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -34,10 +35,12 @@ class AuthenticatedSessionController extends Controller
             // role (owner excluded) — tenant scoping happens post-login via TenantContext.
             // SECURITY FIX: Use cursor() to avoid loading all users into memory (OOM risk at scale).
             $matchedUser = null;
-            $users = User::where('role', '!=', 'owner')
+            // Cross-tenant PIN lookup (bypass TenantScope — same reason as email login).
+            $users = TenantScope::bypass(fn () => User::where('role', '!=', 'owner')
                 ->whereNotNull('password')
                 ->select('id', 'password', 'role', 'tenant_id', 'outlet_id', 'name')
-                ->cursor();
+                ->cursor()
+            );
             foreach ($users as $u) {
                 if (Hash::check($pin, $u->password)) {
                     $matchedUser = $u;
@@ -79,7 +82,13 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        // Login is intrinsically cross-tenant: we authenticate the credential
+        // BEFORE we know which tenant the user belongs to (TenantContext is
+        // bootstrapped only AFTER a successful login via EnsureTenantContext).
+        // The User model carries TenantScope, so the lookup would abort(500)
+        // in production where the scope fails closed. Bypass it for the
+        // credential check — scoping is enforced post-login by EnsureTenantContext.
+        if (! TenantScope::bypass(fn () => Auth::attempt($credentials, $request->boolean('remember')))) {
             throw ValidationException::withMessages([
                 'email' => 'Email atau password salah.',
             ]);
