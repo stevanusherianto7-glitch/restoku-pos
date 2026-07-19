@@ -10,7 +10,8 @@ import {
     MessageSquareIcon,
     PhoneCallIcon,
 } from '../icons';
-import { Screen, Glass, Badge, FeatureLock, planHasFeature } from '../Shared';
+import { Screen, Glass, Badge, planHasFeature } from '../Shared';
+import { FeatureLock } from '../shared/FeatureLock';
 
 // ─── WhatsApp API ─────────────────────────────────────────────────────────────
 export function WhatsAppIntegration() {

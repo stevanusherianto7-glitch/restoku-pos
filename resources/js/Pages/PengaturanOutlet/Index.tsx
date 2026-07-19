@@ -1,7 +1,8 @@
 import { useState, ElementType, useEffect } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import MainLayout from '../../Layouts/MainLayout';
-import { Screen, Glass, PlanBadge, TAX_LABELS, useTenantSettings } from '../../Components/Shared';
+import { Screen, Glass, TAX_LABELS, useTenantSettings } from '../../Components/Shared';
+import { PlanBadge } from '../../Components/shared/PlanBadge';
 import { useSubscription } from '../../Hooks/useSubscription';
 import {
     StoreIcon,

@@ -46,41 +46,9 @@ export {
 } from '../lib/constants';
 export type { Plan } from '../Types';
 
-// PlanBadge — kept here since it depends on PLAN_TONES and PLAN_LABELS
-import { CrownIcon } from './icons';
-import { PLAN_TONES, PLAN_LABELS } from '../lib/constants';
-import type { Plan } from '../Types';
-
-export function PlanBadge({ plan }: { plan: Plan }) {
-    return (
-        <span
-            className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold ${PLAN_TONES[plan]}`}
-        >
-            {plan === 'enterprise' && <CrownIcon className="size-3" />}
-            {PLAN_LABELS[plan]}
-        </span>
-    );
-}
-
-// FeatureLock — kept here for backward compatibility
-import { type ReactNode } from 'react';
-import { LockIcon } from './icons';
-export function FeatureLock({ requiredPlan, children }: { requiredPlan: Plan; children: ReactNode }) {
-    return (
-        <div className="relative">
-            <div className="opacity-40 pointer-events-none select-none">{children}</div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/30 rounded-2xl backdrop-blur-sm">
-                <LockIcon className="size-6 text-slate-400" />
-                <p className="text-xs text-slate-400">
-                    Fitur <PlanBadge plan={requiredPlan} />
-                </p>
-                <button className="px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 text-white rounded-lg border border-white/10 transition-colors">
-                    Upgrade Paket
-                </button>
-            </div>
-        </div>
-    );
-}
+// NOTE: PlanBadge & FeatureLock have been migrated to Components/shared/
+// (PlanBadge.tsx, FeatureLock.tsx) and their consumers repointed. Remove this
+// note once the remaining live exports (useTenantSettings, etc.) are migrated.
 
 import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';

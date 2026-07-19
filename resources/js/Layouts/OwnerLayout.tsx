@@ -10,7 +10,8 @@ import {
     BellIcon,
     StoreIcon,
 } from '../Components/icons';
-import { PlanBadge, useTenantSettings, TenantBrandLockup } from '../Components/Shared';
+import { PlanBadge } from '../Components/shared/PlanBadge';
+import { useTenantSettings, TenantBrandLockup } from '../Components/Shared';
 import GeminiCopilotWidget from '../Components/POS/GeminiCopilotWidget';
 import { useSubscription } from '../Hooks/useSubscription';
 
