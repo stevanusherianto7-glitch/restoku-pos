@@ -37,6 +37,26 @@ export default defineConfig({
             '@css': path.resolve(__dirname, './resources/css'),
         },
     },
+    build: {
+        rollupOptions: {
+            output: {
+                // P-1 (audit 2026-07-19): single bundle 1MB → split vendor besar
+                // dari app code. Tidak ubah behavior; cuma strategi chunking.
+                // Vendor stabil di-cache browser terpisah dari app chunk.
+                // P-1 (audit 2026-07-19): split HANYA vendor besar yang stabil.
+                // App-code (Pages/Components) dibiarkan rollup otomatis bikin
+                // shared chunk (lazy glob di main.tsx) — hindari warning cross-chunk.
+                manualChunks(id) {
+                    if (! id.includes('node_modules')) return undefined;
+                    if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts';
+                    if (id.includes('@radix-ui')) return 'vendor-radix';
+                    if (id.includes('react') || id.includes('inertia') || id.includes('@inertiajs')) return 'vendor-react';
+                    if (id.includes('sonner') || id.includes('lucide')) return 'vendor-ui';
+                    return undefined;
+                },
+            },
+        },
+    },
     assetsInclude: ['**/*.svg', '**/*.csv'],
     test: {
         environment: 'jsdom',
