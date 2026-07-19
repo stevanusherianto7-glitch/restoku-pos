@@ -109,8 +109,9 @@ describe('KDS/Index', () => {
         render(<KDS />);
         // step 2 (sedang_dimasak) → tombol next = "SELESAI MASAK"
         await waitFor(() => expect(screen.getByText(/SELESAI MASAK/i)).toBeInTheDocument());
-        // label meja dinormalisasi: "Meja A1" → "A1"
-        expect(screen.getByText('A1')).toBeInTheDocument();
+        // label meja dinormalisasi: "Meja A1" → "A1" (muncul di badge terpisah)
+        // wrap dalam waitFor untuk hindari race di CI (render async)
+        await waitFor(() => expect(screen.getByText('A1')).toBeInTheDocument());
     });
 
     it('advances item cook status via PUT', async () => {
