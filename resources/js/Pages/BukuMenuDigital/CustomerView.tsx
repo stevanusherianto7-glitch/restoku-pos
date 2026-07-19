@@ -3,14 +3,11 @@ import { Head, usePage } from '@inertiajs/react';
 import {
     SearchIcon,
     MessageCircleIcon,
-    PlusIcon,
-    MinusIcon,
     SparklesIcon,
     ShoppingCartIcon,
     HelpCircleIcon,
     CalendarDaysIcon,
     ImageIcon,
-    Clock3Icon,
     CalendarIcon,
     CheckCircle2Icon,
 } from '../../Components/icons';
@@ -22,6 +19,8 @@ import { evaluateSchedule } from '../../lib/evaluateSchedule';
 import { MenuDetailSheet } from './components/MenuDetailSheet';
 import { CartPanel } from './components/CartPanel';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
+import { MenuItemCard } from './components/MenuItemCard';
+import { WelcomeModal } from './components/WelcomeModal';
 
 export interface MenuItem {
     id: number;
@@ -819,258 +818,19 @@ export default function CustomerView() {
                 )}
             </div>
 
-            {appStage === 'landing' && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div
-                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
-                    >
-                        <div className="flex justify-center">
-                            <img src="/images/restoku_logo.png" alt="Restoku" className="h-9 w-auto select-none" />
-                        </div>
-                        <div className={`h-px ${modalStyle.divider} my-1`} />
-                        <p className={`text-xs ${modalStyle.textDesc} leading-relaxed`}>
-                            Platform pemesanan digital terintegrasi — dari pemesanan langsung dari meja, dapur realtime,
-                            hingga sajian tersaji hangat di meja Anda.
-                        </p>
-                        <div className="mt-1 space-y-2.5 text-left">
-                            {[
-                                { ic: '▣', t: 'QR Self-Order', d: 'Tamu pesan langsung dari meja' },
-                                { ic: '🍴', t: 'Dapur Realtime', d: 'Antrian pesanan otomatis masuk' },
-                                { ic: '📊', t: 'Monitor Pesanan', d: 'Pantau semua transaksi live' },
-                            ].map((f) => (
-                                <div
-                                    key={f.t}
-                                    className={`flex items-center gap-3 ${modalStyle.cardBg} p-2.5 rounded-2xl border`}
-                                >
-                                    <div
-                                        className={`size-8 rounded-lg border ${modalStyle.accentBorder} grid place-items-center ${modalStyle.accentText} text-sm shrink-0`}
-                                    >
-                                        {f.ic}
-                                    </div>
-                                    <div>
-                                        <p className={`font-bold text-xs ${modalStyle.textTitle}`}>{f.t}</p>
-                                        <p className={`text-[10px] ${modalStyle.textDesc}`}>{f.d}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <button
-                            onClick={() => setAppStage('welcome')}
-                            className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black flex justify-center gap-2 items-center cursor-pointer`}
-                        >
-                            Masuk ke Menu →
-                        </button>
-                        <p className={`text-center text-[9px] ${modalStyle.textDesc}`}>© 2025 Restoku App</p>
-                    </div>
-                </div>
-            )}
-
-            {appStage === 'welcome' && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div
-                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden`}
-                    >
-                        {/* IDENTITAS TENANT — hero prominent setelah landing (identitas aplikasi) */}
-                        <div className="flex w-full items-center justify-between gap-3">
-                            <div className="flex items-center gap-3 min-w-0">
-                                {tenantImage ? (
-                                    <div className="size-14 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-md">
-                                        <img src={tenantImage} alt={outletName} className="size-full object-cover" />
-                                    </div>
-                                ) : (
-                                    <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-tr from-[#FF5B35] to-[#E04E2B] text-white shadow-md">
-                                        <span className="text-lg font-black leading-none px-1 text-center">
-                                            {outletName.slice(0, 2).toUpperCase()}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="min-w-0">
-                                    <p
-                                        className={`text-[9px] font-bold tracking-[0.22em] uppercase ${modalStyle.accentText}`}
-                                    >
-                                        Selamat Datang di
-                                    </p>
-                                    <h2
-                                        className={`font-serif text-xl leading-tight font-extrabold ${modalStyle.textTitle} truncate`}
-                                    >
-                                        {outletName}
-                                    </h2>
-                                </div>
-                            </div>
-                            <img
-                                src="/images/halal-indonesia.svg"
-                                alt="Halal Indonesia"
-                                className="h-10 w-auto shrink-0 select-none"
-                            />
-                        </div>
-                        <p className={`text-[11px] ${modalStyle.textDesc} leading-relaxed`}>
-                            Sajian otentik khas Nusantara yang kini hadir lebih dekat. Resmi bersertifikat Halal & tanpa
-                            MSG. Selamat menikmati!
-                        </p>
-                        {/* Notice operasional: Buka/Tutup (dipindah dari header menu ke welcome modal) */}
-                        {!isOutletOpen ? (
-                            <div
-                                className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center gap-2 border border-rose-500/30`}
-                            >
-                                <Clock3Icon className="size-4 shrink-0 text-rose-400" />
-                                <div className="text-left">
-                                    <p className={`text-[11px] font-extrabold ${modalStyle.accentText}`}>
-                                        Pemesanan Online Ditutup
-                                    </p>
-                                    <p className={`text-[10px] ${modalStyle.textDesc}`}>
-                                        {outletScheduleMsg || 'Restoran sedang di luar jam operasional.'}
-                                    </p>
-                                </div>
-                            </div>
-                        ) : (
-                            outletScheduleMsg && (
-                                <div
-                                    className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center gap-2 border border-emerald-500/20`}
-                                >
-                                    <Clock3Icon className="size-4 shrink-0 text-emerald-400" />
-                                    <span className={`text-[10px] ${modalStyle.textDesc}`}>{outletScheduleMsg}</span>
-                                </div>
-                            )
-                        )}
-                        <div
-                            className={`w-full ${modalStyle.cardBg} rounded-2xl p-3 flex items-center justify-between text-left border`}
-                        >
-                            <div>
-                                <p className={`text-[9px] font-extrabold tracking-wider ${modalStyle.accentText}`}>
-                                    📍 NOMOR MEJA ANDA
-                                </p>
-                                <p className={`text-base font-extrabold ${modalStyle.textTitle} mt-0.5`}>
-                                    Meja {tableNumber ?? 'A3'}
-                                </p>
-                            </div>
-                            <span
-                                className={`px-2.5 py-1 rounded-full bg-[#0F8A4D]/10 ${modalStyle.accentText} text-[9px] font-extrabold flex items-center gap-1`}
-                            >
-                                ✓ Terverifikasi
-                            </span>
-                        </div>
-                        <div className="w-full text-left">
-                            <p
-                                className={`text-[10px] font-extrabold tracking-wider ${modalStyle.textDesc} text-left mb-1.5`}
-                            >
-                                PILIH TIPE PESANAN
-                            </p>
-                            <div className={`flex gap-3`}>
-                                <button
-                                    onClick={() => setOrderType('dine_in')}
-                                    className={`flex-1 rounded-2xl py-3 text-white font-extrabold border-[3px] transition-all flex flex-col items-center justify-center ${
-                                        orderType === 'dine_in'
-                                            ? 'border-[#FF5B35] bg-gradient-to-br from-[#7C3AED] to-[#FF5B35]'
-                                            : 'border-transparent bg-gradient-to-br from-[#7C3AED] to-[#FF5B35] opacity-60'
-                                    }`}
-                                >
-                                    <span className="text-lg">🪑</span>
-                                    <span className="text-[11px] block mt-0.5">Dine In</span>
-                                    <span className="text-[8px] font-medium opacity-80 block">Makan di tempat</span>
-                                </button>
-                                <button
-                                    onClick={() => setOrderType('take_away')}
-                                    className={`flex-1 rounded-2xl py-3 text-white font-extrabold border-[3px] transition-all flex flex-col items-center justify-center ${
-                                        orderType === 'take_away'
-                                            ? 'border-[#FF5B35] bg-gradient-to-br from-[#DB2777] to-[#F97316]'
-                                            : 'border-transparent bg-gradient-to-br from-[#DB2777] to-[#F97316] opacity-60'
-                                    }`}
-                                >
-                                    <span className="text-lg">🥡</span>
-                                    <span className="text-[11px] block mt-0.5">Take Away</span>
-                                    <span className="text-[8px] font-medium opacity-80 block">Dibawa pulang</span>
-                                </button>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => setAppStage('howto')}
-                            className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black cursor-pointer`}
-                        >
-                            Lanjut →
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {appStage === 'howto' && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-hidden max-w-md mx-auto">
-                    <div
-                        className={`w-[92%] max-w-sm rounded-3xl ${modalStyle.bg} p-6 text-center shadow-2xl border flex flex-col gap-4 overflow-hidden text-[#1A1410]`}
-                    >
-                        <h2 className={`text-xl font-extrabold ${modalStyle.textTitle}`}>Cara Memesan</h2>
-                        <p className={`text-[11px] ${modalStyle.textDesc} -mt-2`}>
-                            Cukup 3 langkah mudah, pesanan langsung masuk dapur!
-                        </p>
-                        <div className="flex flex-col gap-2.5">
-                            {[
-                                {
-                                    n: 1,
-                                    bg: isDarkTheme
-                                        ? 'bg-white/5 border-white/5 text-slate-300'
-                                        : 'bg-[#F4EEFD] border-[#7C3AED]/10 text-[#7C3AED]',
-                                    t: 'Pilih Menu Favorit',
-                                    d: 'Tekan menu yang kamu inginkan, lihat foto & harga lengkap',
-                                },
-                                {
-                                    n: 2,
-                                    bg: isDarkTheme
-                                        ? 'bg-white/5 border-white/5 text-slate-300'
-                                        : 'bg-[#FFF1E9] border-[#FF5B35]/10 text-[#FF5B35]',
-                                    t: 'Masuk ke Keranjang',
-                                    d: 'Tambah qty, tulis catatan khusus untuk chef jika perlu',
-                                },
-                                {
-                                    n: 3,
-                                    bg: isDarkTheme
-                                        ? 'bg-white/5 border-white/5 text-slate-300'
-                                        : 'bg-[#EAF7EF] border-[#0F8A4D]/10 text-[#0F8A4D]',
-                                    t: 'Kirim Pesanan',
-                                    d: 'Tekan "Pesan Sekarang" — pesanan langsung diterima dapur!',
-                                },
-                            ].map((s) => (
-                                <div
-                                    key={s.n}
-                                    className={`rounded-2xl p-3 flex gap-3 items-start border text-left ${s.bg}`}
-                                >
-                                    <div
-                                        className={`size-5 rounded-full ${isDarkTheme ? 'bg-emerald-500 text-slate-950' : 'bg-current text-white'} font-extrabold grid place-items-center text-[10px] shrink-0`}
-                                    >
-                                        <span
-                                            className={
-                                                isDarkTheme ? 'text-slate-900 font-bold' : 'text-white font-bold'
-                                            }
-                                        >
-                                            {s.n}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <p className={`font-extrabold text-[12px] ${modalStyle.textTitle}`}>{s.t}</p>
-                                        <p className={`text-[10px] ${modalStyle.textDesc} mt-0.5`}>{s.d}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <div
-                            className={`flex items-center justify-between ${modalStyle.cardBg} border rounded-2xl p-3 text-[11px] mt-1`}
-                        >
-                            <span className={modalStyle.textDesc}>🪑 Tipe pesanan</span>
-                            <b className={modalStyle.textTitle}>{orderType === 'dine_in' ? 'Dine In' : 'Take Away'}</b>
-                            <span
-                                className={`${modalStyle.accentText} font-extrabold cursor-pointer`}
-                                onClick={() => setAppStage('welcome')}
-                            >
-                                Ubah
-                            </span>
-                        </div>
-                        <button
-                            onClick={() => setAppStage('app')}
-                            className={`w-full ${modalStyle.button} border-none rounded-xl py-3 text-xs font-black cursor-pointer flex justify-center gap-2 items-center`}
-                        >
-                            ✨ Mulai Pesan Sekarang!
-                        </button>
-                    </div>
-                </div>
-            )}
+            <WelcomeModal
+                stage={appStage === 'app' ? 'landing' : appStage}
+                onStageChange={setAppStage}
+                outletName={outletName}
+                tenantImage={tenantImage}
+                isOutletOpen={isOutletOpen}
+                outletScheduleMsg={outletScheduleMsg}
+                tableNumber={tableNumber}
+                orderType={orderType}
+                setOrderType={setOrderType}
+                isNanoBanana={isNanoBanana}
+                isDarkTheme={isDarkTheme}
+            />
 
             {activeTab === 'menu' && (
                 <>
@@ -1078,75 +838,15 @@ export default function CustomerView() {
                     <main className="flex-1 px-4 pb-28 space-y-4 overflow-y-auto">
                         {filteredItems.length > 0 ? (
                             filteredItems.map((item) => (
-                                <div
+                                <MenuItemCard
                                     key={item.id}
-                                    onClick={() => setDetailItem(item)}
-                                    className="flex gap-4 bg-white/[0.03] p-4 rounded-3xl shadow-sm border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden cursor-pointer"
-                                >
-                                    <div className="relative size-20 rounded-2xl overflow-hidden shrink-0 bg-slate-900 border border-white/5">
-                                        <ProductImage
-                                            src={item.image}
-                                            alt={item.name}
-                                            variant="small"
-                                            className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                        />
-                                        {item.isPopular && (
-                                            <span className="absolute top-1 left-1 bg-amber-500 text-slate-950 font-black text-[7px] uppercase tracking-wider px-1 py-0.5 rounded shadow">
-                                                POPULAR
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-start justify-between gap-1.5">
-                                                <h3
-                                                    className={`text-sm font-bold text-white leading-snug transition-colors truncate ${isNanoBanana ? 'group-hover:text-amber-400' : 'group-hover:text-emerald-400'}`}
-                                                >
-                                                    {item.name}
-                                                </h3>
-                                            </div>
-                                            <p className="text-[10px] text-slate-400 leading-relaxed mt-1 line-clamp-2">
-                                                {item.description ||
-                                                    'Hidangan lezat diolah higienis dengan resep rahasia.'}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
-                                            <span
-                                                className={`text-xs font-mono font-bold ${isNanoBanana ? 'text-amber-400' : 'text-emerald-400'}`}
-                                            >
-                                                {formatRupiah(item.price)}
-                                            </span>
-                                            <div className="flex items-center">
-                                                {cart[item.id] ? (
-                                                    <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-0.5">
-                                                        <button
-                                                            onClick={() => removeFromCart(item.id)}
-                                                            className={`size-6 rounded-full text-slate-950 flex items-center justify-center font-bold transition-colors ${isNanoBanana ? 'bg-amber-500 hover:bg-amber-400' : 'bg-emerald-500 hover:bg-emerald-400'}`}
-                                                        >
-                                                            <MinusIcon className="size-3" />
-                                                        </button>
-                                                        <span className="w-8 text-center text-xs font-bold text-white">
-                                                            {cart[item.id]}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => addToCart(item.id)}
-                                                            className={`size-6 rounded-full text-slate-950 flex items-center justify-center font-bold transition-colors ${isNanoBanana ? 'bg-amber-500 hover:bg-amber-400' : 'bg-emerald-500 hover:bg-emerald-400'}`}
-                                                        >
-                                                            <PlusIcon className="size-3" />
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => addToCart(item.id)}
-                                                        className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-sm ${isNanoBanana ? 'bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500 hover:text-slate-950 text-amber-300 shadow-[0_0_10px_rgba(234,179,8,0.2)]' : 'bg-emerald-500/10 border border-emerald-500/35 hover:bg-emerald-500 hover:text-slate-950 text-emerald-400'}`}
-                                                    >
-                                                        Tambah
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    item={item}
+                                    isNanoBanana={isNanoBanana}
+                                    qty={cart[item.id] ?? 0}
+                                    onOpenDetail={setDetailItem}
+                                    onAdd={addToCart}
+                                    onRemove={removeFromCart}
+                                />
                             ))
                         ) : (
                             <div className="py-16 text-center text-slate-500">
