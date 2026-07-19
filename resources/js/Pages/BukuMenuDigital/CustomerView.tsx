@@ -1,16 +1,6 @@
 import { useState, useEffect, Fragment } from 'react';
 import { Head, usePage } from '@inertiajs/react';
-import {
-    SearchIcon,
-    MessageCircleIcon,
-    SparklesIcon,
-    ShoppingCartIcon,
-    HelpCircleIcon,
-    CalendarDaysIcon,
-    ImageIcon,
-    CalendarIcon,
-    CheckCircle2Icon,
-} from '../../Components/icons';
+import { MessageCircleIcon, HelpCircleIcon, CheckCircle2Icon } from '../../Components/icons';
 import { formatRupiah } from '../../lib/formatters';
 import { ProductImage } from '../../Components/ProductImage';
 import { useTenantSettings } from '../../Components/Shared';
@@ -21,6 +11,11 @@ import { CartPanel } from './components/CartPanel';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
 import { MenuItemCard } from './components/MenuItemCard';
 import { WelcomeModal } from './components/WelcomeModal';
+import { AppHeader } from './components/AppHeader';
+import { ReservationPanel } from './components/ReservationPanel';
+import { GalleryPanel } from './components/GalleryPanel';
+import { StatusPanel } from './components/StatusPanel';
+import { FloatingCheckout } from './components/FloatingCheckout';
 
 export interface MenuItem {
     id: number;
@@ -689,134 +684,24 @@ export default function CustomerView() {
                 @media (prefers-reduced-motion: reduce){.rs-step-on,.rs-step-done{animation:none}}
             `}</style>
 
-            {/* Dynamic Sticky Header Area */}
-            <div
-                className={`${appStage === 'app' ? `sticky top-0 z-40 ${headerBg} ${headerBorder}` : 'fixed inset-x-0 top-0 -z-10 opacity-0 pointer-events-none'} flex flex-col shrink-0`}
-            >
-                {/* Brand Info & Tabs */}
-                <header
-                    className={`${activeTheme.header} !static !bg-transparent !border-b-0 !shadow-none !px-4 !py-3 !flex-col !items-stretch gap-3`}
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-lg shadow-emerald-500/20 overflow-hidden">
-                            {renderLogo('size-7 text-slate-950')}
-                        </div>
-                        <div>
-                            <h1 className="text-sm font-black tracking-tight text-white uppercase">{outletName}</h1>
-                            {appStage === 'app' && (
-                                <p className="text-[10px] font-bold text-emerald-400/90 flex items-center gap-1.5 uppercase tracking-wide">
-                                    <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-                                    {tableNumber ? `Meja ${tableNumber}` : 'Scan Meja Anda'}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* View Mode Tabs */}
-                    <div className="flex bg-white/5 border border-white/10 rounded-xl p-0.5 max-w-full overflow-x-auto gap-0.5">
-                        <button
-                            onClick={() => setActiveTab('menu')}
-                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                activeTab === 'menu'
-                                    ? isNanoBanana
-                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                        : 'bg-emerald-500 text-slate-950 shadow'
-                                    : 'text-slate-400'
-                            }`}
-                        >
-                            Menu
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('reservasi')}
-                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                activeTab === 'reservasi'
-                                    ? isNanoBanana
-                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                        : 'bg-emerald-500 text-slate-950 shadow'
-                                    : 'text-slate-400'
-                            }`}
-                        >
-                            Reservasi
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('galeri')}
-                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                activeTab === 'galeri'
-                                    ? isNanoBanana
-                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                        : 'bg-emerald-500 text-slate-950 shadow'
-                                    : 'text-slate-400'
-                            }`}
-                        >
-                            Galeri
-                        </button>
-                        <button
-                            data-testid="cart-tab"
-                            onClick={() => setActiveTab('cart')}
-                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 shrink-0 ${
-                                activeTab === 'cart'
-                                    ? isNanoBanana
-                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                        : 'bg-emerald-500 text-slate-950 shadow'
-                                    : 'text-slate-400'
-                            }`}
-                        >
-                            <ShoppingCartIcon className="size-3" />
-                            {cartTotalItems > 0 && <span>{cartTotalItems}</span>}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('status')}
-                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all shrink-0 ${
-                                activeTab === 'status'
-                                    ? isNanoBanana
-                                        ? 'bg-amber-500 text-slate-950 font-bold shadow-[0_0_10px_rgba(234,179,8,0.3)]'
-                                        : 'bg-[#FF5B35] text-white shadow'
-                                    : 'text-slate-400'
-                            }`}
-                        >
-                            Status
-                        </button>
-                    </div>
-                </header>
-
-                {/* Category Capsule Filter & Search Bar - only when viewing the Menu tab */}
-                {activeTab === 'menu' && (
-                    <div className="flex flex-col gap-2 pb-3.5">
-                        {/* Category Capsule Filter */}
-                        <div className="flex gap-2 overflow-x-auto px-4">
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setActiveCategory(cat)}
-                                    className={`px-4.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-                                        activeCategory === cat
-                                            ? isNanoBanana
-                                                ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-lg shadow-amber-500/10 scale-95'
-                                                : 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/10 scale-95'
-                                            : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/20'
-                                    }`}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Search Bar - under Category Filter */}
-                        <div className="px-4 pt-1">
-                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 shadow-inner focus-within:border-emerald-500/40 focus-within:ring-1 focus-within:ring-emerald-500/25 transition-all">
-                                <SearchIcon className="size-4 text-slate-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Cari menu terlaris kami..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="bg-transparent text-xs text-slate-100 outline-none w-full placeholder:text-slate-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <AppHeader
+                appStage={appStage}
+                headerBg={headerBg}
+                headerBorder={headerBorder}
+                activeTheme={activeTheme}
+                outletName={outletName}
+                tableNumber={tableNumber}
+                isNanoBanana={isNanoBanana}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                cartTotalItems={cartTotalItems}
+                categories={categories}
+                activeCategory={activeCategory}
+                setActiveCategory={setActiveCategory}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                renderLogo={renderLogo}
+            />
 
             <WelcomeModal
                 stage={appStage === 'app' ? 'landing' : appStage}
@@ -882,429 +767,47 @@ export default function CustomerView() {
                 />
             )}
 
-            {activeTab === 'reservasi' && (
-                <main className="flex-1 p-5 pb-28 flex flex-col justify-between overflow-y-auto">
-                    <div className="space-y-4">
-                        <h2 className="text-base font-extrabold text-white flex items-center gap-2 mb-2">
-                            <CalendarDaysIcon className="size-5 text-emerald-400" /> Booking & Reservasi
-                        </h2>
+            <ReservationPanel
+                reservationSuccess={reservationSuccess}
+                setReservationSuccess={setReservationSuccess}
+                rName={rName}
+                setRName={setRName}
+                rPhone={rPhone}
+                setRPhone={setRPhone}
+                rDate={rDate}
+                setRDate={setRDate}
+                rTime={rTime}
+                setRTime={setRTime}
+                rGuests={rGuests}
+                setRGuests={setRGuests}
+                rType={rType}
+                setRType={setRType}
+                rNotes={rNotes}
+                setRNotes={setRNotes}
+                isSubmittingR={isSubmittingR}
+                handleReservationSubmit={handleReservationSubmit}
+                setActiveTab={setActiveTab}
+            />
 
-                        {reservationSuccess ? (
-                            <div className="py-12 px-4 text-center space-y-4 bg-emerald-950/10 border border-emerald-500/20 rounded-3xl animate-in fade-in duration-300">
-                                <div className="size-16 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20 mx-auto">
-                                    <CheckCircle2Icon className="size-8 text-emerald-400" />
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-sm font-bold text-white">Reservasi Terkirim!</h3>
-                                    <p className="text-xs text-slate-400 leading-relaxed">
-                                        Terima kasih {rName}. Pengajuan reservasi Anda pada {rDate} pukul {rTime} sedang
-                                        ditinjau oleh staf kami.
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={() => {
-                                        setReservationSuccess(false);
-                                        setRName('');
-                                        setRPhone('');
-                                        setRDate('');
-                                        setRTime('');
-                                        setRNotes('');
-                                        setActiveTab('menu');
-                                    }}
-                                    className="px-5 py-2.5 bg-emerald-500 text-slate-950 rounded-xl text-xs font-bold hover:bg-emerald-400 transition-colors"
-                                >
-                                    Kembali ke Menu
-                                </button>
-                            </div>
-                        ) : (
-                            <form onSubmit={handleReservationSubmit} className="space-y-3.5">
-                                <div className="space-y-1.5">
-                                    <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                        Nama Lengkap
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={rName}
-                                        onChange={(e) => setRName(e.target.value)}
-                                        placeholder="Masukkan nama Anda"
-                                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all"
-                                    />
-                                </div>
+            <GalleryPanel setActiveTab={setActiveTab} />
 
-                                <div className="space-y-1.5">
-                                    <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                        Nomor WhatsApp / HP
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        required
-                                        value={rPhone}
-                                        onChange={(e) => setRPhone(e.target.value)}
-                                        placeholder="Contoh: 08123456789"
-                                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all"
-                                    />
-                                </div>
+            <StatusPanel
+                orders={orders}
+                activeOrderId={activeOrderId}
+                orderHasFood={orderHasFood}
+                orderHasDrink={orderHasDrink}
+                orderDrinkServed={orderDrinkServed}
+                orderFoodServed={orderFoodServed}
+                setActiveTab={setActiveTab}
+            />
 
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
-                                        <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                            Tanggal
-                                        </label>
-                                        <input
-                                            type="date"
-                                            required
-                                            value={rDate}
-                                            onChange={(e) => setRDate(e.target.value)}
-                                            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all"
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                            Jam
-                                        </label>
-                                        <input
-                                            type="time"
-                                            required
-                                            value={rTime}
-                                            onChange={(e) => setRTime(e.target.value)}
-                                            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1.5">
-                                        <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                            Jumlah Tamu
-                                        </label>
-                                        <select
-                                            value={rGuests}
-                                            onChange={(e) => setRGuests(e.target.value)}
-                                            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all"
-                                        >
-                                            <option value="1">1 Orang</option>
-                                            <option value="2">2 Orang</option>
-                                            <option value="4">4 Orang</option>
-                                            <option value="6">6 Orang</option>
-                                            <option value="8">8 Orang</option>
-                                            <option value="10">10 Orang</option>
-                                            <option value="20">20+ Orang</option>
-                                            <option value="50">50+ Orang</option>
-                                            <option value="100">100+ Orang (Event)</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                            Jenis Acara
-                                        </label>
-                                        <select
-                                            value={rType}
-                                            onChange={(e) => setRType(e.target.value)}
-                                            className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all"
-                                        >
-                                            <option value="meja">Makan Biasa</option>
-                                            <option value="ulang_tahun">Ulang Tahun</option>
-                                            <option value="gathering">Gathering / Arisan</option>
-                                            <option value="pernikahan">Tunangan / Pernikahan</option>
-                                            <option value="acara_kantor">Acara Kantor</option>
-                                            <option value="lainnya">Lainnya</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                                        Catatan Khusus
-                                    </label>
-                                    <textarea
-                                        value={rNotes}
-                                        onChange={(e) => setRNotes(e.target.value)}
-                                        placeholder="Dekorasi khusus, kebutuhan kursi bayi, atau menu pre-order..."
-                                        className="w-full h-20 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/25 transition-all resize-none"
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isSubmittingR}
-                                    className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-emerald-500/10 disabled:opacity-50"
-                                >
-                                    {isSubmittingR ? 'Mengirim...' : 'Kirim Pengajuan Reservasi'}
-                                </button>
-                            </form>
-                        )}
-                    </div>
-                </main>
-            )}
-
-            {activeTab === 'galeri' && (
-                <main className="flex-1 p-5 pb-28 flex flex-col justify-between overflow-y-auto space-y-6">
-                    <div className="space-y-4">
-                        <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-gradient-to-r from-emerald-950/40 to-slate-950 p-5 shadow-2xl">
-                            <div className="absolute -top-10 -right-10 size-32 bg-emerald-500/10 rounded-full blur-2xl" />
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-bold text-emerald-400 tracking-wider uppercase mb-2">
-                                <SparklesIcon className="size-2.5" /> Event & Venue Booking
-                            </span>
-                            <h2 className="text-sm font-extrabold text-white">Booking Tempat & Acara</h2>
-                            <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                                Kami menyediakan paket ruang eksklusif dan menu khusus untuk melengkapi momen spesial
-                                Anda.
-                            </p>
-                        </div>
-
-                        {/* Gallery Grid */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                {
-                                    title: 'Ulang Tahun',
-                                    desc: 'Momen manis berkesan',
-                                    img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=500',
-                                },
-                                {
-                                    title: 'Intimate Wedding',
-                                    desc: 'Suasana sakral premium',
-                                    img: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=500',
-                                },
-                                {
-                                    title: 'Corporate Meeting',
-                                    desc: 'Fasilitas meeting lengkap',
-                                    img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500',
-                                },
-                                {
-                                    title: 'Family Gathering',
-                                    desc: 'Kebersamaan tak terlupakan',
-                                    img: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=500',
-                                },
-                            ].map((item, idx) => (
-                                <div
-                                    key={idx}
-                                    className="group relative rounded-2xl overflow-hidden border border-white/5 bg-white/[0.02]"
-                                >
-                                    <div className="h-28 w-full overflow-hidden bg-slate-950">
-                                        <img
-                                            src={item.img}
-                                            alt={item.title}
-                                            className="size-full object-cover opacity-80 group-hover:scale-105 transition-all duration-300"
-                                        />
-                                    </div>
-                                    <div className="p-3">
-                                        <h3 className="text-xs font-bold text-slate-200">{item.title}</h3>
-                                        <p className="text-[9px] text-slate-500 mt-0.5">{item.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Premium Facilities */}
-                        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 space-y-3">
-                            <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
-                                <ImageIcon className="size-3.5 text-emerald-400" /> Fasilitas Kami
-                            </h3>
-                            <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400">
-                                <span className="flex items-center gap-1">✓ Sound System Premium</span>
-                                <span className="flex items-center gap-1">✓ Proyektor & Layar</span>
-                                <span className="flex items-center gap-1">✓ AC & Ruangan Privat</span>
-                                <span className="flex items-center gap-1">✓ WiFi Kecepatan Tinggi</span>
-                                <span className="flex items-center gap-1">✓ Parkir Luas & Aman</span>
-                                <span className="flex items-center gap-1">✓ Menu Buffet Variatif</span>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={() => setActiveTab('reservasi')}
-                            className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10"
-                        >
-                            <CalendarIcon className="size-3.5" /> Hubungi & Reservasi Sekarang
-                        </button>
-                    </div>
-                </main>
-            )}
-
-            {activeTab === 'status' && (
-                <main className="flex-1 p-4 pb-28 flex flex-col gap-3 overflow-y-auto bg-[#FAF5EE]">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-base font-extrabold text-[#1A1410] flex items-center gap-2">
-                            <ArrowLeftIcon className="size-4 text-[#FF5B35]" /> Status Pesanan
-                        </h2>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-bold text-[#0F8A4D] flex items-center gap-1">
-                                <span className="size-1.5 rounded-full bg-[#0F8A4D] inline-block" /> Auto Aktif
-                            </span>
-                            <span
-                                className="text-[#9B8D7E] text-sm cursor-pointer"
-                                onClick={() => setActiveTab('menu')}
-                            >
-                                ⟳
-                            </span>
-                        </div>
-                    </div>
-                    {orders.map((o) => {
-                        const steps = [
-                            'Dikonfirmasi',
-                            'Sedang Dimasak',
-                            'Selesai Masak',
-                            'Siap Saji',
-                            'Sudah Disajikan',
-                        ];
-                        const isFood = o.destination !== 'bar';
-                        const routeLabel = isFood ? '🍳 Rute: Dapur (KDS)' : '🥤 Rute: Bar (Waiter)';
-                        const routeCls = isFood ? 'bg-[#FCE3D6] text-[#C9431F]' : 'bg-[#EAF2FB] text-[#1666C9]';
-                        return (
-                            <div key={o.id} className="bg-white border border-[#EFE2D4] rounded-2xl p-4 shadow-sm">
-                                <div className="flex items-center justify-between">
-                                    <p
-                                        className={`text-[13px] font-extrabold flex items-center gap-1.5 ${o.status === 'ready' ? 'text-[#0F8A4D]' : 'text-[#C9431F]'}`}
-                                    >
-                                        {o.status === 'ready' ? '✓ ' : '🍴 '} {o.label}
-                                    </p>
-                                    <span className="text-[10px] font-bold text-[#9B8D7E]">{o.id}</span>
-                                </div>
-                                <p className="text-[10px] font-bold text-[#9B8D7E] mt-0.5">
-                                    DURASI PROSES: {o.duration}
-                                </p>
-                                {/* Per-item 5-tahap tracker (FNB-003) */}
-                                <div className="mt-3 space-y-2">
-                                    {(Array.isArray(o.items) ? o.items : []).map((it, idx) => {
-                                        const itemSteps = [
-                                            'Dikonfirmasi',
-                                            'Sedang Dimasak',
-                                            'Selesai Masak',
-                                            'Siap Saji',
-                                            'Sudah Disajikan',
-                                        ];
-                                        const cookStep = it.cook_step ?? 1;
-                                        return (
-                                            <div
-                                                key={it.id ?? idx}
-                                                className="bg-[#FAF5EE] border border-[#EFE2D4] rounded-xl p-2.5"
-                                            >
-                                                <p className="text-[11px] font-extrabold text-[#1A1410] mb-1.5">
-                                                    {it.qty ?? 1}x {it.name}
-                                                    {it.notes ? (
-                                                        <span className="font-normal text-[#9B8D7E]">
-                                                            {' '}
-                                                            ({it.notes})
-                                                        </span>
-                                                    ) : null}
-                                                </p>
-                                                <div className="flex items-center justify-between px-0.5">
-                                                    {itemSteps.map((s, i) => {
-                                                        const n = i + 1;
-                                                        const state =
-                                                            n < cookStep ? 'done' : n === cookStep ? 'on' : 'off';
-                                                        const bubCls =
-                                                            state === 'done'
-                                                                ? 'bg-[#0F8A4D] text-white rs-step-done'
-                                                                : state === 'on'
-                                                                  ? 'bg-[#FF5B35] text-white rs-step-on'
-                                                                  : 'bg-[#EFE7DD] text-[#9B8D7E]';
-                                                        return (
-                                                            <Fragment key={s}>
-                                                                <div className="flex flex-col items-center gap-1">
-                                                                    <div
-                                                                        className={`size-6 rounded-full ${bubCls} grid place-items-center text-[10px] font-extrabold`}
-                                                                    >
-                                                                        {n}
-                                                                    </div>
-                                                                    <span
-                                                                        className={`text-[8px] font-extrabold tracking-wide ${state === 'done' ? 'text-[#0F8A4D]' : state === 'on' ? 'text-[#FF5B35]' : 'text-[#9B8D7E]'}`}
-                                                                    >
-                                                                        {s.toUpperCase()}
-                                                                    </span>
-                                                                </div>
-                                                                {n < 5 && (
-                                                                    <div
-                                                                        className="h-0.5 flex-1 mx-1 -mt-4"
-                                                                        style={{
-                                                                            background:
-                                                                                n < cookStep
-                                                                                    ? '#0F8A4D'
-                                                                                    : n === cookStep
-                                                                                      ? '#FF5B35'
-                                                                                      : '#EFE7DD',
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            </Fragment>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <div className="flex items-end justify-between mt-3 pt-3 border-t border-[#EFE2D4]">
-                                    <p className="text-[13px] font-extrabold text-[#1A1410]">
-                                        {(Array.isArray(o.items) ? o.items : [])
-                                            .map((it) => `${it.qty ?? 1}x ${it.name}`)
-                                            .join(', ')}
-                                    </p>
-                                    <span className="text-[14px] font-extrabold text-[#0F8A4D]">
-                                        {formatRupiah(o.total)}
-                                    </span>
-                                </div>
-                                {o.id === activeOrderId && (orderHasFood || orderHasDrink) && (
-                                    <div className="mt-3 pt-3 border-t border-[#EFE2D4] space-y-2">
-                                        {orderHasDrink && (
-                                            <div className="flex items-center gap-2 text-[11px] font-bold">
-                                                <span
-                                                    className={`size-2 rounded-full ${orderDrinkServed ? 'bg-[#0F8A4D]' : 'bg-[#FF5B35] animate-pulse'}`}
-                                                />
-                                                <span
-                                                    className={orderDrinkServed ? 'text-[#0F8A4D]' : 'text-[#C9431F]'}
-                                                >
-                                                    🥤 Minuman{' '}
-                                                    {orderDrinkServed ? 'Sudah Disajikan' : 'Disajikan ke Meja…'}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {orderHasFood && (
-                                            <div className="flex items-center gap-2 text-[11px] font-bold">
-                                                <span
-                                                    className={`size-2 rounded-full ${orderFoodServed ? 'bg-[#0F8A4D]' : 'bg-[#FF5B35]'}`}
-                                                />
-                                                <span className={orderFoodServed ? 'text-[#0F8A4D]' : 'text-[#C9431F]'}>
-                                                    🍳 Makanan{' '}
-                                                    {orderFoodServed ? 'Sudah Disajikan' : 'Disajikan ke Meja…'}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                                <span
-                                    className={`inline-flex items-center gap-1.5 mt-3 text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg ${routeCls}`}
-                                >
-                                    {routeLabel}
-                                </span>
-                            </div>
-                        );
-                    })}
-                </main>
-            )}
-
-            {/* Floating Checkout Button */}
-            {cartTotalItems > 0 && !orderSuccess && (
-                <div className="absolute bottom-5 inset-x-4 z-40">
-                    <button
-                        onClick={handleCheckout}
-                        disabled={!guestVerified}
-                        className={`w-full rounded-2xl py-4 px-5 text-sm font-extrabold flex justify-between items-center transition-all ${
-                            guestVerified
-                                ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 shadow-2xl shadow-emerald-950/50 hover:scale-[1.02] active:scale-[0.98]'
-                                : 'bg-white/10 text-white/40 cursor-not-allowed'
-                        }`}
-                    >
-                        <span
-                            className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${guestVerified ? 'bg-slate-950/20 text-slate-900' : 'bg-black/20 text-white/40'}`}
-                        >
-                            {cartTotalItems} Item
-                        </span>
-                        <span>{guestVerified ? 'Kirim Pesanan Ke Dapur' : '🔒 Verifikasi Dulu'}</span>
-                        <span className="font-mono">{formatRupiah(cartTotalPrice * 1.1)}</span>
-                    </button>
-                </div>
-            )}
+            <FloatingCheckout
+                cartTotalItems={cartTotalItems}
+                orderSuccess={orderSuccess}
+                guestVerified={guestVerified}
+                cartTotalPrice={cartTotalPrice}
+                handleCheckout={handleCheckout}
+            />
 
             {orderSuccess && (
                 <OrderTrackingModal
