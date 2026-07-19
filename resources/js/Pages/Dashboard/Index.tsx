@@ -4,6 +4,10 @@ import MainLayout from '../../Layouts/MainLayout';
 import { Screen, Glass, Badge, formatRupiah, toneMap, type Tone, useTenantSettings } from '../../Components/Shared';
 import { RevenueChart, type Timeframe } from '../../Components/Dashboard/RevenueChart';
 import { PeakOrderHours } from '../../Components/Dashboard/PeakOrderHours';
+import { TopModeBar } from '../../Components/Dashboard/TopModeBar';
+import { KpiMetrics } from '../../Components/Dashboard/KpiMetrics';
+import { OutletLeaderboard } from '../../Components/Dashboard/OutletLeaderboard';
+import { TopProductsTable } from '../../Components/Dashboard/TopProductsTable';
 import {
     DollarSignIcon,
     UtensilsIcon,
@@ -11,11 +15,7 @@ import {
     UsersIcon,
     SparklesIcon,
     ClockIcon,
-    AlertTriangleIcon,
     Building2Icon,
-    ChevronRightIcon,
-    AwardIcon,
-    ShieldAlertIcon,
     BarChart3Icon,
 } from '../../Components/icons';
 
@@ -134,7 +134,6 @@ export default function Dashboard() {
             foodCostDelta = '-0.6%';
         }
     }
-
     const globalMetrics: Array<{
         label: string;
         value: string | number;
@@ -313,89 +312,12 @@ export default function Dashboard() {
             <Head title="Owner Dashboard & Analytics" />
             <Screen title="Owner Dashboard & Analytics">
                 <div className="space-y-6">
-                    {/* Top Mode Bar */}
-                    <div
-                        className={`flex flex-col md:flex-row md:items-center justify-between p-4 rounded-xl gap-4 transition-all ${
-                            isNanoBanana
-                                ? 'bg-amber-500/10 border border-amber-500/30 shadow-[0_0_25px_rgba(234,179,8,0.15)]'
-                                : 'bg-emerald-500/10 border border-emerald-500/20'
-                        }`}
-                    >
-                        <div className="flex items-center gap-3.5">
-                            <div
-                                className={`grid size-11 place-items-center rounded-xl border ${isNanoBanana ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'}`}
-                            >
-                                {isNanoBanana ? (
-                                    <SparklesIcon className="size-5 animate-pulse" />
-                                ) : (
-                                    <Building2Icon className="size-5" />
-                                )}
-                            </div>
-                            <div>
-                                <h3
-                                    className={`text-base font-bold flex items-center gap-2 ${isNanoBanana ? 'text-amber-300' : 'text-emerald-200'}`}
-                                >
-                                    {isGlobal ? 'Dasbor Konsolidasi Multi-Outlet' : 'Dasbor Analisis Cabang'}
-                                    {isGlobal && (
-                                        <span className="text-[10px] bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-mono">
-                                            100 OUTLETS CONNECTED
-                                        </span>
-                                    )}
-                                </h3>
-                                <p className={`text-xs ${isNanoBanana ? 'text-amber-200/70' : 'text-emerald-300/70'}`}>
-                                    {isGlobal
-                                        ? 'Pemantauan real-time performa penjualan, tingkat okupansi meja, dan kontrol operasional di seluruh cabang.'
-                                        : `Laporan detail metrik operasional, transaksi harian, dan analisis produk terlaris untuk ${selectedOutlet}.`}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <select
-                                value={selectedOutlet}
-                                onChange={(e) => setSelectedOutlet(e.target.value)}
-                                className="bg-black/60 border border-white/20 rounded-xl px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-amber-500 transition-all shadow-inner"
-                            >
-                                <option>Semua Outlet (Global)</option>
-                                <option>Restoku Pusat (Jakarta)</option>
-                                <option>Restoku Cabang (Bandung)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* KPI Metrics */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {metrics.map(({ label, value, sub, Icon, tone, delta }, idx) => (
-                            <Glass className="p-5 flex flex-col justify-between border-white/10" hover key={label}>
-                                <div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div
-                                            className={`grid size-10 place-items-center rounded-xl border ${toneMap[tone]} ${isNanoBanana && idx === 0 ? 'border-amber-500/40 bg-amber-500/15 text-amber-400 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : ''}`}
-                                        >
-                                            <Icon className="size-4.5" />
-                                        </div>
-                                        <span
-                                            className={`font-semibold text-[11px] px-2.5 py-1 rounded-full ${delta.startsWith('+') || delta.includes('Normal') || delta.includes('mnt') || delta.includes('Stable') ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}
-                                        >
-                                            {delta}
-                                        </span>
-                                    </div>
-                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                        {label}
-                                    </p>
-                                    <div
-                                        className={`text-2xl lg:text-3xl font-bold tracking-tight mt-1 ${
-                                            isNanoBanana && idx === 0
-                                                ? 'bg-gradient-to-r from-yellow-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent'
-                                                : 'text-white'
-                                        }`}
-                                    >
-                                        {value}
-                                    </div>
-                                </div>
-                                <p className="mt-3 text-[11px] text-slate-500 border-t border-white/5 pt-2.5">{sub}</p>
-                            </Glass>
-                        ))}
-                    </div>
+                    <TopModeBar
+                        isNanoBanana={isNanoBanana}
+                        isGlobal={isGlobal}
+                        selectedOutlet={selectedOutlet}
+                        onSelectOutlet={setSelectedOutlet}
+                    />
 
                     {/* Revenue Chart + Peak Hours Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -459,141 +381,14 @@ export default function Dashboard() {
                         </Glass>
                     </div>
 
-                    {/* Multi-Outlet Leaderboard & Fraud Radar (Only Visible when Global mode is on) */}
-                    {isGlobal && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <Glass className="p-6 lg:col-span-2 border-white/10" hover>
-                                <div className="flex justify-between items-center mb-4">
-                                    <div>
-                                        <h2 className="text-base font-bold text-white flex items-center gap-2">
-                                            <AwardIcon className="size-4 text-amber-400" />
-                                            Peringkat Kinerja Cabang Terbaik (Top Revenue Generators)
-                                        </h2>
-                                        <p className="text-xs text-slate-400">
-                                            Cabang dengan kontribusi omset dan stabilitas operasional tertinggi pada
-                                            periode ini.
-                                        </p>
-                                    </div>
-                                    <span className="text-xs text-blue-400 font-semibold cursor-pointer hover:underline flex items-center gap-1">
-                                        Lihat Semua 100 Cabang <ChevronRightIcon className="size-3.5" />
-                                    </span>
-                                </div>
-                                <div className="space-y-3">
-                                    {topOutlets.map((o) => (
-                                        <div
-                                            key={o.rank}
-                                            className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/15 transition-all"
-                                        >
-                                            <div className="flex items-center gap-3.5">
-                                                <div
-                                                    className={`size-8 rounded-lg flex items-center justify-center font-extrabold text-sm ${
-                                                        o.rank === 1
-                                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-[0_0_12px_rgba(234,179,8,0.25)]'
-                                                            : 'bg-white/10 text-slate-300'
-                                                    }`}
-                                                >
-                                                    #{o.rank}
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-bold text-white">{o.name}</p>
-                                                    <p className="text-xs text-slate-400">{o.city}</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-sm font-bold font-mono text-emerald-400">
-                                                    {formatRupiah(o.rev)}
-                                                </p>
-                                                <p className="text-xs text-slate-400 flex items-center justify-end gap-1.5">
-                                                    <span className="text-emerald-400 font-semibold">{o.growth}</span>{' '}
-                                                    vs periode lalu
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </Glass>
+                    {isGlobal && <OutletLeaderboard topOutlets={topOutlets} alertOutlets={alertOutlets} />}
 
-                            <Glass className="p-6 border-red-500/30 bg-red-500/[0.03]" hover>
-                                <div className="flex items-center gap-2 text-red-400 mb-2">
-                                    <ShieldAlertIcon className="size-5 animate-bounce" />
-                                    <h2 className="text-base font-bold text-white">Radar Audit & Peringatan Cabang</h2>
-                                </div>
-                                <p className="text-xs text-slate-400 mb-4">
-                                    Deteksi anomali finansial, lonjakan void, dan penurunan omset ekstrem di cabang.
-                                </p>
-
-                                <div className="space-y-3">
-                                    {alertOutlets.map((a, i) => (
-                                        <div
-                                            key={i}
-                                            className="p-3.5 rounded-xl bg-black/40 border border-red-500/30 space-y-1"
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-xs font-bold text-red-300 flex items-center gap-1.5">
-                                                    <AlertTriangleIcon className="size-3.5 text-red-400" /> {a.name}
-                                                </span>
-                                                <Badge tone="red">
-                                                    {a.type === 'fraud' ? 'AUDIT REQUIRED' : 'UNDERPERFORMING'}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-xs text-slate-300 pt-1 leading-relaxed">{a.issue}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </Glass>
-                        </div>
-                    )}
-
-                    {/* Produk Terlaris Table */}
-                    <Glass className="p-6 border-white/10" hover>
-                        <div className="flex justify-between items-center mb-4">
-                            <div>
-                                <h2 className="text-base font-bold text-white flex items-center gap-2">
-                                    {isNanoBanana && <SparklesIcon className="size-4 text-amber-400" />}
-                                    Produk Terlaris {isGlobal ? '(Akumulasi 100 Cabang)' : `(${selectedOutlet})`}
-                                </h2>
-                                <p className="text-xs text-slate-400">
-                                    Kontributor pendapatan utama berdasarkan volume penjualan item.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-[1.6fr_1fr_.8fr_1fr] border-b border-white/10 pb-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                            <span>Nama Produk</span>
-                            <span>Kategori</span>
-                            <span>Terjual</span>
-                            <span>Total Pendapatan</span>
-                        </div>
-                        <div className="divide-y divide-white/5">
-                            {products.map((p, i) => (
-                                <div
-                                    className="grid grid-cols-[1.6fr_1fr_.8fr_1fr] items-center py-3.5 text-sm hover:bg-white/[0.03] px-2 rounded-lg transition-colors group"
-                                    key={p.name}
-                                >
-                                    <span className="flex items-center gap-3 text-slate-200 font-semibold">
-                                        <span
-                                            className={`size-8 rounded-lg border flex items-center justify-center text-xs font-bold ${
-                                                isNanoBanana && i === 0
-                                                    ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-[0_0_10px_rgba(234,179,8,0.2)]'
-                                                    : 'bg-white/5 border-white/10 text-slate-400 group-hover:border-white/20'
-                                            }`}
-                                        >
-                                            {i + 1}
-                                        </span>
-                                        {p.name}
-                                    </span>
-                                    <span className="text-slate-400">{p.cat}</span>
-                                    <span className="font-mono font-semibold text-slate-300">
-                                        {p.sold.toLocaleString('id-ID')} Porsi
-                                    </span>
-                                    <span
-                                        className={`font-bold font-mono ${isNanoBanana ? 'text-amber-400' : 'text-emerald-400'}`}
-                                    >
-                                        {formatRupiah(p.rev)}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </Glass>
+                    <TopProductsTable
+                        products={products}
+                        isNanoBanana={isNanoBanana}
+                        isGlobal={isGlobal}
+                        selectedOutlet={selectedOutlet}
+                    />
                 </div>
             </Screen>
         </MainLayout>
