@@ -511,7 +511,8 @@ function POSInner({ posMenu = [] }: { posMenu?: PosMenuItem[] | { data?: PosMenu
                                     ) : (
                                         <div className="grid grid-cols-2 gap-3 auto-rows-max">
                                             {(Array.isArray(servedQueue) ? servedQueue : []).map((order) => {
-                                                const isTakeAway = order.table.toLowerCase().includes('takeaway');
+                                                const isTakeAway =
+                                                    order.table?.toLowerCase().includes('takeaway') ?? false;
                                                 return (
                                                     <button
                                                         key={order.id}
